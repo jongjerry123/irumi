@@ -6,7 +6,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>이루미 메인!! 한번더111</title>
+<title>일름이</title>
 <style>
 body {
 	background-color: #111;
