@@ -7,7 +7,11 @@
 <head>
 <meta charset="UTF-8">
 
+<<<<<<< HEAD
 <title>이루미 메인154321</title>
+=======
+<title>irumi!</title>
+>>>>>>> 0028203c2fcc2f3e0d632eb9678fbe0460419967
 <style>
 body {
 	background-color: #111;
@@ -142,7 +146,7 @@ header {
         location.href = 'Ai.do';
     }
     function moveToDash() {
-        location.href = 'viewDash.do';
+        location.href = 'dashboard.do';
     }
     function moveToCommu() {
         location.href = 'viewPost.do';

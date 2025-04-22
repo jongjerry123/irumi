@@ -27,6 +27,16 @@ public class HomeController {
 		// "/WEB-INF/views/common/main.jsp" 를 찾아서 클라이언트로 내보냄
 	}
 	
+	@RequestMapping("dashboard.do")
+	public String forwardDashView() {
+		return "dashboard/dashboard";
+	}
+	
+	@RequestMapping("Ai.do")
+	public String ViewChatBot() {
+		return "chatbot/start";
+	}
+	
 }
 
 
