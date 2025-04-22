@@ -6,7 +6,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>우상호만세</title>
+<title>IRUMI</title>
 <style>
 body {
 	background-color: #111;
