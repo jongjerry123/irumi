@@ -6,7 +6,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>irumi</title>
+
+<title>이루미 메인154321</title>
 <style>
 body {
 	background-color: #111;
