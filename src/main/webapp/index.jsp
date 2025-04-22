@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Hi</title>
+<title>Irumi</title>
 </head>
 <body>
 <!-- <h1>first welcome page</h1> -->
