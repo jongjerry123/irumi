@@ -6,6 +6,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+
 <title>이루미 메인154321</title>
 <style>
 body {
@@ -141,7 +142,7 @@ header {
         location.href = 'Ai.do';
     }
     function moveToDash() {
-        location.href = 'viewDash.do';
+        location.href = 'dashboard.do';
     }
     function moveToCommu() {
         location.href = 'viewPost.do';
