@@ -2,7 +2,9 @@ package com.project.irumi.chatbot.model.dto;
 
 import java.sql.Date;
 
-public class ChatMsg {
+public class ChatMsg implements java.io.Serializable {
+
+	private static final long serialVersionUID = -8536063013979132015L;
 	private String msgId;
 	private String userId;
 	private String convId;
