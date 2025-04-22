@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 
-<title>이루미 메인154321</title>
+<title>irumi</title>
 <style>
 body {
 	background-color: #111;
