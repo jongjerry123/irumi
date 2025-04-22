@@ -32,6 +32,11 @@ public class HomeController {
 		return "dashboard/dashboard";
 	}
 	
+	@RequestMapping("Ai.do")
+	public String ViewChatBot() {
+		return "chatbot/start";
+	}
+	
 }
 
 
