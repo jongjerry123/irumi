@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+//우상호씨 울지마요
 /**
  * Handles requests for the application home page.
  * 스프링 레거시 프로젝트에서는 컨트롤러는 클래스로 작성함
@@ -25,6 +25,11 @@ public class HomeController {
 		//설정된 뷰리졸버에게로 리턴됨
 		//InternalResourceViewResolver 가 받아서, 앞에 "/WEB-INF/views/" 붙이고, 뒤에 ".jsp" 붙여서
 		// "/WEB-INF/views/common/main.jsp" 를 찾아서 클라이언트로 내보냄
+	}
+	
+	@RequestMapping("dashboard.do")
+	public String forwardDashView() {
+		return "dashboard/dashboard";
 	}
 	
 }

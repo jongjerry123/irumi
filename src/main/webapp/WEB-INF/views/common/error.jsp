@@ -10,7 +10,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>first : error</title>
+<title>irumi : error</title>
 </head>
 <body>
 <h1>오류 발생</h1>
