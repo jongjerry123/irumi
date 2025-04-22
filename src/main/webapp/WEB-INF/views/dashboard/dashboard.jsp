@@ -22,7 +22,7 @@ header {
 	padding: 20px 50px;
 }
 </style>
-<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"/>
+<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 <c:set var="menu" value="dashboard" scope="request" />
