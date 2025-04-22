@@ -8,6 +8,18 @@ public class Dashboard implements java.io.Serializable {
 	private String userGraduate;
 	private double userPoint;
 	
+	public Dashboard() {
+		super();
+	}
+	
+	public Dashboard(String userUniversity, String userDegree, String userGraduate, double userPoint) {
+		super();
+		this.userUniversity = userUniversity;
+		this.userDegree = userDegree;
+		this.userGraduate = userGraduate;
+		this.userPoint = userPoint;
+	}
+	
 	public String getUserUniversity() {
 		return userUniversity;
 	}

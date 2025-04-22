@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 
-<title>irumi!</title>
+<title>irumi</title>
 <style>
 body {
 	background-color: #111;
