@@ -26,7 +26,7 @@ public class HomeController {
 		//InternalResourceViewResolver 가 받아서, 앞에 "/WEB-INF/views/" 붙이고, 뒤에 ".jsp" 붙여서
 		// "/WEB-INF/views/common/main.jsp" 를 찾아서 클라이언트로 내보냄
 	}
-	
+	// 테스트
 }
 
 
