@@ -39,3 +39,11 @@ pom.xml
 
 # 기타
 .vscode/
+
+# IntelliJ 관련
+.idea/
+*.iml
+out/
+
+# Smart Tomcat 로컬 설정 제외
+.smarttomcat/
