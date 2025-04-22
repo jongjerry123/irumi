@@ -5,7 +5,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>irumi</title>
+<title>irumi : footer</title>
 <style type="text/css">
   body {
     margin: 0;
