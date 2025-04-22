@@ -5,7 +5,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title></title>
+<title>irumi : footer</title>
 <style type="text/css">
   body {
     margin: 0;
@@ -89,21 +89,18 @@
 </style>
 </head>
 <body>
-
-<%
-  String currentMenu = request.getParameter("menu");
-  if (currentMenu == null) currentMenu = "community";
-  request.setAttribute("currentMenu", currentMenu);
-%>
+<c:if test="${empty menu}">
+  <c:set var="menu" value="community" scope="request" />
+</c:if>
 
 <div class="floating-menu">
   <!-- 메인 아이콘 -->
   <div class="main-icon">
     <c:choose>
-      <c:when test="${currentMenu eq 'dashboard'}">
+      <c:when test="${menu eq 'dashboard'}">
         <img id="activeIcon" src="/irumi/resources/images/dashboard.png" alt="대시보드" />
       </c:when>
-      <c:when test="${currentMenu eq 'chat'}">
+      <c:when test="${menu eq 'chat'}">
         <img id="activeIcon" src="/irumi/resources/images/ai.png" alt="도우미" />
       </c:when>
       <c:otherwise>
@@ -115,19 +112,19 @@
   <!-- 펼쳐지는 메뉴 -->
   <ul class="menu-items">
     <li data-icon="<c:url value='/resources/icons/chart-icon.png' />"
-        class="${currentMenu eq 'dashboard' ? 'active' : ''}"
-        onclick="location.href = 'viewDash.do'">
+        class="${menu eq 'dashboard' ? 'active' : ''}"
+        onclick="location.href = 'dashboard.do'">
       <img src="/irumi/resources/images/dashboard.png" alt="대시보드" class="icon-img" />
       <span>스펙 대시보드</span>
     </li>
     <li data-icon="<c:url value='/resources/icons/chat-icon.png' />"
-        class="${currentMenu eq 'chat' ? 'active' : ''}"
+        class="${menu eq 'chat' ? 'active' : ''}"
         onclick="location.href = 'Ai.do'">
       <img src="/irumi/resources/images/ai.png" alt="AI" class="icon-img" />
       <span>대화형 도우미</span>
     </li>
     <li data-icon="<c:url value='/resources/icons/globe-icon.png' />"
-        class="${currentMenu eq 'community' ? 'active' : ''}"
+        class="${menu eq 'community' ? 'active' : ''}"
         onclick="location.href = 'viewPost.do'">
       <img src="/irumi/resources/images/community.png" alt="커뮤니티" class="icon-img" />
       <span>유저 커뮤니티</span>
