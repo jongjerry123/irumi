@@ -32,11 +32,18 @@ public class HomeController {
 		return "dashboard/dashboard";
 	}
 	
+
+	@RequestMapping("loginPage.do")
+	public String forwardLoginView() {
+		return "user/login"; // /WEB-INF/views/login.jsp
+	}
+
 	@RequestMapping("Ai.do")
 	public String ViewChatBot() {
 		return "chatbot/start";
 	}
 	
+
 }
 
 
