@@ -1,12 +1,11 @@
 package com.project.irumi.board.dao;
 
 import com.project.irumi.board.dto.PostDTO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Repository;
 
-import jakarta.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
