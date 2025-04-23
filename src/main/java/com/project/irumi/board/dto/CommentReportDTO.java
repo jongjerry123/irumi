@@ -1,4 +1,4 @@
-package com.project.irumi.board.model.dto;
+package com.project.irumi.board.dto;
 //CommentReportDTO.java
 import java.time.LocalDateTime;
 
