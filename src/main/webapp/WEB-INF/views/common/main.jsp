@@ -6,18 +6,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<title>이루미 메인154321</title>
-=======
-<title>irumi!</title>
->>>>>>> 0028203c2fcc2f3e0d632eb9678fbe0460419967
-=======
-
-<title>이루미 메인15</title>
-
->>>>>>> branch 'dntkdgh935-committest' of https://github.com/jongjerry123/irumi.git
+<title>IrumI</title>
 <style>
 body {
 	background-color: #111;
@@ -152,7 +141,7 @@ header {
         location.href = 'Ai.do';
     }
     function moveToDash() {
-        location.href = 'dashboard.do';
+        location.href = 'viewDash.do';
     }
     function moveToCommu() {
         location.href = 'viewPost.do';
