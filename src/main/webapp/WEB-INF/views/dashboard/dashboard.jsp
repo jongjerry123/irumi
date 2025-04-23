@@ -26,6 +26,7 @@ header {
 }
 </style>
 <script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
+
 <script>
 $(function() {
 	$.ajax({
@@ -41,6 +42,7 @@ $(function() {
 	});
 });
 </script>
+
 </head>
 <body>
 <c:set var="menu" value="dashboard" scope="request" />
