@@ -9,17 +9,3 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-public class BoardController {
-
-    @Autowired
-    private PostService postService;
-
-    @RequestMapping("/viewPost.do")
-    public String viewPost(@RequestParam(name = "type", defaultValue = "qna") String type, Model model) {
-        List<PostDTO> posts = postService.getPostsByType(type);
-        model.addAttribute("postList", posts);
-        model.addAttribute("selectedType", type);
-        return "board/postlist";
-    }
-}
