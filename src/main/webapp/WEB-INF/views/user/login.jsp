@@ -101,11 +101,11 @@
 <div class="login-container">
     <div class="login-box">
         <h2>로그인</h2>
-        <form action="loginCheck.do" method="post">
+        <form action="login.do" method="post">
             <input type="text" name="userId" placeholder="아이디 입력" id="userId" required>
             <input type="password" name="userPwd" placeholder="*********" id="userPwd" required>
             <button type="submit" class="login-btn" id="loginBtn" disabled>로그인</button>
-            <button type="button" class="signup-btn" onclick="location.href='signup.do'">회원가입</button>
+            <button type="button" class="signup-btn" onclick="location.href='resister.do'">회원가입</button>
         </form>
 
         <div class="helper-links">
