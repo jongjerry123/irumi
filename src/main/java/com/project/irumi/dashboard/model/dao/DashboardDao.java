@@ -16,4 +16,8 @@ public class DashboardDao {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectUserSpec", userId);
 	}
 	
+	public int updateDashboard(Dashboard dashboard) {
+		return sqlSessionTemplate.update("dashboardMapper.updateDashboard", dashboard);
+	}
+	
 }

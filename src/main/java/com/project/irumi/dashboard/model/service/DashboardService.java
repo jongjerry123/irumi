@@ -5,4 +5,6 @@ import com.project.irumi.dashboard.model.dto.Dashboard;
 public interface DashboardService {
 	
 	Dashboard selectUserSpec(String userId);
+	int updateDashboard(Dashboard dashboard);
+	
 }
