@@ -1,4 +1,4 @@
-package com.project.irumi.board.dto;
+package com.project.irumi.board.model.dto;
 
 
 import java.sql.Date;
