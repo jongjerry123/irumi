@@ -16,5 +16,10 @@ public class DashboardServiceImpl implements DashboardService {
 	public Dashboard selectUserSpec(String userId) {
 		return dashboardDao.selectUserSpec(userId);
 	}
+
+	@Override
+	public int updateDashboard(Dashboard dashboard) {
+		return dashboardDao.updateDashboard(dashboard);
+	}
 	
 }

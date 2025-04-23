@@ -56,7 +56,7 @@ CREATE TABLE TB_USER (
     USER_UNIVERSITY    VARCHAR2(100),
     USER_DEGREE        VARCHAR2(30),
     USER_GRADUATE     VARCHAR2(10),
-    USER_POINT         NUMBER,
+    USER_POINT         NUMBER(3,2),
     USER_AUTHORITY     VARCHAR2(50) DEFAULT '유저' NOT NULL,
     USER_LOGIN_TYPE    NUMBER NOT NULL,
     USER_SOCIAL_ID      VARCHAR2(50),
@@ -318,7 +318,7 @@ INSERT INTO TB_USER (
     USER_AUTHORITY,
     USER_LOGIN_TYPE
 ) VALUES (
-    'user0', 'user0', '관리자, 일반로그인', 'user0@user0.com', SYSDATE, NULL, NULL, NULL, 100000, '2', 1
+    'user0', 'user0', '관리자, 일반로그인', 'user0@user0.com', SYSDATE, '해병대', '병사', '졸업', 2.3, '2', 1
 );
 
 -- 일반유저, 일반 로그인
@@ -335,7 +335,7 @@ INSERT INTO TB_USER (
     USER_AUTHORITY,
     USER_LOGIN_TYPE
 ) VALUES (
-    'user1', 'user1', '일반유저, 일반로그인', 'user1@user1.com', SYSDATE, NULL, NULL, NULL, 100000, '1', 1
+    'user1', 'user1', '일반유저, 일반로그인', 'user1@user1.com', SYSDATE, NULL, NULL, NULL, 4.11, '1', 1
 );
 
 -- 일반유저, 소셜(네이버) 로그인
@@ -352,7 +352,7 @@ INSERT INTO TB_USER (
     USER_AUTHORITY,
     USER_LOGIN_TYPE
 ) VALUES (
-    'user2', 'user2', '일반유저, 소셜로그인', 'user2@user2.com', SYSDATE, NULL, NULL, NULL, 100000, '1', 2
+    'user2', 'user2', '일반유저, 소셜로그인', 'user2@user2.com', SYSDATE, NULL, NULL, NULL, 4.01, '1', 2
 );
 
 -- 불량유저, 일반 로그인
@@ -369,7 +369,7 @@ INSERT INTO TB_USER (
     USER_AUTHORITY,
     USER_LOGIN_TYPE
 ) VALUES (
-    'user3', 'user3', '불량유저, 일반로그인', 'user3@user3.com', SYSDATE, NULL, NULL, NULL, 100000, '3', 1
+    'user3', 'user3', '불량유저, 일반로그인', 'user3@user3.com', SYSDATE, NULL, NULL, NULL, 3.5, '3', 1
 );
 
 -- 탈퇴유저, 일반 로그인
@@ -386,7 +386,7 @@ INSERT INTO TB_USER (
     USER_AUTHORITY,
     USER_LOGIN_TYPE
 ) VALUES (
-    'user4', 'user4', '탈퇴유저, 일반로그인', 'user4@user4.com', SYSDATE, NULL, NULL, NULL, 100000, '4', 1
+    'user4', 'user4', '탈퇴유저, 일반로그인', 'user4@user4.com', SYSDATE, NULL, NULL, NULL, 1.9, '4', 1
 );
 
 
