@@ -1,5 +1,10 @@
 package com.project.irumi.chatbot.controller;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import com.project.irumi.chatbot.context.ConvSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -7,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class ChatbotController {
+
+  @Autowired
+	private ConvSessionManager convManager;
 
 	@RequestMapping("startActRecChat.do")
 	public String ViewActChatBot() {
@@ -27,5 +35,6 @@ public class ChatbotController {
 	public String ViewScheduleChatBot() {
 		return "chatbot/schedule";
 	}
+
 	
 }
