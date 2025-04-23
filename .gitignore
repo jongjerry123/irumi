@@ -12,7 +12,9 @@ build/
 # 로그파일
 
 *.log
- */logs/*
+*/logs/*
+*.log*
+
 
 # 운영체제별 불필요 파일
 .DS_Store
