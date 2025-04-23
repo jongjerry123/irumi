@@ -48,6 +48,7 @@ public class HomeController {
 	    return "board/boardListView";  // board/boardListView.jsp 로 이동
 	}
 
+	
 }
 
 
