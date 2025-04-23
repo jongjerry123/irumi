@@ -4,7 +4,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>로그인 - irumi</title>
+    <title>로그인 - Irumi</title>
     <style>
         body {
             background-color: #111;
