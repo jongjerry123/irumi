@@ -43,6 +43,10 @@ public class HomeController {
 		return "chatbot/start";
 	}
 	
+	@RequestMapping("boardPage.do")
+	public String forwardBoardListView() {
+	    return "board/boardListView";  // board/boardListView.jsp 로 이동
+	}
 
 }
 
