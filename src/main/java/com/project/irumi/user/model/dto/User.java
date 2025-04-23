@@ -20,7 +20,7 @@ public class User implements java.io.Serializable{
 	private String userSocialId;
 	private String emailVerification;
 	private String emailVerificationToken;
-	private java.time.LocalDateTime emailTokenExpiry;
+	private java.sql.Date emailTokenExpiry;
 	
 	//constructor
 	public User() {
@@ -29,7 +29,7 @@ public class User implements java.io.Serializable{
 	public User(String userId, String userPwd, String userName, String userEmail, Date registDate,
 			String userUniversity, String userDegree, String userGradulate, int userPoint, String userAuthority,
 			int userLoginType, String userSocialId, String emailVerification, String emailVerificationToken,
-			LocalDateTime emailTokenExpiry) {
+			Date emailTokenExpiry) {
 		super();
 		this.userId = userId;
 		this.userPwd = userPwd;
@@ -133,10 +133,10 @@ public class User implements java.io.Serializable{
 	public void setEmailVerificationToken(String emailVerificationToken) {
 		this.emailVerificationToken = emailVerificationToken;
 	}
-	public LocalDateTime getEmailTokenExpiry() {
+	public Date getEmailTokenExpiry() {
 		return emailTokenExpiry;
 	}
-	public void setEmailTokenExpiry(LocalDateTime emailTokenExpiry) {
+	public void setEmailTokenExpiry(Date emailTokenExpiry) {
 		this.emailTokenExpiry = emailTokenExpiry;
 	}
 	public static long getSerialversionuid() {
