@@ -14,7 +14,7 @@ public class User implements java.io.Serializable{
 	private String userUniversity;
 	private String userDegree;
 	private String userGradulate;
-	private int userPoint;
+	private double userPoint;
 	private String userAuthority;
 	private int userLoginType;
 	private String userSocialId;
@@ -97,7 +97,7 @@ public class User implements java.io.Serializable{
 	public void setUserGradulate(String userGradulate) {
 		this.userGradulate = userGradulate;
 	}
-	public int getUserPoint() {
+	public double getUserPoint() {
 		return userPoint;
 	}
 	public void setUserPoint(int userPoint) {
