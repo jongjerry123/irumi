@@ -7,6 +7,16 @@
 <head>
 <meta charset="UTF-8">
 <title>chatbot</title>
+<script>
+
+	function moveJobPage() {
+		location.href = 'startJobRecChat.do';
+	}
+
+	function moveActPage() {
+		location.href = 'startActRecChat.do';
+	}
+</script>
 <style>
 body {
 	background-color: #111;
@@ -29,8 +39,10 @@ header {
 <body>
 <c:import url="/WEB-INF/views/common/header.jsp"></c:import>
 <hr>
-<input type="text">챗봇
-
+<h1>챗봇 시작화면</h1>
+<hr>
+<button onclick="moveJobPage();">직무 페이지로 이동</button>
+<button onclick="moveActPage();">활동 페이지로 이동</button>
 
 
 
