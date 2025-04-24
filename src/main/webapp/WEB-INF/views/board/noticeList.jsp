@@ -122,7 +122,7 @@
   <div class="filters">
     <div></div>
     <div class="board-header">
-      <c:if test="${loginUserLoginType == 2}">
+      <c:if test="${loginUser.userAuthority == '2'}">
         <button class="write-btn" onclick="location.href='board/writePost.do?type=notice'">✏ 공지 등록</button>
       </c:if>
     </div>
