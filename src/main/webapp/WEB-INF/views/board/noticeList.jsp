@@ -106,6 +106,13 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .admin-btn {
+      background-color: #222;
+      border: 1px solid #fff;
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -116,6 +123,13 @@
       <button onclick="location.href='freeBoard.do'">자유 게시판</button>
       <button onclick="location.href='qnaList.do'">Q&A</button>
       <button class="active">공지사항</button>
+
+      <!-- 관리자만 보는 벨 버튼 -->
+      <c:if test="${loginUser.userAuthority == '2'}">
+        <button class="admin-btn" onclick="location.href='badUserManage.do'">
+          <img src="resources/img/bell.png" alt="관리자 알림" height="20" />
+        </button>
+      </c:if>
     </div>
   </div>
 
