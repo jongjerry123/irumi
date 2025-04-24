@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/common/header.jsp" />
@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>불량 이용자 관리</title>
+  <title>신고된 댓글 관리</title>
   <style>
     body {
       margin: 0;
@@ -15,7 +15,6 @@
       background-color: #111;
       color: #fff;
     }
-
     .main-content {
       padding: 40px 140px;
       max-width: 1280px;
@@ -102,11 +101,6 @@
       cursor: pointer;
     }
 
-    .btn-danger {
-      border: 1px solid #ff4c4c;
-      color: #ff4c4c;
-    }
-
     .pagination {
       display: flex;
       gap: 10px;
@@ -137,7 +131,7 @@
 </head>
 <body>
 <div class="main-content">
-  <!-- 상단 카테고리 + 벨 버튼 -->
+  <!-- 상단 카테고리 + 벨 버튼 우측 배치 -->
   <div class="category-bar">
     <div class="tabs">
       <button onclick="location.href='boardPage.do'">자유 주제</button>
@@ -151,56 +145,55 @@
     </c:if>
   </div>
 
-  <!-- 탭 메뉴 -->
+  <!-- 신고 카테고리 탭 -->
   <div class="tabs" style="margin-top: 30px;">
     <button onclick="location.href='reportedPosts.do'">신고된 게시글</button>
-    <button onclick="location.href='reportedComments.do'">신고된 댓글</button>
-    <button class="active">불량 이용자 목록</button>
+    <button class="active">신고된 댓글</button>
+    <button onclick="location.href='badUserList.do'">불량 이용자 목록</button>
   </div>
 
-  <!-- 테이블 -->
+  <!-- 댓글 목록 테이블 -->
   <table>
     <thead>
       <tr>
         <th>작성자</th>
-        <th>등록 사유</th>
+        <th>댓글 내용</th>
         <th>원본 게시글 제목</th>
-        <th>등록 날짜</th>
+        <th>신고수</th>
         <th>선택</th>
       </tr>
     </thead>
     <tbody>
-      <c:forEach var="user" items="${badUserList}">
+      <c:forEach var="comment" items="${reportedCommentList}">
         <tr>
-          <td>${user.userName}</td>
-          <td>${user.reason}</td>
-          <td>${user.originalPostTitle}</td>
-          <td>${user.registDate}</td>
-          <td><input type="checkbox" name="selectedUsers" value="${user.userId}" /></td>
+          <td>${comment.comWrId}</td>
+          <td>${comment.comContent}</td>
+          <td>-</td>
+          <td>${comment.comReportCount}</td>
+          <td><input type="checkbox" name="selectedComments" value="${comment.comId}" /></td>
         </tr>
       </c:forEach>
     </tbody>
   </table>
 
-  <!-- 하단 정보 -->
+  <!-- 하단 총 개수 + 버튼 + 페이지네이션 -->
   <div class="bottom-bar">
-    <div class="left">등록된 불량 이용자 수: ${fn:length(badUserList)}명</div>
+    <div class="left">신고된 댓글 수: ${fn:length(reportedCommentList)}개</div>
     <div class="right">
-      <button class="btn-action">불량 이용자 등록 해제</button>
-      <button class="btn-action btn-danger">탈퇴시키기</button>
+      <button class="btn-action">선택한 댓글 삭제</button>
+      <button class="btn-action">불량 이용자 등록</button>
     </div>
   </div>
 
-  <!-- 페이징 -->
   <div class="pagination">
     <c:if test="${currentPage > 1}">
-      <button onclick="location.href='badUserList.do?page=${currentPage - 1}'">&lt;</button>
+      <button onclick="location.href='reportedComments.do?page=${currentPage - 1}'">&lt;</button>
     </c:if>
     <c:forEach begin="1" end="${totalPages}" var="pageNum">
-      <button onclick="location.href='badUserList.do?page=${pageNum}'" class="${pageNum == currentPage ? 'selected' : ''}">${pageNum}</button>
+      <button onclick="location.href='reportedComments.do?page=${pageNum}'" class="${pageNum == currentPage ? 'selected' : ''}">${pageNum}</button>
     </c:forEach>
     <c:if test="${currentPage < totalPages}">
-      <button onclick="location.href='badUserList.do?page=${currentPage + 1}'">&gt;</button>
+      <button onclick="location.href='reportedComments.do?page=${currentPage + 1}'">&gt;</button>
     </c:if>
   </div>
 </div>

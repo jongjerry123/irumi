@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>불량 이용자 관리</title>
+  <title>신고된 게시글 관리</title>
   <style>
     body {
       margin: 0;
@@ -20,11 +20,19 @@
       max-width: 1280px;
       margin: 0 auto;
     }
+
+    .category-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
     .tabs {
       display: flex;
       gap: 12px;
-      margin-bottom: 30px;
     }
+
     .tabs button {
       background-color: #222;
       color: #fff;
@@ -33,32 +41,57 @@
       border-radius: 10px;
       cursor: pointer;
     }
+
     .tabs .active {
       border: 1px solid #A983A3;
       color: #A983A3;
     }
+
+    .admin-btn {
+      background-color: #222;
+      border: 1px solid #ff4c4c;
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+      margin-left: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin: 40px 0 20px 0;
     }
+
     th, td {
       border: 1px solid #444;
-      padding: 12px;
+      padding: 14px;
       text-align: center;
     }
+
     th {
       background-color: #222;
     }
+
     td {
       background-color: #1a1a1a;
     }
-    .btn-container {
+
+    .bottom-bar {
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 30px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 60px;
     }
+
+    .bottom-bar .left {
+      font-size: 14px;
+    }
+
+    .bottom-bar .right {
+      display: flex;
+      gap: 10px;
+    }
+
     .btn-action {
       background-color: transparent;
       border: 1px solid #A983A3;
@@ -67,24 +100,14 @@
       border-radius: 8px;
       cursor: pointer;
     }
-    .btn-danger {
-      background-color: transparent;
-      border: 1px solid #ff4c4c;
-      color: #ff4c4c;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .total-count {
-      margin-top: 20px;
-      font-size: 14px;
-    }
+
     .pagination {
       display: flex;
-      justify-content: center;
       gap: 10px;
+      justify-content: center;
       margin-top: 20px;
     }
+
     .pagination button {
       background-color: #222;
       color: #fff;
@@ -93,16 +116,43 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
+    .pagination button.selected {
+      border: 1px solid #A983A3;
+      color: #A983A3;
+    }
+
+    input[type="checkbox"] {
+      accent-color: #A983A3;
+      width: 18px;
+      height: 18px;
+    }
   </style>
 </head>
 <body>
 <div class="main-content">
-  <div class="tabs">
+  <!-- 상단 카테고리 + 벨 버튼 오른쪽 위치 -->
+  <div class="category-bar">
+    <div class="tabs">
+      <button onclick="location.href='boardPage.do'">자유 주제</button>
+      <button onclick="location.href='qnaList.do'">QnA</button>
+      <button onclick="location.href='noticeList.do'">공지사항</button>
+    </div>
+    <c:if test="${loginUser.userAuthority == '2'}">
+      <button class="admin-btn" onclick="location.href='badUserList.do'">
+        <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
+      </button>
+    </c:if>
+  </div>
+
+  <!-- 불량탭 버튼들 -->
+  <div class="tabs" style="margin-top: 30px;">
     <button class="active">신고된 게시글</button>
     <button onclick="location.href='reportedComments.do'">신고된 댓글</button>
     <button onclick="location.href='badUserList.do'">불량 이용자 목록</button>
   </div>
 
+  <!-- 테이블 -->
   <table>
     <thead>
       <tr>
@@ -115,22 +165,25 @@
     <tbody>
       <c:forEach var="post" items="${reportedPostList}">
         <tr>
-          <td>${post.writer}</td>
-          <td>${post.title}</td>
-          <td>${post.reportCount}</td>
-          <td><input type="checkbox" name="selectedPosts" value="${post.id}" /></td>
+          <td>${post.postWriter}</td>
+          <td>${post.postTitle}</td>
+          <td>${post.postReportCount}</td>
+          <td><input type="checkbox" name="selectedPosts" value="${post.postId}" /></td>
         </tr>
       </c:forEach>
     </tbody>
   </table>
 
-  <div class="total-count">신고된 게시글 수: ${fn:length(reportedPostList)}개</div>
-
-  <div class="btn-container">
-    <button class="btn-action">선택한 게시글 삭제</button>
-    <button class="btn-action">불량 이용자 등록</button>
+  <!-- 하단 바 (개수 + 버튼) -->
+  <div class="bottom-bar">
+    <div class="left">신고된 게시글 수: ${fn:length(reportedPostList)}개</div>
+    <div class="right">
+      <button class="btn-action">선택한 게시글 삭제</button>
+      <button class="btn-action">불량 이용자 등록</button>
+    </div>
   </div>
 
+  <!-- 페이지네이션 -->
   <div class="pagination">
     <c:if test="${currentPage > 1}">
       <button onclick="location.href='reportedPosts.do?page=${currentPage - 1}'">&lt;</button>

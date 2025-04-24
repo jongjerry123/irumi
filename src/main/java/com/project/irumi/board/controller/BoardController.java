@@ -1,13 +1,14 @@
 package com.project.irumi.board.controller;
 
+import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
 import com.project.irumi.board.service.PostService;
 import com.project.irumi.user.model.dto.User;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 
@@ -88,6 +89,55 @@ public class BoardController {
         postService.insertPost(post);
         return "redirect:noticeList.do";
     }
-    
-   
+
+    // 신고된 게시글 탭
+    @GetMapping("reportedPosts.do")
+    public String showReportedPosts(HttpSession session, Model model,
+                                    @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+            return "redirect:loginPage.do";
+        }
+
+        model.addAttribute("reportedPostList", List.of());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", 1);
+
+        return "board/reportedPosts";
+    }
+
+    // ✅ 신고된 댓글 탭 (최종 버전)
+    @GetMapping("reportedComments.do")
+    public String showReportedComments(HttpSession session, Model model,
+                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+            return "redirect:loginPage.do";
+        }
+
+        int pageSize = 10;
+        int offset = (page - 1) * pageSize;
+
+        model.addAttribute("reportedCommentList", postService.getReportedComments(offset, pageSize));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", (int) Math.ceil((double) postService.countReportedComments() / pageSize));
+
+        return "board/reportedComments";
+    }
+
+    // 불량 이용자 목록 탭
+    @GetMapping("badUserList.do")
+    public String showBadUserList(HttpSession session, Model model,
+                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+            return "redirect:loginPage.do";
+        }
+
+        model.addAttribute("badUserList", List.of());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", 1);
+
+        return "board/badUserList";
+    }
 }
