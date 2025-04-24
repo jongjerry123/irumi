@@ -8,12 +8,20 @@ import com.project.irumi.user.model.dto.User;
 
 @Repository
 public class UserDao {
-	
+
 	@Autowired
 	private SqlSessionTemplate sqlSessionTemplate;
-	
-	  public User selectUser(User user) { 
-		  return sqlSessionTemplate.selectOne("userMapper.selectUser", user); 
-		  }
-	 
+
+	public User selectUser(User user) {
+		return sqlSessionTemplate.selectOne("userMapper.selectUser", user);
+	}
+
+	public int countByUserId(String userId) {
+		return sqlSessionTemplate.selectOne("userMapper.countByUserId", userId);
+	}
+
+	public int insertUser(User user) {
+		return sqlSessionTemplate.insert("userMapper.insertUser", user);
+	}
+
 }
