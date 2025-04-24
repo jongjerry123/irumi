@@ -1,10 +1,14 @@
 package com.project.irumi.dashboard.model.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.project.irumi.dashboard.model.dto.Dashboard;
+import com.project.irumi.dashboard.model.dto.Job;
 
 @Repository("dashboardDao")
 public class DashboardDao {
@@ -18,6 +22,11 @@ public class DashboardDao {
 	
 	public int updateDashboard(Dashboard dashboard) {
 		return sqlSessionTemplate.update("dashboardMapper.updateDashboard", dashboard);
+	}
+	
+	public ArrayList<Job> selectUserJobs(String userId) {
+		List<Job> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserJobs", userId);
+		return (ArrayList<Job>) list;
 	}
 	
 }
