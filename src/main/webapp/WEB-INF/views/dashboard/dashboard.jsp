@@ -15,15 +15,85 @@ body {
 	padding: 0;
 }
 
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
-}
 .education-info {
+	padding: 20px;
+	background: #303030;
+	border-radius: 10px;
+	width: 300px;
+	margin-left: 50px;
+	margin-top: 100px;
 	color: white;
+	float:left;
 }
+
+.menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu li {
+    margin: 20px 0;
+    color: #888;
+    cursor: pointer;
+}
+
+.menu li.active {
+    color: #00f7d7;
+}
+
+.main {
+    margin: auto;
+    padding: 30px;
+    width: 800px;
+    background: #303030;
+	border-radius: 10px;
+}
+
+.header {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.title {
+    font-size: 18px;
+    display: inline-block;
+}
+
+.content h2 {
+    margin-top: 30px;
+}
+
+.job-tags {
+    margin: 15px 0;
+}
+
+.job-tags button {
+    background: none;
+    border: 1px solid #00f7d7;
+    color: #00f7d7;
+    padding: 5px 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.progress-bar {
+    background-color: darkgray;
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress {
+    background-color: #00f7d7;
+    height: 100%;
+    line-height: 20px;
+    text-align: center;
+    color: black;
+}
+
 .buttons {
 	margin-left: auto;
 	display: flex;
@@ -45,6 +115,11 @@ header {
 	background-color: #fff;
 	color: #000;
 }
+
+.buttons button.selected {
+	background-color: #fff;
+	color: #000;
+}
 </style>
 <script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
 <script>
@@ -54,12 +129,16 @@ function movetoUpDash() {
 	location.href = 'upDash.do?userId=user1';
 
 }
+function viewSpecs(jobId) {
+	console.log(jobId);
+}
 // 학력정보를 표시함
 $(function() {
 	$.ajax({
 		url: "userSpecView.do",
 		method: "POST",
 		dataType: "json",
+		contentType: 'application/json; charset:UTF-8',
 		success: function(data) {
 			console.log("Dashboard: " + data);
 			if (data.userUniversity == null) {
@@ -89,9 +168,22 @@ $(function() {
 			
 		},
 		error: function(xhr, status, error) {
-			
 			console.error("에러 발생:", error);
-			
+		}
+	});
+	
+	$.ajax({
+		url: 'userJobView.do',
+		method: 'POST',
+		dataType: 'json',
+		contentType: 'application/json; charset:UTF-8',
+		success: function(data) {
+			$.each(data, function(index, item) {
+				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\')">' + item.jobName + '</button>');
+			});
+		},
+		error: function(xhr, status, error) {
+			console.error("에러 발생:", error);
 		}
 	});
 });
@@ -110,9 +202,13 @@ $(function() {
 
 <!-- header 표시 -->
 <c:import url="/WEB-INF/views/common/header.jsp" />
+<br>
+
+<!-- 대시보드 제목 -->
+<h1 style="text-align: center;">내 스펙 대시보드</h1>
 
 <!-- 학력 정보 표시를 위한 칸 -->
-<div class="education-info" style="padding: 20px; background: #303030; border-radius: 10px; max-width: 400px; margin-left: 50px;">
+<div class="education-info">
 	<h2>학력 정보</h2>
 	<div style="margin-bottom: 10px;">
 		<label id="university">대학교: </label><br>
@@ -131,6 +227,19 @@ $(function() {
 	</div>
 </div>
 
+<!-- 직무, 스펙, 확동 표시 -->
+<div class="main">
+	<div class="content">
+		<h2>목표 직무</h2>
+		<div id="jobs" class="buttons"><!-- 여기에 직무 버튼이 생성됨 --></div>
+		<h2>목표 스펙 달성도</h2>
+		
+		<div class="progress-bar">
+			<div class="progress" style="width: 35%">35%</div>
+		</div>
+		
+	</div>
+</div>
 
 
 
