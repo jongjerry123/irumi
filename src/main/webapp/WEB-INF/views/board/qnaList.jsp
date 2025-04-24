@@ -48,12 +48,14 @@
     .filters {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 20px;
-      min-height: 42px;
+      align-items: center;
+      margin-bottom: 30px;
+      min-height: 50px;
     }
     .board-header {
       display: flex;
       align-items: center;
+      margin-top: 10px;
     }
     .write-btn {
       background-color: #A983A3;
@@ -79,6 +81,7 @@
     table.board-table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 10px;
       margin-bottom: 20px;
     }
     table.board-table th, table.board-table td {
@@ -123,16 +126,18 @@
   <div class="category-bar">
     <h2>커뮤니티</h2>
     <div class="tabs">
-      <button onclick="location.href='freeBoard.do'">자유 주제</button>
+      <button onclick="location.href='freeBoard.do'">자유 게시판</button>
       <button class="active">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
     </div>
   </div>
 
   <div class="filters">
-    <div style="height: 42px;"></div> <!-- 실제 높이 확보 -->
+    <div></div>
     <div class="board-header">
-      <button class="write-btn" onclick="location.href='board/writePost.do?type=qna'">✏ 질문 등록</button>
+      <c:if test="${empty loginUserLoginType || loginUserLoginType == 1}">
+        <button class="write-btn" onclick="location.href='board/writePost.do?type=qna'">✏ 질문 등록</button>
+      </c:if>
     </div>
   </div>
 
@@ -153,7 +158,7 @@
             <td>${post.postWriter}</td>
             <td>
               <c:choose>
-                <c:when test="${loginUser eq post.postWriter || loginUserLoginType == 9}">
+                <c:when test="${loginUser eq post.postWriter || loginUserLoginType == 2}">
                   <a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a>
                 </c:when>
                 <c:otherwise>
