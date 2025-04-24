@@ -1,11 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/common/header.jsp" />
 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>공지사항</title>
   <style>
     body {
@@ -44,22 +45,30 @@
       border: 1px solid #A983A3;
       color: #A983A3;
     }
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      min-height: 50px;
+    }
     .board-header {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 20px;
+      align-items: center;
+      margin-top: 10px;
     }
-    .board-header .write-btn {
+    .write-btn {
       background-color: #A983A3;
-      color: #fff;
       border: none;
       padding: 10px 20px;
       border-radius: 8px;
+      color: #fff;
       cursor: pointer;
     }
     table.board-table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 10px;
       margin-bottom: 20px;
     }
     table.board-table th, table.board-table td {
@@ -76,11 +85,6 @@
     table.board-table td:nth-child(2) {
       text-align: left;
       padding-left: 20px;
-      width: 70%;
-    }
-    table.board-table td:nth-child(1),
-    table.board-table td:nth-child(3) {
-      width: 15%;
     }
     .empty-message {
       text-align: center;
@@ -88,53 +92,83 @@
       font-size: 16px;
       color: #aaa;
     }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .pagination button {
+      background-color: #222;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div class="main-content">
-    <div class="category-bar">
-      <h2>공지사항</h2>
-      <div class="tabs">
-        <button onclick="location.href='boardPage.do'">자유게시판</button>
-        <button onclick="location.href='qnaList.do'">Q&amp;A</button>
-        <button class="active" onclick="location.href='noticeList.do'">공지사항</button>
-      </div>
+<div class="main-content">
+  <div class="category-bar">
+    <h2>커뮤니티</h2>
+    <div class="tabs">
+      <button onclick="location.href='freeBoard.do'">자유 주제</button>
+      <button onclick="location.href='qnaList.do'">Q&A</button>
+      <button class="active">공지사항</button>
     </div>
+  </div>
 
+  <div class="filters">
+    <div></div>
     <div class="board-header">
-      <c:if test="${loginUser.userType eq 'admin'}">
-        <button class="write-btn" onclick="location.href='board/insertPost.do'">✏ 글쓰기</button>
+      <c:if test="${loginUserLoginType == 2}">
+        <button class="write-btn" onclick="location.href='board/writePost.do?type=notice'">✏ 공지 등록</button>
       </c:if>
     </div>
-
-    <table class="board-table">
-      <thead>
-        <tr>
-          <th>작성자</th>
-          <th>글 제목</th>
-          <th>작성일자</th>
-        </tr>
-      </thead>
-      <tbody>
-        <c:choose>
-          <c:when test="${not empty postList}">
-            <c:forEach var="post" items="${postList}">
-              <tr>
-                <td>${post.postWriter}</td>
-                <td>${post.postTitle}</td>
-                <td>${post.postTime}</td>
-              </tr>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-            <tr>
-              <td colspan="3" class="empty-message">등록된 게시글이 없습니다.</td>
-            </tr>
-          </c:otherwise>
-        </c:choose>
-      </tbody>
-    </table>
   </div>
-  <c:import url="/WEB-INF/views/common/footer.jsp" />
+
+  <table class="board-table">
+    <thead>
+    <tr>
+      <th>작성자</th>
+      <th>글 제목</th>
+      <th>작성일자</th>
+    </tr>
+    </thead>
+    <tbody>
+    <c:choose>
+      <c:when test="${not empty postList}">
+        <c:forEach var="post" items="${postList}">
+          <tr>
+            <td>${post.postWriter}</td>
+            <td><a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a></td>
+            <td>${post.postTime}</td>
+          </tr>
+        </c:forEach>
+      </c:when>
+      <c:otherwise>
+        <tr>
+          <td colspan="3" class="empty-message">등록된 게시글이 없습니다.</td>
+        </tr>
+      </c:otherwise>
+    </c:choose>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <c:if test="${currentPage > 1}">
+      <button onclick="location.href='noticeList.do?page=${currentPage - 1}'">&lt;</button>
+    </c:if>
+    <c:forEach begin="1" end="${totalPages}" var="pageNum">
+      <button onclick="location.href='noticeList.do?page=${pageNum}'"
+              class="${pageNum == currentPage ? 'selected' : ''}">${pageNum}</button>
+    </c:forEach>
+    <c:if test="${currentPage < totalPages}">
+      <button onclick="location.href='noticeList.do?page=${currentPage + 1}'">&gt;</button>
+    </c:if>
+  </div>
+</div>
+<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
