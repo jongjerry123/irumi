@@ -113,7 +113,7 @@
   <div class="category-bar">
     <h2>커뮤니티</h2>
     <div class="tabs">
-      <button onclick="location.href='freeBoard.do'">자유 주제</button>
+      <button onclick="location.href='freeBoard.do'">자유 게시판</button>
       <button onclick="location.href='qnaList.do'">Q&A</button>
       <button class="active">공지사항</button>
     </div>

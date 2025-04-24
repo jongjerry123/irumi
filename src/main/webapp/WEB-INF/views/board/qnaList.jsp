@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Q&A</title>
+  <title>커뮤니티</title>
   <style>
     body {
       margin: 0;
@@ -45,17 +45,22 @@
       border: 1px solid #A983A3;
       color: #A983A3;
     }
+    .admin-btn {
+      background-color: #222;
+      border: 1px solid #fff;
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+    }
     .filters {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
-      min-height: 50px;
+      margin-bottom: 40px;
     }
-    .board-header {
+    .filters-left {
       display: flex;
-      align-items: center;
-      margin-top: 10px;
+      gap: 12px;
     }
     .write-btn {
       background-color: #A983A3;
@@ -65,23 +70,9 @@
       color: #fff;
       cursor: pointer;
     }
-    .question-btn {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 30px;
-    }
-    .question-btn button {
-      background-color: #111;
-      border: 1px solid #A983A3;
-      color: #A983A3;
-      padding: 10px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
     table.board-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
       margin-bottom: 20px;
     }
     table.board-table th, table.board-table td {
@@ -98,6 +89,7 @@
     table.board-table td:nth-child(2) {
       text-align: left;
       padding-left: 20px;
+      width: 60%;
     }
     .empty-message {
       text-align: center;
@@ -105,18 +97,42 @@
       font-size: 16px;
       color: #aaa;
     }
-    .pagination {
+    .board-footer {
       display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
+      flex-direction: column;
+      align-items: stretch;
+      margin-top: 30px;
+      gap: 12px;
     }
-    .pagination button {
+    .board-footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .board-footer .pagination {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .board-footer .pagination button {
       background-color: #222;
       color: #fff;
       border: none;
       padding: 8px 14px;
       border-radius: 6px;
+      cursor: pointer;
+    }
+    .question-btn {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 30px;
+    }
+    .question-btn button {
+      background-color: #111;
+      border: 1px solid #A983A3;
+      color: #A983A3;
+      padding: 10px 24px;
+      border-radius: 8px;
       cursor: pointer;
     }
   </style>
@@ -135,10 +151,18 @@
   <div class="filters">
     <div></div>
     <div class="board-header">
-      <c:if test="${empty loginUserLoginType || loginUserLoginType == 1}">
+  <c:choose>
+    <c:when test="${not empty loginUser}">
+      <c:if test="${loginUserLoginType != 2}">
         <button class="write-btn" onclick="location.href='board/writePost.do?type=qna'">✏ 질문 등록</button>
       </c:if>
-    </div>
+    </c:when>
+    <c:otherwise>
+      <!-- 자유게시판과 동일하게 로그인 페이지 경로 사용 -->
+      <button class="write-btn" onclick="location.href='loginPage.do'">✏ 질문 등록</button>
+    </c:otherwise>
+  </c:choose>
+</div>
   </div>
 
   <table class="board-table">
