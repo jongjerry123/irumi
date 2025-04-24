@@ -35,12 +35,16 @@
 
         .login-box input {
             width: 100%;
-            padding: 10px;
+            padding: 10px; /* 버튼과 패딩 통일 */
+            height: 40px; /* 버튼과 높이 명시적 통일 */
             margin-bottom: 10px;
             border: none;
             border-radius: 6px;
             background-color: #333;
             color: white;
+            box-sizing: border-box;
+            font-size: 14px; /* 폰트 크기 통일 */
+            line-height: 20px; /* 라인 높이 조정 */
         }
 
         .login-btn {
@@ -49,9 +53,13 @@
             border: none;
             width: 100%;
             padding: 10px;
+            height: 40px; /* 입력 창과 높이 통일 */
             border-radius: 6px;
             margin-bottom: 10px;
             cursor: pointer;
+            box-sizing: border-box;
+            font-size: 14px;
+            line-height: 20px;
         }
 
         .login-btn:disabled {
@@ -66,9 +74,13 @@
             border: none;
             width: 100%;
             padding: 10px;
+            height: 40px;
             border-radius: 6px;
             margin-bottom: 20px;
             cursor: pointer;
+            box-sizing: border-box;
+            font-size: 14px;
+            line-height: 20px;
         }
 
         .helper-links {
@@ -102,8 +114,8 @@
     <div class="login-box">
         <h2>로그인</h2>
         <form action="login.do" method="post">
-            <input type="text" name="userId" placeholder="아이디 입력" id="userId" required>
-            <input type="password" name="userPwd" placeholder="*********" id="userPwd" required>
+            <input type="text" name="userId" placeholder="아이디 입력" id="userId" maxlength="12" required>
+            <input type="password" name="userPwd" placeholder="*********" id="userPwd" maxlength="16" required>
             <button type="submit" class="login-btn" id="loginBtn" disabled>로그인</button>
             <button type="button" class="signup-btn" onclick="location.href='resister.do'">회원가입</button>
         </form>
