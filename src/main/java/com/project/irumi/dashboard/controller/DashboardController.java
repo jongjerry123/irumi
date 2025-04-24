@@ -1,5 +1,7 @@
 package com.project.irumi.dashboard.controller;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.project.irumi.dashboard.model.dto.Dashboard;
+import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
 
@@ -69,6 +72,21 @@ public class DashboardController {
 			model.addAttribute("message", "학력 정보 수정 실패! 확인하고 다시 가입해 주세요.");
 			return "common/error";
 		}
+	}
+	
+	@RequestMapping(value = "userJobView.do", method = RequestMethod.POST, produces = "application/json; charset:UTF-8")
+	@ResponseBody
+	public ArrayList<Job> selectUserJobs(Model model, HttpSession session) {
+		
+		// 로그인 유저 불러오기
+		// User loginUser = (User) session.getAttribute("loginUser");	//로그인 기능 완성되면 주석 풀기
+		// return dashboardService.selectUserJobs(loginUser.getUserId());
+		
+		// TODO: 테스트용임. 로그인기능 완성되면 지우고 위의 주석 제거
+		return dashboardService.selectUserJobs("user0");
+		
+		
+		
 	}
 	
 }
