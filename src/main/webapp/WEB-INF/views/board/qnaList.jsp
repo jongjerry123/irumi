@@ -145,6 +145,11 @@
       <button onclick="location.href='freeBoard.do'">자유 게시판</button>
       <button class="active">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
+      <c:if test="${loginUser.userAuthority == '2'}">
+  <button class="admin-btn" onclick="location.href='badUserList.do'">
+    <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
+  </button>
+</c:if>
     </div>
   </div>
 

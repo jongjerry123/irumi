@@ -15,17 +15,24 @@
       background-color: #111;
       color: #fff;
     }
+
     .main-content {
       padding: 40px 140px;
       max-width: 1280px;
       margin: 0 auto;
     }
 
-    .category-bar {
+    .top-bar {
       display: flex;
       align-items: center;
-      gap: 20px;
+      justify-content: space-between;
       margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-right: 30px;
     }
 
     .tabs {
@@ -52,8 +59,8 @@
       border: 1px solid #ff4c4c;
       border-radius: 10px;
       padding: 8px;
+      margin-left: auto;
       cursor: pointer;
-      margin-left: 20px;
     }
 
     table {
@@ -131,13 +138,17 @@
 </head>
 <body>
 <div class="main-content">
-  <!-- 상단 카테고리 + 벨 버튼 오른쪽 위치 -->
-  <div class="category-bar">
+
+  <!-- 상단 제목 + 카테고리 + 벨 버튼 -->
+  <div class="top-bar">
+    <h2 class="section-title">불량 이용자 관리</h2>
+
     <div class="tabs">
       <button onclick="location.href='boardPage.do'">자유 주제</button>
       <button onclick="location.href='qnaList.do'">QnA</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
     </div>
+
     <c:if test="${loginUser.userAuthority == '2'}">
       <button class="admin-btn" onclick="location.href='badUserList.do'">
         <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
@@ -145,7 +156,7 @@
     </c:if>
   </div>
 
-  <!-- 불량탭 버튼들 -->
+  <!-- 신고탭 -->
   <div class="tabs" style="margin-top: 30px;">
     <button class="active">신고된 게시글</button>
     <button onclick="location.href='reportedComments.do'">신고된 댓글</button>
@@ -174,7 +185,7 @@
     </tbody>
   </table>
 
-  <!-- 하단 바 (개수 + 버튼) -->
+  <!-- 하단 -->
   <div class="bottom-bar">
     <div class="left">신고된 게시글 수: ${fn:length(reportedPostList)}개</div>
     <div class="right">
@@ -183,7 +194,7 @@
     </div>
   </div>
 
-  <!-- 페이지네이션 -->
+  <!-- 페이징 -->
   <div class="pagination">
     <c:if test="${currentPage > 1}">
       <button onclick="location.href='reportedPosts.do?page=${currentPage - 1}'">&lt;</button>
@@ -195,6 +206,7 @@
       <button onclick="location.href='reportedPosts.do?page=${currentPage + 1}'">&gt;</button>
     </c:if>
   </div>
+
 </div>
 <c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>

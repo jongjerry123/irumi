@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/common/header.jsp" />
@@ -15,17 +15,24 @@
       background-color: #111;
       color: #fff;
     }
+
     .main-content {
       padding: 40px 140px;
       max-width: 1280px;
       margin: 0 auto;
     }
 
-    .category-bar {
+    .top-bar {
       display: flex;
       align-items: center;
-      gap: 20px;
+      justify-content: space-between;
       margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-right: 30px;
     }
 
     .tabs {
@@ -42,18 +49,18 @@
       cursor: pointer;
     }
 
-    .tabs .active {
-      border: 1px solid #A983A3;
-      color: #A983A3;
-    }
-
     .admin-btn {
       background-color: #222;
       border: 1px solid #ff4c4c;
       border-radius: 10px;
       padding: 8px;
+      margin-left: auto;
       cursor: pointer;
-      margin-left: 20px;
+    }
+
+    .tabs .active {
+      border: 1px solid #A983A3;
+      color: #A983A3;
     }
 
     table {
@@ -131,13 +138,16 @@
 </head>
 <body>
 <div class="main-content">
-  <!-- 상단 카테고리 + 벨 버튼 우측 배치 -->
-  <div class="category-bar">
+  <!-- ✅ 커뮤니티 스타일 구조 반영 -->
+  <div class="top-bar">
+    <h2 class="section-title">불량 이용자 관리</h2>
+
     <div class="tabs">
       <button onclick="location.href='boardPage.do'">자유 주제</button>
       <button onclick="location.href='qnaList.do'">QnA</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
     </div>
+
     <c:if test="${loginUser.userAuthority == '2'}">
       <button class="admin-btn" onclick="location.href='badUserList.do'">
         <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
@@ -152,7 +162,7 @@
     <button onclick="location.href='badUserList.do'">불량 이용자 목록</button>
   </div>
 
-  <!-- 댓글 목록 테이블 -->
+  <!-- 댓글 테이블 -->
   <table>
     <thead>
       <tr>
@@ -176,7 +186,7 @@
     </tbody>
   </table>
 
-  <!-- 하단 총 개수 + 버튼 + 페이지네이션 -->
+  <!-- 하단 정보 -->
   <div class="bottom-bar">
     <div class="left">신고된 댓글 수: ${fn:length(reportedCommentList)}개</div>
     <div class="right">
@@ -185,6 +195,7 @@
     </div>
   </div>
 
+  <!-- 페이징 -->
   <div class="pagination">
     <c:if test="${currentPage > 1}">
       <button onclick="location.href='reportedComments.do?page=${currentPage - 1}'">&lt;</button>

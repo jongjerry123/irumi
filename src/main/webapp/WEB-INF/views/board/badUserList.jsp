@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>불량 이용자 관리</title>
+  <title>불량 이용자 목록</title>
   <style>
     body {
       margin: 0;
@@ -22,11 +22,17 @@
       margin: 0 auto;
     }
 
-    .category-bar {
+    .top-bar {
       display: flex;
       align-items: center;
-      gap: 20px;
+      justify-content: space-between;
       margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-right: 30px;
     }
 
     .tabs {
@@ -53,8 +59,8 @@
       border: 1px solid #ff4c4c;
       border-radius: 10px;
       padding: 8px;
+      margin-left: auto;
       cursor: pointer;
-      margin-left: 20px;
     }
 
     table {
@@ -137,13 +143,16 @@
 </head>
 <body>
 <div class="main-content">
-  <!-- 상단 카테고리 + 벨 버튼 -->
-  <div class="category-bar">
+  <!-- 상단 구조 (타이틀 + 게시판 탭 + 벨버튼) -->
+  <div class="top-bar">
+    <h2 class="section-title">불량 이용자 관리</h2>
+
     <div class="tabs">
       <button onclick="location.href='boardPage.do'">자유 주제</button>
       <button onclick="location.href='qnaList.do'">QnA</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
     </div>
+
     <c:if test="${loginUser.userAuthority == '2'}">
       <button class="admin-btn" onclick="location.href='badUserList.do'">
         <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
@@ -151,7 +160,7 @@
     </c:if>
   </div>
 
-  <!-- 탭 메뉴 -->
+  <!-- 불량 관련 탭 -->
   <div class="tabs" style="margin-top: 30px;">
     <button onclick="location.href='reportedPosts.do'">신고된 게시글</button>
     <button onclick="location.href='reportedComments.do'">신고된 댓글</button>
@@ -182,7 +191,7 @@
     </tbody>
   </table>
 
-  <!-- 하단 정보 -->
+  <!-- 하단 영역 -->
   <div class="bottom-bar">
     <div class="left">등록된 불량 이용자 수: ${fn:length(badUserList)}명</div>
     <div class="right">
