@@ -49,3 +49,9 @@ out/
 
 # Smart Tomcat 로컬 설정 제외
 .smarttomcat/
+
+# eclipse 설정 무시
+.metadata/
+*.prefs
+*.lock
+*.log
