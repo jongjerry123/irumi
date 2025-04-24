@@ -9,21 +9,77 @@
 <title>chatbot 활동 찾기</title>
 <script>
 
-	function moveJobPage() {
-		location.href = 'startJobRecChat.do';
-	}
+function moveJobPage() {
+	location.href = 'startJobRecChat.do';
+}
 
-	function moveSpecPage() {
-		location.href = 'startSpecRecChat.do';
-	}
-	
-	function moveSchedulePage() {
-		location.href = 'startScheduleRecChat.do';
-	}
-	
-	function moveActPage() {
-		location.href = 'startActRecChat.do';
-	}
+function moveSpecPage() {
+	location.href = 'startSpecRecChat.do';
+}
+
+function moveSchedulePage() {
+	location.href = 'startScheduleRecChat.do';
+}
+
+function moveActPage() {
+	location.href = 'startActRecChat.do';
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+	  // 버튼 선택 토글 이벤트
+	  const btns = document.querySelectorAll(".select-btn");
+	  btns.forEach(btn => {
+	    btn.addEventListener("click", function() {
+	      this.classList.toggle("active");
+	    });
+	  });
+
+	  // 채팅 보내기 함수
+	  function sendMessage() {
+	    const userInput = document.getElementById("userInput");
+	    const chatArea = document.getElementById("chatArea");
+	    const message = userInput.value.trim();
+	    if (!message) return;
+
+	    const userDiv = document.createElement("div");
+	    userDiv.className = "message user-msg";
+	    userDiv.textContent = message;
+	    chatArea.appendChild(userDiv);
+
+	    fetch("/chatbot/sendUserMsg.do", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	      body: new URLSearchParams({
+	        convId: "demo-conv-id",
+	        topic: "job",
+	        userMsg: message
+	      })
+	    })
+	    .then(response => response.text())
+	    .then(gptReply => {
+	      const botDiv = document.createElement("div");
+	      botDiv.className = "message bot-msg";
+	      botDiv.textContent = gptReply;
+	      chatArea.appendChild(botDiv);
+	      userInput.value = "";
+	      chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
+	    });
+	  }
+
+	  // 엔터키 이벤트 추가
+	  document.getElementById("userInput").addEventListener("keyup", function(event) {
+	    if (event.key === "Enter") {
+	      sendMessage();
+	    }
+	  });
+
+	  // 버튼 클릭 시 메시지 전송 이벤트 추가
+	  document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
+
+	});
+
 </script>
 <style>
 body {
@@ -90,7 +146,23 @@ body {
 	line-height: 1.7;
 	font-size: 14px;
 	margin-bottom: 30px;
-	height: 500px;
+	height: 700px;
+	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
+    display: flex;
+    flex-direction: column;
+}
+
+.content-box::-webkit-scrollbar {
+  width: 9px;
+  background: #222;
+}
+.content-box::-webkit-scrollbar-thumb {
+  background: #BAAC80;
+  border-radius: 6px;
+}
+.content-box {
+  scrollbar-color: #BAAC80 #222;
+  scrollbar-width: thin;
 }
 
 .right-panel {
@@ -287,6 +359,106 @@ body {
 }
 
 
+
+
+
+.select-group {
+  display: flex;
+  flex-direction: column;  /* 세로 정렬 */
+  align-items: flex-start; /* 좌측 정렬 */
+  gap: 8px;
+}
+
+.select-label {
+  color: #d9d9d9;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;  /* 라벨 아래 약간 여백 */
+}
+
+.select-btn {
+  background: none;
+  border: 1.5px solid #BAAC80;
+  color: #BAAC80;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 7px 20px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  margin-bottom: 4px;  /* 버튼들끼리 간격 */
+}
+
+.select-btn-list {
+  display: flex;
+  flex-direction: row;
+  gap: 8px; /* 버튼 사이 간격 */
+  flex-wrap: nowrap;  
+}
+
+.select-btn.active {
+  background: #BAAC80;
+  color: #232323;
+  font-weight: 700;
+}
+
+/*************************************************************************** */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#userInput {
+  flex: 1;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin-right: 6px;
+  font-size: 15px;
+  outline: none;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  line-height: 1.5;
+  font-size: 0.95em;
+  word-wrap: break-word;
+}
+
+.user-msg {
+  background-color: #BAAC80;
+  color : black;
+  align-self: flex-end;
+  text-align: right;
+  font-weight : bold;
+}
+
+.bot-msg {
+  align-self: flex-start;
+  text-align: left;
+}
+
+/* 추가 - 입력창과 버튼 정렬 */
+.chat-input-box {
+  display: flex;
+  align-items: center;
+  background: #222;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin-top: 10px;
+}
+
 </style>
 </head>
 <body>
@@ -306,21 +478,36 @@ body {
 	
 	<!-- 콘텐츠 영역 -->
 	<div class="content-box">
-		<p>✅ <strong>정보처리기사</strong><br>
-		정보처리기사 입점 관련 사이트입니다.<br>
-		<a href="http://www.정보처리기사사이트.co.kr" style="color:#60a5fa; text-decoration:underline;" target="_blank">
-			www.정보처리기사사이트.co.kr
-		</a><br>
-		사이트에서 원하는 일정을 선택한 후 이곳에 일정</p>
+	  <div class="select-bar">
+    <div class="select-group">
+      <span class="select-label">스펙 대상 직무 선택</span>
+      <div class="select-btn-list">
+      <button class="select-btn active">프론트엔드 개발자</button>
+      <button class="select-btn">백엔드 개발자</button>
+      </div>
+    </div>
+    <div class="select-group">
+      <span class="select-label">일정 대상 스펙 선택</span>
+      <div class="select-btn-list">
+      <button class="select-btn active">정보처리기사</button>
+      <button class="select-btn">OPIC IM 이상</button>
+    </div>
+    </div>
+  </div>
+	
+	
+		<div class="chat-area" id="chatArea">
+				<div class="message bot-msg">무엇을 도와드릴까요?</div>
+			</div>
 	</div>
 	
 	<div class="chat-input-box">
-    <input type="text" placeholder="무엇이든 물어보세요" class="chat-input"/>
-    <button class="chat-send-btn"><i class="fa fa-paper-plane"> > </i></button>
+    <input type="text" placeholder="무엇이든 물어보세요" class="chat-input" id="userInput"/>
+    <button class="chat-send-btn" onclick="sendMessage()"><i class="fa fa-paper-plane"> > </i></button>
 </div>
-	
-	
-</div>
+
+
+		</div>
 
 <!-- Right panel -->
 <div class="right-panel">

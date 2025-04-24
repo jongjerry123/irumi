@@ -37,6 +37,49 @@ function moveActPage() {
         this.classList.toggle("active");
       });
     });
+    
+ // 채팅 보내기 함수
+	  function sendMessage() {
+	    const userInput = document.getElementById("userInput");
+	    const chatArea = document.getElementById("chatArea");
+	    const message = userInput.value.trim();
+	    if (!message) return;
+
+	    const userDiv = document.createElement("div");
+	    userDiv.className = "message user-msg";
+	    userDiv.textContent = message;
+	    chatArea.appendChild(userDiv);
+
+	    fetch("/chatbot/sendUserMsg.do", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	      body: new URLSearchParams({
+	        convId: "demo-conv-id",
+	        topic: "job",
+	        userMsg: message
+	      })
+	    })
+	    .then(response => response.text())
+	    .then(gptReply => {
+	      const botDiv = document.createElement("div");
+	      botDiv.className = "message bot-msg";
+	      botDiv.textContent = gptReply;
+	      chatArea.appendChild(botDiv);
+	      userInput.value = "";
+	      chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
+	    });
+	  }
+
+	  // 엔터키 이벤트 추가
+	  document.getElementById("userInput").addEventListener("keyup", function(event) {
+	    if (event.key === "Enter") {
+	      sendMessage();
+	    }
+	  });
+
+	  // 버튼 클릭 시 메시지 전송 이벤트 추가
+	  document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
+
   });
 </script>
 <style>
@@ -104,7 +147,23 @@ body {
 	line-height: 1.7;
 	font-size: 14px;
 	margin-bottom: 30px;
-	height: 500px;
+	height: 700px;
+	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
+    display: flex;
+    flex-direction: column;
+}
+
+.content-box::-webkit-scrollbar {
+  width: 9px;
+  background: #222;
+}
+.content-box::-webkit-scrollbar-thumb {
+  background: #BAAC80;
+  border-radius: 6px;
+}
+.content-box {
+  scrollbar-color: #BAAC80 #222;
+  scrollbar-width: thin;
 }
 
 .right-panel {
@@ -393,6 +452,64 @@ body {
   color: #232323;
   font-weight: 700;
 }
+
+
+
+/*************************************************************************** */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#userInput {
+  flex: 1;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin-right: 6px;
+  font-size: 15px;
+  outline: none;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  line-height: 1.5;
+  font-size: 0.95em;
+  word-wrap: break-word;
+}
+
+.user-msg {
+  background-color: #BAAC80;
+  color : black;
+  align-self: flex-end;
+  text-align: right;
+  font-weight : bold;
+}
+
+.bot-msg {
+  align-self: flex-start;
+  text-align: left;
+}
+
+/* 추가 - 입력창과 버튼 정렬 */
+.chat-input-box {
+  display: flex;
+  align-items: center;
+  background: #222;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin-top: 10px;
+}
 </style>
 
 <script type="text/javascript">
@@ -441,19 +558,12 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 					</div>
 				</div>
 
-
-				<p>프론트엔드 개발자 직무에 관심이 있으시군요!<br> 프론트엔드 개발자가 되기 위한 스펙을 추천해 드릴까요?<p/>
-					
-				프론트엔드 개발자가 되기 위해서는 다음과 같은 스펙이 도움이 됩니다<br>
-				✅ 1. 정보처리기사 <br>
-				 가장 대표적인 개발 관련 국가자격증 <br>
-				 필기+실기 시험 (CS 전반 지식 필요) <p/>
+	<div class="chat-area" id="chatArea">
+				<div class="message bot-msg">무엇을 도와드릴까요?</div>
+			</div>
 				 
-				 ✅ 2. 영어 자격증 (외국계 or 글로벌 기업 목표 시) <br>
-				 문서 읽기나 메일 커뮤니케이션 수준은 실무에 필요함 <br> 
-				 기본 점수: TOEIC 700 이상 or OPIc IM 이상이면 무난 </p>
 				 
-				 <div class="custom-checkbox-list">
+<!--   <div class="custom-checkbox-list">
 					<label class="custom-checkbox"> 
 					<input type="checkbox"> 
 					<span class="checkbox-text">정보처리기사</span> <span
@@ -461,12 +571,13 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 					</label> <label class="custom-checkbox"> <input type="checkbox">
 						<span class="checkbox-text">OPEC 시험</span> <span class="checkmark">&#10003;</span>
 					</label>
-				</div>
+				</div>    -->
+				 
 			</div>
 	
 	<div class="chat-input-box">
-    <input type="text" placeholder="무엇이든 물어보세요" class="chat-input"/>
-    <button class="chat-send-btn"><i class="fa fa-paper-plane"> > </i></button>
+    <input type="text" placeholder="무엇이든 물어보세요" class="chat-input" id="userInput"/>
+    <button class="chat-send-btn" onclick="sendMessage()"><i class="fa fa-paper-plane"> > </i></button>
 </div>
 	
 	
@@ -490,7 +601,7 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
             </div>
         </div>
 	<div class="manual-input-box">
-    <input type="text" placeholder="직접 활동 입력" class="manual-input"/>
+    <input type="text" placeholder="직접 스펙 입력" class="manual-input"/>
     <button class="add-btn"><i class="fa fa-plus"> + </i></button>
 </div>
 </div>

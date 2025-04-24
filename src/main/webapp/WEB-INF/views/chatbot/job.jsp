@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>chatbot 직무 설정</title>
+<title>chatbot 직무 찾기</title>
 <script>
 
 function moveJobPage() {
@@ -25,6 +25,52 @@ function moveActPage() {
 	location.href = 'startActRecChat.do';
 }
 </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+	  function sendMessage() {
+	    const userInput = document.getElementById("userInput");
+	    const chatArea = document.getElementById("chatArea");
+	    const message = userInput.value.trim();
+	    if (!message) return;
+
+	    const userDiv = document.createElement("div");
+	    userDiv.className = "message user-msg";
+	    userDiv.textContent = message;
+	    chatArea.appendChild(userDiv);
+
+	    fetch("/chatbot/sendUserMsg.do", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	      body: new URLSearchParams({
+	        convId: "demo-conv-id",
+	        topic: "job",
+	        userMsg: message
+	      })
+	    })
+	    .then(response => response.text())
+	    .then(gptReply => {
+	      const botDiv = document.createElement("div");
+	      botDiv.className = "message bot-msg";
+	      botDiv.textContent = gptReply;
+	      chatArea.appendChild(botDiv);
+	      userInput.value = "";
+	      chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
+	    });
+	  }
+
+	  // 엔터키 이벤트 추가
+	  document.getElementById("userInput").addEventListener("keyup", function(event) {
+	    if (event.key === "Enter") {
+	      sendMessage();
+	    }
+	  });
+
+	  // 버튼 클릭 시 메시지 전송 이벤트 추가
+	  document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
+
+  });
+</script>
 <style>
 body {
 	background-color: #111;
@@ -36,15 +82,14 @@ body {
 }
 
 .container {
-    display: flex;
-    min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
-    margin-top: 20px; /* header 높이만큼 아래로 */
+	display: flex;
+	min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
+	margin-top: 20px; /* header 높이만큼 아래로 */
 }
 
 .sidebar, .right-panel {
-    height: auto;   /* 높이 자동 (100vh 등 절대값 X) */
+	height: auto; /* 높이 자동 (100vh 등 절대값 X) */
 }
-
 
 .sidebar {
 	width: 200px;
@@ -55,10 +100,6 @@ body {
 	gap: 20px;
 }
 
-.sidebar h1 {
-	font-size: 24px;
-	font-weight: bold;
-}
 
 .sidebar button {
 	background-color: #222;
@@ -69,7 +110,7 @@ body {
 	cursor: pointer;
 	border-radius: 8px;
 	transition: background 0.3s;
-	text-align : center;
+	text-align: center;
 	font-weight : bold;
 	
 }
@@ -77,7 +118,6 @@ body {
 .sidebar button:hover {
 	background-color: #BAAC80;
 	color: black;
-	
 }
 
 .main {
@@ -88,7 +128,6 @@ body {
 	flex-direction: column;
 }
 
-
 .content-box {
 	background-color: #1e1e1e;
 	padding-right: 20px;
@@ -97,7 +136,23 @@ body {
 	line-height: 1.7;
 	font-size: 14px;
 	margin-bottom: 30px;
-	height : 500px;
+	height: 700px;
+	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
+    display: flex;
+    flex-direction: column;
+}
+
+.content-box::-webkit-scrollbar {
+  width: 9px;
+  background: #222;
+}
+.content-box::-webkit-scrollbar-thumb {
+  background: #BAAC80;
+  border-radius: 6px;
+}
+.content-box {
+  scrollbar-color: #BAAC80 #222;
+  scrollbar-width: thin;
 }
 
 .right-panel {
@@ -109,126 +164,102 @@ body {
 	gap: 30px;
 }
 
-.right-panel h2 {
-	font-size: 16px;
-	margin-bottom: 10px;
-	color: #BAAC80;
+
+.right-panel .spec-value {
+	color: #fff;
+	font-size : 9px;
+	margin-left : 4px;
 }
 
-.right-panel .btn {
-	background: none;
-	border: 1px solid #BAAC80;
-	color: #BAAC80;
-	border-radius: 6px;
-	padding: 6px 10px;
-	margin-bottom: 8px;
-	cursor: pointer;
-	width: 100%;
-	text-align: left;
-	font-size: 13px;
+.right-panel .schedule-value {
+	color: #fff;
+	font-size : 9px;	
+	margin-left : 4px;
 }
+
 
 .chat-input-box .chat-send-btn:hover {
-    background: #BAAC80;
+	background: #BAAC80;
 }
 
 .chat-input-box {
-    display: flex;
-    align-items: center;
-    background: #222;
-    border-radius: 24px;
-    padding: 8px 16px;
-    margin-top: 40px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+	display: flex;
+	align-items: center;
+	background: #222;
+	border-radius: 24px;
+	padding: 8px 16px;
+	margin-top: 40px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 
 .chat-input-box .chat-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 15px;
-    padding: 8px;
-    outline: none;
+	flex: 1;
+	background: transparent;
+	border: none;
+	color: white;
+	font-size: 15px;
+	padding: 8px;
+	outline: none;
 }
 
 .chat-input-box .chat-send-btn {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 50%;
-    background: #D9D9D9;
-    color: #232323;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 10px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background 0.2s;
+	width: 36px;
+	height: 36px;
+	border: none;
+	border-radius: 50%;
+	background: #D9D9D9;
+	color: #232323;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 10px;
+	font-size: 18px;
+	cursor: pointer;
+	transition: background 0.2s;
 }
 
 .chat-input-box .chat-send-btn:hover {
-    background: #BAAC80;
+	background: #BAAC80;
 }
 
 .manual-input-box {
-    display: flex;
-    align-items: center;
-    background: #232323;
-    border-radius: 8px;
-    padding: 6px 10px;
-    margin-top: 12px;
-    gap: 6px;
+	display: flex;
+	align-items: center;
+	background: #232323;
+	border-radius: 8px;
+	padding: 6px 10px;
+	margin-top: 12px;
+	gap: 6px;
 }
 
 .manual-input-box .manual-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: #facc15;
-    font-size: 14px;
-    padding: 8px 4px;
-    outline: none;
+	flex: 1;
+	background: transparent;
+	border: none;
+	color: #facc15;
+	font-size: 14px;
+	padding: 8px 4px;
+	outline: none;
 }
 
 .manual-input-box .add-btn {
-    background: #232323;
-    border: 1px solid #BAAC80;
-    color: #BAAC80;
-    border-radius: 6px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 18px;
-    margin-left: 4px;
+	background: #232323;
+	border: 1px solid #BAAC80;
+	color: #BAAC80;
+	border-radius: 6px;
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 18px;
+	margin-left: 4px;
 }
 
 .manual-input-box .add-btn:hover {
-    background: #BAAC80;
-    color: #232323;
-}
-
-
-.sidebar .checked-list h3 {
-    color: #facc15;
-    font-size: 15px;
-    margin-bottom: 8px;
-}
-
-.sidebar .checked-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.sidebar .checked-list li {
-    color: #fff;
-    font-size: 14px;
-    margin-bottom: 6px;
+	background: #BAAC80;
+	color: #232323;
 }
 
 .content-box .custom-checkbox-list {
@@ -352,6 +383,105 @@ body {
 }
 
 
+
+.select-group {
+  display: flex;
+  flex-direction: column;  /* 세로 정렬 */
+  align-items: flex-start; /* 좌측 정렬 */
+  gap: 8px;
+}
+
+.select-label {
+  color: #d9d9d9;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;  /* 라벨 아래 약간 여백 */
+}
+
+.select-btn {
+  background: none;
+  border: 1.5px solid #BAAC80;
+  color: #BAAC80;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 7px 20px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  margin-bottom: 4px;  /* 버튼들끼리 간격 */
+}
+
+.select-btn-list {
+  display: flex;
+  flex-direction: row;
+  gap: 8px; /* 버튼 사이 간격 */
+  flex-wrap: nowrap;  
+}
+
+.select-btn.active {
+  background: #BAAC80;
+  color: #232323;
+  font-weight: 700;
+}
+
+
+
+/*************************************************************************** */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#userInput {
+  flex: 1;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin-right: 6px;
+  font-size: 15px;
+  outline: none;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  line-height: 1.5;
+  font-size: 0.95em;
+  word-wrap: break-word;
+}
+
+.user-msg {
+  background-color: #BAAC80;
+  color : black;
+  align-self: flex-end;
+  text-align: right;
+  font-weight : bold;
+}
+
+.bot-msg {
+  align-self: flex-start;
+  text-align: left;
+}
+
+/* 추가 - 입력창과 버튼 정렬 */
+.chat-input-box {
+  display: flex;
+  align-items: center;
+  background: #222;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin-top: 10px;
+}
 </style>
 
 <script type="text/javascript">
@@ -371,12 +501,12 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 });
 };
 </script>
-
 </head>
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp"/>
 
  <div class="container">
+
 <!-- Sidebar -->
 		<div class="sidebar">
 			<button onclick="moveJobPage();">직무 찾기</button>
@@ -390,22 +520,12 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 	
 	<!-- 콘텐츠 영역 -->
 			<div class="content-box">
-				<p>소프트웨어 개발 관련 직무는 매우 다양하지만, 주요 직무를 역할과 기술 기반으로 나눠서 설명하면 다음과
-					같아요:
-				<p />
 
-				✅ <strong>프론트엔드 (Front-end) 개발자 </strong> <br> 역할: 사용자가 보는 웹
-				화면(UI)을 개발 <br> 기술: HTML, CSS, JavaScript, React, Vue.js 등
-				<p />
-
-				✅ <strong>백엔드 (Back-end) 개발자 </strong><br> 역할: 서버, 데이터베이스, API
-				등을 개발 기술: Java(Spring), Python(Django), Node.js, MySQL, MongoDB 등
-				<p />
-
-				특별히 원하는 직무 방향이 있으시면, 그에 맞춰 더 구체적인 설명도 해 드릴 수 있어요.
-				</p>
-
-				<div class="custom-checkbox-list">
+	<div class="chat-area" id="chatArea">
+				<div class="message bot-msg">무엇을 도와드릴까요?</div>
+			</div>
+				 
+<!-- <div class="custom-checkbox-list">
 					<label class="custom-checkbox"> 
 					<input type="checkbox"> 
 					<span class="checkbox-text">프론트엔드 개발자</span> <span
@@ -413,12 +533,13 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 					</label> <label class="custom-checkbox"> <input type="checkbox">
 						<span class="checkbox-text">백엔드 개발자</span> <span class="checkmark">&#10003;</span>
 					</label>
-				</div>
+				</div> -->
+				 
 			</div>
-
-			<div class="chat-input-box">
-    <input type="text" placeholder="무엇이든 물어보세요" class="chat-input"/>
-    <button class="chat-send-btn"><i class="fa fa-paper-plane"> > </i></button>
+	
+	<div class="chat-input-box">
+    <input type="text" placeholder="무엇이든 물어보세요" class="chat-input" id="userInput"/>
+    <button class="chat-send-btn" onclick="sendMessage()"><i class="fa fa-paper-plane"> > </i></button>
 </div>
 	
 	

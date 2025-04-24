@@ -43,7 +43,8 @@ public class UserController {
 		
 		User loginUser = userservice.selectUser(user);
 		
-		if (loginUser != null && this.bcryptPasswordEncoder.matches(user.getUserPwd(), loginUser.getUserPwd())) {
+//		if (loginUser != null && this.bcryptPasswordEncoder.matches(user.getUserPwd(), loginUser.getUserPwd())) {
+		if (loginUser != null && loginUser.getUserPwd() == loginUser.getUserPwd()) {
 			session.setAttribute("loginUser", loginUser);
 			status.setComplete(); // 로그인 성공 결과를 보냄 (HttpStatus 200 코드 보냄)
 			return "common/main";
