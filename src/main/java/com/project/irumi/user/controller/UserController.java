@@ -37,6 +37,7 @@ public class UserController {
         return "common/main";
     }
 
+
     @RequestMapping(value = "loginPage.do", method = RequestMethod.GET)
     public String moveToLoginPage() {
         logger.info("moveToLoginPage: Displaying login page");
