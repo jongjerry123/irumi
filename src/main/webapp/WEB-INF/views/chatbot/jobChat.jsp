@@ -161,6 +161,79 @@ body {
 	display: box;
 }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>  <!-- sendBtn: 텍스트 전송버튼 // -->
+$(function() {
+    // ✅ 1. 유저가 텍스트 입력 후 [전송] 버튼 클릭
+    $('#sendBtn').click(function() {
+        const userMsg = $('#userInput').val();
+        const convId = $('#convId').val();
+
+        if (!userMsg.trim()) return;
+
+        // 사용자 메시지 append
+        $('#chatBox').append('<div class="user">' + userMsg + '</div>');
+        $('#userInput').val(''); // 입력창 비우기
+
+        $.ajax({
+            url: 'sendMessageToChatbot.do',
+            type: 'POST',
+            data: {
+                convId: convId,
+                userMsg: userMsg
+            },
+            success: function(res) {
+                // GPT 응답 출력
+                $('#chatBox').append('<div class="bot">' + res.gptAnswer + '</div>');
+
+                // 옵션 버튼이 있다면 동적으로 추가
+                if (res.options && res.options.length > 0) {
+                    res.options.forEach(function(opt) {
+                        $('#chatBox').append('<button class="chatOption">' + opt + '</button>');
+                    });
+                }
+            },
+            error: function() {
+                alert('GPT 응답 요청 중 오류 발생');
+            }
+        });
+    });
+
+    // ✅ 2. 동적으로 생성된 옵션 버튼 클릭 시
+    $(document).on('click', '.chatOption', function () {
+        const selectedOption = $(this).text();
+        const convId = $('#convId').val();
+
+        // 선택한 옵션 append
+        $('#chatBox').append('<div class="user">' + selectedOption + '</div>');
+
+        $.ajax({
+            url: 'submitChatbotOption.do',
+            type: 'POST',
+            data: {
+                convId: convId,
+                userChoice: selectedOption
+            },
+            success: function (res) {
+                // GPT 응답 출력
+                $('#chatBox').append('<div class="bot">' + res.gptAnswer + '</div>');
+
+                // 새로운 옵션 있으면 다시 버튼 추가
+                if (res.options && res.options.length > 0) {
+                    res.options.forEach(function (opt) {
+                        $('#chatBox').append('<button class="chatOption">' + opt + '</button>');
+                    });
+                }
+            },
+            error: function () {
+                alert("옵션 처리 중 오류가 발생했습니다.");
+            }
+        });
+    });
+});
+</script>
+
 </head>
 <body>
 	<div class="column col-1">
