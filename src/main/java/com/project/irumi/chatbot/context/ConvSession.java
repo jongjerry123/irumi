@@ -7,10 +7,12 @@ import java.util.UUID;
 public class ConvSession {
 	private final String convId = UUID.randomUUID().toString();
     private final String topic;
+    private String userId;
     private final List<String> contextHistory = new ArrayList<>();
 
-    public ConvSession(String topic) {
+    public ConvSession(String topic, String userId) {
         this.topic = topic;
+        this.userId = userId;
     }
 
     public void appendMessage(String role, String content) {
@@ -28,5 +30,13 @@ public class ConvSession {
     public String getTopic() {
         return topic;
     }
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
 }
