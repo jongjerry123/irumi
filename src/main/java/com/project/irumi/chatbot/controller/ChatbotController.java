@@ -58,17 +58,13 @@ public class ChatbotController {
 
 	// 유저가 탭 내에서 대화 시작하기 버튼 누른 경우 ===========================
 	// 세션매니저 관리 시작 (tab 유형에 따라 session 정보 저장)
-	@RequestMapping(
-			value = "startChatSession.do", 
-			method = RequestMethod.POST)
+	@RequestMapping(value = "startChatSession.do", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, String> startChatSession(
-			@RequestParam("topic") String topic,
-			HttpSession loginSession) {
-		
+	public Map<String, String> startChatSession(@RequestParam("topic") String topic, HttpSession loginSession) {
+
 		String userId = (String) loginSession.getAttribute("userId");
 		ConvSession session = convManager.createNewSession(userId, topic);
-		
+
 		Map<String, String> result = new HashMap<>();
 		result.put("convId", session.getConvId());
 		result.put("message", "대화가 시작되었습니다. 질문을 입력해주세요.");
@@ -76,76 +72,107 @@ public class ChatbotController {
 		// 이거 map 리턴해야 되나? 안해도 되지 않나?
 	}
 
-	// 유저가 대화를 시작한 후 메세지 전송버튼 클릭한 경우 ===========================
-	// 세션 정보에 따라 매니저 서비스 호출
-	@RequestMapping(value = "sendMessageToChatbot.do",
-										method = RequestMethod.POST)
+	// 대화 시작하고 서브 토픽 설정 클릭 ===========================
+	@RequestMapping(value = "setConvSubTopic.do", method = RequestMethod.POST)
 	@ResponseBody
-	public ChatbotResponseDto sendMessageToChatbot (
-													@RequestParam("convId") String convId,
-	                                               @RequestParam("userMsg") String userMsg) {
-	    ConvSession session = convManager.getSession(convId);
-	    String topic = session.getTopic();
+	public ChatbotResponseDto setConvSubTopic(@RequestParam("userChoice") String userChoice,
+			@RequestParam("convId") String convId
+	/* HttpSession loginSession */
+	) {
+		ConvSession session = convManager.getSession(convId);
+		String topic = session.getTopic();
 
-	    ChatbotResponseDto responseDto;
+		ChatbotResponseDto responseDto;
 
-	    switch (topic) {
-	        case "job":
-	            responseDto = jobManager.getGptResponse(session, userMsg);
-	            break;
-	        case "spec":
-	            responseDto = specManager.getGptResponse(session, userMsg);
-	            break;
-	        case "ss":
-	            responseDto = ssManager.getGptResponse(session, userMsg);
-	            break;
-	        case "act":
-	            responseDto = actManager.getGptResponse(session, userMsg);
-	            break;
-	        default:
-	            responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-	    }
+		// handleChatbotOption:
+		// 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라
+		// 다르게 동작하여 유저 선택에 대해 응답하도록 함.
+		switch (topic) {
+		case "job":
+			responseDto = jobManager.setConvSubTopic(session, userChoice);
+			break;
+		case "spec":
+			responseDto = specManager.setConvSubTopic(session, userChoice);
+			break;
+		case "ss":
+			responseDto = ssManager.setConvSubTopic(session, userChoice);
+			break;
+		case "act":
+			responseDto = actManager.setConvSubTopic(session, userChoice);
+			break;
+		default:
+			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
+		}
 
-	    return responseDto;
+		return responseDto;
 	}
 
+	// 유저가 대화를 시작한 후 메세지 전송버튼 클릭한 경우 ===========================
+	// 세션 정보에 따라 매니저 서비스 호출
+	@RequestMapping(value = "sendMessageToChatbot.do", method = RequestMethod.POST)
+	@ResponseBody
+	public ChatbotResponseDto sendMessageToChatbot(@RequestParam("convId") String convId,
+			@RequestParam("userMsg") String userMsg) {
+		ConvSession session = convManager.getSession(convId);
+		String topic = session.getTopic();
 
-	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우
+		ChatbotResponseDto responseDto;
+
+		switch (topic) {
+		case "job":
+			responseDto = jobManager.getGptResponse(session, userMsg);
+			break;
+		case "spec":
+			responseDto = specManager.getGptResponse(session, userMsg);
+			break;
+		case "ss":
+			responseDto = ssManager.getGptResponse(session, userMsg);
+			break;
+		case "act":
+			responseDto = actManager.getGptResponse(session, userMsg);
+			break;
+		default:
+			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
+		}
+
+		return responseDto;
+	}
+
+	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우
 	// 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에 append
 	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
-    @RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
-    @ResponseBody
-    public ChatbotResponseDto submitChatbotOption(
-    											@RequestParam("userChoice") String userChoice,
-                                                  @RequestParam("convId") String convId
-                                                  /*HttpSession loginSession*/	
-    		) {
-        ConvSession session = convManager.getSession(convId);
-        String topic = session.getTopic();
+	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
+	@ResponseBody
+	public ChatbotResponseDto submitChatbotOption(@RequestParam("userChoice") String userChoice,
+			@RequestParam("convId") String convId
+	/* HttpSession loginSession */
+	) {
+		ConvSession session = convManager.getSession(convId);
+		String topic = session.getTopic();
 
-        ChatbotResponseDto responseDto;
+		ChatbotResponseDto responseDto;
 
-        // handleChatbotOption: 
-        // 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라 
-        // 다르게 동작하여 유저 선택에 대해 응답하도록 함.
-        switch (topic) {
-            case "job":
-                responseDto = jobManager.handleChatbotOption(session, userChoice);
-                break;
-            case "spec":
-                responseDto = specManager.handleChatbotOption(session, userChoice);
-                break;
-            case "ss":
-                responseDto = ssManager.handleChatbotOption(session, userChoice);
-                break;
-            case "act":
-                responseDto = actManager.handleChatbotOption(session, userChoice);
-                break;
-            default:
-                responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-        }
+		// handleChatbotOption:
+		// 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라
+		// 다르게 동작하여 유저 선택에 대해 응답하도록 함.
+		switch (topic) {
+		case "job":
+			responseDto = jobManager.handleChatbotOption(session, userChoice);
+			break;
+		case "spec":
+			responseDto = specManager.handleChatbotOption(session, userChoice);
+			break;
+		case "ss":
+			responseDto = ssManager.handleChatbotOption(session, userChoice);
+			break;
+		case "act":
+			responseDto = actManager.handleChatbotOption(session, userChoice);
+			break;
+		default:
+			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
+		}
 
-        return responseDto;
-    }
+		return responseDto;
+	}
 
 }

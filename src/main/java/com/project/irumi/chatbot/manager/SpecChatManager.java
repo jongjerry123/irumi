@@ -18,4 +18,9 @@ public class SpecChatManager {
 		return null;
 	}
 
+	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
