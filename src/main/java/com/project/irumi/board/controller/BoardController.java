@@ -17,7 +17,7 @@ public class BoardController {
     @Autowired
     private PostService postService;
 
-    // ✅ 자유게시판 with 정렬 + 검색 + 페이징
+    // 자유게시판 with 정렬 + 검색 + 페이징
     @RequestMapping("freeBoard.do")
     public String showFreeBoard(
             @RequestParam(value = "period", required = false, defaultValue = "전체") String period,
@@ -52,20 +52,21 @@ public class BoardController {
         return "board/noticeList";
     }
 
-    // 자유게시판 글쓰기 화면
+    // 글쓰기 화면
     @RequestMapping(value = "board/writePost.do", method = RequestMethod.GET)
     public String showWritePostForm() {
         return "board/writePost";
     }
 
-    // 자유게시판 글 등록 처리
+    // 글 등록 처리 (자유/질문 공통)
     @RequestMapping(value = "board/insertPost.do", method = RequestMethod.POST)
     public String insertPost(@ModelAttribute PostDTO post, HttpSession session) {
         String writer = (String) session.getAttribute("loginUser");
         post.setPostWriter(writer);
-        post.setPostType("free");
+
         postService.insertPost(post);
-        return "redirect:freeBoard.do";
+
+        return "redirect:" + ("qna".equals(post.getPostType()) ? "qnaList.do" : "freeBoard.do");
     }
 
     // 공지사항 글 등록 처리 (관리자 전용)
@@ -74,7 +75,7 @@ public class BoardController {
                                    @RequestParam("postContent") String content,
                                    HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser == null || !"admin".equals(loginUser.getUserLoginType())) {
+        if (loginUser == null || !"2".equals(String.valueOf(loginUser.getUserLoginType()))) {
             return "redirect:main.do";
         }
 
@@ -87,5 +88,6 @@ public class BoardController {
         postService.insertPost(post);
         return "redirect:noticeList.do";
     }
-
+    
+   
 }
