@@ -124,14 +124,17 @@ body {
 <script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
 <script>
 function movetoUpDash() {
-	// TODO: 로그인 기능 완성되면 주석 풀기
-	// location.href = 'upDash.do?userId=${ sessionScope.loginUser.userId }';
-	location.href = 'upDash.do?userId=user1';
+	location.href = 'upDash.do';
 
 }
 function viewSpecs(jobId) {
 	console.log(jobId);
 }
+
+function addJob() {
+	location.href = 'addJob.do';
+}
+
 // 학력정보를 표시함
 $(function() {
 	$.ajax({
@@ -181,6 +184,7 @@ $(function() {
 			$.each(data, function(index, item) {
 				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\')">' + item.jobName + '</button>');
 			});
+			$('#jobs').html($('#jobs').html() + '<button onclick="addJob()">목표 직업 추가하기</button>');
 		},
 		error: function(xhr, status, error) {
 			console.error("에러 발생:", error);
@@ -193,9 +197,9 @@ $(function() {
 <body>
 
 <!-- TODO: 로그인 상태가 아닌 경우 로그인 페이지로 이동 -->
-<%-- <c:if test="${ empty sessionScope.loginUser }">
+<c:if test="${ empty sessionScope.loginUser }">
 	<jsp:forward page="/WEB-INF/views/user/login.jsp"/>
-</c:if> --%>
+</c:if>
 
 <!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 dashboard로 설정함 -->
 <c:set var="menu" value="dashboard" scope="request" />

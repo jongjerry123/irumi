@@ -153,7 +153,7 @@
     <div class="board-header">
   <c:choose>
     <c:when test="${not empty loginUser}">
-      <c:if test="${loginUserLoginType != 2}">
+      <c:if test="${loginUser.userAuthority == !'2'}">
         <button class="write-btn" onclick="location.href='board/writePost.do?type=qna'">✏ 질문 등록</button>
       </c:if>
     </c:when>
@@ -182,7 +182,7 @@
             <td>${post.postWriter}</td>
             <td>
               <c:choose>
-                <c:when test="${loginUser eq post.postWriter || loginUserLoginType == 2}">
+                <c:when test="${loginUser eq post.postWriter || userAuthority == '1'}">
                   <a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a>
                 </c:when>
                 <c:otherwise>
