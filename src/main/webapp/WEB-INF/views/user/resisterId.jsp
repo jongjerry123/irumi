@@ -116,10 +116,10 @@ input[type="text"], input[type="password"], select {
             <div class="input-group">
                 <select id="userAuthority" name="userAuthority">
                     <option value="">권한 선택</option>
-                    <option value="1">관리자 (1)</option>
-                    <option value="2">일반 사용자 (2)</option>
-                    <option value="3">제한된 사용자 (3)</option>
-                    <option value="4">게스트 (4)</option>
+                    <option value="1">일반 유저(1)</option>
+                    <option value="2">관리자(2)</option>
+                    <option value="3">불량 유저(3)</option>
+                    <option value="4">탈퇴(4)</option>
                 </select>
                 <div id="authority-message" class="message"></div>
             </div>
