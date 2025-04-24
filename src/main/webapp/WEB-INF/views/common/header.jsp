@@ -116,12 +116,12 @@ function logout() {
     <div class="login-actions">
         <c:choose>
             <c:when test="${not empty sessionScope.loginUser}">
-                <!-- 권한이 1인 경우: 관리자 기능 버튼 표시 -->
-                <c:if test="${sessionScope.loginUser.userAuthority == '1'}">
+                <!-- 권한이 2인 경우: 관리자 기능 버튼 표시 -->
+                <c:if test="${sessionScope.loginUser.userAuthority == '2'}">
                     <button onclick="location.href='adminPage.do'">관리자 기능</button>
                 </c:if>
-                <!-- 권한이 2인 경우: 마이페이지 버튼 표시 -->
-                <c:if test="${sessionScope.loginUser.userAuthority == '2'}">
+                <!-- 권한이 1인 경우: 마이페이지 버튼 표시 -->
+                <c:if test="${sessionScope.loginUser.userAuthority == '1'}">
                     <button onclick="location.href='myPage.do'">마이페이지</button>
                 </c:if>
                 <!-- 로그아웃 버튼 -->
