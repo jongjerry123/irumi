@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/common/header.jsp" />
 
 <!DOCTYPE html>
@@ -210,21 +211,30 @@
       </div>
     </div>
 
+    <form id="filterForm" action="freeBoard.do" method="get">
+      <input type="hidden" name="period" value="${selectedPeriod}" />
+      <input type="hidden" name="sort" value="${selectedSort}" />
+      <input type="hidden" name="keyword" value="${keyword}" />
+      <input type="hidden" name="page" value="${currentPage}" />
+    </form>
+
     <div class="filters">
       <div class="dropdown">
-        <button class="dropdown-button selected" onclick="toggleDropdown(this)" id="periodBtn">단위기간: 전체</button>
+        <button type="button" class="dropdown-button selected" onclick="toggleDropdown(this)" id="periodBtn">
+          단위기간: ${selectedPeriod}
+        </button>
         <div class="dropdown-content">
-          <button onclick="selectPeriod(this, '전체')">전체</button>
-          <button onclick="selectPeriod(this, '최근 한달')">최근 한달</button>
-          <button onclick="selectPeriod(this, '최근 1일')">최근 1일</button>
+          <button onclick="updateFilter('period', '전체')">전체</button>
+          <button onclick="updateFilter('period', '최근 한달')">최근 한달</button>
+          <button onclick="updateFilter('period', '최근 1일')">최근 1일</button>
         </div>
       </div>
-      <button class="sort-btn" onclick="highlightSort(this)">조회수 정렬</button>
-      <button class="sort-btn" onclick="highlightSort(this)">추천순 정렬</button>
+      <button class="sort-btn ${selectedSort eq 'hit' ? 'selected' : ''}" onclick="updateFilter('sort', 'hit')">조회수 정렬</button>
+      <button class="sort-btn ${selectedSort eq 'like' ? 'selected' : ''}" onclick="updateFilter('sort', 'like')">추천순 정렬</button>
     </div>
 
     <div class="board-header">
-      <button class="write-btn">✏ 글쓰기</button>
+      <button class="write-btn" onclick="location.href='writePost.do'">✏ 글쓰기</button>
     </div>
 
     <table class="board-table">
@@ -238,24 +248,50 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="5" class="empty-message">등록된 게시글이 없습니다.</td>
-        </tr>
+        <c:choose>
+          <c:when test="${not empty postList}">
+            <c:forEach var="post" items="${postList}">
+              <tr>
+                <td>${post.postWriter}</td>
+                <td>${post.postTitle}</td>
+                <td>${post.postTime}</td>
+                <td>${post.postViewCount}</td>
+                <td>${post.postRecommend}</td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="5" class="empty-message">등록된 게시글이 없습니다.</td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
     </table>
 
     <div class="board-footer">
       <div class="board-footer-top">
-        <div class="post-count">글 수: 0개</div>
+        <div class="post-count">글 수: ${totalCount}개</div>
         <div class="search-box">
-          <input type="text" placeholder="검색 키워드 입력 후 엔터" />
-          <button class="search-btn">↵</button>
+          <form action="freeBoard.do" method="get">
+            <input type="hidden" name="period" value="${selectedPeriod}" />
+            <input type="hidden" name="sort" value="${selectedSort}" />
+            <input type="hidden" name="page" value="1" />
+            <input type="text" name="keyword" value="${keyword}" placeholder="검색 키워드 입력 후 엔터" />
+            <button type="submit" class="search-btn">↵</button>
+          </form>
         </div>
       </div>
       <div class="pagination">
-        <button>&lt;</button>
-        <button>1</button>
-        <button>&gt;</button>
+        <c:if test="${currentPage > 1}">
+          <button onclick="goToPage(${currentPage - 1})">&lt;</button>
+        </c:if>
+        <c:forEach begin="1" end="${totalPages}" var="pageNum">
+          <button onclick="goToPage(${pageNum})" class="${pageNum == currentPage ? 'selected' : ''}">${pageNum}</button>
+        </c:forEach>
+        <c:if test="${currentPage < totalPages}">
+          <button onclick="goToPage(${currentPage + 1})">&gt;</button>
+        </c:if>
       </div>
     </div>
   </div>
@@ -267,16 +303,17 @@
       dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     }
 
-    function selectPeriod(el, label) {
-      const dropdownBtn = document.getElementById('periodBtn');
-      dropdownBtn.innerText = `단위기간: ${label}`;
-      dropdownBtn.classList.add('selected');
-      el.closest('.dropdown-content').style.display = 'none';
+    function updateFilter(type, value) {
+      const form = document.getElementById('filterForm');
+      form[type].value = value;
+      form.page.value = 1;
+      form.submit();
     }
 
-    function highlightSort(button) {
-      document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('selected'));
-      button.classList.add('selected');
+    function goToPage(pageNum) {
+      const form = document.getElementById('filterForm');
+      form.page.value = pageNum;
+      form.submit();
     }
   </script>
 </body>

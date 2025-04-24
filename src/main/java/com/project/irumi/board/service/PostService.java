@@ -12,14 +12,52 @@ public class PostService {
     @Resource
     private PostDAO postDAO;
 
-    // 
+    // 기존 메서드
     public List<PostDTO> getPostsByType(String postType) {
         return postDAO.selectByType(postType);
     }
 
-    //  새로 추가한 메서드 - 지금 컨트롤러에서 필요한 기능!
-    public List<PostDTO> getPosts(String period, String sort, String keyword) {
-        // 지금은 조건 안 걸고 전체 게시글 반환 (나중에 확장 가능)
-        return postDAO.selectByType("free"); // 자유게시판만 보여주도록 고정
+    // 자유게시판 - 정렬 및 키워드
+    public List<PostDTO> getFreePosts(String period, String sort, String keyword) {
+        return postDAO.selectFreePosts(period, sort, keyword);
+    }
+
+    public List<PostDTO> getFreePosts(String period, String sort, String keyword, int offset, int pageSize) {
+        return postDAO.selectFreePosts(period, sort, keyword, offset, pageSize);
+    }
+
+    public int countFreePosts(String period, String keyword) {
+        return postDAO.countFreePosts(period, keyword);
+    }
+
+    public void insertPost(PostDTO post) {
+        postDAO.insertPost(post);
+    }
+
+    // QnA, 공지사항 - postType 기반 페이징 조회
+    public List<PostDTO> getPostsByTypeWithPaging(String postType, int offset, int pageSize) {
+        return postDAO.selectByTypeWithPaging(postType, offset, pageSize);
+    }
+
+    public int countPostsByType(String postType) {
+        return postDAO.countPostsByType(postType);
+    }
+
+    // QnA - 답변 여부 포함된 게시물 조회
+    public List<PostDTO> getQnaPostsWithAnswerFlag(String loginUserId, int offset, int pageSize) {
+        return postDAO.selectQnaPostsWithAnswerFlag(loginUserId, offset, pageSize);
+    }
+
+    public int countQnaPostsWithAnswerFlag(String loginUserId) {
+        return postDAO.countQnaPostsWithAnswerFlag(loginUserId);
+    }
+
+    // QnA - 내 질문만 보기
+    public List<PostDTO> getMyQnaPosts(String loginUserId, int offset, int pageSize) {
+        return postDAO.selectMyQnaPosts(loginUserId, offset, pageSize);
+    }
+
+    public int countMyQnaPosts(String loginUserId) {
+        return postDAO.countMyQnaPosts(loginUserId);
     }
 }
