@@ -23,11 +23,13 @@ public class DashboardController {
 	@Autowired
 	private DashboardService dashboardService;
 	
-	@RequestMapping("upDash.do") // 전송방식 get 임
-	public String memberDetailMethod(@RequestParam("userId") String userId, Model model) {
+	@RequestMapping("upDash.do")
+	public String memberDetailMethod(Model model, HttpSession session) {
 
+		User loginUser = (User) session.getAttribute("loginUser");
+		
 		// 서비스 모델로 아이디 전달해서, 학력 정보 조회한 결과 리턴받기
-		Dashboard dashboard = dashboardService.selectUserSpec(userId);
+		Dashboard dashboard = dashboardService.selectUserSpec(loginUser.getUserId());
 
 		// 리턴받은 결과를 가지고 성공 또는 실패 페이지 내보내기
 		if (dashboard != null) { // 조회 성공
@@ -35,9 +37,14 @@ public class DashboardController {
 
 			return "dashboard/dashboardUpdate";
 		} else { // 조회 실패
-			model.addAttribute("message", userId + " 에 대한 학력 정보 조회 실패! 아이디를 다시 확인하세요.");
+			model.addAttribute("message", loginUser.getUserId() + " 에 대한 학력 정보 조회 실패! 아이디를 다시 확인하세요.");
 			return "common/error";
 		}
+	}
+	
+	@RequestMapping("addJob.do")
+	public String moveToAddJob() {
+		return "dashboard/newJob";
 	}
 	
 	// 유저의 현재 스펙(userUniversity, userDegree, userGraduate, userPoint)을 보여주는 메소드
@@ -46,11 +53,8 @@ public class DashboardController {
 	public Dashboard selectUserSpec(HttpSession session) {
 		
 		// 로그인 유저 불러오기
-		// User loginUser = (User) session.getAttribute("loginUser");	//로그인 기능 완성되면 주석 풀기
+		User loginUser = (User) session.getAttribute("loginUser");
 		
-		// TODO: 테스트용임. 로그인기능 완성되면 지우고 위의 주석 제거
-		User loginUser = new User();
-		loginUser.setUserId("user1");
 		
 		if (loginUser != null) {
 			String userId = loginUser.getUserId();
@@ -79,14 +83,9 @@ public class DashboardController {
 	public ArrayList<Job> selectUserJobs(Model model, HttpSession session) {
 		
 		// 로그인 유저 불러오기
-		// User loginUser = (User) session.getAttribute("loginUser");	//로그인 기능 완성되면 주석 풀기
-		// return dashboardService.selectUserJobs(loginUser.getUserId());
-		
-		// TODO: 테스트용임. 로그인기능 완성되면 지우고 위의 주석 제거
-		return dashboardService.selectUserJobs("user0");
-		
-		
-		
+		User loginUser = (User) session.getAttribute("loginUser");
+		return dashboardService.selectUserJobs(loginUser.getUserId());
 	}
+	
 	
 }
