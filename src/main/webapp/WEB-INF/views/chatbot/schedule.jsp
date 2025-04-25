@@ -470,6 +470,7 @@ body {
 </head>
 <body>
    <c:import url="/WEB-INF/views/common/header.jsp"/>
+<c:set var="menu" value="chat" scope="request" />
 
  <div class="container">
 

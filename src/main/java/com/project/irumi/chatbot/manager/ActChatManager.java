@@ -1,9 +1,14 @@
 package com.project.irumi.chatbot.manager;
 
+
+import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Component;
 
+import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
@@ -12,10 +17,27 @@ import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 @Component
 public class ActChatManager {
 
-    public ChatbotResponseDto getGptResponse(ConvSession session, String userChoice) {
-        StateActChat state = (StateActChat) session.getChatState();
+	@Autowired
+	private GptApiService gptApiService;
+	
+	 public ChatbotResponseDto getGptResponse(ConvSession session, String userMsg) {
+             StateActChat state = (StateActChat) session.getChatState();
 
-        switch (state) {
+	        String context = session.getContext();
+	        String prompt = context + "\nuser: " + userMsg;
+	        String gptAnswer = gptApiService.callGPT(prompt);
+
+	        session.appendMessage("user", userMsg);
+	        session.appendMessage("assistant", gptAnswer);
+
+	        List<String> options = new ArrayList<>();
+	        options.add("더 추천받기");
+	        options.add("대시보드에 저장");
+
+          /////////////////////////////////////////////////////////////////////////
+     
+     
+     switch (state) {
             case START:
                 session.setChatState(StateActChat.RECOMMEND_RESOURCE);
                 return new ChatbotResponseDto(
@@ -50,7 +72,23 @@ public class ActChatManager {
             default:
                 return new ChatbotResponseDto("대화 상태 오류입니다. 다시 시도해주세요.", null);
         }
-    }
+     
+     
+     
+     
+     
+     
+     
+     
+               
+     
+	        return new ChatbotResponseDto(gptAnswer, options);
+	    }
+
+	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     public ChatbotResponseDto handleChatbotOption(ConvSession session, String userChoice) {
         // 예: 사용자가 버튼을 클릭했을 때의 선택 처리 로직

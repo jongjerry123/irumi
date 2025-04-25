@@ -92,7 +92,15 @@ public class ChatbotController {
 			HttpSession loginSession,
 			@RequestParam("userMsg") String userMsg) {
 		String userId = (String) loginSession.getAttribute("userId");
+		
+		if(userId == null) {
+			userId = "user";
+		}   ///////////////////////////////////////////////////// 임시 추가
 		ConvSession session = convManager.getSession(userId);
+		
+		if (session == null) {
+	        return new ChatbotResponseDto("대화 세션이 없습니다. 먼저 '대화 시작' 버튼을 눌러주세요.", null);
+	    } /////////////////////////////////////////////// 임시 추가
 		String topic = session.getTopic();
 
 		ChatbotResponseDto responseDto;

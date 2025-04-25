@@ -21,10 +21,15 @@ public class ConvSessionManager {
 
     // 새 주제 시작 → 기존 세션 종료 후 새로 생성
     public ConvSession createNewSession(String userId, String topic) {
+
+//    	sessionMap.remove(userId);
+    	if (userId == null) userId = "user"; ////// 임시 추가
+
     	//이미 진행중인 세션이 있는데 호출됐다면 이전 세션 종료
     	if (sessionMap.get(userId)!=null) {
     		sessionMap.remove(userId);
     	}
+
         ConvSession session = new ConvSession(userId, topic);
         sessionMap.put(userId, session);
         return session;

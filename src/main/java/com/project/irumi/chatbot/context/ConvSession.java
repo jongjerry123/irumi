@@ -12,7 +12,9 @@ public class ConvSession {
 	private String subtopicId = null;    // 서브 주제 ID (직무 ID or 스펙 ID 등)
 	private String userId;
 
+
 	private final List<String> contextHistory = new ArrayList<>();
+
 
 	// ✅ 하나의 상태만 관리
 	private ChatState chatState;

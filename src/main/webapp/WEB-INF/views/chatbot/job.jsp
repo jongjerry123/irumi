@@ -511,29 +511,33 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 </script>
 </head>
 <body>
-	<c:import url="/WEB-INF/views/common/header.jsp" />
 
-	<div class="container">
+   <c:import url="/WEB-INF/views/common/header.jsp"/>
+   <!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 chatbot로 설정함 -->
+<c:set var="menu" value="chat" scope="request" />
 
-		<!-- Sidebar -->
-		<div class="sidebar">
-			<button onclick="moveJobPage();">직무 찾기</button>
-			<button onclick="moveSpecPage();">스펙 찾기</button>
-			<button onclick="moveSchedulePage();">일정 찾기</button>
-			<button onclick="moveActPage();">활동 찾기</button>
-		</div>
+ <div class="container">
 
-		<!-- Main content -->
-		<div class="main">
+<!-- Sidebar -->
+      <div class="sidebar">
+         <button onclick="moveJobPage();">직무 찾기</button>
+         <button onclick="moveSpecPage();">스펙 찾기</button>
+         <button onclick="moveSchedulePage();">일정 찾기</button>
+         <button onclick="moveActPage();">활동 찾기</button>
+      </div>
 
-			<!-- 콘텐츠 영역 -->
-			<div class="content-box">
+      <!-- Main content -->
+<div class="main">
+   
+   <!-- 콘텐츠 영역 -->
+         <div class="content-box">
 
-				<div class="chat-area" id="chatArea">
-					<div class="message bot-msg">무엇을 도와드릴까요?</div>
-				</div>
+   <div class="chat-area" id="chatArea">
+            <div class="message bot-msg">무엇을 도와드릴까요?</div>
+         </div>
+             
+<!-- <div class="custom-checkbox-list">
 
-				<!-- <div class="custom-checkbox-list">
                <label class="custom-checkbox"> 
                <input type="checkbox"> 
                <span class="checkbox-text">프론트엔드 개발자</span> <span
