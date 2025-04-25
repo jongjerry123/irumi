@@ -39,22 +39,22 @@ public class ChatbotController {
 	private ActChatManager actManager;
 
 	// 탭별로 뷰페이지 내보내기 용도 ===========================
-	@RequestMapping("startActRecChat.do")
+	@RequestMapping("viewActRecChat.do")
 	public String ViewActChatBot() {
 		return "chatbot/act";
 	}
 
-	@RequestMapping("startJobRecChat.do")
+	@RequestMapping("viewJobRecChat.do")
 	public String ViewJobChatBot() {
 		return "chatbot/job";
 	}
 
-	@RequestMapping("startSpecRecChat.do")
+	@RequestMapping("viewSpecRecChat.do")
 	public String ViewSpecChatBot() {
 		return "chatbot/spec";
 	}
 
-	@RequestMapping("startScheduleRecChat.do")
+	@RequestMapping("viewScheduleRecChat.do")
 	public String ViewScheduleChatBot() {
 		return "chatbot/schedule";
 	}
