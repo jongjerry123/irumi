@@ -56,3 +56,4 @@ out/
 *.lock
 *.log
 src/main/resources/application.properties
+*.json

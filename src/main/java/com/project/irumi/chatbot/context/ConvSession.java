@@ -4,34 +4,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+
 public class ConvSession {
 	private final String convId = UUID.randomUUID().toString();
-	private final String topic;          // 대화 주제: job / spec / act / schedule
-    private String subtopicId = null;    // 서브 주제 ID (직무 ID or 스펙 ID 등)
-    private String userId;
-    private final List<String> contextHistory = new ArrayList<>();
+	private final String topic;          // 대화 주제: job / spec / act / ss
+	private String subtopicId = null;    // 서브 주제 ID (직무 ID or 스펙 ID 등)
+	private String userId;
 
-    public ConvSession(String userId, String topic) {  /// 수정
-    	// 현재는 subtopic이 세션 중에 변경 가능한 주제인듯?
-        this.topic = topic;
-        this.userId = userId;
-    }
 
-    public void appendMessage(String role, String content) {
-        contextHistory.add(role + ": " + content);
-    }
+	private final List<String> contextHistory = new ArrayList<>();
 
-    public String getContext() {
-        return String.join("\n", contextHistory);
-    }
 
-    public String getConvId() {
-        return convId;
-    }
+	// ✅ 하나의 상태만 관리
+	private ChatState chatState;
 
-    public String getTopic() {
-        return topic;
-    }
+	// ✅ 생성자
+	public ConvSession(String userId, String topic) {
+		this.userId = userId;
+		this.topic = topic;
+		this.chatState = resolveInitialState(topic); // 초기 상태 자동 세팅
+	}
+
+	private ChatState resolveInitialState(String topic) {
+		switch (topic) {
+			case "job":
+				return StateJobChat.START;
+			case "spec":
+				return StateSpecChat.START;
+			case "ss":
+				return StateSsChat.START;
+			case "act":
+				return StateActChat.START;
+			default:
+				throw new IllegalArgumentException("Invalid topic: " + topic);
+		}
+	}
+
+	// ✅ 대화 기록 저장
+	public void appendMessage(String role, String content) {
+		contextHistory.add(role + ": " + content);
+	}
+
+	// ✅ 전체 대화 컨텍스트 가져오기
+	public String getContext() {
+		return String.join("\n", contextHistory);
+	}
+
+	// ✅ Getter/Setter
+	public String getConvId() {
+		return convId;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
 
 	public String getUserId() {
 		return userId;
@@ -49,4 +76,11 @@ public class ConvSession {
 		this.subtopicId = subtopicId;
 	}
 
+	public ChatState getChatState() {
+		return chatState;
+	}
+
+	public void setChatState(ChatState chatState) {
+		this.chatState = chatState;
+	}
 }

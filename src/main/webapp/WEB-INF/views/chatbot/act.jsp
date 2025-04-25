@@ -11,19 +11,19 @@
 <script>
 
 function moveJobPage() {
-   location.href = 'startJobRecChat.do';
+   location.href = 'viewJobRecChat.do';
 }
 
 function moveSpecPage() {
-   location.href = 'startSpecRecChat.do';
+   location.href = 'viewSpecRecChat.do';
 }
 
 function moveSchedulePage() {
-   location.href = 'startScheduleRecChat.do';
+   location.href = 'viewScheduleRecChat.do';
 }
 
 function moveActPage() {
-   location.href = 'startActRecChat.do';
+   location.href = 'viewActRecChat.do';
 }
 </script>
 <script>

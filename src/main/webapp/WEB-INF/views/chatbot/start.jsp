@@ -10,11 +10,11 @@
 <script>
 
 	function moveJobPage() {
-		location.href = 'startJobRecChat.do';
+		location.href = 'viewJobRecChat.do';
 	}
 
 	function moveActPage() {
-		location.href = 'startActRecChat.do';
+		location.href = 'viewActRecChat.do';
 	}
 </script>
 <style>

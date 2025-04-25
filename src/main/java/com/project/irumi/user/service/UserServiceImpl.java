@@ -8,21 +8,27 @@ import com.project.irumi.user.model.dao.UserDao;
 import com.project.irumi.user.model.dto.User;
 
 @Service("userService")
-public class UserServiceImpl implements UserService{
-	
-	@Autowired
-	private UserDao userDao;
-	
-	@Autowired
+public class UserServiceImpl implements UserService {
+    
+    @Autowired
+    private UserDao userDao;
+    
+    @Autowired
     private BCryptPasswordEncoder bcryptPasswordEncoder;
 
-	@Override
-	public User selectUser(User user) {
-		return userDao.selectUser(user);
-	}
-	@Override
+    @Override
+    public User selectUser(User user) {
+        return userDao.selectUser(user);
+    }
+
+    @Override
     public boolean checkIdAvailability(String userId) {
         return userDao.countByUserId(userId) == 0;
+    }
+
+    @Override
+    public boolean checkEmailAvailability(String email) {
+        return userDao.countByEmail(email) == 0;
     }
 
     @Override
@@ -30,5 +36,4 @@ public class UserServiceImpl implements UserService{
         user.setUserPwd(bcryptPasswordEncoder.encode(user.getUserPwd()));
         userDao.registerUser(user);
     }
-
 }

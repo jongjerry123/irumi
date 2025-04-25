@@ -146,65 +146,63 @@
       <button class="active">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
       <c:if test="${loginUser.userAuthority == '2'}">
-  <button class="admin-btn" onclick="location.href='badUserList.do'">
-    <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
-  </button>
-</c:if>
+        <button class="admin-btn" onclick="location.href='badUserList.do'">
+          <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
+        </button>
+      </c:if>
     </div>
   </div>
 
   <div class="filters">
-  <div></div>
-  <div class="board-header">
-    <c:choose>
-      <c:when test="${not empty loginUser}">
-        <c:if test="${loginUser.userAuthority ne '2'}">
-          <button class="write-btn" onclick="location.href='board/writePost.do?type=질문'">✏ 질문 등록</button>
-        </c:if>
-      </c:when>
-      <c:otherwise>
-        <button class="write-btn" onclick="location.href='loginPage.do'">✏ 질문 등록</button>
-      </c:otherwise>
-    </c:choose>
+    <div></div>
+    <div class="board-header">
+      <c:choose>
+        <c:when test="${not empty loginUser}">
+          <c:if test="${loginUser.userAuthority ne '2'}">
+            <button class="write-btn" onclick="location.href='writePost.do?type=질문'">✏ 질문 등록</button>
+          </c:if>
+        </c:when>
+        <c:otherwise>
+          <button class="write-btn" onclick="location.href='loginPage.do'">✏ 질문 등록</button>
+        </c:otherwise>
+      </c:choose>
+    </div>
   </div>
-</div>
 
   <table class="board-table">
     <thead>
-    <tr>
-      <th>작성자</th>
-      <th>글 제목</th>
-      <th>답변여부</th>
-      <th>작성일자</th>
-    </tr>
+      <tr>
+        <th>작성자</th>
+        <th>글 제목</th>
+        <th>작성일자</th>
+      </tr>
     </thead>
     <tbody>
-    <c:choose>
-      <c:when test="${not empty postList}">
-        <c:forEach var="post" items="${postList}">
+      <c:choose>
+        <c:when test="${not empty postList}">
+          <c:forEach var="post" items="${postList}">
+            <tr>
+              <td>${post.postWriter}</td>
+              <td>
+                <c:choose>
+                  <c:when test="${loginUser eq post.postWriter || loginUser.userAuthority == '1'}">
+                    <a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a>
+                  </c:when>
+                  <c:otherwise>
+                    작성자와 관리자만 볼 수 있는 글입니다.
+                  </c:otherwise>
+                </c:choose>
+              </td>
+              <td>${post.postTime}</td>
+            </tr>
+          </c:forEach>
+        </c:when>
+        <c:otherwise>
           <tr>
-            <td>${post.postWriter}</td>
-            <td>
-              <c:choose>
-                <c:when test="${loginUser eq post.postWriter || userAuthority == '1'}">
-                  <a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a>
-                </c:when>
-                <c:otherwise>
-                  작성자와 관리자만 볼 수 있는 글입니다.
-                </c:otherwise>
-              </c:choose>
-            </td>
-            <td>${post.answeredFlag}</td>
-            <td>${post.postTime}</td>
+            <td colspan="3" class="empty-message">등록된 게시글이 없습니다.</td>
           </tr>
-        </c:forEach>
-      </c:when>
-      <c:otherwise>
-        <tr>
-          <td colspan="4" class="empty-message">등록된 게시글이 없습니다.</td>
-        </tr>
-      </c:otherwise>
-    </c:choose>
+        </c:otherwise>
+      </c:choose>
     </tbody>
   </table>
 
@@ -225,6 +223,7 @@
     <button onclick="location.href='myQna.do'">내 질문만 보기</button>
   </div>
 </div>
+
 <c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

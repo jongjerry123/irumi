@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.project.irumi.dashboard.model.dao.DashboardDao;
 import com.project.irumi.dashboard.model.dto.Dashboard;
 import com.project.irumi.dashboard.model.dto.Job;
+import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.Specific;
 
 @Service("dashboardService")
 public class DashboardServiceImpl implements DashboardService {
@@ -28,6 +30,11 @@ public class DashboardServiceImpl implements DashboardService {
 	@Override
 	public ArrayList<Job> selectUserJobs(String userId) {
 		return dashboardDao.selectUserJobs(userId);
+	}
+
+	@Override
+	public ArrayList<Spec> selectUserSpecs(Specific specific) {
+		return dashboardDao.selectUserSpecs(specific);
 	}
 	
 }

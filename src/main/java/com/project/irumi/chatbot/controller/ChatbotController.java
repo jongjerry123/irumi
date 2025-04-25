@@ -1,12 +1,8 @@
 package com.project.irumi.chatbot.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,85 +35,58 @@ public class ChatbotController {
 	private ActChatManager actManager;
 
 	// 탭별로 뷰페이지 내보내기 용도 ===========================
-	@RequestMapping("startActRecChat.do")
+	@RequestMapping("viewActRecChat.do")
 	public String ViewActChatBot() {
 		return "chatbot/act";
 	}
 
-	@RequestMapping("startJobRecChat.do")
+	@RequestMapping("viewJobRecChat.do")
 	public String ViewJobChatBot() {
 		return "chatbot/job";
 	}
 
-	@RequestMapping("startSpecRecChat.do")
+	@RequestMapping("viewSpecRecChat.do")
 	public String ViewSpecChatBot() {
 		return "chatbot/spec";
 	}
 
-	@RequestMapping("startScheduleRecChat.do")
+	@RequestMapping("viewScheduleRecChat.do")
 	public String ViewScheduleChatBot() {
 		return "chatbot/schedule";
 	}
 
 	// 유저가 탭 내에서 대화 시작하기 버튼 누른 경우 ===========================
-	// 세션매니저 관리 시작 (tab 유형에 따라 session 정보 저장)
+	// 세션매니저 관리 시작 (tab 유형에 따라 현재 로그인한 유저가 진행중인 session 정보)
 	@RequestMapping(value = "startChatSession.do", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, String> startChatSession(
+	public void startChatSession(
 			@RequestParam("topic") String topic, 
 			HttpSession loginSession) {
 
 		String userId = (String) loginSession.getAttribute("userId");
 		ConvSession session = convManager.createNewSession(userId, topic);
-
-		Map<String, String> result = new HashMap<>();
-		result.put("convId", session.getConvId());
-		result.put("message", "대화가 시작되었습니다. 질문을 입력해주세요.");
-		return result;
-		// 이거 map 리턴해야 되나? 안해도 되지 않나?
 	}
 
 	// 대화 시작하고 서브 토픽 설정 클릭 ===========================
-	@RequestMapping(value = "setConvSubTopic.do", method = RequestMethod.POST)
+	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
+	@RequestMapping(value = "setConvSubTopic.do", 
+										method = RequestMethod.POST)
 	@ResponseBody
-	public ChatbotResponseDto setConvSubTopic(
-			@RequestParam("userChoice") String userChoice,
-			@RequestParam("convId") String convId,
-			HttpSession loginSession
-	/* HttpSession loginSession */
-	) {
+	public void setConvSubTopic(
+			 @RequestBody CareerItemDto selectedItem,
+			HttpSession loginSession) 
+	{
 		String userId = (String) loginSession.getAttribute("userId");
 		ConvSession session = convManager.getSession(userId);
-		String topic = session.getTopic();
-
-		ChatbotResponseDto responseDto;
-
-		// handleChatbotOption:
-		// 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라
-		// 다르게 동작하여 유저 선택에 대해 응답하도록 함.
-		switch (topic) {
-		case "job":
-			responseDto = jobManager.setConvSubTopic(session, userChoice);
-			break;
-		case "spec":
-			responseDto = specManager.setConvSubTopic(session, userChoice);
-			break;
-		case "ss":
-			responseDto = ssManager.setConvSubTopic(session, userChoice);
-			break;
-		case "act":
-			responseDto = actManager.setConvSubTopic(session, userChoice);
-			break;
-		default:
-			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-		}
-
-		return responseDto;
+		
+		//세션 sub 주제 설정
+		convManager.setConvSubTopic(session, selectedItem);
 	}
 
 	// 유저가 대화를 시작한 후 메세지 전송버튼 클릭한 경우 ===========================
 	// 세션 정보에 따라 매니저 서비스 호출
-	@RequestMapping(value = "sendMessageToChatbot.do", method = RequestMethod.POST)
+	@RequestMapping(value = "sendMessageToChatbot.do", 
+										method = RequestMethod.POST)
 	@ResponseBody
 	public ChatbotResponseDto sendMessageToChatbot(
 			HttpSession loginSession,
@@ -164,7 +133,6 @@ public class ChatbotController {
 	public ChatbotResponseDto submitChatbotOption(
 			@RequestParam("userChoice") String userChoice,
 			HttpSession loginSession
-	/* HttpSession loginSession */
 	) {
 		String userId = (String) loginSession.getAttribute("userId");
 		ConvSession session = convManager.getSession(userId);
