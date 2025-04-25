@@ -1,6 +1,6 @@
 package com.project.irumi.board.dto;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 public class PostDTO {
     private Long postId;
@@ -8,7 +8,7 @@ public class PostDTO {
     private String postType;
     private String postTitle;
     private String postContent;
-    private LocalDateTime postTime;
+    private Timestamp postTime;
     private int postViewCount;
     private int postReportCount;
     private int postRecommend;
@@ -18,7 +18,7 @@ public class PostDTO {
     public PostDTO() {}
 
     public PostDTO(Long postId, String postWriter, String postType, String postTitle, String postContent,
-                   LocalDateTime postTime, int postViewCount, int postReportCount, int postRecommend,
+                   Timestamp postTime, int postViewCount, int postReportCount, int postRecommend,
                    String postSavedName, String postOriginalName) {
         this.postId = postId;
         this.postWriter = postWriter;
@@ -48,8 +48,8 @@ public class PostDTO {
     public String getPostContent() { return postContent; }
     public void setPostContent(String postContent) { this.postContent = postContent; }
 
-    public LocalDateTime getPostTime() { return postTime; }
-    public void setPostTime(LocalDateTime postTime) { this.postTime = postTime; }
+    public Timestamp getPostTime() { return postTime; }
+    public void setPostTime(Timestamp postTime) { this.postTime = postTime; }
 
     public int getPostViewCount() { return postViewCount; }
     public void setPostViewCount(int postViewCount) { this.postViewCount = postViewCount; }
@@ -82,5 +82,4 @@ public class PostDTO {
                 ", postOriginalName='" + postOriginalName + '\'' +
                 '}';
     }
-    
-}
+} 

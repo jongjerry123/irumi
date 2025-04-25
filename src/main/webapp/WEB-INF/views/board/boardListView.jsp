@@ -54,7 +54,7 @@
       <button onclick="location.href='noticeList.do'">공지사항</button>
       <c:if test="${loginUser.userAuthority == '2'}">
         <button class="admin-btn" onclick="location.href='badUserList.do'">
-          <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
+          <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
         </button>
       </c:if>
     </div>
@@ -84,7 +84,7 @@
     </div>
     <c:choose>
       <c:when test="${not empty loginUser}">
-        <button class="write-btn" onclick="location.href='board/writePost.do?type=일반'">✏ 글쓰기</button>
+        <button class="write-btn" onclick="location.href='writePost.do?type=일반'">✏ 글쓰기</button>
       </c:when>
       <c:otherwise>
         <button class="write-btn" onclick="location.href='loginPage.do'">✏ 글쓰기</button>
