@@ -207,7 +207,7 @@ $(function() {
 		contentType: 'application/json; charset:UTF-8',
 		success: function(data) {
 			$.each(data, function(index, item) {
-				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\')">' + item.jobName + '</button>');
+				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\'); $(\'#jobExplain\').html(\'' + item.jobExplain + '\');">' + item.jobName + '</button>');
 			});
 			$('#jobs').html($('#jobs').html() + '<button onclick="addJob()">목표 직업 추가하기</button>');
 			$('#jobs').html($('#jobs').html() + '<button onclick="searchJob()">목표 직업 탐색하기</button>');
