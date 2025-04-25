@@ -27,11 +27,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void registerUser(User user) {
-        // 비밀번호 암호화
         user.setUserPwd(bcryptPasswordEncoder.encode(user.getUserPwd()));
-        // 기본 권한 설정
-        user.setUserAuthority("1"); // 일반 사용자
-        userDao.insertUser(user);
+        userDao.registerUser(user);
     }
 
 }

@@ -21,15 +21,15 @@ public class User implements java.io.Serializable{
 	private String emailVerification;
 	private String emailVerificationToken;
 	private java.sql.Date emailTokenExpiry;
-	
+	private java.sql.Date chPWD;
 	//constructor
 	public User() {
 		super();
 	}
 	public User(String userId, String userPwd, String userName, String userEmail, Date registDate,
-			String userUniversity, String userDegree, String userGradulate, int userPoint, String userAuthority,
+			String userUniversity, String userDegree, String userGradulate, double userPoint, String userAuthority,
 			int userLoginType, String userSocialId, String emailVerification, String emailVerificationToken,
-			Date emailTokenExpiry) {
+			Date emailTokenExpiry, Date chPWD) {
 		super();
 		this.userId = userId;
 		this.userPwd = userPwd;
@@ -46,9 +46,8 @@ public class User implements java.io.Serializable{
 		this.emailVerification = emailVerification;
 		this.emailVerificationToken = emailVerificationToken;
 		this.emailTokenExpiry = emailTokenExpiry;
+		this.chPWD = chPWD;
 	}
-	
-	//getter && setter
 	public String getUserId() {
 		return userId;
 	}
@@ -100,7 +99,7 @@ public class User implements java.io.Serializable{
 	public double getUserPoint() {
 		return userPoint;
 	}
-	public void setUserPoint(int userPoint) {
+	public void setUserPoint(double userPoint) {
 		this.userPoint = userPoint;
 	}
 	public String getUserAuthority() {
@@ -133,11 +132,17 @@ public class User implements java.io.Serializable{
 	public void setEmailVerificationToken(String emailVerificationToken) {
 		this.emailVerificationToken = emailVerificationToken;
 	}
-	public Date getEmailTokenExpiry() {
+	public java.sql.Date getEmailTokenExpiry() {
 		return emailTokenExpiry;
 	}
-	public void setEmailTokenExpiry(Date emailTokenExpiry) {
+	public void setEmailTokenExpiry(java.sql.Date emailTokenExpiry) {
 		this.emailTokenExpiry = emailTokenExpiry;
+	}
+	public java.sql.Date getChPWD() {
+		return chPWD;
+	}
+	public void setChPWD(java.sql.Date chPWD) {
+		this.chPWD = chPWD;
 	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -149,7 +154,8 @@ public class User implements java.io.Serializable{
 				+ ", userGradulate=" + userGradulate + ", userPoint=" + userPoint + ", userAuthority=" + userAuthority
 				+ ", userLoginType=" + userLoginType + ", userSocialId=" + userSocialId + ", emailVerification="
 				+ emailVerification + ", emailVerificationToken=" + emailVerificationToken + ", emailTokenExpiry="
-				+ emailTokenExpiry + "]";
+				+ emailTokenExpiry + ", chPWD=" + chPWD + "]";
 	}
 	
+
 }

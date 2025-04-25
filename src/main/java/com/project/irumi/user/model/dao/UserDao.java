@@ -20,7 +20,7 @@ public class UserDao {
 		return sqlSessionTemplate.selectOne("userMapper.countByUserId", userId);
 	}
 
-	public int insertUser(User user) {
+	public int registerUser(User user) {
 		return sqlSessionTemplate.insert("userMapper.insertUser", user);
 	}
 
