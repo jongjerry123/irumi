@@ -116,23 +116,48 @@ body {
 	color: #000;
 }
 
-.buttons button.selected {
-	background-color: #fff;
-	color: #000;
+.buttons button.active {
+	background-color: #00f7d7;   /* 강조 배경색 :contentReference[oaicite:0]{index=0} */
+	color: #000;                  /* 강조 글자색 :contentReference[oaicite:1]{index=1} */
+	border-color: #00f7d7;        /* 테두리도 강조색과 맞춤 :contentReference[oaicite:2]{index=2} */
 }
+
 </style>
 <script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
 <script>
 function movetoUpDash() {
 	location.href = 'upDash.do';
-
 }
 function viewSpecs(jobId) {
-	console.log(jobId);
+	$.ajax({
+		url: 'userSpecsView.do',
+		method: 'POST',
+		data: { 'jobId': jobId },
+		dataType: 'json',
+		success: function(data) {
+			
+			// 결과를 저장할 변수
+			var output = '';
+			$.each(data, function(index, item) {
+				output += '<button>' + item.specName + '</button>';
+			});
+			
+			output += '<button onclick="addSpec()">목표 스펙 추가하기</button>';
+			output += '<button onclick="searchSpec()">목표 스펙 탐색하기</button>';
+			$('#specs').html(output);
+		},
+		error: function(xhr, status, error) {
+			console.error("에러 발생:", error);
+		}
+	});
 }
 
 function addJob() {
 	location.href = 'addJob.do';
+}
+
+function searchJob() {
+	location.href = 'searchJob.do';
 }
 
 // 학력정보를 표시함
@@ -185,11 +210,23 @@ $(function() {
 				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\')">' + item.jobName + '</button>');
 			});
 			$('#jobs').html($('#jobs').html() + '<button onclick="addJob()">목표 직업 추가하기</button>');
+			$('#jobs').html($('#jobs').html() + '<button onclick="searchJob()">목표 직업 탐색하기</button>');
+			
 		},
 		error: function(xhr, status, error) {
 			console.error("에러 발생:", error);
 		}
 	});
+	
+	// 버튼에 active 클래스로 색깔 처리하기
+	$('.buttons').each(function(){
+		var $grp = $(this);
+		$grp.on('click', 'button', function(){
+			$grp.find('button').removeClass('active');
+			$(this).addClass('active');
+		});
+	});
+	
 });
 </script>
 
@@ -236,16 +273,16 @@ $(function() {
 	<div class="content">
 		<h2>목표 직무</h2>
 		<div id="jobs" class="buttons"><!-- 여기에 직무 버튼이 생성됨 --></div>
+		<div id="jobExplain"><!-- 여기에 직무에 관한 설명이 추가됨 --></div>
 		<h2>목표 스펙 달성도</h2>
-		
 		<div class="progress-bar">
 			<div class="progress" style="width: 35%">35%</div>
 		</div>
-		
+		<br>
+		<h2>목표 스펙</h2>
+		<div id="specs" class="buttons"><!-- 여기에 스펙 버튼이 생성됨 --></div>
 	</div>
 </div>
-
-
 
 <!-- footer 표시 -->
 <c:import url="/WEB-INF/views/common/footer.jsp" />

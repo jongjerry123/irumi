@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import com.project.irumi.dashboard.model.dto.Dashboard;
 import com.project.irumi.dashboard.model.dto.Job;
+import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.Specific;
 
 @Repository("dashboardDao")
 public class DashboardDao {
@@ -27,6 +29,11 @@ public class DashboardDao {
 	public ArrayList<Job> selectUserJobs(String userId) {
 		List<Job> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserJobs", userId);
 		return (ArrayList<Job>) list;
+	}
+	
+	public ArrayList<Spec> selectUserSpecs(Specific specific) {
+		List<Spec> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserSpecs", specific);
+		return (ArrayList<Spec>) list;
 	}
 	
 }

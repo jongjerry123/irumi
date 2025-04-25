@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.project.irumi.dashboard.model.dto.Dashboard;
 import com.project.irumi.dashboard.model.dto.Job;
+import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
 
@@ -47,8 +49,13 @@ public class DashboardController {
 		return "dashboard/newJob";
 	}
 	
+	@RequestMapping("searchJob.do")
+	public String moveToSearchJob() {
+		return "chatbot/job";
+	}
+	
 	// 유저의 현재 스펙(userUniversity, userDegree, userGraduate, userPoint)을 보여주는 메소드
-	@RequestMapping(value = "userSpecView.do", method = RequestMethod.POST, produces = "application/json; charset:UTF-8")
+	@RequestMapping(value="userSpecView.do", method=RequestMethod.POST, produces="application/json; charset:UTF-8")
 	@ResponseBody
 	public Dashboard selectUserSpec(HttpSession session) {
 		
@@ -78,13 +85,26 @@ public class DashboardController {
 		}
 	}
 	
-	@RequestMapping(value = "userJobView.do", method = RequestMethod.POST, produces = "application/json; charset:UTF-8")
+	@RequestMapping(value="userJobView.do", method=RequestMethod.POST, produces="application/json; charset:UTF-8")
 	@ResponseBody
 	public ArrayList<Job> selectUserJobs(Model model, HttpSession session) {
 		
 		// 로그인 유저 불러오기
 		User loginUser = (User) session.getAttribute("loginUser");
 		return dashboardService.selectUserJobs(loginUser.getUserId());
+	}
+	
+	@RequestMapping(value="userSpecsView.do", method=RequestMethod.POST, produces="application/json; charset:UTF-8")
+	@ResponseBody
+	public ArrayList<Spec> selectUserSpecs(@RequestParam("jobId") String jobId, Model model, HttpSession session) {
+		
+		// 로그인 유저 불러오기
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		return dashboardService.selectUserSpecs(specific);
+		
 	}
 	
 	
