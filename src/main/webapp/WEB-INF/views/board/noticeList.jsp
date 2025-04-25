@@ -126,10 +126,10 @@
 
       <!-- 관리자만 보는 벨 버튼 -->
       <c:if test="${loginUser.userAuthority == '2'}">
-  <button class="admin-btn" onclick="location.href='badUserList.do'">
-    <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
-  </button>
-</c:if>
+        <button class="admin-btn" onclick="location.href='badUserList.do'">
+          <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
+        </button>
+      </c:if>
     </div>
   </div>
 
@@ -137,7 +137,7 @@
     <div></div>
     <div class="board-header">
       <c:if test="${loginUser.userAuthority == '2'}">
-        <button class="write-btn" onclick="location.href='board/writePost.do?type=공지'">✏ 공지 등록</button>
+        <button class="write-btn" onclick="location.href='writePost.do?type=공지'">✏ 공지 등록</button>
       </c:if>
     </div>
   </div>

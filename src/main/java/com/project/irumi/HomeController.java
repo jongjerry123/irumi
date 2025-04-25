@@ -45,7 +45,7 @@ public class HomeController {
 	
 	@RequestMapping("/boardPage.do")  
     public String forwardBoardListView() {
-        return "redirect:/freeBoard.do";  // 자유게시판으로 리디렉트
+        return "redirect:/board/freeBoard.do";  // 자유게시판으로 리디렉트
     }
 
 

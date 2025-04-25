@@ -22,17 +22,15 @@
       margin: 0 auto;
     }
 
-    .top-bar {
+    .category-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 30px;
       margin-bottom: 30px;
     }
 
-    .section-title {
-      font-size: 24px;
-      font-weight: 600;
-      margin-right: 30px;
+    .category-bar h2 {
+      margin: 0;
     }
 
     .tabs {
@@ -59,7 +57,6 @@
       border: 1px solid #ff4c4c;
       border-radius: 10px;
       padding: 8px;
-      margin-left: auto;
       cursor: pointer;
     }
 
@@ -143,21 +140,19 @@
 </head>
 <body>
 <div class="main-content">
-  <!-- 상단 구조 (타이틀 + 게시판 탭 + 벨버튼) -->
-  <div class="top-bar">
-    <h2 class="section-title">불량 이용자 관리</h2>
-
+  <!-- 상단 구조 (카테고리 + 벨버튼 포함) -->
+  <div class="category-bar">
+    <h2>커뮤니티</h2>
     <div class="tabs">
-      <button onclick="location.href='boardPage.do'">자유 주제</button>
-      <button onclick="location.href='qnaList.do'">QnA</button>
+      <button onclick="location.href='freeBoard.do'">자유게시판</button>
+      <button onclick="location.href='qnaList.do'">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
+      <c:if test="${loginUser.userAuthority == '2'}">
+        <button class="admin-btn" onclick="location.href='badUserList.do'">
+          <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
+        </button>
+      </c:if>
     </div>
-
-    <c:if test="${loginUser.userAuthority == '2'}">
-      <button class="admin-btn" onclick="location.href='badUserList.do'">
-        <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
-      </button>
-    </c:if>
   </div>
 
   <!-- 불량 관련 탭 -->
