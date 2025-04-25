@@ -504,6 +504,8 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 </head>
 <body>
    <c:import url="/WEB-INF/views/common/header.jsp"/>
+   <!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 chatbot로 설정함 -->
+<c:set var="menu" value="chat" scope="request" />
 
  <div class="container">
 

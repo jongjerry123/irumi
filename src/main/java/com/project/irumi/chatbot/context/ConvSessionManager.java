@@ -18,7 +18,8 @@ public class ConvSessionManager {
 
     // 새 주제 시작 → 기존 세션 종료 후 새로 생성
     public ConvSession createNewSession(String userId, String topic) {
-    	sessionMap.remove(userId);
+//    	sessionMap.remove(userId);
+    	if (userId == null) userId = "user"; ////// 임시 추가
         ConvSession session = new ConvSession(userId, topic);
         sessionMap.put(userId, session);
         return session;

@@ -11,7 +11,7 @@ public class ConvSession {
     private String userId;
     private final List<String> contextHistory = new ArrayList<>();
 
-    public ConvSession(String topic, String userId) {
+    public ConvSession(String userId, String topic) {  /// 수정
     	// 현재는 subtopic이 세션 중에 변경 가능한 주제인듯?
         this.topic = topic;
         this.userId = userId;

@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,59 +29,87 @@ function moveActPage() {
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
-     // 버튼 선택 토글 이벤트
-     const btns = document.querySelectorAll(".select-btn");
-     btns.forEach(btn => {
-       btn.addEventListener("click", function() {
-         this.classList.toggle("active");
-       });
-     });
+  let sessionStarted = false;
+  fetch("/irumi/startChatSession.do", {
+	    method: "POST",
+	    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	    body: new URLSearchParams({ topic: "act" })
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+	    // data.message 활용해서 "활동 챗봇 세션이 시작되었습니다!" 등 안내문 띄워도 됨
+	    // 또는 전역변수에 data.convId 저장해서 이후 메시지 보낼 때 사용
+	    window.currentConvId = data.convId; // 필요하면 이렇게 저장
+	  });
+  
+  
+  
+  function startChatSession(topic = "act") {
+    return fetch("/irumi/startChatSession.do", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ topic })
+    })
+    .then(response => response.json())
+    .then(data => {
+      sessionStarted = true;
+      // console.log("세션 생성 성공:", data);
+      return data;
+    });
+  }
 
-     // 채팅 보내기 함수
-     function sendMessage() {
-       const userInput = document.getElementById("userInput");
-       const chatArea = document.getElementById("chatArea");
-       const message = userInput.value.trim();
-       if (!message) return;
+  function sendMessage() {
+    const userInput = document.getElementById("userInput");
+    const chatArea = document.getElementById("chatArea");
+    const message = userInput.value.trim();
+    if (!message) return;
 
-       const userDiv = document.createElement("div");
-       userDiv.className = "message user-msg";
-       userDiv.textContent = message;
-       chatArea.appendChild(userDiv);
+    reallySendMessage(message, chatArea, userInput);
+  }
 
-       fetch("/chatbot/sendUserMsg.do", {
-         method: "POST",
-         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-         body: new URLSearchParams({
-           convId: "demo-conv-id",
-           topic: "job",
-           userMsg: message
-         })
-       })
-       .then(response => response.text())
-       .then(gptReply => {
-         const botDiv = document.createElement("div");
-         botDiv.className = "message bot-msg";
-         botDiv.textContent = gptReply;
-         chatArea.appendChild(botDiv);
-         userInput.value = "";
-         chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
-       });
-     }
+  function reallySendMessage(message, chatArea, userInput) {
+    // 1) 사용자 메시지 표시
+    const userDiv = document.createElement("div");
+    userDiv.className = "message user-msg";
+    userDiv.textContent = message;
+    chatArea.appendChild(userDiv);
 
-     // 엔터키 이벤트 추가
-     document.getElementById("userInput").addEventListener("keyup", function(event) {
-       if (event.key === "Enter") {
-         sendMessage();
-       }
-     });
+    // 2) 서버로 메시지 전송
+    fetch("/irumi/sendMessageToChatbot.do", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ userMsg: message })
+    })
+    .then(response => response.json())
+    .then(gptReply => {
+      const botDiv = document.createElement("div");
+      botDiv.className = "message bot-msg";
+      // gptReply가 객체(JSON)인지 문자열인지 분기 처리
+      if (typeof gptReply === "object" && gptReply.gptAnswer) {
+        botDiv.textContent = gptReply.gptAnswer;
+      } else {
+        botDiv.textContent = "오류: 잘못된 응답";
+      }
+      chatArea.appendChild(botDiv);
+      userInput.value = "";
+      chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
+    }).catch(e => {
+      const botDiv = document.createElement("div");
+      botDiv.className = "message bot-msg";
+      botDiv.textContent = "서버 오류 또는 JSON 파싱 실패!";
+      chatArea.appendChild(botDiv);
+    });
+  }
 
-     // 버튼 클릭 시 메시지 전송 이벤트 추가
-     document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
+  // 이벤트 연결
+  document.getElementById("userInput").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") sendMessage();
+  });
+  document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
 
-   });
-
+});
 </script>
+
 <style>
 body {
    background-color: #111;
@@ -463,6 +492,7 @@ body {
 </head>
 <body>
    <c:import url="/WEB-INF/views/common/header.jsp"/>
+<c:set var="menu" value="chat" scope="request" />
 
  <div class="container">
 <!-- Sidebar -->

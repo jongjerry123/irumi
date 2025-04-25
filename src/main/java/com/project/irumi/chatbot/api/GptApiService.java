@@ -5,15 +5,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import java.util.*;
+import org.springframework.context.annotation.PropertySource;
+
 
 @Component
-public class GptApiClient {
+@PropertySource("classpath:application.properties")
+public class GptApiService {
     @Value("${openai.api.key}")
     private String openaiApiKey;
 
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
     public String callGPT(String prompt) {
+    	
+    	System.out.println("GPT API KEY: " + openaiApiKey);
+    	
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -35,4 +41,5 @@ public class GptApiClient {
         return gptReply.trim();
     }
 }
+
 
