@@ -5,6 +5,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
+/* 
+한 유저는 항상 하나의 세션만 가질 수 있다
+다른 탭으로 넘어가면 기존 세션은 삭제되고 새로 시작된다
+서버는 항상 로그인 유저의 userId를 알고 있다
+ */
+
 @Component
 public class ConvSessionManager {
 
@@ -12,6 +18,7 @@ public class ConvSessionManager {
 
     // 새 주제 시작 → 기존 세션 종료 후 새로 생성
     public ConvSession createNewSession(String userId, String topic) {
+    	sessionMap.remove(userId);
         ConvSession session = new ConvSession(userId, topic);
         sessionMap.put(userId, session);
         return session;
