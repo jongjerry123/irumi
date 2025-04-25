@@ -55,3 +55,4 @@ out/
 *.prefs
 *.lock
 *.log
+src/main/resources/application.properties
