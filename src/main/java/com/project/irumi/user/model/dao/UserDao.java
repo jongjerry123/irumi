@@ -9,19 +9,26 @@ import com.project.irumi.user.model.dto.User;
 @Repository
 public class UserDao {
 
-	@Autowired
-	private SqlSessionTemplate sqlSessionTemplate;
+    @Autowired
+    private SqlSessionTemplate sqlSessionTemplate;
 
-	public User selectUser(User user) {
-		return sqlSessionTemplate.selectOne("userMapper.selectUser", user);
-	}
+    // 사용자 조회 (로그인 시 사용)
+    public User selectUser(User user) {
+        return sqlSessionTemplate.selectOne("userMapper.selectUser", user);
+    }
 
-	public int countByUserId(String userId) {
-		return sqlSessionTemplate.selectOne("userMapper.countByUserId", userId);
-	}
+    // 아이디 중복 확인
+    public int countByUserId(String userId) {
+        return sqlSessionTemplate.selectOne("userMapper.countByUserId", userId);
+    }
 
-	public int registerUser(User user) {
-		return sqlSessionTemplate.insert("userMapper.insertUser", user);
-	}
+    // 이메일 중복 확인
+    public int countByEmail(String email) {
+        return sqlSessionTemplate.selectOne("userMapper.countByEmail", email);
+    }
 
+    // 사용자 등록 (회원가입)
+    public int registerUser(User user) {
+        return sqlSessionTemplate.insert("userMapper.insertUser", user);
+    }
 }
