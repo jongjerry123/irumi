@@ -30,8 +30,8 @@ public class BoardController {
         int pageSize = 10;
         int offset = (page - 1) * pageSize;
 
-        List<PostDTO> posts = postService.getFreePosts(period, sort, keyword, offset, pageSize);
-        int totalCount = postService.countFreePosts(period, keyword);
+        List<PostDTO> posts = postService.getPostsByTypeWithPaging("일반", offset, pageSize);
+        int totalCount = postService.countPostsByType("일반");
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
         model.addAttribute("postList", posts);
@@ -48,7 +48,7 @@ public class BoardController {
     // 공지사항
     @RequestMapping("noticeList.do")
     public String showNoticeList(Model model) {
-        List<PostDTO> notices = postService.getPostsByType("notice");
+        List<PostDTO> notices = postService.getPostsByType("공지");
         model.addAttribute("postList", notices);
         return "board/noticeList";
     }
@@ -59,35 +59,36 @@ public class BoardController {
         return "board/writePost";
     }
 
-    // 글 등록 처리 (자유/질문 공통)
+    // ✅ 글 등록 후 게시판 타입에 따라 이동
     @RequestMapping(value = "board/insertPost.do", method = RequestMethod.POST)
     public String insertPost(@ModelAttribute PostDTO post, HttpSession session) {
-        String writer = (String) session.getAttribute("loginUser");
-        post.setPostWriter(writer);
-
-        postService.insertPost(post);
-
-        return "redirect:" + ("qna".equals(post.getPostType()) ? "qnaList.do" : "freeBoard.do");
-    }
-
-    // 공지사항 글 등록 처리 (관리자 전용)
-    @PostMapping("board/insertNoticePost.do")
-    public String insertNoticePost(@RequestParam("postTitle") String title,
-                                   @RequestParam("postContent") String content,
-                                   HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser == null || !"2".equals(String.valueOf(loginUser.getUserLoginType()))) {
-            return "redirect:main.do";
+        if (loginUser == null) {
+            return "redirect:loginPage.do";
         }
 
-        PostDTO post = new PostDTO();
-        post.setPostTitle(title);
-        post.setPostContent(content);
         post.setPostWriter(loginUser.getUserId());
-        post.setPostType("notice");
-
         postService.insertPost(post);
-        return "redirect:noticeList.do";
+
+        String redirect;
+        switch (post.getPostType()) {
+            case "질문" -> redirect = "qnaList.do";
+            case "공지" -> redirect = "noticeList.do";
+            default -> redirect = "freeBoard.do";
+        }
+
+        return "redirect:" + redirect;
+    }
+
+    // ✅ 게시글 상세보기
+    @GetMapping("postDetail.do")
+    public String showPostDetail(@RequestParam("postId") Long postId, Model model) {
+        PostDTO post = postService.getPostById(postId);
+        List<CommentDTO> commentList = postService.getCommentsByPostId(postId);
+
+        model.addAttribute("post", post);
+        model.addAttribute("commentList", commentList);
+        return "board/postDetailView";
     }
 
     // 신고된 게시글 탭
@@ -106,7 +107,7 @@ public class BoardController {
         return "board/reportedPosts";
     }
 
-    // ✅ 신고된 댓글 탭 (최종 버전)
+    // 신고된 댓글 탭
     @GetMapping("reportedComments.do")
     public String showReportedComments(HttpSession session, Model model,
                                        @RequestParam(value = "page", required = false, defaultValue = "1") int page) {

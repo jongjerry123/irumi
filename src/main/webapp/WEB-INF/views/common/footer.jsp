@@ -125,7 +125,7 @@
     </li>
     <li data-icon="<c:url value='/resources/icons/globe-icon.png' />"
         class="${menu eq 'community' ? 'active' : ''}"
-        onclick="location.href = 'boardPage.do'">
+        onclick="location.href = 'freeBoard.do'">
       <img src="/irumi/resources/images/community.png" alt="커뮤니티" class="icon-img" />
       <span>유저 커뮤니티</span>
     </li>

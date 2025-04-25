@@ -43,10 +43,11 @@ public class HomeController {
 		return "chatbot/start";
 	}
 	
-	@RequestMapping("boardPage.do")
-	public String forwardBoardListView() {
-	    return "board/boardListView";  // board/boardListView.jsp 로 이동
-	}
+	@RequestMapping("/boardPage.do")  
+    public String forwardBoardListView() {
+        return "redirect:/freeBoard.do";  // 자유게시판으로 리디렉트
+    }
+
 
 	
 }

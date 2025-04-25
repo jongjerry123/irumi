@@ -154,21 +154,20 @@
   </div>
 
   <div class="filters">
-    <div></div>
-    <div class="board-header">
-  <c:choose>
-    <c:when test="${not empty loginUser}">
-      <c:if test="${loginUser.userAuthority == !'2'}">
-        <button class="write-btn" onclick="location.href='board/writePost.do?type=qna'">✏ 질문 등록</button>
-      </c:if>
-    </c:when>
-    <c:otherwise>
-      <!-- 자유게시판과 동일하게 로그인 페이지 경로 사용 -->
-      <button class="write-btn" onclick="location.href='loginPage.do'">✏ 질문 등록</button>
-    </c:otherwise>
-  </c:choose>
-</div>
+  <div></div>
+  <div class="board-header">
+    <c:choose>
+      <c:when test="${not empty loginUser}">
+        <c:if test="${loginUser.userAuthority ne '2'}">
+          <button class="write-btn" onclick="location.href='board/writePost.do?type=질문'">✏ 질문 등록</button>
+        </c:if>
+      </c:when>
+      <c:otherwise>
+        <button class="write-btn" onclick="location.href='loginPage.do'">✏ 질문 등록</button>
+      </c:otherwise>
+    </c:choose>
   </div>
+</div>
 
   <table class="board-table">
     <thead>
