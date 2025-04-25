@@ -1,10 +1,14 @@
 package com.project.irumi.board.service;
 
-import com.project.irumi.board.dao.PostDAO;
-import com.project.irumi.board.dto.PostDTO;
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.project.irumi.board.dao.PostDAO;
+import com.project.irumi.board.dto.CommentDTO;
+import com.project.irumi.board.dto.PostDTO;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class PostService {
@@ -59,5 +63,15 @@ public class PostService {
 
     public int countMyQnaPosts(String loginUserId) {
         return postDAO.countMyQnaPosts(loginUserId);
+    }
+
+ // 신고된 댓글 목록 조회
+    public List<CommentDTO> getReportedComments(int offset, int pageSize) {
+        return postDAO.selectReportedComments(offset, pageSize);
+    }
+
+    // 신고된 댓글 개수 조회
+    public int countReportedComments() {
+        return postDAO.countReportedComments();
     }
 }

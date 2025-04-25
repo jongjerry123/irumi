@@ -126,10 +126,10 @@
 
       <!-- 관리자만 보는 벨 버튼 -->
       <c:if test="${loginUser.userAuthority == '2'}">
-        <button class="admin-btn" onclick="location.href='badUserManage.do'">
-          <img src="resources/img/bell.png" alt="관리자 알림" height="20" />
-        </button>
-      </c:if>
+  <button class="admin-btn" onclick="location.href='badUserList.do'">
+    <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
+  </button>
+</c:if>
     </div>
   </div>
 
