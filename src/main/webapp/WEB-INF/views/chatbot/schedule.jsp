@@ -10,20 +10,20 @@
 <script>
 
 function moveJobPage() {
-   location.href = 'startJobRecChat.do';
-}
+	   location.href = 'viewJobRecChat.do';
+	}
 
-function moveSpecPage() {
-   location.href = 'startSpecRecChat.do';
-}
+	function moveSpecPage() {
+	   location.href = 'viewSpecRecChat.do';
+	}
 
-function moveSchedulePage() {
-   location.href = 'startScheduleRecChat.do';
-}
+	function moveSchedulePage() {
+	   location.href = 'viewScheduleRecChat.do';
+	}
 
-function moveActPage() {
-   location.href = 'startActRecChat.do';
-}
+	function moveActPage() {
+	   location.href = 'viewActRecChat.do';
+	}
 </script>
 
 <script>
