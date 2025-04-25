@@ -137,7 +137,7 @@
     <div></div>
     <div class="board-header">
       <c:if test="${loginUser.userAuthority == '2'}">
-        <button class="write-btn" onclick="location.href='board/writePost.do?type=notice'">✏ 공지 등록</button>
+        <button class="write-btn" onclick="location.href='board/writePost.do?type=공지'">✏ 공지 등록</button>
       </c:if>
     </div>
   </div>

@@ -45,8 +45,13 @@
       resize: vertical;
       height: 200px;
     }
-    .btn-submit {
-      align-self: flex-end;
+    .btn-wrap {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .btn-submit,
+    .btn-cancel {
       background-color: #A983A3;
       border: none;
       padding: 10px 24px;
@@ -54,28 +59,66 @@
       color: #fff;
       cursor: pointer;
     }
+    .btn-cancel {
+      background-color: #555;
+    }
   </style>
+  <script>
+    function updateHeaderAndType(select) {
+      const type = select.value;
+      const header = document.getElementById('post-header');
+      const hiddenInput = document.querySelector('input[name="postType"]');
+
+      switch (type) {
+        case '질문':
+          header.innerText = '질문 등록';
+          break;
+        case '공지':
+          header.innerText = '공지사항 등록';
+          break;
+        default:
+          header.innerText = '글쓰기';
+      }
+
+      hiddenInput.value = type;
+    }
+  </script>
 </head>
 <body>
 <div class="main-content">
-  <h2>${param.type == 'qna' ? '질문 등록' : '글쓰기'}</h2>
+  <h2 id="post-header">
+    <c:choose>
+      <c:when test="${param.type eq '질문'}">질문 등록</c:when>
+      <c:when test="${param.type eq '공지'}">공지사항 등록</c:when>
+      <c:otherwise>글쓰기</c:otherwise>
+    </c:choose>
+  </h2>
+
   <form action="insertPost.do" method="post">
-    <input type="hidden" name="postType" value="${param.type}" />
-    <label for="category">카테고리</label>
-    <select id="category" onchange="document.querySelector('[name=postType]').value = this.value">
-      <option value="free" ${param.type == 'free' ? 'selected' : ''}>자유게시판</option>
-      <option value="qna" ${param.type == 'qna' ? 'selected' : ''}>Q&A</option>
-    </select>
+  <input type="hidden" name="postType" value="${param.type}" />
 
-    <label for="title">제목</label>
-    <input type="text" id="title" name="postTitle" required />
+  <label for="category">카테고리</label>
+  <select id="category" name="category" onchange="updateHeaderAndType(this)">
+    <option value="일반" ${param.type eq '일반' ? 'selected' : ''}>자유게시판</option>
+    <option value="질문" ${param.type eq '질문' ? 'selected' : ''}>Q&A</option>
+    <c:if test="${loginUser.userAuthority eq '2'}">
+      <option value="공지" ${param.type eq '공지' ? 'selected' : ''}>공지사항</option>
+    </c:if>
+  </select>
 
-    <label for="content">내용</label>
-    <textarea id="content" name="postContent" required></textarea>
+  <label for="title">제목</label>
+  <input type="text" id="title" name="postTitle" required />
 
+  <label for="content">내용</label>
+  <textarea id="content" name="postContent" required></textarea>
+
+  <div style="display: flex; justify-content: flex-end; gap: 8px;">
+    <button type="button" class="btn-submit" onclick="history.back()">취소</button>
     <button type="submit" class="btn-submit">등록</button>
-  </form>
+  </div>
+</form>
 </div>
+
 <c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

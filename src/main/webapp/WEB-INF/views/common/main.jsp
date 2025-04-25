@@ -146,7 +146,7 @@ header {
         location.href = 'dashboard.do';
     }
     function moveToCommu() {
-        location.href = 'boardPage.do';
+        location.href = 'freeBoard.do';
     }
 </script>
 </head>
