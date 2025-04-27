@@ -319,16 +319,20 @@ input[type="text"], input[type="password"], input[type="email"] {
           dataType: 'json',
           success: function(data) {
             console.log('Email check success:', data);
-            emailMessage.textContent = data.message;
-            emailMessage.classList.toggle('success', data.available);
-            emailMessage.classList.toggle('error', !data.available);
-            isEmailAvailable = data.available;
-            if (data.available && isEmailValid) {
+            if (data.available) {
+              emailMessage.textContent = '사용 가능한 이메일입니다.';
+              emailMessage.classList.add('success');
+              emailMessage.classList.remove('error');
+              isEmailAvailable = true;
               sendVerificationButton.disabled = false;
               sendVerificationButton.style.backgroundColor = '#2ccfcf';
               sendVerificationButton.style.color = 'black';
               sendVerificationButton.style.cursor = 'pointer';
             } else {
+              emailMessage.textContent = '이미 등록된 이메일입니다. 다른 이메일을 입력해주세요.';
+              emailMessage.classList.add('error');
+              emailMessage.classList.remove('success');
+              isEmailAvailable = false;
               sendVerificationButton.disabled = true;
               sendVerificationButton.style.backgroundColor = 'black';
               sendVerificationButton.style.color = 'white';
@@ -339,8 +343,8 @@ input[type="text"], input[type="password"], input[type="email"] {
           error: function(jqXHR, textStatus, errorThrown) {
             console.error('Email check error:', jqXHR, textStatus, errorThrown);
             emailMessage.textContent = '이메일 확인 중 오류가 발생했습니다.';
-            emailMessage.classList.remove('success');
             emailMessage.classList.add('error');
+            emailMessage.classList.remove('success');
             isEmailAvailable = false;
             sendVerificationButton.disabled = true;
             sendVerificationButton.style.backgroundColor = 'black';
@@ -360,7 +364,6 @@ input[type="text"], input[type="password"], input[type="email"] {
           emailMessage.classList.add('error');
           return;
         }
-        // 버튼 비활성화
         sendVerificationButton.disabled = true;
         sendVerificationButton.style.backgroundColor = 'black';
         sendVerificationButton.style.color = 'white';
@@ -384,7 +387,6 @@ input[type="text"], input[type="password"], input[type="email"] {
             verificationMessage.textContent = '인증번호를 입력해주세요.';
             verificationMessage.classList.remove('error');
             verificationMessage.classList.add('success');
-            // 인증번호 입력 필드와 확인 버튼 즉시 활성화
             verificationCodeInput.disabled = false;
             verifyCodeButton.disabled = false;
             verifyCodeButton.style.backgroundColor = '#2ccfcf';
@@ -405,7 +407,6 @@ input[type="text"], input[type="password"], input[type="email"] {
             verifyCodeButton.style.color = 'white';
             verifyCodeButton.style.cursor = 'not-allowed';
           }
-          // 5초 후 인증전송 버튼 재활성화
           setTimeout(() => {
             if (isEmailValid && isEmailAvailable) {
               console.log('Re-enabling sendVerificationButton');
@@ -427,7 +428,6 @@ input[type="text"], input[type="password"], input[type="email"] {
           verifyCodeButton.style.backgroundColor = 'black';
           verifyCodeButton.style.color = 'white';
           verifyCodeButton.style.cursor = 'not-allowed';
-          // 5초 후 인증전송 버튼 재활성화
           setTimeout(() => {
             if (isEmailValid && isEmailAvailable) {
               console.log('Re-enabling sendVerificationButton after error');
