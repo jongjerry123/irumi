@@ -139,7 +139,8 @@ function viewSpecs(jobId) {
 			// 결과를 저장할 변수
 			var output = '';
 			$.each(data, function(index, item) {
-				output += '<button>' + item.specName + '</button>';
+				// TODO: 여기부터 시작
+				output += '<button onclick="$(\'#specExplain\').html(\'' + item.specExplain + '\');">' + item.specName + '</button>';
 			});
 			
 			output += '<button onclick="addSpec()">목표 스펙 추가하기</button>';
@@ -156,8 +157,16 @@ function addJob() {
 	location.href = 'addJob.do';
 }
 
+function addSpec() {
+	location.href = 'addSpec.do';
+}
+
 function searchJob() {
 	location.href = 'searchJob.do';
+}
+
+function searchSpec() {
+	location.href = 'searchSpec.do';
 }
 
 // 학력정보를 표시함
@@ -207,7 +216,7 @@ $(function() {
 		contentType: 'application/json; charset:UTF-8',
 		success: function(data) {
 			$.each(data, function(index, item) {
-				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\'); $(\'#jobExplain\').html(\'' + item.jobExplain + '\');">' + item.jobName + '</button>');
+				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\'); $(\'#jobExplain\').html(\'' + item.jobExplain + '\'); $(\'#specExplain\').html(\'\');">' + item.jobName + '</button>');
 			});
 			$('#jobs').html($('#jobs').html() + '<button onclick="addJob()">목표 직업 추가하기</button>');
 			$('#jobs').html($('#jobs').html() + '<button onclick="searchJob()">목표 직업 탐색하기</button>');
@@ -281,6 +290,7 @@ $(function() {
 		<br>
 		<h2>목표 스펙</h2>
 		<div id="specs" class="buttons"><!-- 여기에 스펙 버튼이 생성됨 --></div>
+		<div id="specExplain"><!-- 여기에 스펙 설명이 추가됨 --></div>
 	</div>
 </div>
 

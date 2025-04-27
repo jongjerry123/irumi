@@ -49,9 +49,19 @@ public class DashboardController {
 		return "dashboard/newJob";
 	}
 	
+	@RequestMapping("addSpec.do")
+	public String moveToAddSpec() {
+		return "dashboard/newSpec";
+	}
+	
 	@RequestMapping("searchJob.do")
 	public String moveToSearchJob() {
 		return "chatbot/job";
+	}
+	
+	@RequestMapping("searchSpec.do")
+	public String moveToSearchSpec() {
+		return "chatbot/spec";
 	}
 	
 	// 유저의 현재 스펙(userUniversity, userDegree, userGraduate, userPoint)을 보여주는 메소드
