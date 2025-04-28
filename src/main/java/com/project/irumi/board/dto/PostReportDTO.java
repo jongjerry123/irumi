@@ -1,17 +1,17 @@
 package com.project.irumi.board.dto;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 public class PostReportDTO {
     private Long reportId;
     private Long targetId;
     private String reportReason;
     private String reportedBy;
-    private LocalDateTime reportDate;
+    private Timestamp reportDate;
 
     public PostReportDTO() {}
 
-    public PostReportDTO(Long reportId, Long targetId, String reportReason, String reportedBy, LocalDateTime reportDate) {
+    public PostReportDTO(Long reportId, Long targetId, String reportReason, String reportedBy, Timestamp reportDate) {
         this.reportId = reportId;
         this.targetId = targetId;
         this.reportReason = reportReason;
@@ -31,8 +31,8 @@ public class PostReportDTO {
     public String getReportedBy() { return reportedBy; }
     public void setReportedBy(String reportedBy) { this.reportedBy = reportedBy; }
 
-    public LocalDateTime getReportDate() { return reportDate; }
-    public void setReportDate(LocalDateTime reportDate) { this.reportDate = reportDate; }
+    public Timestamp getReportDate() { return reportDate; }
+    public void setReportDate(Timestamp reportDate) { this.reportDate = reportDate; }
 
     @Override
     public String toString() {

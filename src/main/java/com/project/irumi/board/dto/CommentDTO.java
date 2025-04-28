@@ -1,6 +1,6 @@
 package com.project.irumi.board.dto;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 public class CommentDTO {
     private Long comId;
@@ -8,14 +8,15 @@ public class CommentDTO {
     private Long postId;
     private Long comParentId;
     private String comContent;
-    private LocalDateTime comTime;
+    private Timestamp comTime;
     private int comRecommend;
     private int comReportCount;
+    private int lvl; // ❗ 추가
 
     public CommentDTO() {}
 
     public CommentDTO(Long comId, String comWrId, Long postId, Long comParentId, String comContent,
-                      LocalDateTime comTime, int comRecommend, int comReportCount) {
+                      Timestamp comTime, int comRecommend, int comReportCount, int lvl) { // ❗ 수정
         this.comId = comId;
         this.comWrId = comWrId;
         this.postId = postId;
@@ -24,6 +25,7 @@ public class CommentDTO {
         this.comTime = comTime;
         this.comRecommend = comRecommend;
         this.comReportCount = comReportCount;
+        this.lvl = lvl; // ❗ 추가
     }
 
     public Long getComId() { return comId; }
@@ -41,14 +43,17 @@ public class CommentDTO {
     public String getComContent() { return comContent; }
     public void setComContent(String comContent) { this.comContent = comContent; }
 
-    public LocalDateTime getComTime() { return comTime; }
-    public void setComTime(LocalDateTime comTime) { this.comTime = comTime; }
+    public Timestamp getComTime() { return comTime; }
+    public void setComTime(Timestamp comTime) { this.comTime = comTime; }
 
     public int getComRecommend() { return comRecommend; }
     public void setComRecommend(int comRecommend) { this.comRecommend = comRecommend; }
 
     public int getComReportCount() { return comReportCount; }
     public void setComReportCount(int comReportCount) { this.comReportCount = comReportCount; }
+
+    public int getLvl() { return lvl; } // ❗ 추가
+    public void setLvl(int lvl) { this.lvl = lvl; } // ❗ 추가
 
     @Override
     public String toString() {
@@ -61,6 +66,7 @@ public class CommentDTO {
                 ", comTime=" + comTime +
                 ", comRecommend=" + comRecommend +
                 ", comReportCount=" + comReportCount +
+                ", lvl=" + lvl +  // ❗ 추가
                 '}';
     }
 }

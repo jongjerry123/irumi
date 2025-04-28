@@ -60,6 +60,12 @@
       cursor: pointer;
     }
 
+    /* 🔥 추가: 벨 버튼 강조 스타일 */
+    .admin-btn.active {
+      border: 2px solid #ff4c4c;
+      background-color: #1a1a1a;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -105,6 +111,12 @@
       cursor: pointer;
     }
 
+    /* 🔥 추가: 불량 이용자 등록 버튼 강조용 */
+    .btn-danger {
+      border: 1px solid #ff4c4c;
+      color: #ff4c4c;
+    }
+
     .pagination {
       display: flex;
       gap: 10px;
@@ -138,13 +150,13 @@
 
   <!-- 상단 카테고리 + 벨 버튼 -->
   <div class="category-bar">
-    <h2>커뮤니티</h2>
+    <h2>불량 이용자 관리</h2> <!-- 수정된 부분 -->
     <div class="tabs">
-      <button onclick="location.href='freeboard.do'">자유게시판</button>
+      <button onclick="location.href='freeBoard.do'">자유게시판</button>
       <button onclick="location.href='qnaList.do'">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
       <c:if test="${loginUser.userAuthority == '2'}">
-        <button class="admin-btn" onclick="location.href='badUserList.do'">
+        <button class="admin-btn active" onclick="location.href='badUserList.do'">
           <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
         </button>
       </c:if>
@@ -185,7 +197,7 @@
     <div class="left">신고된 게시글 수: ${fn:length(reportedPostList)}개</div>
     <div class="right">
       <button class="btn-action">선택한 게시글 삭제</button>
-      <button class="btn-action">불량 이용자 등록</button>
+      <button class="btn-action btn-danger">불량 이용자 등록</button> <!-- 🔥 강조 스타일 적용 -->
     </div>
   </div>
 

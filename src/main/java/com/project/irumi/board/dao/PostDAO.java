@@ -1,55 +1,76 @@
 package com.project.irumi.board.dao;
 
-import com.project.irumi.board.dto.CommentDTO;
-import com.project.irumi.board.dto.PostDTO;
-import jakarta.annotation.Resource;
-import org.apache.ibatis.session.SqlSession;
-import org.springframework.stereotype.Repository;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.stereotype.Repository;
+
+import com.project.irumi.board.dto.CommentDTO;
+import com.project.irumi.board.dto.PostDTO;
+
+import jakarta.annotation.Resource;
+
 @Repository
 public class PostDAO {
 
-    @Resource(name = "sqlSessionTemplate") // ✔ sqlSessionTemplate로 변경
+    @Resource(name = "sqlSessionTemplate")
     private SqlSession sqlSession;
 
+    // ✅ 게시글 등록
+    public void insertPost(PostDTO post) {
+        sqlSession.insert("boardMapper.insertPost", post);
+    }
+
+    // ✅ 게시글 등록 후 ID 반환
     public Long insertPostAndReturnId(PostDTO post) {
         sqlSession.insert("boardMapper.insertPost", post);
         return sqlSession.selectOne("boardMapper.selectLastPostId");
     }
 
-    public void insertPost(PostDTO post) {
-        sqlSession.insert("boardMapper.insertPost", post);
-    }
-
+    // ✅ 게시글 단건 조회
     public PostDTO getPostById(Long postId) {
         return sqlSession.selectOne("boardMapper.selectPostById", postId);
     }
 
+    // ✅ 게시글 댓글 전체 조회 (대댓글 순서 수정)
     public List<CommentDTO> getCommentsByPostId(Long postId) {
-        return sqlSession.selectList("boardMapper.selectCommentsByPostId", postId);
+        return sqlSession.selectList("boardMapper.selectCommentsByPostIdOrdered", postId);
     }
 
-    public List<PostDTO> selectFreePosts(String period, String sort, String keyword, int offset, int pageSize) {
+    // ✅ 자유게시판/질문게시판 필터+정렬+검색 조회
+    public List<PostDTO> selectFilteredPosts(String postType, String period, String sort, String keyword, int offset, int pageSize) {
         Map<String, Object> param = new HashMap<>();
+        param.put("postType", postType);
+        param.put("period", period);
+        param.put("sort", sort);
         param.put("keyword", keyword);
         param.put("offset", offset);
         param.put("pageSize", pageSize);
-        param.put("sort", sort);
-        return sqlSession.selectList("boardMapper.selectFreePosts", param);
+        return sqlSession.selectList("boardMapper.selectFilteredPosts", param);
     }
 
-    public int countFreePosts(String period, String keyword) {
-        return sqlSession.selectOne("boardMapper.countFreePosts", keyword);
+    // ✅ 자유게시판/질문게시판 필터+검색된 게시글 수
+    public int countFilteredPosts(String postType, String period, String keyword) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("postType", postType);
+        param.put("period", period);
+        param.put("keyword", keyword);
+        return sqlSession.selectOne("boardMapper.countFilteredPosts", param);
     }
 
+    // ✅ 게시글 조회수 증가
+    public void updatePostViewCount(Long postId) {
+        sqlSession.update("boardMapper.updatePostViewCount", postId);
+    }
+
+    // ✅ 타입별 게시글 조회
     public List<PostDTO> selectByType(String postType) {
         return sqlSession.selectList("boardMapper.selectByType", postType);
     }
 
+    // ✅ 타입별 게시글 페이징 조회
     public List<PostDTO> selectByTypeWithPaging(String postType, int offset, int pageSize) {
         Map<String, Object> param = new HashMap<>();
         param.put("postType", postType);
@@ -58,38 +79,37 @@ public class PostDAO {
         return sqlSession.selectList("boardMapper.selectByTypeWithPaging", param);
     }
 
+    // ✅ 타입별 게시글 수 조회
     public int countPostsByType(String postType) {
         return sqlSession.selectOne("boardMapper.countPostsByType", postType);
     }
 
-    public List<PostDTO> selectQnaPostsWithAnswerFlag(String loginUserId, int offset, int pageSize) {
-        return sqlSession.selectList("boardMapper.selectQnaPostsWithAnswerFlag", Map.of(
-            "loginUserId", loginUserId,
-            "offset", offset,
-            "pageSize", pageSize
-        ));
+    // ✅ 내 QnA 질문 목록 조회
+    public List<PostDTO> selectMyOwnPosts(String userId, int offset, int pageSize) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("offset", offset);
+        param.put("pageSize", pageSize);
+        return sqlSession.selectList("boardMapper.selectMyQnaPosts", param);
     }
 
-    public int countQnaPostsWithAnswerFlag(String loginUserId) {
-        return sqlSession.selectOne("boardMapper.countQnaPostsWithAnswerFlag", loginUserId);
+    // ✅ 내 QnA 질문 수 조회
+    public int countMyQnaPosts(String userId) {
+        return sqlSession.selectOne("boardMapper.countMyQnaPosts", userId);
     }
 
-    public List<PostDTO> selectMyQnaPosts(String loginUserId, int offset, int pageSize) {
-        return sqlSession.selectList("boardMapper.selectMyQnaPosts", Map.of(
-            "loginUserId", loginUserId,
-            "offset", offset,
-            "pageSize", pageSize
-        ));
+    // ✅ QnA 답변 여부 조회
+    public boolean existsAnswerByPostId(Long postId) {
+        Integer count = sqlSession.selectOne("boardMapper.countAnswersByPostId", postId);
+        return count != null && count > 0;
     }
 
-    public int countMyQnaPosts(String loginUserId) {
-        return sqlSession.selectOne("boardMapper.countMyQnaPosts", loginUserId);
-    }
-
+    // ✅ 신고된 게시글 수
     public int countReportedPosts() {
         return sqlSession.selectOne("boardMapper.countReportedPosts");
     }
 
+    // ✅ 신고된 댓글 목록
     public List<CommentDTO> selectReportedComments(int offset, int pageSize) {
         Map<String, Object> param = new HashMap<>();
         param.put("offset", offset);
@@ -97,7 +117,53 @@ public class PostDAO {
         return sqlSession.selectList("boardMapper.selectReportedComments", param);
     }
 
+    // ✅ 신고된 댓글 수
     public int countReportedComments() {
         return sqlSession.selectOne("boardMapper.countReportedComments");
+    }
+
+    // ✅ 불량이용자 게시판 체크박스 선택 후 댓글 삭제
+    public void deleteComments(List<Long> commentIds) {
+        sqlSession.delete("boardMapper.deleteSelectedComments", commentIds);
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long commentId) {
+        sqlSession.delete("boardMapper.deleteComment", commentId);
+    }
+
+    // ✅ 게시글 수정
+    public void updatePost(PostDTO post) {
+        sqlSession.update("boardMapper.updatePost", post);
+    }
+
+    // ✅ 게시글 삭제
+    public void deletePost(Long postId) {
+        sqlSession.delete("boardMapper.deletePost", postId);
+    }
+
+    // ✅ 게시글 추천 수 증가
+    public void increaseRecommend(Long postId) {
+        sqlSession.update("boardMapper.increaseRecommend", postId);
+    }
+
+    // ✅ 게시글 신고 수 증가
+    public void increaseReport(Long postId) {
+        sqlSession.update("boardMapper.increaseReport", postId);
+    }
+
+    // ✅ 댓글 등록
+    public void insertComment(CommentDTO comment) {
+        sqlSession.insert("boardMapper.insertComment", comment);
+    }
+
+    // ✅ 댓글 추천 수 증가
+    public void increaseCommentRecommend(Long commentId) {
+        sqlSession.update("boardMapper.increaseCommentRecommend", commentId);
+    }
+
+    // ✅ 댓글 신고 수 증가
+    public void increaseCommentReport(Long commentId) {
+        sqlSession.update("boardMapper.increaseCommentReport", commentId);
     }
 }

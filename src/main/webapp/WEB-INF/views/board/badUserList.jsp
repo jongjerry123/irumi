@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/common/header.jsp" />
@@ -58,6 +58,12 @@
       border-radius: 10px;
       padding: 8px;
       cursor: pointer;
+    }
+
+    /* 🔥 수정 추가: 벨 버튼 강조 스타일 */
+    .admin-btn.active {
+      border: 2px solid #ff4c4c;
+      background-color: #1a1a1a;
     }
 
     table {
@@ -142,13 +148,13 @@
 <div class="main-content">
   <!-- 상단 구조 (카테고리 + 벨버튼 포함) -->
   <div class="category-bar">
-    <h2>커뮤니티</h2>
+    <h2>불량 이용자 관리</h2> <!-- 수정된 부분 -->
     <div class="tabs">
       <button onclick="location.href='freeBoard.do'">자유게시판</button>
       <button onclick="location.href='qnaList.do'">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
       <c:if test="${loginUser.userAuthority == '2'}">
-        <button class="admin-btn" onclick="location.href='badUserList.do'">
+        <button class="admin-btn active" onclick="location.href='badUserList.do'">
           <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
         </button>
       </c:if>
