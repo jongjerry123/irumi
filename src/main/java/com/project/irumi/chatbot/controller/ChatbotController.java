@@ -102,44 +102,32 @@ public class ChatbotController {
 		convManager.setConvSubTopic(session, selectedItem);
 	}
 
-	
-	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우
-	// 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에 append
-	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
-	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
-	@ResponseBody
-	public ChatbotResponseDto submitChatbotOption(
-			@RequestParam("userChoice") String userChoice,
-			HttpSession loginSession
-	) {
-		String userId = (String) loginSession.getAttribute("userId");
-		ConvSession session = convManager.getSession(userId);
-		String topic = session.getTopic();
-
-		ChatbotResponseDto responseDto;
-
-		// handleChatbotOption:
-		// 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라
-		// 다르게 동작하여 유저 선택에 대해 응답하도록 함.
-		switch (topic) {
-		case "job":
-			responseDto = jobManager.handleChatbotOption(session, userChoice);
-			break;
-		case "spec":
-			responseDto = specManager.handleChatbotOption(session, userChoice);
-			break;
-		case "ss":
-			responseDto = ssManager.handleChatMessage(session, userChoice);
-			break;
-		case "act":
-			responseDto = actManager.handleChatMessage(session, userChoice);
-			break;
-		default:
-			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-		}
-
-		return responseDto;
-	}
+	/*
+	 * // 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우 // 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에
+	 * append // 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
+	 * 
+	 * @RequestMapping(value = "submitChatbotOption.do", method =
+	 * RequestMethod.POST)
+	 * 
+	 * @ResponseBody public ChatbotResponseDto submitChatbotOption(
+	 * 
+	 * @RequestParam("userChoice") String userChoice, HttpSession loginSession ) {
+	 * String userId = (String) loginSession.getAttribute("userId"); ConvSession
+	 * session = convManager.getSession(userId); String topic = session.getTopic();
+	 * 
+	 * ChatbotResponseDto responseDto;
+	 * 
+	 * // handleChatbotOption: // 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라 // 다르게
+	 * 동작하여 유저 선택에 대해 응답하도록 함. switch (topic) { case "job": responseDto =
+	 * jobManager.handleChatbotOption(session, userChoice); break; case "spec":
+	 * responseDto = specManager.handleChatbotOption(session, userChoice); break;
+	 * case "ss": responseDto = ssManager.handleChatMessage(session, userChoice);
+	 * break; case "act": responseDto = actManager.handleChatMessage(session,
+	 * userChoice); break; default: responseDto = new
+	 * ChatbotResponseDto("유효하지 않은 주제입니다.", null); }
+	 * 
+	 * return responseDto; }
+	 */
 
 	// 메소드 추가 =====================================================
 	// 사용자가 직접 직무/ 스펙/ 일정/ 활동 입력하고 추가 버튼 누르는 경우

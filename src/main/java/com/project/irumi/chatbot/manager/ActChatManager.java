@@ -25,101 +25,104 @@ public class ActChatManager {
 	}
 
 	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
-		StateActChat state = (StateActChat) session.getChatState();
-		if (state == null) state = StateActChat.START;
-	    String lastTopic = session.getLastTopic();
-		
-	    
-	    switch (state) {
-	        case START:
-	            session.setChatState(StateActChat.RECOMMEND_RESOURCE);
-	            return new ChatbotResponseDto(
-	                "어떤 스펙에 대한 활동을 추천받으실 건가요?"
-	            );
+        StateActChat state = (StateActChat) session.getChatState();
+        if (state == null) state = StateActChat.START;
+        String lastSpec = session.getLastTopic();
+        String lastActivityType = (String) session.getLastActivityType();
 
-	        case RECOMMEND_RESOURCE:
-	            if ("네".equals(userMsg)) {
-	                session.setChatState(StateActChat.SELECT_SPEC_TOPIC);
-	                return new ChatbotResponseDto(
-	                    "어떤 스펙(분야/기술/자격증 등)에 대해 추천받고 싶으신가요? (예: 자바스크립트, 프론트엔드, 정보처리기사 등 자유롭게 입력)",
-	                    null
-	                );
-	            } else if ("아니요".equals(userMsg)) {
-	                session.setChatState(StateActChat.COMPLETE);
-	                return new ChatbotResponseDto("알겠습니다. 궁금한 점이 있으면 언제든 말씀해 주세요!", null);
-	            } else {
-	                // 버튼이 아닌 입력(주제)도 허용
-	                session.setLastTopic(userMsg);
-	                session.setChatState(StateActChat.SELECT_SPEC_TOPIC);
-	                return new ChatbotResponseDto(
-	                    "알겠습니다! " + userMsg + "에 대해 더 궁금한 점이 있으신가요? (필요 역량, 준비 방법 등)",
-	                    List.of("필요 역량 추천받기", "준비 방법 추천받기", "처음으로")
-	                );
-	            }
+        switch (state) {
+            case START:
+                session.setChatState(StateActChat.INPUT_SPEC);
+                return new ChatbotResponseDto(
+                    "어떤 스펙(분야/자격증 등)에 대한 활동을 추천받고 싶으신가요?"
+                );
 
-	        case SELECT_SPEC_TOPIC:
-	            // 주제 입력 받았거나, 버튼 선택
-	            if (userMsg != null && !userMsg.equals("처음으로")) {
-	                session.setLastTopic(userMsg);
-	                session.setChatState(StateActChat.ASK_REQUIRED_SKILL);
+            case INPUT_SPEC:
+                if (userMsg != null && !userMsg.isBlank()) {
+                    session.setLastTopic(userMsg.trim());
+                    session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
+                    return new ChatbotResponseDto(
+                        "'" + userMsg + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?",
+                        List.of("도서 추천", "영상 추천", "기타 활동 추천")
+                    );
+                } else {
+                    return new ChatbotResponseDto(
+                        "추천받고 싶은 스펙(분야/자격증 등)을 입력해 주세요."
+                    );
+                }
 
-	                // 도서/자료 추천
-	                String gptAnswer = gptApiService.callGPT(userMsg + " 관련 추천 도서 3개만, 한 줄에 1개씩 출력해줘.");
-	                
-	                List<String> bookList = Arrays.stream(gptAnswer.split("\n"))
-	                        .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
-	                        .collect(Collectors.toList());
-	                
-	                return new ChatbotResponseDto(
-	                	"관련 도서를 선택해보세요!", // 안내 멘트
-	                    bookList,
-	                    List.of("필요 역량 추천받기", "준비 방법 추천받기", "처음으로")
-	                );
-	            } else if ("처음으로".equals(userMsg)) {
-	                session.setChatState(StateActChat.START);
-	                return new ChatbotResponseDto("무엇이든 질문해 주세요!", null);
-	            }
-	            return new ChatbotResponseDto("추천받고 싶은 스펙을 입력해 주세요!", null);
+            case CHOOSE_ACTIVITY_TYPE:
+                // 버튼 또는 텍스트 입력 모두 허용
+                String type = null;
+                if ("도서 추천".equals(userMsg)) type = "도서";
+                else if ("영상 추천".equals(userMsg)) type = "영상";
+                else if ("기타 활동 추천".equals(userMsg)) type = "기타 활동";
+                else type = userMsg; // 자유 텍스트도 허용
 
-	        case ASK_REQUIRED_SKILL:
-	            lastTopic = (String) session.getLastTopic();
-	            if ("필요 역량 추천받기".equals(userMsg)) {
-	                // 필요 역량 추천
-	                String gptAnswer = gptApiService.callGPT(lastTopic + " 준비에 필요한 능력/조건/지식 2~3개만 간단히 알려줘.");
-	                return new ChatbotResponseDto(
-	                    gptAnswer,
-	                    List.of("준비 방법 추천받기", "처음으로")
-	                );
-	            } else if ("준비 방법 추천받기".equals(userMsg)) {
-	                // 준비 방법 추천
-	                String gptAnswer = gptApiService.callGPT(lastTopic + " 준비/학습 방법을 요약해줘.");
-	                return new ChatbotResponseDto(
-	                    gptAnswer,
-	                    List.of("필요 역량 추천받기", "처음으로")
-	                );
-	            } else if ("처음으로".equals(userMsg)) {
-	                session.setChatState(StateActChat.START);
-	                return new ChatbotResponseDto("새로운 질문을 입력해 주세요!", null);
-	            } else {
-	                // 자유 질문 받기
-	                String gptAnswer = gptApiService.callGPT(lastTopic + " 관련 질문: " + userMsg + " 에 대한 답변 알려줘.");
-	                return new ChatbotResponseDto(
-	                    gptAnswer,
-	                    List.of("필요 역량 추천받기", "준비 방법 추천받기", "처음으로")
-	                );
-	            }
+                session.setLastActivityType(type);
+                session.setChatState(StateActChat.RECOMMEND);
+                return recommendActivity(lastSpec, type, session);
 
-	        case COMPLETE:
-	            // 대화 종료/초기화 안내
-	            session.setChatState(StateActChat.START);
-	            return new ChatbotResponseDto("대화가 종료되었습니다. 다시 시작하려면 질문을 입력해 주세요!", null);
+            case RECOMMEND:
+                // SHOW_MORE_OPTIONS로 자동 이동해서 버튼 선택받기
+                session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
+                return new ChatbotResponseDto(
+                    "더 추천받거나 다른 유형을 원하시면 아래 옵션을 선택하세요.",
+                    List.of("더 추천", "다른 유형", "종료")
+                );
 
-	        default:
-	            session.setChatState(StateActChat.START);
-	            return new ChatbotResponseDto("오류가 발생했습니다. 처음부터 다시 시도해 주세요.", null);
-	    } 
+            case SHOW_MORE_OPTIONS:
+                if ("더 추천".equals(userMsg)) {
+                    session.setChatState(StateActChat.RECOMMEND);
+                    return recommendActivity(lastSpec, lastActivityType, session);
+                } else if ("다른 유형".equals(userMsg)) {
+                    session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
+                    return new ChatbotResponseDto(
+                        "어떤 유형의 활동을 추천받으시겠어요?",
+                        List.of("도서 추천", "영상 추천", "기타 활동 추천")
+                    );
+                } else if ("종료".equals(userMsg)) {
+                    session.setChatState(StateActChat.COMPLETE);
+                    return new ChatbotResponseDto("활동 추천을 종료합니다. 궁금한 점이 있으면 언제든 질문해 주세요!");
+                } else {
+                    return new ChatbotResponseDto(
+                        "원하시는 옵션을 선택해 주세요.",
+                        List.of("더 추천", "다른 유형", "종료")
+                    );
+                }
 
-	}
+            case COMPLETE:
+                session.setChatState(StateActChat.START);
+                return new ChatbotResponseDto("대화를 종료합니다. 새로운 활동 추천이 필요하면 말씀해 주세요!");
+
+            default:
+                session.setChatState(StateActChat.START);
+                return new ChatbotResponseDto("오류가 발생했습니다. 처음부터 다시 시도해 주세요.");
+        }
+    }
+
+    /** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
+    private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session) {
+        String prompt = "";
+        switch (activityType) {
+            case "도서":
+                prompt = spec + " 학습에 도움 되는 추천 도서 3권만 한글로 알려줘. 각 도서명/저자 간략 설명만.";
+                break;
+            case "영상":
+                prompt = spec + " 공부에 추천할 만한 무료 온라인 강의나 유튜브 영상 3개만 추천해줘. 각 링크와 간단한 설명 포함해서.";
+                break;
+            case "기타 활동":
+                prompt = spec + " 실전 경험을 쌓을 수 있는 대외활동, 공모전, 봉사, 동아리 등 3가지 추천해줘.";
+                break;
+            default:
+                prompt = spec + "와 관련된 추천 활동을 3개만 제안해줘. 유형은 자유롭게 섞어도 좋아.";
+        }
+        String gptAnswer = gptApiService.callGPT(prompt);
+
+        return new ChatbotResponseDto(
+            "'" + spec + "'에 대한 " + activityType + " 추천 결과:\n" + gptAnswer
+        );
+    }
 
 }
 

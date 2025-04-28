@@ -14,6 +14,8 @@ public class ConvSession {
 
 	// 추가
 	private String lastTopic;
+	// 추가 활동 타입 (도서, 영상, 기타 등등)
+	private String lastActivityType;
 
 
 	private final List<String> contextHistory = new ArrayList<>();
@@ -101,6 +103,12 @@ public class ConvSession {
     }
     public void setLastTopic(String lastTopic) {
         this.lastTopic = lastTopic;
+    }
+    public String getLastActivityType() {
+        return lastActivityType;
+    }
+    public void setLastActivityType(String lastActivityType) {
+        this.lastActivityType = lastActivityType;
     }
 
 }
