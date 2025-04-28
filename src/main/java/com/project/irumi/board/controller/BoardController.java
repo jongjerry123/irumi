@@ -20,7 +20,7 @@ public class BoardController {
     @Autowired
     private PostService postService;
 
-    // 자유게시판
+    // ✅ 자유게시판
     @GetMapping("/freeBoard.do")
     public String showFreeBoard(@RequestParam(value = "period", required = false, defaultValue = "전체") String period,
                                 @RequestParam(value = "sort", required = false, defaultValue = "") String sort,
@@ -30,7 +30,6 @@ public class BoardController {
 
         int pageSize = 10;
         int offset = (page - 1) * pageSize;
-
         List<PostDTO> posts = postService.getFilteredPosts("일반", period, sort, keyword, offset, pageSize);
         int totalCount = postService.countFilteredPosts("일반", period, keyword);
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
@@ -46,7 +45,7 @@ public class BoardController {
         return "board/boardListView";
     }
 
-    // 공지사항
+    // ✅ 공지사항
     @GetMapping("/noticeList.do")
     public String showNoticeList(Model model) {
         List<PostDTO> notices = postService.getPostsByType("공지");
@@ -54,7 +53,7 @@ public class BoardController {
         return "board/noticeList";
     }
 
-    // Q&A 목록
+    // ✅ QnA 목록
     @GetMapping("/qnaList.do")
     public String showQnaList(@RequestParam(value = "period", required = false, defaultValue = "전체") String period,
                               @RequestParam(value = "sort", required = false, defaultValue = "") String sort,
@@ -64,7 +63,6 @@ public class BoardController {
 
         int pageSize = 10;
         int offset = (page - 1) * pageSize;
-
         List<PostDTO> posts = postService.getFilteredPosts("질문", period, sort, keyword, offset, pageSize);
 
         // 답변 유무 세팅
@@ -88,7 +86,7 @@ public class BoardController {
         return "board/qnaList";
     }
 
-    // 내 질문만 보기
+    // ✅ 내 질문만 보기
     @GetMapping("/myQna.do")
     public String showMyQnaPosts(HttpSession session, Model model,
                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -99,7 +97,6 @@ public class BoardController {
 
         int pageSize = 10;
         int offset = (page - 1) * pageSize;
-
         List<PostDTO> posts = postService.getMyQnaPosts(loginUser.getUserId(), offset, pageSize);
         int totalCount = postService.countMyQnaPosts(loginUser.getUserId());
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
@@ -112,14 +109,14 @@ public class BoardController {
         return "board/qnaList";
     }
 
-    // 글쓰기 화면
+    // ✅ 글쓰기 화면
     @GetMapping("/writePost.do")
     public String showWritePostForm(@RequestParam("type") String type, Model model) {
         model.addAttribute("postType", type);
         return "board/writePost";
     }
 
-    // 글 등록
+    // ✅ 글 등록
     @PostMapping("/insertPost.do")
     public String insertPost(@ModelAttribute PostDTO post, HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
@@ -139,7 +136,7 @@ public class BoardController {
         return "redirect:" + redirect;
     }
 
-    // 게시글 상세보기
+    // ✅ 게시글 상세보기
     @GetMapping("/postDetail.do")
     public String showPostDetail(@RequestParam("postId") Long postId, Model model) {
         postService.increasePostViewCount(postId);
@@ -151,15 +148,7 @@ public class BoardController {
         return "board/postDetailView";
     }
 
-    // 공지사항 상세보기
-    @GetMapping("/detailPost.do")
-    public String showDetailPostFromNotice(@RequestParam("id") Long postId, Model model) {
-        PostDTO post = postService.getPostById(postId);
-        model.addAttribute("post", post);
-        return "board/postDetailView";
-    }
-
-    // 게시글 수정 화면 이동
+    // ✅ 게시글 수정 화면
     @GetMapping("/editPost.do")
     public String editPostForm(@RequestParam("postId") Long postId, Model model) {
         PostDTO post = postService.getPostById(postId);
@@ -167,49 +156,66 @@ public class BoardController {
         return "board/editPost";
     }
 
-    // 게시글 수정 처리
+    // ✅ 게시글 수정 처리
     @PostMapping("/updatePost.do")
     public String updatePost(@ModelAttribute PostDTO post) {
         postService.updatePost(post);
         return "redirect:/postDetail.do?postId=" + post.getPostId();
     }
 
-    // 게시글 삭제
+    // ✅ 게시글 삭제
     @PostMapping("/deletePost.do")
     public String deletePost(@RequestParam("postId") Long postId) {
         postService.deletePost(postId);
         return "redirect:/freeBoard.do";
     }
 
-    // 게시글 추천
+    // ✅ 게시글 추천
     @PostMapping("/recommendPost.do")
     public String recommendPost(@RequestParam("postId") Long postId) {
         postService.recommendPost(postId);
         return "redirect:/postDetail.do?postId=" + postId;
     }
 
-    // 게시글 신고
+    // ✅ 게시글 신고
     @PostMapping("/reportPost.do")
     public String reportPost(@RequestParam("postId") Long postId) {
         postService.reportPost(postId);
         return "redirect:/postDetail.do?postId=" + postId;
     }
 
-    // 댓글 등록
+    // ✅ 댓글 등록
     @PostMapping("/addComment.do")
     public String addComment(@RequestParam("postId") Long postId,
                               @RequestParam("commentContent") String commentContent,
+                              @RequestParam(value = "parentId", required = false) Long parentId,
                               HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
         if (loginUser == null) {
             return "redirect:/loginPage.do";
         }
 
-        postService.addComment(postId, commentContent, loginUser.getUserId());
+        postService.addComment(postId, commentContent, loginUser.getUserId(), parentId);
         return "redirect:/postDetail.do?postId=" + postId;
     }
 
-    // 신고된 게시글 목록
+    // ✅ 댓글 추천
+    @PostMapping("/recommendComment.do")
+    public String recommendComment(@RequestParam("commentId") Long commentId,
+                                    @RequestParam("postId") Long postId) {
+        postService.recommendComment(commentId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // ✅ 댓글 신고
+    @PostMapping("/reportComment.do")
+    public String reportComment(@RequestParam("commentId") Long commentId,
+                                 @RequestParam("postId") Long postId) {
+        postService.reportComment(commentId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // ✅ 신고된 게시글 목록
     @GetMapping("/reportedPosts.do")
     public String showReportedPosts(HttpSession session, Model model,
                                     @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -217,13 +223,14 @@ public class BoardController {
         if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
             return "redirect:/loginPage.do";
         }
-        model.addAttribute("reportedPostList", List.of());
+
+        model.addAttribute("reportedPostList", List.of()); // 임시
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", 1);
         return "board/reportedPosts";
     }
 
-    // 신고된 댓글 목록
+    // ✅ 신고된 댓글 목록
     @GetMapping("/reportedComments.do")
     public String showReportedComments(HttpSession session, Model model,
                                        @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -241,7 +248,15 @@ public class BoardController {
         return "board/reportedComments";
     }
 
-    // 불량 이용자 목록
+    // ✅ 신고 댓글 삭제
+    @PostMapping("/deleteSelectedComments.do")
+    @ResponseBody
+    public String deleteSelectedComments(@RequestBody List<Long> commentIds) {
+        postService.deleteCommentsByIds(commentIds);
+        return "success";
+    }
+
+    // ✅ 불량 이용자 목록
     @GetMapping("/badUserList.do")
     public String showBadUserList(HttpSession session, Model model,
                                   @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -249,17 +264,9 @@ public class BoardController {
         if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
             return "redirect:/loginPage.do";
         }
-        model.addAttribute("badUserList", List.of());
+        model.addAttribute("badUserList", List.of()); // 임시
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", 1);
         return "board/badUserList";
-    }
-
-    // 신고 댓글 삭제
-    @PostMapping("/deleteSelectedComments.do")
-    @ResponseBody
-    public String deleteSelectedComments(@RequestBody List<Long> commentIds) {
-        postService.deleteCommentsByIds(commentIds);
-        return "success";
     }
 }
