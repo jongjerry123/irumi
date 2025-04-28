@@ -10,4 +10,5 @@ public interface UserService {
     String findIdByEmail(String email);
     boolean checkUserMatch(String userId, String email);
     void updatePassword(String userId, String encodedPassword);
+    User findUserBySocialId(String socialId, int loginType);
 }

@@ -48,4 +48,9 @@ public class UserServiceImpl implements UserService {
     public void updatePassword(String userId, String encodedPassword) {
         userDao.updatePassword(userId, encodedPassword);
     }
+
+    @Override
+    public User findUserBySocialId(String socialId, int loginType) {
+        return userDao.findUserBySocialId(socialId, loginType);
+    }
 }
