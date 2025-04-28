@@ -10,6 +10,16 @@ public class ChatbotResponseDto {
 	public ChatbotResponseDto() {
 		super();
 	}
+	
+	
+	
+	public ChatbotResponseDto(String gptAnswer) {
+		super();
+		this.gptAnswer = gptAnswer;
+	}
+
+
+
 	public ChatbotResponseDto(String gptAnswer, List<String> options) {
 		super();
 		this.gptAnswer = gptAnswer;

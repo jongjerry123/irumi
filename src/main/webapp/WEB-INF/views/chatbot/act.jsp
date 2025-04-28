@@ -22,6 +22,9 @@ function moveActPage() {
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+	
+	const CHAT_TOPIC = "act";
+	
 	  // 활동(도서) 리스트에 추가하는 함수
 	  function addToActivityList(items) {
 	    const actList = document.getElementById("savedActivityList");
@@ -77,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	        alert("하나 이상 선택해 주세요!");
 	        return;
 	      }
-	      // 오른쪽 활동(도서) 리스트에 추가!
+	      // 오른쪽 활동(도서) 리스트에 추가
 	      addToActivityList(checked);
 	      removeCheckboxList();
 	    };
@@ -109,10 +112,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	    });
 	    chatArea.appendChild(btnWrap);
 	  }
+	  
 	  function removeOptionButtons() {
 	    const prev = document.getElementById("option-buttons");
 	    if (prev) prev.remove();
 	  }
+	  
 	  // 채팅 메시지 추가 함수
 	  function addMessageToChat(message, cls) {
 	    const chatArea = document.getElementById("chatArea");
@@ -121,13 +126,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	    div.textContent = message;
 	    chatArea.appendChild(div);
 	  }
+	  
 	  // 실제 메시지 전송 로직
 	  function sendMessage(message) {
 	    addMessageToChat(message, "user-msg");
 	    fetch("/irumi/sendMessageToChatbot.do", {
 	      method: "POST",
 	      headers: { "Content-Type": "application/json" },
-	      body: JSON.stringify({ userMsg: message })
+	      body: JSON.stringify({ userMsg: message, topic: CHAT_TOPIC})
 	    })
 	    .then(response => response.json())
 	    .then(gptReply => {
@@ -202,6 +208,16 @@ body {
   min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
   margin-top: 20px; /* header 높이만큼 아래로 */
 }
+
+.main {
+  flex: 1;
+  padding-right: 40px;
+  padding-left: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 사이드바 ************************************************************************************* */
 .sidebar, .right-panel {
   height: auto; /* 높이 자동 (100vh 등 절대값 X) */
 }
@@ -230,13 +246,9 @@ body {
   background-color: #BAAC80;
   color: black;
 }
-.main {
-  flex: 1;
-  padding-right: 40px;
-  padding-left: 40px;
-  display: flex;
-  flex-direction: column;
-}
+
+
+/* 컨텐츠 박스 ***********************************************/
 .content-box {
   background-color: #1e1e1e;
   padding-right: 20px;
@@ -262,6 +274,9 @@ body {
  scrollbar-color: #BAAC80 #222;
  scrollbar-width: thin;
 }
+
+
+/* 오른쪽 페널********************************************************* */
 .right-panel {
   width: 230px;
   padding-right: 20px;
@@ -295,6 +310,9 @@ body {
   font-size : 9px;  
   margin-left : 4px;
 }
+
+
+/* 채팅 쪽 부분 */
 .chat-input-box .chat-send-btn:hover {
   background: #BAAC80;
 }
@@ -334,6 +352,9 @@ body {
 .chat-input-box .chat-send-btn:hover {
   background: #BAAC80;
 }
+
+
+/* manual 부분 */
 .manual-input-box {
   display: flex;
   align-items: center;
@@ -370,6 +391,9 @@ body {
   background: #BAAC80;
   color: #232323;
 }
+
+
+/* 왼쪽 저장한 활동 부분 */
 .saved-schedule-section {
    margin-bottom: 20px;
 }
@@ -520,6 +544,7 @@ body {
  padding: 8px 16px;
  margin-top: 10px;
 } 
+
   /* 옵션 버튼 css 추가  */
  #option-buttons button.select-btn {
  padding: 8px 18px;
@@ -665,16 +690,9 @@ body {
   <div class="saved-schedule-section">
        <div class="section-title">➤ 저장한 활동</div>
       
-       <div class="saved-schedule-list" id="savedActivityList">
-           <!-- div class="schedule-card">
-               <button class="remove-btn">✕</button>
-               <span>정보처리기사 문제집 풀기</span>
-           </div>
-           <div class="schedule-card">
-               <button class="remove-btn">✕</button>
-               <span>정보처리기사 필기 강의 듣기</span>
-           </div>  -->
-       </div>
+       <div class="saved-schedule-list" id="savedActivityList"></div>
+       
+       
   <div class="manual-input-box">
    <input type="text" placeholder="직접 활동 입력" class="manual-input"/>
    <button class="add-btn"><i class="fa fa-plus"> + </i></button>
