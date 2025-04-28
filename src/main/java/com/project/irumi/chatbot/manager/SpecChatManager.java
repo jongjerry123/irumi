@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
+import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.context.StateSpecChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 
@@ -63,9 +64,11 @@ public class SpecChatManager {
                 }
 
             case COMPLETE:
+            	session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
                 return new ChatbotResponseDto("대화가 완료되었습니다. 추가로 필요한 것이 있으면 새로 시작해주세요.", null);
 
             default:
+            	session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
                 return new ChatbotResponseDto("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
         }
     }
