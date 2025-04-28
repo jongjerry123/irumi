@@ -78,15 +78,35 @@
 
   <div class="comment-box">
     <form class="comment-form" action="addComment.do" method="post">
-      <input type="hidden" name="postId" value="${post.postId}" />
-      <textarea name="commentContent" placeholder="댓글을 입력하세요."></textarea>
-      <button type="submit" class="submit-btn">
-        <c:choose>
-          <c:when test="${post.postType == '질문'}">질문 등록</c:when>
-          <c:otherwise>새 댓글 달기</c:otherwise>
-        </c:choose>
-      </button>
-    </form>
+  <input type="hidden" name="postId" value="${post.postId}" />
+  <textarea name="commentContent" placeholder="댓글을 입력하세요."></textarea>
+  
+  <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+    <!-- 목록으로 버튼 -->
+    <c:choose>
+      <c:when test="${post.postType == '자유'}">
+        <button type="button" class="btn" onclick="location.href='freeBoard.do'">목록으로</button>
+      </c:when>
+      <c:when test="${post.postType == '질문'}">
+        <button type="button" class="btn" onclick="location.href='qnaList.do'">목록으로</button>
+      </c:when>
+      <c:when test="${post.postType == '공지'}">
+        <button type="button" class="btn" onclick="location.href='noticeList.do'">목록으로</button>
+      </c:when>
+      <c:otherwise>
+        <button type="button" class="btn" onclick="location.href='freeBoard.do'">목록으로</button>
+      </c:otherwise>
+    </c:choose>
+
+    <!-- 질문등록(또는 새 댓글) 버튼 -->
+    <button type="submit" class="submit-btn">
+      <c:choose>
+        <c:when test="${post.postType == '질문'}">질문 등록</c:when>
+        <c:otherwise>새 댓글 달기</c:otherwise>
+      </c:choose>
+    </button>
+  </div>
+</form>
 
     <div class="comment-list">
       <c:forEach var="comment" items="${commentList}">
