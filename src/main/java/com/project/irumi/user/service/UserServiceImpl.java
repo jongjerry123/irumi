@@ -36,4 +36,16 @@ public class UserServiceImpl implements UserService {
         user.setUserPwd(bcryptPasswordEncoder.encode(user.getUserPwd()));
         userDao.registerUser(user);
     }
+    @Override
+    public String findIdByEmail(String email) {
+        return userDao.findIdByEmail(email);
+    }
+    @Override
+    public boolean checkUserMatch(String userId, String email) {
+        return userDao.countByUserIdAndEmail(userId, email) > 0;
+    }
+    @Override
+    public void updatePassword(String userId, String encodedPassword) {
+        userDao.updatePassword(userId, encodedPassword);
+    }
 }

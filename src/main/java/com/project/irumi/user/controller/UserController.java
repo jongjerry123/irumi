@@ -312,4 +312,85 @@ public class UserController {
         }
         return response;
     }
+    
+    @RequestMapping("findId.do")
+    public String goToFindId() {
+        logger.info("goToFindId: Displaying findId page");
+        return "user/findId";
+    }
+    @RequestMapping("showId.do")
+    public String goToShowId() {
+        logger.info("goToFindId: Displaying findId page");
+        return "user/findId";
+    }
+ // showId.do에서 이메일로 아이디 조회 후 showId.jsp로 전달
+    @GetMapping("showId.do")
+    public String showId(@RequestParam(name = "email") String email, Model model) {
+        logger.info("showId.do: Finding userId for email = {}", email);
+        String userId = userservice.findIdByEmail(email);
+        model.addAttribute("userId", userId);
+        return "user/showId";
+    }
+    @RequestMapping("findPassword.do")
+    public String goTofindPassword() {
+        logger.info("goTofindPassword: Displaying findPassword page");
+        return "user/findPassword";
+    }
+ // 추가: 아이디와 이메일 일치 확인
+    @PostMapping("checkUser.do")
+    @ResponseBody
+    public Map<String, Object> checkUser(
+            @RequestParam(name = "userId") String userId,
+            @RequestParam(name = "email") String email) {
+        logger.info("checkUser.do: Checking userId = {}, email = {}", userId, email);
+        boolean matched = userservice.checkUserMatch(userId, email);
+        Map<String, Object> response = new HashMap<>();
+        response.put("matched", matched);
+        response.put("message", matched ? "아이디와 이메일이 일치합니다." : "아이디와 이메일이 일 고맙습니다.");
+        return response;
+    }
+
+    // 추가: 비밀번호 재설정 페이지 이동
+    @GetMapping("resetPassword.do")
+    public String resetPassword(
+            @RequestParam(name = "userId") String userId,
+            HttpSession session,
+            Model model) {
+        logger.info("resetPassword.do: Processing for userId = {}", userId);
+        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+        if (emailVerified != null && emailVerified) {
+            model.addAttribute("userId", userId);
+            return "user/resetPassword"; // resetPassword.jsp로 이동
+        } else {
+            logger.warn("resetPassword.do: Email not verified for userId = {}", userId);
+            return "redirect:/findPassword.do";
+        }
+    }
+    @PostMapping("updatePassword.do")
+    public String updatePassword(
+            @RequestParam(name = "userId") String userId,
+            @RequestParam(name = "newPassword") String newPassword,
+            HttpSession session,
+            Model model) {
+        logger.info("updatePassword.do: Updating password for userId = {}", userId);
+        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+        if (emailVerified != null && emailVerified) {
+            try {
+                userservice.updatePassword(userId, bcryptPasswordEncoder.encode(newPassword));
+                session.removeAttribute("emailVerified");
+                session.removeAttribute("verificationCode");
+                session.removeAttribute("verificationEmail");
+                session.removeAttribute("emailTokenExpiry");
+                model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+                return "user/login";
+            } catch (Exception e) {
+                logger.error("updatePassword.do: Error updating password for userId = {}", userId, e);
+                model.addAttribute("message", "비밀번호 변경 중 오류가 발생했습니다.");
+                return "user/resetPassword";
+            }
+        } else {
+            logger.warn("updatePassword.do: Email not verified for userId = {}", userId);
+            return "redirect:/findPassword.do";
+        }
+    }
 }
