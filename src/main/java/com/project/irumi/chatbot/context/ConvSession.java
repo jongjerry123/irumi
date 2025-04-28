@@ -12,7 +12,10 @@ public class ConvSession {
 	private String subtopicId = null;    // 서브 주제 ID (직무 ID or 스펙 ID 등)
 	private String userId;
 
+	// 추가
+	private String lastTopic;
 
+	
 	private final List<String> contextHistory = new ArrayList<>();
 
 
@@ -83,4 +86,13 @@ public class ConvSession {
 	public void setChatState(ChatState chatState) {
 		this.chatState = chatState;
 	}
+	
+	// --- 추가 ---
+    public String getLastTopic() {
+        return lastTopic;
+    }
+    public void setLastTopic(String lastTopic) {
+        this.lastTopic = lastTopic;
+    }
+
 }

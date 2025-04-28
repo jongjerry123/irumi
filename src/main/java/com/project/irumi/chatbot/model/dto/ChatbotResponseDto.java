@@ -1,13 +1,12 @@
 package com.project.irumi.chatbot.model.dto;
-
 import java.util.List;
-
 public class ChatbotResponseDto {
 	
 	private String gptAnswer;
-    private List<String> options; // 선택지가 없으면 null or 빈 리스트
-    
-    // 생성자 + getters/ setters
+	private List<String> checkboxOptions;
+   private List<String> options; // 선택지가 없으면 null or 빈 리스트
+  
+   // 생성자 + getters/ setters
 	public ChatbotResponseDto() {
 		super();
 	}
@@ -15,6 +14,24 @@ public class ChatbotResponseDto {
 		super();
 		this.gptAnswer = gptAnswer;
 		this.options = options;
+		this.checkboxOptions = null;
+	}
+	
+	
+	public ChatbotResponseDto(String gptAnswer, List<String> checkboxOptions, List<String> options) {
+		super();
+		this.gptAnswer = gptAnswer;
+		this.checkboxOptions = checkboxOptions;
+		this.options = options;
+	}
+	
+	
+	
+	public List<String> getCheckboxOptions() {
+		return checkboxOptions;
+	}
+	public void setCheckboxOptions(List<String> checkboxOptions) {
+		this.checkboxOptions = checkboxOptions;
 	}
 	public String getGptAnswer() {
 		return gptAnswer;
@@ -29,5 +46,5 @@ public class ChatbotResponseDto {
 		this.options = options;
 	}
 	
-
 }
+

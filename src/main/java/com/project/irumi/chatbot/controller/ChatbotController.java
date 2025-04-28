@@ -1,5 +1,7 @@
 package com.project.irumi.chatbot.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.manager.ActChatManager;
@@ -25,6 +28,16 @@ public class ChatbotController {
 	@Autowired
 	private ConvSessionManager convManager;
 
+	
+	// 추가
+		@Autowired
+	    private ConvSessionManager convSessionManager;
+		
+		// 추가
+		@Autowired
+		private GptApiService gptApiService;
+
+		
 	@Autowired
 	private JobChatManager jobManager;
 	@Autowired
@@ -85,46 +98,36 @@ public class ChatbotController {
 
 	// 유저가 대화를 시작한 후 메세지 전송버튼 클릭한 경우 ===========================
 	// 세션 정보에 따라 매니저 서비스 호출
-	@RequestMapping(value = "sendMessageToChatbot.do", 
-										method = RequestMethod.POST)
-	@ResponseBody
-	public ChatbotResponseDto sendMessageToChatbot(
-			HttpSession loginSession,
-			@RequestParam("userMsg") String userMsg) {
-		String userId = (String) loginSession.getAttribute("userId");
-		
-		if(userId == null) {
-			userId = "user";
-		}   ///////////////////////////////////////////////////// 임시 추가
-		ConvSession session = convManager.getSession(userId);
-		
-		if (session == null) {
-	        return new ChatbotResponseDto("대화 세션이 없습니다. 먼저 '대화 시작' 버튼을 눌러주세요.", null);
-	    } /////////////////////////////////////////////// 임시 추가
-		String topic = session.getTopic();
-
-		ChatbotResponseDto responseDto;
-
-		switch (topic) {
-		case "job":
-			responseDto = jobManager.getGptResponse(session, userMsg);
-			break;
-		case "spec":
-			responseDto = specManager.getGptResponse(session, userMsg);
-			break;
-		case "ss":
-			responseDto = ssManager.getGptResponse(session, userMsg);
-			break;
-		case "act":
-			responseDto = actManager.getGptResponse(session, userMsg);
-			break;
-		default:
-			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-		}
-
-		return responseDto;
-	}
-
+	/*
+	 * @RequestMapping(value = "sendMessageToChatbot.do", method =
+	 * RequestMethod.POST)
+	 * 
+	 * @ResponseBody public ChatbotResponseDto sendMessageToChatbot( HttpSession
+	 * loginSession,
+	 * 
+	 * @RequestParam("userMsg") String userMsg) { String userId = (String)
+	 * loginSession.getAttribute("userId");
+	 * 
+	 * if(userId == null) { userId = "user"; }
+	 * ///////////////////////////////////////////////////// 임시 추가 ConvSession
+	 * session = convManager.getSession(userId);
+	 * 
+	 * if (session == null) { return new
+	 * ChatbotResponseDto("대화 세션이 없습니다. 먼저 '대화 시작' 버튼을 눌러주세요.", null); }
+	 * /////////////////////////////////////////////// 임시 추가 String topic =
+	 * session.getTopic();
+	 * 
+	 * ChatbotResponseDto responseDto;
+	 * 
+	 * switch (topic) { case "job": responseDto = jobManager.getGptResponse(session,
+	 * userMsg); break; case "spec": responseDto =
+	 * specManager.getGptResponse(session, userMsg); break; case "ss": responseDto =
+	 * ssManager.getGptResponse(session, userMsg); break; case "act": responseDto =
+	 * actManager.getGptResponse(session, userMsg); break; default: responseDto =
+	 * new ChatbotResponseDto("유효하지 않은 주제입니다.", null); }
+	 * 
+	 * return responseDto; }
+	 */
 	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우
 	// 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에 append
 	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
@@ -154,7 +157,7 @@ public class ChatbotController {
 			responseDto = ssManager.handleChatbotOption(session, userChoice);
 			break;
 		case "act":
-			responseDto = actManager.handleChatbotOption(session, userChoice);
+			responseDto = actManager.handleChatMessage(session, userChoice);
 			break;
 		default:
 			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
@@ -213,4 +216,56 @@ public class ChatbotController {
 	// 사용자가 우측 사이드바에서 스펙/ 일정/ 활동.. 삭제하는 경우 Dashboard Service 사용
 		
 
+	
+	// 메소드 추가
+	@RequestMapping(value = "/sendMessageToChatbot.do", method = RequestMethod.POST)
+	@ResponseBody
+	public ChatbotResponseDto sendMessageToChatbot(
+	        @RequestBody Map<String, Object> body,
+	        HttpSession session
+	) {
+		String userMsg = (String) body.get("userMsg");
+	    String topic = (String) body.get("topic"); // 주제값 받기
+
+	    // 세션에서 userId 꺼내기 (없으면 임시 user로)
+	    String userId = (String) session.getAttribute("userId");
+	    if (userId == null) {
+	        userId = "testUser"; // 임시 user
+	        session.setAttribute("userId", userId);
+	    }
+
+	    ConvSession convSession = convManager.getSession(userId);
+	    if (convSession == null) {
+	        // topic이 없으면 기본값, 예: "act"
+	        convSession = convManager.createNewSession(userId, topic != null ? topic : "act");
+	        System.out.println("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);
+	    }
+
+	    ChatbotResponseDto responseDto;
+
+	    // 주제별로 분기 처리
+	    if (topic == null && convSession != null) {
+	        topic = convSession.getTopic();
+	    }
+
+	    switch (topic) {
+	        case "job":
+	            responseDto = jobManager.getGptResponse(convSession, userMsg);
+	            break;
+	        case "spec":
+	            responseDto = specManager.getGptResponse(convSession, userMsg);
+	            break;
+	        case "ss":
+	            responseDto = ssManager.getGptResponse(convSession, userMsg);
+	            break;
+	        case "act":
+	            responseDto = actManager.handleChatMessage(convSession, userMsg);
+	            break;
+	        default:
+	            responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
+	    }
+
+	    return responseDto;
+	}
+	
 }
