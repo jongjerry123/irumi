@@ -34,8 +34,7 @@ public class ActChatManager {
 	        case START:
 	            session.setChatState(StateActChat.RECOMMEND_RESOURCE);
 	            return new ChatbotResponseDto(
-	                "추천받고 싶은 자료(도서/영상 등)가 있으신가요?",
-	                List.of("네", "아니요")
+	                "어떤 스펙에 대한 활동을 추천받으실 건가요?"
 	            );
 
 	        case RECOMMEND_RESOURCE:

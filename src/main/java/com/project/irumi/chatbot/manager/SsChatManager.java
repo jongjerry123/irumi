@@ -1,67 +1,101 @@
 package com.project.irumi.chatbot.manager;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ChatState;
 import com.project.irumi.chatbot.context.ConvSession;
+import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.context.StateSsChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 
 @Component
 public class SsChatManager {
 
-	public ChatbotResponseDto getGptResponse(ConvSession session, String userInput) {
-		ChatState rawState = session.getChatState();
+	@Autowired
+	private GptApiService gptApiService;
+	
+	
+	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+		StateSsChat state = (StateSsChat) session.getChatState();
+		if (state == null) state = StateSsChat.START;
+	    String lastTopic = session.getLastTopic();
+		
+	    
+	    switch (state) {
+	    case START:
+	        session.setChatState(StateSsChat.ASK_WHICH_SCHEDULE);
+	        return new ChatbotResponseDto(
+	            "알고 싶은 시험/자격증 일정을 말씀해 주세요! (예: 정보처리기사 필기, 토익 시험일 등)"
+	        );
 
-		if (!(rawState instanceof StateSsChat)) {
-			return new ChatbotResponseDto("일정 추천 상태 오류입니다. 세션을 새로 시작해주세요.", null);
-		}
+	    case ASK_WHICH_SCHEDULE:
+	        // 유저가 일정명을 입력하면 GPT로 일정 안내 및 공식 링크 생성
+	        if (userMsg != null && !userMsg.isBlank()) {
+	            session.setLastTopic(userMsg);
+	            // 예시: GPT가 "정보처리기사 필기시험: 2025-06-01 / [공식 안내 바로가기](https://q-net.or.kr)" 형태로 반환
+	            String gptAnswer = gptApiService.callGPT(
+	                userMsg + " 시험(자격증) 일정과 공식 사이트 안내 URL을 한글로 알려줘. 답변에 반드시 공식 사이트 주소(하이퍼링크)를 포함해줘."
+	            );
+	            session.setChatState(StateSsChat.ASK_WANT_MORE);
+	            return new ChatbotResponseDto(
+	                gptAnswer, 
+	                List.of("다른 일정도 질문하기", "종료")
+	            );
+	        } else {
+	            return new ChatbotResponseDto("알고 싶은 일정명을 입력해 주세요!", null);
+	        }
 
-		StateSsChat state = (StateSsChat) rawState;
+	    case ASK_WANT_MORE:
+	        if ("다른 일정도 질문하기".equals(userMsg)) {
+	            session.setChatState(StateSsChat.ASK_WHICH_SCHEDULE);
+	            return new ChatbotResponseDto(
+	                "알고 싶은 시험/자격증 일정명을 입력해 주세요!", 
+	                null
+	            );
+	        } else if ("종료".equals(userMsg) || "아니요".equals(userMsg)) {
+	            session.setChatState(StateSsChat.COMPLETE);
+	            return new ChatbotResponseDto(
+	                "일정 안내를 종료합니다. 또 궁금한 점이 있으면 언제든 질문해 주세요!", 
+	                null
+	            );
+	        } else {
+	            // 사용자가 바로 일정명을 또 질문하는 경우
+	            session.setLastTopic(userMsg);
+	            String gptAnswer = gptApiService.callGPT(
+	                userMsg + " 시험(자격증) 일정과 공식 사이트 안내 URL을 한글로 알려줘. 답변에 반드시 공식 사이트 주소(링크)를 포함해줘."
+	            );
+	            session.setChatState(StateSsChat.ASK_WANT_MORE);
+	            return new ChatbotResponseDto(
+	                gptAnswer, 
+	                List.of("다른 일정도 질문하기", "종료")
+	            );
+	        }
 
-		switch (state) {
-			case START:
-				session.setChatState(StateSsChat.ASK_WHICH_SCHEDULE);
-				return new ChatbotResponseDto(
-					"스펙 관련 어떤 일정을 알고 싶으신가요? (예: 필기 시험 시작일, 실기 일정 등)", 
-					null
-				);
+	    case COMPLETE:
+	        // 세션 초기화
+	        session.setChatState(StateSsChat.START);
+	        return new ChatbotResponseDto("일정 챗봇을 종료합니다. 다시 시작하려면 질문을 입력해 주세요!", null);
 
-			case ASK_WHICH_SCHEDULE:
-				// 예시 응답: GPT를 통해 실제 일정 추천하는 로직이 들어갈 자리
-				session.setChatState(StateSsChat.ASK_WANT_MORE);
-				return new ChatbotResponseDto(
-					"찾으시는 일정은 5월 12일입니다. 다른 일정도 알고 싶으신가요?", 
-					List.of("네", "아니요")
-				);
-
-			case ASK_WANT_MORE:
-				if ("네".equals(userInput)) {
-					session.setChatState(StateSsChat.ASK_WHICH_SCHEDULE);
-					return new ChatbotResponseDto(
-						"추가로 알고 싶은 일정을 말씀해주세요.", 
-						null
-					);
-				} else {
-					session.setChatState(StateSsChat.COMPLETE);
-					return new ChatbotResponseDto(
-						"일정 추천을 마쳤습니다. 도움이 되었기를 바랍니다!", 
-						null
-					);
-				}
-
-			case COMPLETE:
-				return new ChatbotResponseDto("대화가 이미 종료된 상태입니다.", null);
-
-			default:
-				return new ChatbotResponseDto("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
-		}
+	    default:
+	        session.setChatState(StateSsChat.START);
+	        return new ChatbotResponseDto("오류가 발생했습니다. 다시 시도해 주세요.", null);
 	}
 
-	public ChatbotResponseDto handleChatbotOption(ConvSession session, String userChoice) {
-		// 선택된 일정 옵션에 대한 처리 로직
-		return new ChatbotResponseDto("선택한 일정 옵션 처리 기능은 아직 구현되지 않았습니다.", null);
+
 	}
+
+	
 }
