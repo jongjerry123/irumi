@@ -3,6 +3,8 @@ package com.project.irumi.board.dto;
 import java.sql.Timestamp;
 
 public class PostDTO {
+
+    // 기본 필드
     private Long postId;
     private String postWriter;
     private String postType;
@@ -14,6 +16,9 @@ public class PostDTO {
     private int postRecommend;
     private String postSavedName;
     private String postOriginalName;
+
+    // ✨ 추가된 가상 필드 (DB와 무관) 
+    private boolean hasAnswer;
 
     public PostDTO() {}
 
@@ -33,6 +38,7 @@ public class PostDTO {
         this.postOriginalName = postOriginalName;
     }
 
+    // Getter & Setter
     public Long getPostId() { return postId; }
     public void setPostId(Long postId) { this.postId = postId; }
 
@@ -66,6 +72,9 @@ public class PostDTO {
     public String getPostOriginalName() { return postOriginalName; }
     public void setPostOriginalName(String postOriginalName) { this.postOriginalName = postOriginalName; }
 
+    public boolean isHasAnswer() { return hasAnswer; }
+    public void setHasAnswer(boolean hasAnswer) { this.hasAnswer = hasAnswer; }
+
     @Override
     public String toString() {
         return "PostDTO{" +
@@ -80,6 +89,7 @@ public class PostDTO {
                 ", postRecommend=" + postRecommend +
                 ", postSavedName='" + postSavedName + '\'' +
                 ", postOriginalName='" + postOriginalName + '\'' +
+                ", hasAnswer=" + hasAnswer +
                 '}';
     }
-} 
+}

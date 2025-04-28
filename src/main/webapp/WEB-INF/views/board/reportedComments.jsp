@@ -22,17 +22,15 @@
       margin: 0 auto;
     }
 
-    .top-bar {
+    .category-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 30px;
       margin-bottom: 30px;
     }
 
-    .section-title {
-      font-size: 24px;
-      font-weight: 600;
-      margin-right: 30px;
+    .category-bar h2 {
+      margin: 0;
     }
 
     .tabs {
@@ -49,18 +47,22 @@
       cursor: pointer;
     }
 
+    .tabs .active {
+      border: 1px solid #A983A3;
+      color: #A983A3;
+    }
+
     .admin-btn {
       background-color: #222;
       border: 1px solid #ff4c4c;
       border-radius: 10px;
       padding: 8px;
-      margin-left: auto;
       cursor: pointer;
     }
 
-    .tabs .active {
-      border: 1px solid #A983A3;
-      color: #A983A3;
+    .admin-btn.active {
+      border: 2px solid #ff4c4c;
+      background-color: #1a1a1a;
     }
 
     table {
@@ -108,6 +110,11 @@
       cursor: pointer;
     }
 
+    .btn-danger {
+      border: 1px solid #ff4c4c;
+      color: #ff4c4c;
+    }
+
     .pagination {
       display: flex;
       gap: 10px;
@@ -135,24 +142,53 @@
       height: 18px;
     }
   </style>
+
+  <script>
+    function deleteSelectedComments() {
+      const selected = Array.from(document.querySelectorAll('input[name="selectedComments"]:checked'))
+                             .map(checkbox => checkbox.value);
+
+      if (selected.length === 0) {
+        alert('삭제할 댓글을 선택하세요.');
+        return;
+      }
+
+      if (!confirm('선택한 댓글을 삭제하시겠습니까?')) {
+        return;
+      }
+
+      fetch('deleteSelectedComments.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(selected)
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('삭제 완료되었습니다.');
+          location.reload();
+        } else {
+          alert('삭제 실패. 다시 시도해주세요.');
+        }
+      });
+    }
+  </script>
 </head>
 <body>
 <div class="main-content">
-  <!-- ✅ 커뮤니티 스타일 구조 반영 -->
-  <div class="top-bar">
-    <h2 class="section-title">불량 이용자 관리</h2>
 
+  <!-- 상단 카테고리 -->
+  <div class="category-bar">
+    <h2>불량 이용자 관리</h2>
     <div class="tabs">
-      <button onclick="location.href='boardPage.do'">자유 주제</button>
-      <button onclick="location.href='qnaList.do'">QnA</button>
+      <button onclick="location.href='freeBoard.do'">자유게시판</button>
+      <button onclick="location.href='qnaList.do'">Q&A</button>
       <button onclick="location.href='noticeList.do'">공지사항</button>
+      <c:if test="${loginUser.userAuthority == '2'}">
+        <button class="admin-btn active" onclick="location.href='badUserList.do'">
+          <img src="/irumi/resources/images/bell.png" alt="관리자 알림" height="20" />
+        </button>
+      </c:if>
     </div>
-
-    <c:if test="${loginUser.userAuthority == '2'}">
-      <button class="admin-btn" onclick="location.href='badUserList.do'">
-        <img src="/resources/img/bell.png" alt="관리자 알림" height="20" />
-      </button>
-    </c:if>
   </div>
 
   <!-- 신고 카테고리 탭 -->
@@ -178,7 +214,7 @@
         <tr>
           <td>${comment.comWrId}</td>
           <td>${comment.comContent}</td>
-          <td>-</td>
+          <td>-</td> <!-- (나중에 원본 게시글 제목 연결하고 싶으면 추가 가능) -->
           <td>${comment.comReportCount}</td>
           <td><input type="checkbox" name="selectedComments" value="${comment.comId}" /></td>
         </tr>
@@ -190,8 +226,8 @@
   <div class="bottom-bar">
     <div class="left">신고된 댓글 수: ${fn:length(reportedCommentList)}개</div>
     <div class="right">
-      <button class="btn-action">선택한 댓글 삭제</button>
-      <button class="btn-action">불량 이용자 등록</button>
+      <button class="btn-action" onclick="deleteSelectedComments()">선택한 댓글 삭제</button>
+      <button class="btn-action btn-danger">불량 이용자 등록</button>
     </div>
   </div>
 
@@ -207,6 +243,7 @@
       <button onclick="location.href='reportedComments.do?page=${currentPage + 1}'">&gt;</button>
     </c:if>
   </div>
+
 </div>
 <c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>

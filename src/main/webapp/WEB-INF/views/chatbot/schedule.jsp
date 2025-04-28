@@ -28,58 +28,140 @@ function moveJobPage() {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+	
+	const CHAT_TOPIC = "ss";
+	
+	// 오른쪽 저장한 일정 부분 함수들
+	function addToActivityList(items) {
+	    const actList = document.getElementById("savedActivityList");
+	    items.forEach(activity => {
+	      const card = document.createElement("div");
+	      card.className = "schedule-card";
+	      // 삭제 버튼
+	      const removeBtn = document.createElement("button");
+	      removeBtn.className = "remove-btn";
+	      removeBtn.textContent = "✕";
+	      removeBtn.onclick = function() {
+	        card.remove();
+	      };
+	      // 텍스트
+	      const span = document.createElement("span");
+	      span.textContent = activity;
+	      card.appendChild(removeBtn);
+	      card.appendChild(span);
+	      actList.appendChild(card);
+	    });
+	  }
+	
+	document.querySelector(".add-btn").addEventListener("click", function() {
+		  const input = document.querySelector(".manual-input");
+		  const val = input.value.trim();
+		  if (val) {
+		    addToActivityList([val]);
+		    input.value = "";
+		  } else {
+		    alert("활동을 입력해 주세요!");
+		  }
+		});
+	
+	// 저장한 일정쪽 함수 끝
+	
+	
+	// 채팅 부분 관련 함수 
+	
+	// 채팅 메시지 추가 함수
+	  function addMessageToChat(message, cls) {
+	    const chatArea = document.getElementById("chatArea");
+	    const div = document.createElement("div");
+	    div.className = "message " + cls;
+	    div.textContent = message;
+	    chatArea.appendChild(div);
+	  }
+	  
+	  // 실제 메시지 전송 로직
+	  function sendMessage(message) {
+	    addMessageToChat(message, "user-msg");
+	    fetch("/irumi/sendMessageToChatbot.do", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/json" },
+	      body: JSON.stringify({ userMsg: message, topic: CHAT_TOPIC })
+	    })
+	    .then(response => response.json())
+	    .then(gptReply => {
+	    	console.log("서버 응답:", gptReply);
+	      addMessageToChat(gptReply.gptAnswer, "bot-msg");
+	      // 버튼 옵션이 있으면 버튼 렌더
+	      if (gptReply.options && Array.isArray(gptReply.options) && gptReply.options.length > 0) {
+	        renderOptionButtons(gptReply.options);
+	      } else {
+	        removeOptionButtons();
+	      }
+	      scrollToBottom();
+	    })
+	    .catch(e => {
+	      addMessageToChat("서버 오류 또는 JSON 파싱 실패!", "bot-msg");
+	    });
+	  }
+	  // 사용자가 직접 입력할 때
+	  document.getElementById("userInput").addEventListener("keyup", function(event) {
+	    if (event.key === "Enter") {
+	      const val = this.value.trim();
+	      if (val) {
+	        sendMessage(val);
+	        this.value = "";
+	      }
+	    }
+	  });
+	  document.querySelector(".chat-send-btn").addEventListener("click", function() {
+	    const input = document.getElementById("userInput");
+	    const val = input.value.trim();
+	    if (val) {
+	      sendMessage(val);
+	      input.value = "";
+	    }
+	  });
+	  function scrollToBottom() {
+	    const chatArea = document.getElementById("chatArea");
+	    chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
+	  }
+	 
+	  // 채팅 관련 함수 끝
+	 
+	  
+	  // 옵션 관련 함수
+	  
+	   // 옵션 버튼 렌더링 함수
+	  function renderOptionButtons(options) {
+	    removeOptionButtons();
+	    const chatArea = document.getElementById("chatArea");
+	    const btnWrap = document.createElement("div");
+	    btnWrap.id = "option-buttons";
+	    btnWrap.style.marginTop = "15px";
+	    btnWrap.style.display = "flex";
+	    btnWrap.style.gap = "10px";
+	    options.forEach(option => {
+	      const btn = document.createElement("button");
+	      btn.className = "select-btn";
+	      btn.textContent = option;
+	      btn.onclick = function() {
+	        sendMessage(option);
+	      };
+	      btnWrap.appendChild(btn);
+	    });
+	    chatArea.appendChild(btnWrap);
+	  }
+	  
+	  function removeOptionButtons() {
+		    const prev = document.getElementById("option-buttons");
+		    if (prev) prev.remove();
+		  
+	  }
+	  
+	  // 옵션 관련 함수 끝
+	  
+	});
+	
 
-     // 버튼 선택 토글 이벤트
-     const btns = document.querySelectorAll(".select-btn");
-     btns.forEach(btn => {
-       btn.addEventListener("click", function() {
-         this.classList.toggle("active");
-       });
-     });
-
-     // 채팅 보내기 함수
-     function sendMessage() {
-       const userInput = document.getElementById("userInput");
-       const chatArea = document.getElementById("chatArea");
-       const message = userInput.value.trim();
-       if (!message) return;
-
-       const userDiv = document.createElement("div");
-       userDiv.className = "message user-msg";
-       userDiv.textContent = message;
-       chatArea.appendChild(userDiv);
-
-       fetch("/chatbot/sendUserMsg.do", {
-         method: "POST",
-         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-         body: new URLSearchParams({
-           convId: "demo-conv-id",
-           topic: "job",
-           userMsg: message
-         })
-       })
-       .then(response => response.text())
-       .then(gptReply => {
-         const botDiv = document.createElement("div");
-         botDiv.className = "message bot-msg";
-         botDiv.textContent = gptReply;
-         chatArea.appendChild(botDiv);
-         userInput.value = "";
-         chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
-       });
-     }
-
-     // 엔터키 이벤트 추가
-     document.getElementById("userInput").addEventListener("keyup", function(event) {
-       if (event.key === "Enter") {
-         sendMessage();
-       }
-     });
-
-     // 버튼 클릭 시 메시지 전송 이벤트 추가
-     document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
-
-   });
 
 </script>
 
@@ -99,6 +181,14 @@ body {
    display: flex;
    min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
    margin-top: 20px; /* header 높이만큼 아래로 */
+}
+
+.main {
+   flex: 1;
+   padding-right: 40px;
+   padding-left: 40px;
+   display: flex;
+   flex-direction: column;
 }
 
 /* 사이드바 ************************************************************************************* */
@@ -137,15 +227,6 @@ body {
 
 
 /* 사이드바 ************************************************************************************* */
-
-.main {
-   flex: 1;
-   padding-right: 40px;
-   padding-left: 40px;
-   display: flex;
-   flex-direction: column;
-}
-
 .content-box {
    background-color: #1e1e1e;
    padding-right: 20px;
@@ -174,6 +255,8 @@ body {
 }
 
 
+
+/* 오른쪽 페널 */
 .right-panel {
    width: 230px;
    padding-right: 20px;
@@ -213,6 +296,8 @@ body {
    margin-left : 4px;
 }
 
+
+/* 채팅 쪽 부분 */
 
 .chat-input-box .chat-send-btn:hover {
    background: #BAAC80;
@@ -258,6 +343,8 @@ body {
    background: #BAAC80;
 }
 
+
+/*  */
 .manual-input-box {
    display: flex;
    align-items: center;
@@ -528,16 +615,9 @@ body {
    </div>
    <div class="saved-schedule-section">
         <div class="section-title">➤ 저장한 일정</div>
-        <div class="saved-schedule-list">
-            <div class="schedule-card">
-                <button class="remove-btn">✕</button>
-                <span>20xx.xx.xx (정보처리기사 필기)</span>
-            </div>
-            <div class="schedule-card">
-                <button class="remove-btn">✕</button>
-                <span>20xx.xx.xx (OPEC 시험)</span>
-            </div>
-        </div>
+        <div class="saved-schedule-list" id="savedActivityList"></div>
+        
+        
    <div class="manual-input-box">
     <input type="text" placeholder="직접 일정 입력" class="manual-input"/>
     <button class="add-btn"><i class="fa fa-plus"> + </i></button>

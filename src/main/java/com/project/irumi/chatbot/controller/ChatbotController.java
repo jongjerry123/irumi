@@ -102,38 +102,7 @@ public class ChatbotController {
 		convManager.setConvSubTopic(session, selectedItem);
 	}
 
-	// 유저가 대화를 시작한 후 메세지 전송버튼 클릭한 경우 ===========================
-	// 세션 정보에 따라 매니저 서비스 호출
-	/*
-	 * @RequestMapping(value = "sendMessageToChatbot.do", method =
-	 * RequestMethod.POST)
-	 * 
-	 * @ResponseBody public ChatbotResponseDto sendMessageToChatbot( HttpSession
-	 * loginSession,
-	 * 
-	 * @RequestParam("userMsg") String userMsg) { String userId = (String)
-	 * loginSession.getAttribute("userId");
-	 * 
-	 * if(userId == null) { userId = "user"; }
-	 * ///////////////////////////////////////////////////// 임시 추가 ConvSession
-	 * session = convManager.getSession(userId);
-	 * 
-	 * if (session == null) { return new
-	 * ChatbotResponseDto("대화 세션이 없습니다. 먼저 '대화 시작' 버튼을 눌러주세요.", null); }
-	 * /////////////////////////////////////////////// 임시 추가 String topic =
-	 * session.getTopic();
-	 * 
-	 * ChatbotResponseDto responseDto;
-	 * 
-	 * switch (topic) { case "job": responseDto = jobManager.getGptResponse(session,
-	 * userMsg); break; case "spec": responseDto =
-	 * specManager.getGptResponse(session, userMsg); break; case "ss": responseDto =
-	 * ssManager.getGptResponse(session, userMsg); break; case "act": responseDto =
-	 * actManager.getGptResponse(session, userMsg); break; default: responseDto =
-	 * new ChatbotResponseDto("유효하지 않은 주제입니다.", null); }
-	 * 
-	 * return responseDto; }
-	 */
+	
 	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우
 	// 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에 append
 	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
@@ -160,7 +129,7 @@ public class ChatbotController {
 			responseDto = specManager.handleChatbotOption(session, userChoice);
 			break;
 		case "ss":
-			responseDto = ssManager.handleChatbotOption(session, userChoice);
+			responseDto = ssManager.handleChatMessage(session, userChoice);
 			break;
 		case "act":
 			responseDto = actManager.handleChatMessage(session, userChoice);
@@ -240,16 +209,13 @@ public class ChatbotController {
 		String userMsg = (String) body.get("userMsg");
 		String topic = (String) body.get("topic");
 	    
-	    ConvSession convSession=convManager.getSession(userId);
-	    //진행중인 세션이 없는 경우
-	    if (convSession==null) {
-	    	convSession = convManager.createNewSession(userId, topic);
-	    	logger.info("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);    
+	   
 
-	    }
-	    //진행중인 세션이 있는 경우
-	    else {
-	    	convSession=convManager.getSession(userId);
+	    ConvSession convSession = convManager.getSession(userId);
+	    if (convSession == null || !topic.equals(convSession.getTopic())) {
+	        convSession = convManager.createNewSession(userId, topic);
+	        System.out.println("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);
+
 	    }
 	 
 	    ChatbotResponseDto responseDto;
@@ -263,7 +229,7 @@ public class ChatbotController {
 	            responseDto = specManager.getGptResponse(convSession, userMsg);
 	            break;
 	        case "ss":
-	            responseDto = ssManager.getGptResponse(convSession, userMsg);
+	            responseDto = ssManager.handleChatMessage(convSession, userMsg);
 	            break;
 	        case "act":
 	            responseDto = actManager.handleChatMessage(convSession, userMsg);
