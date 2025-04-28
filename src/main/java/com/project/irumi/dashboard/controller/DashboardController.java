@@ -1,6 +1,8 @@
 package com.project.irumi.dashboard.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -117,5 +119,19 @@ public class DashboardController {
 		
 	}
 	
+	@RequestMapping(value = "userSpecStuff.do", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> noticeNewTop3Method(@RequestParam("jobId") String jobId, @RequestParam("specId") String specId, Model model, HttpSession session) { // Jackson 라이브러리 사용시 리턴방식
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		specific.setSpecId(specId);
+		Map<String, Object> result = new HashMap<>();
+		result.put("acts", dashboardService.selectUserActs(specific));
+		result.put("specSchedules", dashboardService.selectUserSpecSchedule(specId));
+		return result;
+	}
 	
 }

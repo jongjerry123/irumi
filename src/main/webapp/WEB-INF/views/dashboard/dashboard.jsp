@@ -1,12 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>irumi</title>
 <style>
+.clearfix::after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
 body {
 	background-color: #111;
 	color: white;
@@ -16,286 +23,348 @@ body {
 }
 
 .education-info {
-	padding: 20px;
-	background: #303030;
-	border-radius: 10px;
-	width: 300px;
-	margin-left: 50px;
-	margin-top: 100px;
-	color: white;
-	float:left;
-}
-
-.menu {
-    list-style: none;
-    padding: 0;
-}
-
-.menu li {
-    margin: 20px 0;
-    color: #888;
-    cursor: pointer;
-}
-
-.menu li.active {
-    color: #00f7d7;
+    padding: 20px;
+    background: #303030;
+    border-radius: 10px;
+    width: 300px;
+    position: fixed;
+    top: 100px; /* Adjust this value to position it vertically */
+    left: 50px; /* Adjust this value to position it horizontally */
+    z-index: 1000; /* Ensures it stays above other content */
 }
 
 .main {
-    margin: auto;
-    padding: 30px;
-    width: 800px;
-    background: #303030;
+	margin: auto;
+	padding: 30px;
+	width: 800px;
+	background: #303030;
 	border-radius: 10px;
 }
 
-.header {
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.title {
-    font-size: 18px;
-    display: inline-block;
-}
-
-.content h2 {
-    margin-top: 30px;
-}
-
-.job-tags {
-    margin: 15px 0;
-}
-
-.job-tags button {
-    background: none;
-    border: 1px solid #00f7d7;
-    color: #00f7d7;
-    padding: 5px 10px;
-    margin-right: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.progress-bar {
-    background-color: darkgray;
-    width: 100%;
-    height: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-.progress {
-    background-color: #00f7d7;
-    height: 100%;
-    line-height: 20px;
-    text-align: center;
-    color: black;
-}
-
 .buttons {
-	margin-left: auto;
 	display: flex;
 	gap: 10px;
 }
 
 .buttons button {
-	background-color: transparent;
+	background: transparent;
 	color: white;
 	border: 1px solid #ccc;
 	padding: 6px 12px;
 	border-radius: 5px;
-	font-size: 14px;
 	cursor: pointer;
-	transition: background-color 0.2s ease;
+	transition: background-color .2s;
 }
 
 .buttons button:hover {
-	background-color: #fff;
+	background: #fff;
 	color: #000;
 }
 
-.buttons button.active {
-	background-color: #00f7d7;   /* 강조 배경색 :contentReference[oaicite:0]{index=0} */
-	color: #000;                  /* 강조 글자색 :contentReference[oaicite:1]{index=1} */
-	border-color: #00f7d7;        /* 테두리도 강조색과 맞춤 :contentReference[oaicite:2]{index=2} */
+.progress-bar {
+	background: darkgray;
+	width: 100%;
+	height: 20px;
+	border-radius: 10px;
+	overflow: hidden;
+	margin-top: 10px;
 }
 
+.progress {
+	background: #00f7d7;
+	height: 100%;
+	line-height: 20px;
+	text-align: center;
+	color: black;
+}
+
+#certSection {
+	margin-top: 20px;
+}
+
+#certToggle {
+	cursor: pointer;
+	color: #fff;
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
+#certCards {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin-top: 10px;
+}
+
+.certCard {
+	background: #404040;
+	border-radius: 10px;
+	padding: 20px;
+	width: 300px;
+}
+
+.certCard table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+	margin-bottom: 15px;
+}
+
+.certCard table td {
+	padding: 5px 0;
+	border-bottom: 1px solid #555;
+}
+
+.certCard a {
+	color: #00f7d7;
+	text-decoration: underline;
+}
 </style>
-<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
-function movetoUpDash() {
-	location.href = 'upDash.do';
-}
-function viewSpecs(jobId) {
-	$.ajax({
-		url: 'userSpecsView.do',
-		method: 'POST',
-		data: { 'jobId': jobId },
-		dataType: 'json',
-		success: function(data) {
-			
-			// 결과를 저장할 변수
-			var output = '';
-			$.each(data, function(index, item) {
-				// TODO: 여기부터 시작
-				output += '<button onclick="$(\'#specExplain\').html(\'' + item.specExplain + '\');">' + item.specName + '</button>';
-			});
-			
-			output += '<button onclick="addSpec()">목표 스펙 추가하기</button>';
-			output += '<button onclick="searchSpec()">목표 스펙 탐색하기</button>';
-			$('#specs').html(output);
-		},
-		error: function(xhr, status, error) {
-			console.error("에러 발생:", error);
-		}
-	});
-}
+	$(document).ready(function() {
+		$.ajax({
+			url: 'userSpecView.do',
+			method: 'POST',
+			dataType: 'json',
+			contentType: 'application/json; charset=UTF-8',
+			success: function(data) {
+				$('#university').append(data.userUniversity || ' 대학정보를 기입해주세요');
+				$('#degree').append(data.userDegree || ' 학위정보를 기입해주세요');
+				$('#graduation').append(data.userGraduate || ' 졸업정보를 기입해주세요');
+				$('#gpa').append(data.userPoint || ' 학점을 기입해주세요');
+			}
+		});
 
-function addJob() {
-	location.href = 'addJob.do';
-}
+		$.ajax({
+			url: 'userJobView.do',
+			method: 'POST',
+			dataType: 'json',
+			contentType: 'application/json; charset=UTF-8',
+			success: function(data) {
+				data.forEach(function(item) {
+					/* TODO: 이 부분 수정 */
+					$('<button>')
+						.text(item.jobName)
+						.on('click', function() {
+							$('#targetJob').empty();
+							$('#targetJob').html('목표 직무: ' + item.jobName);
+							viewSpecs(item.jobId);
+							$('#jobExplain').html(item.jobExplain);
+							$('#specExplain').empty();
+						})
+						.appendTo('#jobs');
+				});
+				$('<button>').text('목표 직업 추가하기').on('click', addJob).appendTo('#jobs');
+				$('<button>').text('목표 직업 탐색하기').on('click', searchJob).appendTo('#jobs');
+			}
+		});
 
-function addSpec() {
-	location.href = 'addSpec.do';
-}
-
-function searchJob() {
-	location.href = 'searchJob.do';
-}
-
-function searchSpec() {
-	location.href = 'searchSpec.do';
-}
-
-// 학력정보를 표시함
-$(function() {
-	$.ajax({
-		url: "userSpecView.do",
-		method: "POST",
-		dataType: "json",
-		contentType: 'application/json; charset:UTF-8',
-		success: function(data) {
-			console.log("Dashboard: " + data);
-			if (data.userUniversity == null) {
-				$('#university').html($('#university').html() + ' 대학정보를 기입해주세요');
-			}
-			else {
-				$('#university').html($('#university').html() + ' ' + data.userUniversity);
-			}
-			if (data.userDegree == null) {
-				$('#degree').html($('#degree').html() + ' 학위정보를 기입해주세요');
-			}
-			else {
-				$('#degree').html($('#degree').html() + ' ' + data.userDegree);
-			}
-			if (data.userGraduate == null) {
-				$('#graduation').html($('#graduation').html() + ' 졸업정보를 기입해주세요');
-			}
-			else {
-				$('#graduation').html($('#graduation').html() + ' ' + data.userGraduate);
-			}
-			if (data.userPoint == null) {
-				$('#gpa').html($('#gpa').html() + ' 학점을 기입해주세요');
-			}
-			else {
-				$('#gpa').html($('#gpa').html() + ' ' + data.userPoint);
-			}
-			
-		},
-		error: function(xhr, status, error) {
-			console.error("에러 발생:", error);
-		}
-	});
-	
-	$.ajax({
-		url: 'userJobView.do',
-		method: 'POST',
-		dataType: 'json',
-		contentType: 'application/json; charset:UTF-8',
-		success: function(data) {
-			$.each(data, function(index, item) {
-				$('#jobs').html($('#jobs').html() + '<button onclick="viewSpecs(\'' + item.jobId + '\'); $(\'#jobExplain\').html(\'' + item.jobExplain + '\'); $(\'#specExplain\').html(\'\');">' + item.jobName + '</button>');
-			});
-			$('#jobs').html($('#jobs').html() + '<button onclick="addJob()">목표 직업 추가하기</button>');
-			$('#jobs').html($('#jobs').html() + '<button onclick="searchJob()">목표 직업 탐색하기</button>');
-			
-		},
-		error: function(xhr, status, error) {
-			console.error("에러 발생:", error);
-		}
-	});
-	
-	// 버튼에 active 클래스로 색깔 처리하기
-	$('.buttons').each(function(){
-		var $grp = $(this);
-		$grp.on('click', 'button', function(){
-			$grp.find('button').removeClass('active');
-			$(this).addClass('active');
+		$('#certToggle').click(function() {
+			$('#certCards').slideToggle(300);
 		});
 	});
-	
-});
+
+	function viewSpecs(jobId) {
+		$.ajax({
+			url: 'userSpecsView.do',
+			method: 'POST',
+			data: { jobId: jobId },
+			dataType: 'json',
+			success: function(data) {
+				
+				$.each(data, function(index, item) {
+					$('#certCards').html($('#certCards').html() + '<div class=\"certCard\"><h3>' + item.specName + '</h3><h5>' + item.specType + '</h5><div style=\"font-size: 13px; margin-bottom: 15px;\">' + item.specExplain + '</div></div>');
+					$.ajax({
+						url: 'userSpecStuff.do',
+						method: 'POST',
+						data: { jobId: jobId, specId: item.specId },
+						dataType: 'json',
+						success: function(data) {
+							
+						}
+					});
+				});
+			}
+		});
+	}
+
+	function addJob() {
+		location.href = 'addJob.do';
+	}
+
+	function searchJob() {
+		location.href = 'searchJob.do';
+	}
+
+	function addSpec() {
+		location.href = 'addSpec.do';
+	}
+
+	function searchSpec() {
+		location.href = 'searchSpec.do';
+	}
+
+	function movetoUpDash() {
+		location.href = 'upDash.do';
+	}
 </script>
-
 </head>
+
 <body>
+	<c:if test="${ empty sessionScope.loginUser }">
+		<jsp:forward page="/WEB-INF/views/user/login.jsp" />
+	</c:if>
+	<c:set var="menu" value="dashboard" scope="request" />
+	<c:import url="/WEB-INF/views/common/header.jsp" />
 
-<!-- TODO: 로그인 상태가 아닌 경우 로그인 페이지로 이동 -->
-<c:if test="${ empty sessionScope.loginUser }">
-	<jsp:forward page="/WEB-INF/views/user/login.jsp"/>
-</c:if>
+	<h1 style="text-align: center; margin-top: 20px;">내 스펙 대시보드</h1>
 
-<!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 dashboard로 설정함 -->
-<c:set var="menu" value="dashboard" scope="request" />
-
-<!-- header 표시 -->
-<c:import url="/WEB-INF/views/common/header.jsp" />
-<br>
-
-<!-- 대시보드 제목 -->
-<h1 style="text-align: center;">내 스펙 대시보드</h1>
-
-<!-- 학력 정보 표시를 위한 칸 -->
-<div class="education-info">
-	<h2>학력 정보</h2>
-	<div style="margin-bottom: 10px;">
-		<label id="university">대학교: </label><br>
-	</div>
-	<div style="margin-bottom: 10px;">
-		<label id="degree">학위: </label><br>
-	</div>
-	<div style="margin-bottom: 10px;">
-		<label id="graduation">졸업 여부: </label><br>
-	</div>
-	<div style="margin-bottom: 10px;">
-		<label id="gpa">학점: </label><br>
-	</div>
-	<div class="buttons">
-		<button onclick="movetoUpDash()">수정하기</button>
-	</div>
-</div>
-
-<!-- 직무, 스펙, 확동 표시 -->
-<div class="main">
-	<div class="content">
-		<h2>목표 직무</h2>
-		<div id="jobs" class="buttons"><!-- 여기에 직무 버튼이 생성됨 --></div>
-		<div id="jobExplain"><!-- 여기에 직무에 관한 설명이 추가됨 --></div>
-		<h2>목표 스펙 달성도</h2>
-		<div class="progress-bar">
-			<div class="progress" style="width: 35%">35%</div>
+	<div class="dashboard-wrapper clearfix">
+		<div class="education-info">
+			<h2>학력 정보</h2>
+			<label id="university">대학교: </label><br> <label id="degree">학위:
+			</label><br> <label id="graduation">졸업 여부: </label><br> <label
+				id="gpa">학점: </label><br>
+			<div class="buttons">
+				<button onclick="movetoUpDash()">수정하기</button>
+			</div>
 		</div>
-		<br>
-		<h2>목표 스펙</h2>
-		<div id="specs" class="buttons"><!-- 여기에 스펙 버튼이 생성됨 --></div>
-		<div id="specExplain"><!-- 여기에 스펙 설명이 추가됨 --></div>
+
+		<div class="main">
+			<div class="content">
+				<h2 id="targetJob">목표 직무</h2>
+				<div id="jobs" class="buttons"></div>
+				<div id="jobExplain"></div>
+
+				<h2>목표 스펙 달성도</h2>
+				<div class="progress-bar">
+					<div class="progress" style="width: 35%">35%</div>
+				</div>
+				<br>
+
+				<h2>목표 스펙</h2>
+				<div id="specs" class="buttons"></div>
+				<div id="specExplain"></div>
+				
+				<h2 id="certToggle">정보처리기사 자격증</h2>
+				<div id="certSection">
+					
+
+					<div id="certCards" style="display: none;">
+						<div class="certCard">
+							<h3>정보처리기사</h3>
+							<h5>자격증</h5>
+							<div style="font-size: 13px; margin-bottom: 15px;">소프트웨어
+								개발, 시스템 운영, 데이터베이스 관리 등 IT 분야 전반의 이론·실무 능력을 평가하는 국가기술자격증입니다.</div>
+							<table>
+								<tr>
+									<td>2025년 5월 11일</td>
+									<td>필기시험</td>
+									<td>D-27</td>
+								</tr>
+								<tr>
+									<td>2025년 6월 14일</td>
+									<td>실기시험</td>
+									<td>D-50</td>
+								</tr>
+								<tr>
+									<td>2025년 6월 24일</td>
+									<td>구술 면접</td>
+									<td>D-60</td>
+								</tr>
+							</table>
+							<div style="font-size: 12px;">
+								<div>
+									<input type="checkbox" checked> <a href="#">신나공
+										정보처리기사 기출문제집</a>
+								</div>
+								<div style="margin-top: 8px;">
+									<input type="checkbox"> <a href="#">코세라 YY 강의 시청</a>
+								</div>
+							</div>
+							<button class="button"
+								style="margin-top: 15px; width: 100%; background: #00f7d7; color: #000; border: none; padding: 8px 0; border-radius: 5px;">
+								스펙 달성</button>
+						</div>
+
+						<!-- 카드 복제 -->
+						<div class="certCard">
+							<div style="font-size: 13px; margin-bottom: 15px;">소프트웨어
+								개발, 시스템 운영, 데이터베이스 관리 등 IT 분야 전반의 이론·실무 능력을 평가하는 국가기술자격증입니다.</div>
+							<table>
+								<tr>
+									<td>2025년 5월 11일</td>
+									<td>필기시험</td>
+									<td>D-27</td>
+								</tr>
+								<tr>
+									<td>2025년 6월 14일</td>
+									<td>실기시험</td>
+									<td>D-50</td>
+								</tr>
+								<tr>
+									<td>2025년 6월 24일</td>
+									<td>구술 면접</td>
+									<td>D-60</td>
+								</tr>
+							</table>
+							<div style="font-size: 12px;">
+								<div>
+									<input type="checkbox" checked> <a href="#">신나공
+										정보처리기사 기출문제집</a>
+								</div>
+								<div style="margin-top: 8px;">
+									<input type="checkbox"> <a href="#">코세라 YY 강의 시청</a>
+								</div>
+							</div>
+							<button class="button"
+								style="margin-top: 15px; width: 100%; background: #00f7d7; color: #000; border: none; padding: 8px 0; border-radius: 5px;">
+								스펙 달성</button>
+						</div>
+						<div class="certCard">
+							<div style="font-size: 13px; margin-bottom: 15px;">소프트웨어
+								개발, 시스템 운영, 데이터베이스 관리 등 IT 분야 전반의 이론·실무 능력을 평가하는 국가기술자격증입니다.</div>
+							<table>
+								<tr>
+									<td>2025년 5월 11일</td>
+									<td>필기시험</td>
+									<td>D-27</td>
+								</tr>
+								<tr>
+									<td>2025년 6월 14일</td>
+									<td>실기시험</td>
+									<td>D-50</td>
+								</tr>
+								<tr>
+									<td>2025년 6월 24일</td>
+									<td>구술 면접</td>
+									<td>D-60</td>
+								</tr>
+							</table>
+							<div style="font-size: 12px;">
+								<div>
+									<input type="checkbox" checked> <a href="#">신나공
+										정보처리기사 기출문제집</a>
+								</div>
+								<div style="margin-top: 8px;">
+									<input type="checkbox"> <a href="#">코세라 YY 강의 시청</a>
+								</div>
+							</div>
+							<button class="button"
+								style="margin-top: 15px; width: 100%; background: #00f7d7; color: #000; border: none; padding: 8px 0; border-radius: 5px;">
+								스펙 달성</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
 	</div>
-</div>
 
-<!-- footer 표시 -->
-<c:import url="/WEB-INF/views/common/footer.jsp" />
-
+	<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
