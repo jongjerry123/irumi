@@ -34,7 +34,7 @@ public class ConvSession {
 			case "job":
 				return StateJobChat.ASK_PERSONALITY;
 			case "spec":
-				return StateSpecChat.START;
+				return StateSpecChat.TEXT_CURRENT_SPEC;
 			case "ss":
 				return StateSsChat.START;
 			case "act":
