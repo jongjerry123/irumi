@@ -16,11 +16,7 @@
   .post-meta { margin-bottom: 20px; font-size: 14px; color: #aaa; }
   .post-body { margin-bottom: 40px; line-height: 1.6; word-wrap: break-word; }
   .post-actions { display: flex; gap: 10px; }
-  .btn, .btn-red {
-    display: inline-flex; justify-content: center; align-items: center;
-    padding: 8px 16px; min-width: 72px; height: 38px; font-size: 14px;
-    border-radius: 6px; cursor: pointer; background-color: transparent;
-  }
+  .btn, .btn-red { display: inline-flex; justify-content: center; align-items: center; padding: 8px 16px; min-width: 72px; height: 38px; font-size: 14px; border-radius: 6px; cursor: pointer; background-color: transparent; }
   .btn { border: 1px solid #666; color: #fff; }
   .btn-red { border: 1px solid #ff4c4c; color: #ff4c4c; }
   .comment-box { margin-top: 60px; }
@@ -29,7 +25,7 @@
   .comment-form .submit-btn { align-self: flex-end; background-color: #A983A3; border: none; padding: 8px 18px; border-radius: 6px; color: #fff; cursor: pointer; }
   .comment-list { margin-top: 30px; }
   .comment-item { background-color: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-  .comment-item.reply { margin-left: 40px; background-color: #191919; }
+  .comment-item.reply { background-color: #191919; }
   .comment-meta { font-size: 13px; margin-bottom: 8px; color: #ccc; }
   .comment-content { margin-bottom: 10px; }
   .comment-actions { display: flex; gap: 12px; font-size: 13px; align-items: center; }
@@ -94,7 +90,7 @@
 
     <div class="comment-list">
       <c:forEach var="comment" items="${commentList}">
-        <div class="comment-item ${comment.comParentId != null ? 'reply' : ''}">
+        <div class="comment-item ${comment.comParentId != null ? 'reply' : ''}" style="margin-left: ${comment.lvl * 20}px;">
           <div class="comment-meta">
             <c:if test="${comment.comParentId != null}">↪️</c:if>
             ${comment.comWrId} (${comment.comTime})
@@ -111,7 +107,7 @@
               <input type="hidden" name="postId" value="${post.postId}" />
               <button><span class="icon-text">🚨 ${comment.comReportCount}</span></button>
             </form>
-            <form>
+            <form onsubmit="return false;">
               <button type="button" onclick="toggleReply(${comment.comId})">답글</button>
             </form>
             <c:if test="${loginUser.userId == comment.comWrId}">

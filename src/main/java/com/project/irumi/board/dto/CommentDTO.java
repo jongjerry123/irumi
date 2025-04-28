@@ -11,11 +11,12 @@ public class CommentDTO {
     private Timestamp comTime;
     private int comRecommend;
     private int comReportCount;
+    private int lvl; // ❗ 추가
 
     public CommentDTO() {}
 
     public CommentDTO(Long comId, String comWrId, Long postId, Long comParentId, String comContent,
-                      Timestamp comTime, int comRecommend, int comReportCount) {
+                      Timestamp comTime, int comRecommend, int comReportCount, int lvl) { // ❗ 수정
         this.comId = comId;
         this.comWrId = comWrId;
         this.postId = postId;
@@ -24,6 +25,7 @@ public class CommentDTO {
         this.comTime = comTime;
         this.comRecommend = comRecommend;
         this.comReportCount = comReportCount;
+        this.lvl = lvl; // ❗ 추가
     }
 
     public Long getComId() { return comId; }
@@ -50,6 +52,9 @@ public class CommentDTO {
     public int getComReportCount() { return comReportCount; }
     public void setComReportCount(int comReportCount) { this.comReportCount = comReportCount; }
 
+    public int getLvl() { return lvl; } // ❗ 추가
+    public void setLvl(int lvl) { this.lvl = lvl; } // ❗ 추가
+
     @Override
     public String toString() {
         return "CommentDTO{" +
@@ -61,6 +66,7 @@ public class CommentDTO {
                 ", comTime=" + comTime +
                 ", comRecommend=" + comRecommend +
                 ", comReportCount=" + comReportCount +
+                ", lvl=" + lvl +  // ❗ 추가
                 '}';
     }
 }
