@@ -3,12 +3,14 @@
 
 <meta name="_csrf" content="${_csrf.token}"/>
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
 <style>
 header {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* 좌우 끝 정렬 */
     padding: 20px 50px;
-    max-width: 1000px;
+    max-width: 1200px; /* 좀 더 넓게 */
     margin: 0 auto;
     color: white;
     font-family: 'Noto Sans KR', sans-serif;
@@ -20,17 +22,24 @@ header {
     gap: 10px;
     font-size: 24px;
     font-weight: bold;
+    cursor: pointer;
+    margin-right: auto; /* 왼쪽 정렬 강제 */
 }
 
 .triangle-img {
     height: 1.2em;
     vertical-align: middle;
+    transition: transform 0.2s ease; /* 부드럽게 확대 */
+}
+
+.logo-area:hover .triangle-img {
+    transform: scale(1.4); /* 호버 시 삼각형 확대 */
 }
 
 .login-actions {
-    margin-left: auto;
     display: flex;
     gap: 10px;
+    margin-left: auto; /* 오른쪽 정렬 강제 */
 }
 
 .login-actions button {
@@ -69,15 +78,12 @@ function logout() {
         })
         .then(response => {
             if (response.ok) {
-                console.log('Logout successful');
                 window.location.href = '/irumi';
             } else {
-                console.error('Logout failed:', response.status);
                 alert('로그아웃에 실패했습니다.');
             }
         })
         .catch(error => {
-            console.error('Error during logout:', error);
             alert('로그아웃 중 오류가 발생했습니다.');
         });
         return;
@@ -92,43 +98,42 @@ function logout() {
     })
     .then(response => {
         if (response.ok) {
-            console.log('Logout successful');
             window.location.href = '/irumi';
         } else {
-            console.error('Logout failed:', response.status);
             alert('로그아웃에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('Error during logout:', error);
         alert('로그아웃 중 오류가 발생했습니다.');
     });
+}
+
+// 삼각형 + irumi 클릭 시 메인페이지 이동
+function moveToMain() {
+    location.href = 'main.do';
 }
 </script>
 
 <header>
-    <div class="logo-area">
+    <div class="logo-area" onclick="moveToMain()">
         <svg class="triangle-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <polygon points="12,6 6,18 18,18" fill="white" />
         </svg>
-        irumi
+        <span>irumi</span>
     </div>
+
     <div class="login-actions">
         <c:choose>
             <c:when test="${not empty sessionScope.loginUser}">
-                <!-- 권한이 2인 경우: 관리자 기능 버튼 표시 -->
                 <c:if test="${sessionScope.loginUser.userAuthority == '2'}">
                     <button onclick="location.href='adminPage.do'">관리자 기능</button>
                 </c:if>
-                <!-- 권한이 1인 경우: 마이페이지 버튼 표시 -->
                 <c:if test="${sessionScope.loginUser.userAuthority == '1'}">
                     <button onclick="location.href='myPage.do'">마이페이지</button>
                 </c:if>
-                <!-- 로그아웃 버튼 -->
                 <button onclick="logout()">로그아웃</button>
             </c:when>
             <c:otherwise>
-                <!-- 비로그인 상태: 로그인 버튼 -->
                 <button onclick="moveToLogin()">로그인</button>
             </c:otherwise>
         </c:choose>
