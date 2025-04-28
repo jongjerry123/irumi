@@ -6,7 +6,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>chatbot 직무 찾기</title>
+
+<!--  sidebar: 뷰 페이지 이동용 스크립트 -->
 <script>
 
 function moveJobPage() {
@@ -26,50 +29,181 @@ function moveJobPage() {
 	}
 </script>
 
+<!--  메세지 전송 이벤트용 스크립트 -->
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-     function sendMessage() {
-       const userInput = document.getElementById("userInput");
-       const chatArea = document.getElementById("chatArea");
-       const message = userInput.value.trim();
-       if (!message) return;
+$(function() {
+		// ➤ 사용자 입력 메시지 서버로 전송 함수
+	  function sendMessage(message) {
+	    addMessageToChat(message, "user-msg"); // 사용자 메시지 표시
 
-       const userDiv = document.createElement("div");
-       userDiv.className = "message user-msg";
-       userDiv.textContent = message;
-       chatArea.appendChild(userDiv);
+	    $.ajax({
+	      type: "POST",
+	      url: "/irumi/sendMessageToChatbot.do",
+	      contentType: "application/json",
+	      data: JSON.stringify({ userMsg: message,  topic: "job"  }),
+	      success: function(gptReply) {
+	        addMessageToChat(gptReply.gptAnswer, "bot-msg"); // 챗봇 응답 표시
 
-       fetch("/chatbot/sendUserMsg.do", {
-         method: "POST",
-         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-         body: new URLSearchParams({
-           convId: "demo-conv-id",
-           topic: "job",
-           userMsg: message
-         })
-       })
-       .then(response => response.text())
-       .then(gptReply => {
-         const botDiv = document.createElement("div");
-         botDiv.className = "message bot-msg";
-         botDiv.textContent = gptReply;
-         chatArea.appendChild(botDiv);
-         userInput.value = "";
-         chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
-       });
-     }
+	        // 답장 안에 checkboxOptions가 있으면 → renderCheckboxList() 실행
+	        if (gptReply.checkboxOptions && Array.isArray(gptReply.checkboxOptions) && gptReply.checkboxOptions.length > 0) {
+	          renderCheckboxList(gptReply.checkboxOptions);
+	        } else {
+	          removeCheckboxList();
+	        }
 
-     // 엔터키 이벤트 추가
-     document.getElementById("userInput").addEventListener("keyup", function(event) {
-       if (event.key === "Enter") {
-         sendMessage();
-       }
-     });
+	        //답장 안에 options가 있으면 → renderOptionButtons() 실행
+	        if (gptReply.options && Array.isArray(gptReply.options) && gptReply.options.length > 0) {
+	          renderOptionButtons(gptReply.options);
+	        } else {
+	          removeOptionButtons();
+	        }
 
-     // 버튼 클릭 시 메시지 전송 이벤트 추가
-     document.querySelector(".chat-send-btn").addEventListener("click", sendMessage);
+	        scrollToBottom(); // 스크롤 맨 아래로
+	      },
+	      error: function() {
+	        addMessageToChat("서버 오류 또는 JSON 파싱 실패!", "bot-msg");
+	      }
+	    });
+	  }
+	
+	// 복수선택 옵션에서 직무 선택완료 했을 때 실행======================
+	  // ➤ 선택한 직무 리스트를 화면에 출력 가능한 카드로 만드는 함수
+	  function addToJobList(jobs) {
+	    const $jobList = $(".saved-job-list");
+	    $.each(jobs, function(_, job) {
+	      const $card = $("<div>").addClass("citem-card");
 
-  });
+	      // ✕ 삭제 버튼
+	      const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
+	        $card.remove(); // 클릭 시 카드 삭제
+	      });
+
+	      // 직무명 텍스트
+	      const $span = $("<span>").text(job);
+
+	      $card.append($removeBtn).append($span);
+	      $jobList.append($card);
+	    });
+	  }//선택한 직무 리스트를 화면에 출력 가능한 카드로 만드는 함수
+	  
+	  
+	   // 복수 선택 옵션 버튼 제공 관련 =================================
+	  function renderCheckboxList(options) {
+	    removeCheckboxList(); // 기존 체크박스 목록 제거
+
+	    const $chatArea = $("#chatArea");
+	    const $listWrap = $("<div>").addClass("custom-checkbox-list").attr("id", "checkbox-list");
+
+	    $.each(options, function(_, opt) {
+	      const $label = $("<label>").addClass("custom-checkbox");
+	      const $input = $("<input>").attr({ type: "checkbox", value: opt });
+	      const $textSpan = $("<span>").addClass("checkbox-text").text(opt);
+	      const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
+
+	      $label.append($input, $textSpan, $checkMark);
+	      $listWrap.append($label);
+	    });
+
+	    // ➤ "선택 완료" 버튼 추가
+	    const $submitBtn = $("<button>").text("선택 완료").css("margin-left", "10px").on("click", function() {
+	      const checked = $listWrap.find("input:checked").map(function() {
+	        return this.value;
+	      }).get();
+	      if (checked.length === 0) {
+	        alert("하나 이상 선택해 주세요!");
+	        return;
+	      }
+	      addToJobList(checked);
+	      removeCheckboxList();
+	    });
+
+	    $listWrap.append($submitBtn);
+	    $chatArea.append($listWrap);
+	  }	//체크박스 리스트 렌더링 함수
+
+	// 택1 옵션 버튼 제공 관련 ===============================
+	  function renderOptionButtons(options) {
+	    removeOptionButtons(); // 기존 옵션 버튼 제거
+
+	    const $chatArea = $("#chatArea");
+	    const $btnWrap = $("<div>").attr("id", "option-buttons").css({
+	      marginTop: "15px",
+	      display: "flex",
+	      gap: "10px"
+	    });
+
+	    // 넘어온 옵션들에 대해, 클릭시 select-btn으로 설정해 메세지처럼 보냄.
+	    $.each(options, function(_, option) {
+	      const $btn = $("<button>").addClass("select-btn").text(option).on("click", function() {
+	        sendMessage(option); // 버튼 클릭하면 전송
+	      });
+	      $btnWrap.append($btn);
+	    });
+
+	    $chatArea.append($btnWrap);
+	  }
+
+
+	  // ➤ 유저 직접 입력 후 엔터키 입력 시 sendMessage()
+	  $("#userInput").on("keyup", function(event) {
+	    if (event.key === "Enter") {
+	      const val = $(this).val().trim();
+	      if (val) {
+	        sendMessage(val);
+	        $(this).val("");
+	      }
+	    }
+	  });
+
+	  // ➤ 유저 직접 입력 후 전송 버튼 클릭 시 sendMessage()
+	  $(".chat-send-btn").on("click", function() {
+	    const $input = $("#userInput");
+	    const val = $input.val().trim();
+	    if (val) {
+	      sendMessage(val);
+	      $input.val("");
+	    }
+	  });
+
+	  // ➤ 사이드바에서 수동 입력으로 직무 추가
+	  $(".add-btn").on("click", function() {
+	    const $input = $(".manual-input");
+	    const val = $input.val().trim();
+	    if (val) {
+	      addToJobList([val]);
+	      $input.val("");
+	    } else {
+	      alert("직무를 입력해 주세요!");
+	    }
+	  });
+	  
+	//기타 ------------------------------------------------
+	
+	 // 채팅창에 메시지 말풍선 추가 함수
+	  function addMessageToChat(message, cls) {
+	    const $chatArea = $("#chatArea");
+	    const $div = $("<div>").addClass("message " + cls).text(message);
+	    $chatArea.append($div);
+	  }
+	
+	// 체크박스 리스트 제거 함수
+	  function removeCheckboxList() {
+	    $("#checkbox-list").remove();
+	  }
+
+	  // 옵션 버튼 리스트 제거 함수
+	  function removeOptionButtons() {
+	    $("#option-buttons").remove();
+	  }
+	  
+	// 채팅창 스크롤 자동 내려주는 함수
+	  function scrollToBottom() {
+	    const $chatArea = $("#chatArea");
+	    $chatArea.parent().scrollTop($chatArea.parent()[0].scrollHeight);
+	  }
+
+});
+
 </script>
 <style>
 body {
@@ -170,7 +304,7 @@ body {
 	margin-left: 4px;
 }
 
-.right-panel .schedule-value {
+.right-panel .citem-value {
 	color: #fff;
 	font-size: 9px;
 	margin-left: 4px;
@@ -321,7 +455,7 @@ body {
 	background: #222;
 }
 
-.saved-schedule-section {
+.saved-citem-section {
 	margin-bottom: 20px;
 }
 
@@ -332,14 +466,14 @@ body {
 	margin: 24px 0 10px 0;
 }
 
-.saved-schedule-list {
+.saved-citem-list {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	margin-bottom: 14px;
 }
 
-.schedule-card {
+.citem-card {
 	background: #232323;
 	border: 1.5px solid #444;
 	border-radius: 7px;
@@ -366,7 +500,7 @@ body {
 	color: #f87171;
 }
 
-.add-schedule-btn {
+.add-citem-btn {
 	margin-top: 10px;
 	width: 100%;
 	padding: 9px 0;
@@ -384,12 +518,12 @@ body {
 	transition: background 0.2s, color 0.2s;
 }
 
-.add-schedule-btn span {
+.add-citem-btn span {
 	font-size: 18px;
 	font-weight: bold;
 }
 
-.add-schedule-btn:hover {
+.add-citem-btn:hover {
 	background: #BAAC80;
 	color: #232323;
 }
@@ -512,40 +646,32 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 </head>
 <body>
 
-   <c:import url="/WEB-INF/views/common/header.jsp"/>
-   <!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 chatbot로 설정함 -->
-<c:set var="menu" value="chat" scope="request" />
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+	<!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 chatbot로 설정함 -->
+	<c:set var="menu" value="chat" scope="request" />
 
- <div class="container">
+	<div class="container">
 
-<!-- Sidebar -->
-      <div class="sidebar">
-         <button onclick="moveJobPage();">직무 찾기</button>
-         <button onclick="moveSpecPage();">스펙 찾기</button>
-         <button onclick="moveSchedulePage();">일정 찾기</button>
-         <button onclick="moveActPage();">활동 찾기</button>
-      </div>
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<button onclick="moveJobPage();">직무 찾기</button>
+			<button onclick="moveSpecPage();">스펙 찾기</button>
+			<button onclick="moveSchedulePage();">일정 찾기</button>
+			<button onclick="moveActPage();">활동 찾기</button>
+		</div>
 
-      <!-- Main content -->
-<div class="main">
-   
-   <!-- 콘텐츠 영역 -->
-         <div class="content-box">
+		<!-- Main content -->
+		<div class="main">
 
-   <div class="chat-area" id="chatArea">
-            <div class="message bot-msg">무엇을 도와드릴까요?</div>
-         </div>
-             
-<!-- <div class="custom-checkbox-list">
+			<!-- 콘텐츠 영역 -->
+			<div class="content-box">
 
-               <label class="custom-checkbox"> 
-               <input type="checkbox"> 
-               <span class="checkbox-text">프론트엔드 개발자</span> <span
-                  class="checkmark">&#10003;</span>
-               </label> <label class="custom-checkbox"> <input type="checkbox">
-                  <span class="checkbox-text">백엔드 개발자</span> <span class="checkmark">&#10003;</span>
-               </label>
-            </div> -->
+				<div class="chat-area" id="chatArea">
+					<div class="message bot-msg">
+						내게 맞는 직무 찾기 세션입니다.<br> 먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점,
+						가치관 등)을 말해주세요.
+					</div>
+				</div>
 
 			</div>
 
@@ -562,17 +688,20 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 
 		<!-- Right panel -->
 		<div class="right-panel">
-			<div class="saved-schedule-section">
+			<div class="saved-job-section">
 				<div class="section-title">➤ 저장한 직무</div>
-				<div class="saved-schedule-list">
+				<div class="saved-job-list">
+					<!-- 
 					<div class="schedule-card">
 						<button class="remove-btn">✕</button>
 						<span>프론트엔드 개발자</span>
 					</div>
+					
 					<div class="schedule-card">
 						<button class="remove-btn">✕</button>
 						<span>백엔드 개발자</span>
 					</div>
+					 -->
 				</div>
 				<div class="manual-input-box">
 					<input type="text" placeholder="직접 직무 입력" class="manual-input" />

@@ -2,6 +2,8 @@ package com.project.irumi.chatbot.controller;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,7 @@ import com.project.irumi.chatbot.manager.SpecChatManager;
 import com.project.irumi.chatbot.manager.SsChatManager;
 import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.user.model.dto.User;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,6 +30,7 @@ public class ChatbotController {
 
 	@Autowired
 	private ConvSessionManager convManager;
+	private static final Logger logger = LoggerFactory.getLogger(ChatbotController.class);
 
 	
 	// 추가
@@ -75,9 +79,11 @@ public class ChatbotController {
 	public void startChatSession(
 			@RequestParam("topic") String topic, 
 			HttpSession loginSession) {
-
+		
 		String userId = (String) loginSession.getAttribute("userId");
 		ConvSession session = convManager.createNewSession(userId, topic);
+		
+		
 	}
 
 	// 대화 시작하고 서브 토픽 설정 클릭 ===========================
@@ -190,31 +196,30 @@ public class ChatbotController {
 	@RequestMapping(value = "/sendMessageToChatbot.do", method = RequestMethod.POST)
 	@ResponseBody
 	public ChatbotResponseDto sendMessageToChatbot(
-	        @RequestBody Map<String, Object> body,
+			 @RequestBody Map<String, Object> body,
 	        HttpSession session
 	) {
-		String userMsg = (String) body.get("userMsg");
-	    String topic = (String) body.get("topic"); // 주제값 받기
+		// 보낸 유저 정보
+		User loginUser = (User) session.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : null;
 
-	    // 세션에서 userId 꺼내기 (없으면 임시 user로)
-	    String userId = (String) session.getAttribute("userId");
-	    if (userId == null) {
-	        userId = "testUser"; // 임시 user
-	        session.setAttribute("userId", userId);
-	    }
+		logger.info("login User: "+userId);
+		
+		//프론트에서 받은 유저 메세지와 토픽 가져오기
+		String userMsg = (String) body.get("userMsg");
+		String topic = (String) body.get("topic");
+	    
+	   
 
 	    ConvSession convSession = convManager.getSession(userId);
 	    if (convSession == null || !topic.equals(convSession.getTopic())) {
 	        convSession = convManager.createNewSession(userId, topic);
 	        System.out.println("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);
-	    }
 
+	    }
+	 
 	    ChatbotResponseDto responseDto;
 
-	    // 주제별로 분기 처리
-	    if (topic == null && convSession != null) {
-	        topic = convSession.getTopic();
-	    }
 
 	    switch (topic) {
 	        case "job":
