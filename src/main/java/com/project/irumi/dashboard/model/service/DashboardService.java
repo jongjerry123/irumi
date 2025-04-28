@@ -2,9 +2,11 @@ package com.project.irumi.dashboard.model.service;
 
 import java.util.ArrayList;
 
+import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Dashboard;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.SpecSchedule;
 import com.project.irumi.dashboard.model.dto.Specific;
 
 public interface DashboardService {
@@ -13,5 +15,7 @@ public interface DashboardService {
 	int updateDashboard(Dashboard dashboard);
 	ArrayList<Job> selectUserJobs(String userId);
 	ArrayList<Spec> selectUserSpecs(Specific specific);
+	ArrayList<Activity> selectUserActs(Specific specific);
+	ArrayList<SpecSchedule> selectUserSpecSchedule(String specId);
 	
 }

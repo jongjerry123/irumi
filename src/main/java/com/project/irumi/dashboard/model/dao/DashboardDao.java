@@ -7,9 +7,11 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Dashboard;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.SpecSchedule;
 import com.project.irumi.dashboard.model.dto.Specific;
 
 @Repository("dashboardDao")
@@ -34,6 +36,16 @@ public class DashboardDao {
 	public ArrayList<Spec> selectUserSpecs(Specific specific) {
 		List<Spec> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserSpecs", specific);
 		return (ArrayList<Spec>) list;
+	}
+	
+	public ArrayList<Activity> selectUserActs(Specific specific) {
+		List<Activity> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserActs", specific);
+		return (ArrayList<Activity>) list;
+	}
+	
+	public ArrayList<SpecSchedule> selectUserSpecSchedule(String specId) {
+		List<SpecSchedule> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserSpecSchedule", specId);
+		return (ArrayList<SpecSchedule>) list;
 	}
 	
 }
