@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
+import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.context.StateJobChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 
@@ -59,13 +60,17 @@ public class JobChatManager {
 					return new ChatbotResponseDto("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요", null);
 				} else {
 					session.setChatState(StateJobChat.COMPLETE);
+					// db에 job 저장하기
+					
 					return new ChatbotResponseDto("추천을 마쳤습니다. 도움이 되었기를 바랍니다!", null);
 				}
 
 			case COMPLETE:
+				 session.setChatState(StateJobChat.ASK_PERSONALITY);
 				return new ChatbotResponseDto("대화가 완료되었습니다.", null);
 
 			default:
+				 session.setChatState(StateJobChat.ASK_PERSONALITY);
 				return new ChatbotResponseDto("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
 		}
 	}
