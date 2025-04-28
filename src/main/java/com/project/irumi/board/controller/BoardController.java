@@ -27,7 +27,6 @@ public class BoardController {
                                 @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                                 Model model) {
-
         int pageSize = 10;
         int offset = (page - 1) * pageSize;
         List<PostDTO> posts = postService.getFilteredPosts("일반", period, sort, keyword, offset, pageSize);
@@ -60,12 +59,10 @@ public class BoardController {
                               @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
                               @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                               Model model, HttpSession session) {
-
         int pageSize = 10;
         int offset = (page - 1) * pageSize;
         List<PostDTO> posts = postService.getFilteredPosts("질문", period, sort, keyword, offset, pageSize);
 
-        // 답변 유무 세팅
         for (PostDTO post : posts) {
             boolean hasAnswer = postService.hasAnswer(post.getPostId());
             post.setHasAnswer(hasAnswer);
@@ -184,7 +181,7 @@ public class BoardController {
         return "redirect:/postDetail.do?postId=" + postId;
     }
 
-    // ✅ 댓글 등록
+    // ✅ 댓글 등록 + 대댓글 등록
     @PostMapping("/addComment.do")
     public String addComment(@RequestParam("postId") Long postId,
                               @RequestParam("commentContent") String commentContent,
@@ -224,7 +221,7 @@ public class BoardController {
             return "redirect:/loginPage.do";
         }
 
-        model.addAttribute("reportedPostList", List.of()); // 임시
+        model.addAttribute("reportedPostList", List.of());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", 1);
         return "board/reportedPosts";
@@ -264,9 +261,17 @@ public class BoardController {
         if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
             return "redirect:/loginPage.do";
         }
-        model.addAttribute("badUserList", List.of()); // 임시
+
+        model.addAttribute("badUserList", List.of());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", 1);
         return "board/badUserList";
+    }
+    
+    @PostMapping("/deleteComment.do")
+    public String deleteComment(@RequestParam("commentId") Long commentId,
+                                 @RequestParam("postId") Long postId) {
+        postService.deleteComment(commentId);
+        return "redirect:/postDetail.do?postId=" + postId;
     }
 }

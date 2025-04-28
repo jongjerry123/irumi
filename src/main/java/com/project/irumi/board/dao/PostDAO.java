@@ -34,9 +34,9 @@ public class PostDAO {
         return sqlSession.selectOne("boardMapper.selectPostById", postId);
     }
 
-    // ✅ 게시글 댓글 전체 조회
+    // ✅ 게시글 댓글 전체 조회 (대댓글 순서 수정)
     public List<CommentDTO> getCommentsByPostId(Long postId) {
-        return sqlSession.selectList("boardMapper.selectCommentsByPostId", postId);
+        return sqlSession.selectList("boardMapper.selectCommentsByPostIdOrdered", postId);
     }
 
     // ✅ 자유게시판/질문게시판 필터+정렬+검색 조회
@@ -65,7 +65,7 @@ public class PostDAO {
         sqlSession.update("boardMapper.updatePostViewCount", postId);
     }
 
-    // ✅ 타입별 게시글 조회 (공지/Q&A)
+    // ✅ 타입별 게시글 조회
     public List<PostDTO> selectByType(String postType) {
         return sqlSession.selectList("boardMapper.selectByType", postType);
     }
@@ -98,7 +98,7 @@ public class PostDAO {
         return sqlSession.selectOne("boardMapper.countMyQnaPosts", userId);
     }
 
-    // ✅ QnA 답변 여부 조회 (관리자 댓글 있는지)
+    // ✅ QnA 답변 여부 조회
     public boolean existsAnswerByPostId(Long postId) {
         Integer count = sqlSession.selectOne("boardMapper.countAnswersByPostId", postId);
         return count != null && count > 0;
@@ -122,9 +122,14 @@ public class PostDAO {
         return sqlSession.selectOne("boardMapper.countReportedComments");
     }
 
-    // ✅ 댓글 삭제
+    // ✅ 불량이용자 게시판 체크박스 선택 후 댓글 삭제
     public void deleteComments(List<Long> commentIds) {
         sqlSession.delete("boardMapper.deleteSelectedComments", commentIds);
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long commentId) {
+        sqlSession.delete("boardMapper.deleteComment", commentId);
     }
 
     // ✅ 게시글 수정

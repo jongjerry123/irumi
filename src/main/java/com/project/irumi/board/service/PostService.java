@@ -36,7 +36,7 @@ public class PostService {
         return postDAO.getCommentsByPostId(postId);
     }
 
-    // ✅ 타입별 게시글 조회 (공지/Q&A)
+    // ✅ 타입별 게시글 조회 (공지/QnA)
     public List<PostDTO> getPostsByType(String postType) {
         return postDAO.selectByType(postType);
     }
@@ -76,9 +76,14 @@ public class PostService {
         return postDAO.countReportedComments();
     }
 
-    // ✅ 댓글 삭제
+    // ✅ 불량 이용자 게시판의 체크박스 선택 후 댓글 삭제
     public void deleteCommentsByIds(List<Long> commentIds) {
         postDAO.deleteComments(commentIds);
+    }
+    
+    // 댓글 삭제
+    public void deleteComment(Long commentId) {
+        postDAO.deleteComment(commentId);
     }
 
     // ✅ 답변 여부 조회 (특정 게시글에 관리자 댓글 존재 여부)
@@ -116,22 +121,13 @@ public class PostService {
         postDAO.increaseReport(postId);
     }
 
-    // ✅ 댓글 추가 (일반 댓글 등록)
-    public void addComment(Long postId, String commentContent, String userId) {
+    // ✅ 댓글 추가 (일반 댓글 / 대댓글 모두 지원)
+    public void addComment(Long postId, String commentContent, String userId, Long parentId) {
         CommentDTO comment = new CommentDTO();
         comment.setPostId(postId);
         comment.setComContent(commentContent);
         comment.setComWrId(userId);
-        postDAO.insertComment(comment);
-    }
-
-    // ✅ 대댓글 추가 (답글 등록)
-    public void addReply(Long postId, String commentContent, String userId, Long parentId) {
-        CommentDTO comment = new CommentDTO();
-        comment.setPostId(postId);
-        comment.setComContent(commentContent);
-        comment.setComWrId(userId);
-        comment.setComParentId(parentId);
+        comment.setComParentId(parentId); // ✅ 대댓글이면 parentId 세팅, 아니면 null
         postDAO.insertComment(comment);
     }
 

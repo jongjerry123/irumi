@@ -156,7 +156,7 @@
         <c:forEach var="post" items="${postList}">
           <tr>
             <td>${post.postWriter}</td>
-            <td><a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a></td>
+            <td><a href="postDetail.do?postId=${post.postId}" style="color: #A983A3">${post.postTitle}</a></td>
             <td>${post.postTime}</td>
           </tr>
         </c:forEach>

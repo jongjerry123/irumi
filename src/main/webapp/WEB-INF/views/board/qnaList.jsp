@@ -81,7 +81,7 @@
               <td>
                 <c:choose>
                   <c:when test="${not empty loginUser and (loginUser.userId == post.postWriter || loginUser.userAuthority == '2')}">
-                    <a href="detailPost.do?id=${post.postId}" style="color: #A983A3">${post.postTitle}</a>
+                    <a href="postDetail.do?postId=${post.postId}" style="color: #A983A3">${post.postTitle}</a>
                   </c:when>
                   <c:otherwise>
                     작성자와 관리자만 볼 수 있는 글입니다.
