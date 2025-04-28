@@ -15,9 +15,9 @@ public class ConvSession {
 	// 추가
 	private String lastTopic;
 
-	
-	private final List<String> contextHistory = new ArrayList<>();
 
+	private final List<String> contextHistory = new ArrayList<>();
+	
 
 	// ✅ 하나의 상태만 관리
 	private ChatState chatState;
@@ -32,7 +32,7 @@ public class ConvSession {
 	private ChatState resolveInitialState(String topic) {
 		switch (topic) {
 			case "job":
-				return StateJobChat.START;
+				return StateJobChat.ASK_PERSONALITY;
 			case "spec":
 				return StateSpecChat.START;
 			case "ss":
@@ -42,6 +42,14 @@ public class ConvSession {
 			default:
 				throw new IllegalArgumentException("Invalid topic: " + topic);
 		}
+	}
+
+	public List<String> getContextHistory() {
+		return contextHistory;
+	}
+
+	public void addToContextHistory(String text ) {
+		contextHistory.add(text +"\n");
 	}
 
 	// ✅ 대화 기록 저장

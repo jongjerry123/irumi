@@ -1,50 +1,69 @@
 package com.project.irumi.chatbot.manager;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.project.irumi.chatbot.context.ChatState;
+import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateJobChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 
 @Component
 public class JobChatManager {
-
-	public ChatbotResponseDto getGptResponse(ConvSession session, String userChoice) {
-		ChatState rawState = session.getChatState();
-
-		if (!(rawState instanceof StateJobChat)) {
-			return new ChatbotResponseDto("직무 추천 챗봇 상태 오류입니다. 세션을 다시 시작해주세요.", null);
-		}
-
-		StateJobChat state = (StateJobChat) rawState;
-
+	@Autowired
+	private GptApiService gptApiService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
+	
+	public ChatbotResponseDto getGptResponse(ConvSession session, String userMsg) {
+		
+		
+		StateJobChat state = (StateJobChat) session.getChatState();
+		if (state == null) state = StateJobChat.ASK_PERSONALITY;
+		logger.info("job chat state: "+ state);
+	
 		switch (state) {
-			case START:
-				session.setChatState(StateJobChat.ASK_PERSONALITY);
-				return new ChatbotResponseDto("직무 추천을 시작합니다. 성격, 강점, 가치관 등을 알려주세요.", null);
-
-			case ASK_PERSONALITY:
+				// 성격 정보를 저장.
+		case ASK_PERSONALITY:
+				session.addToContextHistory("유저는 자신에 대해 다음과 같이 설명함: "+userMsg);
 				session.setChatState(StateJobChat.ASK_JOB_CHARACTERISTIC);
 				return new ChatbotResponseDto("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.", null);
 
 			case ASK_JOB_CHARACTERISTIC:
-				session.setChatState(StateJobChat.ASK_WANT_MORE_OPT);
-				return new ChatbotResponseDto("더 많은 추천을 받아보고 싶으신가요?", List.of("네", "아니요"));
+				session.addToContextHistory("유저가 원하는 희망 직무의 특성은 다음과 같음: "+userMsg);
+				session.setChatState(StateJobChat.ASK_WORK_CHARACTERISTIC);
+				return new ChatbotResponseDto("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)", null);
+			
+			case ASK_WORK_CHARACTERISTIC:
+				session.addToContextHistory("유저는 다음과 같은 업계를 선호함: "+userMsg);
+				
+                String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저에게 추천할 만한 직무들을 3개 추천해 줘. 한 줄에 1개씩 출력해줘."+
+                																				String.join(" ", session.getContextHistory()));
+                List<String> jobList = Arrays.stream(gptAnswer.split("\n"))
+                        .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
+                        .collect(Collectors.toList());
+                
+                session.setChatState(StateJobChat.ASK_WANT_MORE_OPT);
+				return new ChatbotResponseDto("더 많은 추천을 받아보고 싶으신가요?", 
+						jobList, List.of("네", "아니요"));
 
 			case ASK_WANT_MORE_OPT:
-				if ("네".equals(userChoice)) {
+				if ("네".equals(userMsg)) {
 					session.setChatState(StateJobChat.ASK_PERSONALITY); // 루프 예시
-					return new ChatbotResponseDto("그럼 다시 특성을 알려주세요!", null);
+					return new ChatbotResponseDto("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요", null);
 				} else {
 					session.setChatState(StateJobChat.COMPLETE);
 					return new ChatbotResponseDto("추천을 마쳤습니다. 도움이 되었기를 바랍니다!", null);
 				}
 
 			case COMPLETE:
-				return new ChatbotResponseDto("대화가 이미 완료되었습니다.", null);
+				return new ChatbotResponseDto("대화가 완료되었습니다.", null);
 
 			default:
 				return new ChatbotResponseDto("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);

@@ -40,7 +40,7 @@ public class HomeController {
 
 	@RequestMapping("Ai.do")
 	public String ViewChatBot() {
-		return "chatbot/start";
+		return "chatbot/job";
 	}
 	
 	@RequestMapping("/boardPage.do")  
