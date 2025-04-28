@@ -53,4 +53,11 @@ public class UserDao {
 	    params.put("userPwd", encodedPassword);
 	    sqlSessionTemplate.update("userMapper.updatePassword", params);
 	}
+	//구글로그인
+	public User findUserBySocialId(String socialId, int loginType) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("socialId", socialId);
+        params.put("loginType", loginType);
+        return sqlSessionTemplate.selectOne("userMapper.findUserBySocialId", params);
+    }
 }
