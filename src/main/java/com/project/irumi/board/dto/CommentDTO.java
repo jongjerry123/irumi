@@ -12,7 +12,8 @@ public class CommentDTO {
     private int comRecommend;
     private int comReportCount;
     private int lvl; // ❗ 추가
-
+    
+    
     public CommentDTO() {}
 
     public CommentDTO(Long comId, String comWrId, Long postId, Long comParentId, String comContent,

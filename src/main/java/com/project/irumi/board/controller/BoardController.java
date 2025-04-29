@@ -1,5 +1,6 @@
 package com.project.irumi.board.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.project.irumi.board.dto.PostDTO;
 import com.project.irumi.board.service.PostService;
 import com.project.irumi.user.model.dto.User;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -20,7 +22,7 @@ public class BoardController {
     @Autowired
     private PostService postService;
 
-    // ✅ 자유게시판
+    // 자유게시판
     @GetMapping("/freeBoard.do")
     public String showFreeBoard(@RequestParam(value = "period", required = false, defaultValue = "전체") String period,
                                 @RequestParam(value = "sort", required = false, defaultValue = "") String sort,
@@ -44,7 +46,7 @@ public class BoardController {
         return "board/boardListView";
     }
 
-    // ✅ 공지사항
+    // 공지사항
     @GetMapping("/noticeList.do")
     public String showNoticeList(Model model) {
         List<PostDTO> notices = postService.getPostsByType("공지");
@@ -52,7 +54,7 @@ public class BoardController {
         return "board/noticeList";
     }
 
-    // ✅ QnA 목록
+    // QnA 목록
     @GetMapping("/qnaList.do")
     public String showQnaList(@RequestParam(value = "period", required = false, defaultValue = "전체") String period,
                               @RequestParam(value = "sort", required = false, defaultValue = "") String sort,
@@ -83,7 +85,7 @@ public class BoardController {
         return "board/qnaList";
     }
 
-    // ✅ 내 질문만 보기
+    // 내 질문만 보기
     @GetMapping("/myQna.do")
     public String showMyQnaPosts(HttpSession session, Model model,
                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -106,14 +108,14 @@ public class BoardController {
         return "board/qnaList";
     }
 
-    // ✅ 글쓰기 화면
+    // 글쓰기 화면
     @GetMapping("/writePost.do")
     public String showWritePostForm(@RequestParam("type") String type, Model model) {
         model.addAttribute("postType", type);
         return "board/writePost";
     }
 
-    // ✅ 글 등록
+    // 글 등록
     @PostMapping("/insertPost.do")
     public String insertPost(@ModelAttribute PostDTO post, HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
@@ -124,16 +126,14 @@ public class BoardController {
         post.setPostWriter(loginUser.getUserId());
         postService.insertPost(post);
 
-        String redirect;
-        switch (post.getPostType()) {
-            case "질문" -> redirect = "/qnaList.do";
-            case "공지" -> redirect = "/noticeList.do";
-            default -> redirect = "/freeBoard.do";
-        }
-        return "redirect:" + redirect;
+        return switch (post.getPostType()) {
+            case "질문" -> "redirect:/qnaList.do";
+            case "공지" -> "redirect:/noticeList.do";
+            default -> "redirect:/freeBoard.do";
+        };
     }
 
-    // ✅ 게시글 상세보기
+    // 게시글 상세보기
     @GetMapping("/postDetail.do")
     public String showPostDetail(@RequestParam("postId") Long postId, Model model) {
         postService.increasePostViewCount(postId);
@@ -145,7 +145,103 @@ public class BoardController {
         return "board/postDetailView";
     }
 
-    // ✅ 게시글 수정 화면
+    // 게시글 추천 (중복 방지)
+    @PostMapping("/recommendPost.do")
+    public String recommendPost(@RequestParam("postId") Long postId, HttpSession session, HttpServletResponse response) throws IOException {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/loginPage.do";
+
+        String userId = loginUser.getUserId();
+        if (postService.hasAlreadyRecommendedPost(userId, postId)) {
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().write("<script>alert('이미 추천하셨습니다.'); history.back();</script>");
+            return null;
+        }
+        postService.recommendPost(postId, userId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // 게시글 신고 (중복 방지)
+    @PostMapping("/reportPost.do")
+    public String reportPost(@RequestParam("postId") Long postId, HttpSession session, HttpServletResponse response) throws IOException {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/loginPage.do";
+
+        String userId = loginUser.getUserId();
+        if (postService.hasAlreadyReportedPost(userId, postId)) {
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().write("<script>alert('이미 신고하셨습니다.'); history.back();</script>");
+            return null;
+        }
+        postService.reportPost(postId, userId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // 댓글 등록
+    @PostMapping("/addComment.do")
+    public String addComment(@RequestParam("postId") Long postId,
+                             @RequestParam("commentContent") String commentContent,
+                             @RequestParam(value = "parentId", required = false) Long parentId,
+                             HttpSession session) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/loginPage.do";
+
+        postService.addComment(postId, commentContent, loginUser.getUserId(), parentId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // 댓글 추천 (중복 방지)
+    @PostMapping("/recommendComment.do")
+    public String recommendComment(@RequestParam("commentId") Long commentId,
+                                   @RequestParam("postId") Long postId,
+                                   HttpSession session, HttpServletResponse response) throws IOException {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/loginPage.do";
+
+        String userId = loginUser.getUserId();
+        if (postService.hasAlreadyRecommendedComment(userId, commentId)) {
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().write("<script>alert('이미 추천하셨습니다.'); history.back();</script>");
+            return null;
+        }
+        postService.recommendComment(commentId, userId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // 댓글 신고 (중복 방지)
+    @PostMapping("/reportComment.do")
+    public String reportComment(@RequestParam("commentId") Long commentId,
+                                @RequestParam("postId") Long postId,
+                                HttpSession session, HttpServletResponse response) throws IOException {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/loginPage.do";
+
+        String userId = loginUser.getUserId();
+        if (postService.hasAlreadyReportedComment(userId, commentId)) {
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().write("<script>alert('이미 신고하셨습니다.'); history.back();</script>");
+            return null;
+        }
+        postService.reportComment(commentId, userId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // 댓글 삭제
+    @PostMapping("/deleteComment.do")
+    public String deleteComment(@RequestParam("commentId") Long commentId,
+                                 @RequestParam("postId") Long postId) {
+        postService.deleteComment(commentId);
+        return "redirect:/postDetail.do?postId=" + postId;
+    }
+
+    // 게시글 수정
+    @PostMapping("/updatePost.do")
+    public String updatePost(@ModelAttribute PostDTO post) {
+        postService.updatePost(post);
+        return "redirect:/postDetail.do?postId=" + post.getPostId();
+    }
+
+    // 게시글 수정 화면
     @GetMapping("/editPost.do")
     public String editPostForm(@RequestParam("postId") Long postId, Model model) {
         PostDTO post = postService.getPostById(postId);
@@ -153,65 +249,13 @@ public class BoardController {
         return "board/editPost";
     }
 
-    // ✅ 게시글 수정 처리
-    @PostMapping("/updatePost.do")
-    public String updatePost(@ModelAttribute PostDTO post) {
-        postService.updatePost(post);
-        return "redirect:/postDetail.do?postId=" + post.getPostId();
-    }
-
-    // ✅ 게시글 삭제
+    // 게시글 삭제
     @PostMapping("/deletePost.do")
     public String deletePost(@RequestParam("postId") Long postId) {
         postService.deletePost(postId);
         return "redirect:/freeBoard.do";
     }
-
-    // ✅ 게시글 추천
-    @PostMapping("/recommendPost.do")
-    public String recommendPost(@RequestParam("postId") Long postId) {
-        postService.recommendPost(postId);
-        return "redirect:/postDetail.do?postId=" + postId;
-    }
-
-    // ✅ 게시글 신고
-    @PostMapping("/reportPost.do")
-    public String reportPost(@RequestParam("postId") Long postId) {
-        postService.reportPost(postId);
-        return "redirect:/postDetail.do?postId=" + postId;
-    }
-
-    // ✅ 댓글 등록 + 대댓글 등록
-    @PostMapping("/addComment.do")
-    public String addComment(@RequestParam("postId") Long postId,
-                              @RequestParam("commentContent") String commentContent,
-                              @RequestParam(value = "parentId", required = false) Long parentId,
-                              HttpSession session) {
-        User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser == null) {
-            return "redirect:/loginPage.do";
-        }
-
-        postService.addComment(postId, commentContent, loginUser.getUserId(), parentId);
-        return "redirect:/postDetail.do?postId=" + postId;
-    }
-
-    // ✅ 댓글 추천
-    @PostMapping("/recommendComment.do")
-    public String recommendComment(@RequestParam("commentId") Long commentId,
-                                    @RequestParam("postId") Long postId) {
-        postService.recommendComment(commentId);
-        return "redirect:/postDetail.do?postId=" + postId;
-    }
-
-    // ✅ 댓글 신고
-    @PostMapping("/reportComment.do")
-    public String reportComment(@RequestParam("commentId") Long commentId,
-                                 @RequestParam("postId") Long postId) {
-        postService.reportComment(commentId);
-        return "redirect:/postDetail.do?postId=" + postId;
-    }
-
+    
     // ✅ 신고된 게시글 목록
     @GetMapping("/reportedPosts.do")
     public String showReportedPosts(HttpSession session, Model model,
@@ -221,10 +265,20 @@ public class BoardController {
             return "redirect:/loginPage.do";
         }
 
-        model.addAttribute("reportedPostList", List.of());
+        int pageSize = 10;
+        int offset = (page - 1) * pageSize;
+
+        model.addAttribute("reportedPostList", postService.getReportedPosts(offset, pageSize));
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", 1);
+        model.addAttribute("totalPages", (int) Math.ceil((double) postService.countReportedPosts() / pageSize));
         return "board/reportedPosts";
+    }
+    
+ // ✅ 게시글 다중 삭제 + 신고기록 삭제
+    @PostMapping("/deleteSelectedPosts.do")
+    public String deleteSelectedPosts(@RequestParam("selectedPosts") List<Long> postIds) {
+        postService.deletePostsAndReports(postIds); // 🔄 게시글과 연결된 신고 기록 먼저 삭제 후 게시글 삭제
+        return "redirect:/reportedPosts.do";
     }
 
     // ✅ 신고된 댓글 목록
@@ -247,12 +301,11 @@ public class BoardController {
 
     // ✅ 신고 댓글 삭제
     @PostMapping("/deleteSelectedComments.do")
-    @ResponseBody
-    public String deleteSelectedComments(@RequestBody List<Long> commentIds) {
-        postService.deleteCommentsByIds(commentIds);
-        return "success";
+    public String deleteSelectedComments(@RequestParam("selectedComments") List<Long> commentIds) {
+        postService.deleteReportedCommentsByIds(commentIds);
+        return "redirect:/reportedComments.do";
     }
-
+    
     // ✅ 불량 이용자 목록
     @GetMapping("/badUserList.do")
     public String showBadUserList(HttpSession session, Model model,
@@ -262,16 +315,27 @@ public class BoardController {
             return "redirect:/loginPage.do";
         }
 
-        model.addAttribute("badUserList", List.of());
+        model.addAttribute("badUserList", List.of()); // TODO: 실제 데이터 연결 필요
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", 1);
         return "board/badUserList";
     }
     
-    @PostMapping("/deleteComment.do")
-    public String deleteComment(@RequestParam("commentId") Long commentId,
-                                 @RequestParam("postId") Long postId) {
-        postService.deleteComment(commentId);
-        return "redirect:/postDetail.do?postId=" + postId;
+    
+    
+
+    // 불량 이용자 등록
+    @PostMapping("/registerBadUsers.do")
+    public String registerBadUsers(@RequestParam("selectedPosts") List<Long> postIds) {
+        postService.registerBadUsersFromPosts(postIds);
+        return "redirect:/reportedPosts.do";
+    }
+    
+ // ✅ 댓글 작성자 불량 등록
+    @PostMapping("/registerBadUsersFromComments.do")
+    public String registerBadUsersFromComments(@RequestParam List<Long> selectedComments,
+                                               @RequestParam String reason) {
+        postService.registerBadUsersFromComments(selectedComments, reason);
+        return "redirect:reportedComments.do";
     }
 }

@@ -122,11 +122,6 @@ public class PostDAO {
         return sqlSession.selectOne("boardMapper.countReportedComments");
     }
 
-    // ✅ 불량이용자 게시판 체크박스 선택 후 댓글 삭제
-    public void deleteComments(List<Long> commentIds) {
-        sqlSession.delete("boardMapper.deleteSelectedComments", commentIds);
-    }
-
     // 댓글 삭제
     public void deleteComment(Long commentId) {
         sqlSession.delete("boardMapper.deleteComment", commentId);
@@ -165,5 +160,145 @@ public class PostDAO {
     // ✅ 댓글 신고 수 증가
     public void increaseCommentReport(Long commentId) {
         sqlSession.update("boardMapper.increaseCommentReport", commentId);
+    }
+    
+ // ✅ 게시글 추천 중복 여부 확인
+    public int countPostRecommend(String userId, Long postId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("postId", postId);
+        return sqlSession.selectOne("boardMapper.countPostRecommend", param);
+    }
+
+    // ✅ 댓글 추천 중복 여부 확인
+    public int countCommentRecommend(String userId, Long commentId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("commentId", commentId);
+        return sqlSession.selectOne("boardMapper.countCommentRecommend", param);
+    }
+
+    // ✅ 게시글 추천 기록 삽입
+    public void insertPostRecommend(String userId, Long postId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("postId", postId);
+        sqlSession.insert("boardMapper.insertPostRecommend", param);
+    }
+
+    // ✅ 댓글 추천 기록 삽입
+    public void insertCommentRecommend(String userId, Long commentId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("commentId", commentId);
+        sqlSession.insert("boardMapper.insertCommentRecommend", param);
+    }
+    
+ // 게시글 신고 중복 여부 확인
+    public int countPostReport(String userId, Long postId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("postId", postId);
+        return sqlSession.selectOne("boardMapper.countPostReport", param);
+    }
+    
+    public int countCommentReport(String userId, Long commentId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("commentId", commentId);
+        return sqlSession.selectOne("boardMapper.countCommentReport", param);
+    }
+    
+ // 댓글 신고 기록 저장
+    public void insertCommentReport(String userId, Long commentId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("commentId", commentId);
+        sqlSession.insert("boardMapper.insertCommentReport", param);
+    }
+    
+ // 게시글 신고 기록 저장
+    public void insertPostReport(String userId, Long postId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("postId", postId);
+        sqlSession.insert("boardMapper.insertPostReport", param);
+    }
+    
+
+
+    // 게시글 ID 목록으로 작성자 ID 목록 조회
+    public List<String> findWritersByPostIds(List<Long> postIds) {
+        return sqlSession.selectList("boardMapper.findWritersByPostIds", postIds);
+    }
+
+    // 사용자 ID 목록을 불량 이용자로 업데이트
+    public void updateUsersToBad(List<String> userIds) {
+        sqlSession.update("boardMapper.updateUsersToBad", userIds);
+    }
+    
+    public List<PostDTO> selectReportedPosts(int offset, int pageSize) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("offset", offset);
+        param.put("pageSize", pageSize);
+        return sqlSession.selectList("boardMapper.selectReportedPosts", param);
+    }
+    
+ // 게시글 삭제 전 신고 기록 삭제
+    public void deletePostReports(List<Long> postIds) {
+        sqlSession.delete("boardMapper.deletePostReports", postIds);
+    }
+
+    // 게시글 ID들에 해당하는 모든 댓글 삭제
+    public void deleteCommentsByPostIds(List<Long> postIds) {
+        sqlSession.delete("boardMapper.deleteCommentsByPostIds", postIds);
+    }
+
+    // 게시글 삭제
+    public void deletePosts(List<Long> postIds) {
+        sqlSession.delete("boardMapper.deletePosts", postIds);
+    }
+
+    // 게시글 ID 기준 댓글 신고 기록 삭제
+    public void deleteCommentReportsByPostIds(List<Long> postIds) {
+        sqlSession.delete("boardMapper.deleteCommentReportsByPostIds", postIds);
+    }
+
+    // 게시글 ID 기준 댓글 추천 기록 삭제
+    public void deleteCommentRecommendsByPostIds(List<Long> postIds) {
+        sqlSession.delete("boardMapper.deleteCommentRecommendsByPostIds", postIds);
+    }
+
+    // 게시글 ID 기준 게시글 추천 기록 삭제
+    public void deletePostRecommends(List<Long> postIds) {
+        sqlSession.delete("boardMapper.deletePostRecommends", postIds);
+    }
+    
+ // ✅ 댓글 추천 삭제
+    public void deleteCommentRecommendsByCommentIds(List<Long> commentIds) {
+        sqlSession.delete("boardMapper.deleteCommentRecommendsByCommentIds", commentIds);
+    }
+
+    // ✅ 댓글 신고 삭제
+    public void deleteCommentReportsByCommentIds(List<Long> commentIds) {
+        sqlSession.delete("boardMapper.deleteCommentReportsByCommentIds", commentIds);
+    }
+
+    // ✅ 댓글 삭제
+    public void deleteComments(List<Long> commentIds) {
+        sqlSession.delete("boardMapper.deleteComments", commentIds);
+    }
+    
+ // 댓글 ID 리스트로 작성자 ID 조회
+    public List<String> findWritersByCommentIds(List<Long> commentIds) {
+        return sqlSession.selectList("boardMapper.findWritersByCommentIds", commentIds);
+    }
+    
+ // ✅ 불량 이용자 등록 기록 남기기
+    public void insertReport(String reportedBy, String reason) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("reportedBy", reportedBy);
+        param.put("reason", reason);
+        sqlSession.insert("boardMapper.insertReport", param);
     }
 }
