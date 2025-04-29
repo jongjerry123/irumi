@@ -46,6 +46,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	      actList.appendChild(card);
 	    });
 	  }
+	  
+	  
 	  // 체크박스 리스트 렌더링 함수 (선택 완료 시 오른쪽에 추가)
 	  function renderCheckboxList(options) {
 	    removeCheckboxList();
