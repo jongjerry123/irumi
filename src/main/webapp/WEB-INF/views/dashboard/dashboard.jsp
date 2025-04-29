@@ -82,13 +82,6 @@ body {
 	margin-top: 20px;
 }
 
-#certToggle {
-	cursor: pointer;
-	color: #fff;
-	display: inline-block;
-	margin-bottom: 10px;
-}
-
 #certCards {
 	display: flex;
 	flex-wrap: wrap;
@@ -125,6 +118,7 @@ body {
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
 	$(document).ready(function() {
+		$('#certCards').slideToggle(300);
 		$.ajax({
 			url: 'userSpecView.do',
 			method: 'POST',
@@ -145,7 +139,7 @@ body {
 			contentType: 'application/json; charset=UTF-8',
 			success: function(data) {
 				data.forEach(function(item) {
-					/* TODO: 이 부분 수정 */
+					/* TODO: 이 부분에 클릭 시 토글 기능이 들어가도록 수정 */
 					$('<button>')
 						.text(item.jobName)
 						.on('click', function() {
@@ -153,7 +147,8 @@ body {
 							$('#targetJob').html('목표 직무: ' + item.jobName);
 							viewSpecs(item.jobId);
 							$('#jobExplain').html(item.jobExplain);
-							$('#specExplain').empty();
+							$('#certCards').slideToggle(300);
+							$('#certCards').slideToggle(300);
 						})
 						.appendTo('#jobs');
 				});
@@ -161,38 +156,59 @@ body {
 				$('<button>').text('목표 직업 탐색하기').on('click', searchJob).appendTo('#jobs');
 			}
 		});
-
-		$('#certToggle').click(function() {
-			$('#certCards').slideToggle(300);
-		});
 	});
 
 	function viewSpecs(jobId) {
-		$.ajax({
-			url: 'userSpecsView.do',
-			method: 'POST',
-			data: { jobId: jobId },
-			dataType: 'json',
-			success: function(data) {
-				
-				$.each(data, function(index, item) {
-					$('#certCards').html($('#certCards').html() + '<div class=\"certCard\"><h3>' + item.specName + '</h3><h5>' + item.specType + '</h5><div style=\"font-size: 13px; margin-bottom: 15px;\">' + item.specExplain + '</div></div>');
-					$.ajax({
-						url: 'userSpecStuff.do',
-						method: 'POST',
-						data: { jobId: jobId, specId: item.specId },
-						dataType: 'json',
-						success: function(data) {
-							
-						}
-					});
-				});
-			}
-		});
+	    $.ajax({
+	        url: 'userSpecsView.do',
+	        method: 'POST',
+	        data: { jobId: jobId },
+	        dataType: 'json',
+	        success: function(data) {
+	            $('#certCards').empty();
+	            if (!data) {
+	            	/* TODO: 여기에 스펙 정보가 없을 경우 출력할 HTML */
+	            }
+	            $.each(data, function(index, item) {
+	                var cardHtml = 
+	                    '<div class="certCard">' +
+	                      '<h3>' + item.specName + '</h3>' +
+	                      '<h5>' + item.specType + '</h5>' +
+	                      '<div style=\"font-size:13px; margin-bottom:15px;\">' + item.specExplain + '</div>' +
+	                      '<table>';
+
+	                $.ajax({
+	                    url: 'userSpecStuff.do',
+	                    method: 'POST',
+	                    data: { jobId: jobId, specId: item.specId },
+	                    dataType: 'json',
+	                    success: function(json) {
+	                    	
+	                    	cardHtml += '<h5>주요 일정<h5>';
+	                        $.each(json.specSchedules, function(i, sch) {
+	                            cardHtml += '<tr><td>' + formatDate(sch.ssDate) + '</td><td>' + sch.ssType + '</td></tr>';
+	                        });
+	                        cardHtml += '</table><div style=\"font-size:12px;\">';
+
+	                        $.each(json.acts, function(i, act) {
+	                            cardHtml +=
+	                              '<div style=\"margin-top:12px;\">' +
+	                                '<input type="checkbox" checked>' +
+	                                '<a href=\"#\">' + act.actContent + '</a>' +
+	                              '</div>';
+	                        });
+
+	                        cardHtml += '</div></div>';
+	                        $('#certCards').append(cardHtml);
+	                    }
+	                });
+	            });
+	        }
+	    });
 	}
 
 	function addJob() {
-		location.href = 'addJob.do';
+		location.href = 'addJob.do?page=1';
 	}
 
 	function searchJob() {
@@ -209,6 +225,14 @@ body {
 
 	function movetoUpDash() {
 		location.href = 'upDash.do';
+	}
+
+	function formatDate(sqlDate) {
+		const date = new Date(sqlDate);
+		const yyyy = date.getFullYear();
+		const mm = String(date.getMonth() + 1).padStart(2, '0');
+		const dd = String(date.getDate()).padStart(2, '0');
+		return yyyy + '-' + mm + '-' + dd;
 	}
 </script>
 </head>
@@ -244,119 +268,12 @@ body {
 					<div class="progress" style="width: 35%">35%</div>
 				</div>
 				<br>
-
-				<h2>목표 스펙</h2>
-				<div id="specs" class="buttons"></div>
-				<div id="specExplain"></div>
 				
-				<h2 id="certToggle">정보처리기사 자격증</h2>
+				<h2>목표 스펙</h2>
 				<div id="certSection">
-					
-
 					<div id="certCards" style="display: none;">
-						<div class="certCard">
-							<h3>정보처리기사</h3>
-							<h5>자격증</h5>
-							<div style="font-size: 13px; margin-bottom: 15px;">소프트웨어
-								개발, 시스템 운영, 데이터베이스 관리 등 IT 분야 전반의 이론·실무 능력을 평가하는 국가기술자격증입니다.</div>
-							<table>
-								<tr>
-									<td>2025년 5월 11일</td>
-									<td>필기시험</td>
-									<td>D-27</td>
-								</tr>
-								<tr>
-									<td>2025년 6월 14일</td>
-									<td>실기시험</td>
-									<td>D-50</td>
-								</tr>
-								<tr>
-									<td>2025년 6월 24일</td>
-									<td>구술 면접</td>
-									<td>D-60</td>
-								</tr>
-							</table>
-							<div style="font-size: 12px;">
-								<div>
-									<input type="checkbox" checked> <a href="#">신나공
-										정보처리기사 기출문제집</a>
-								</div>
-								<div style="margin-top: 8px;">
-									<input type="checkbox"> <a href="#">코세라 YY 강의 시청</a>
-								</div>
-							</div>
-							<button class="button"
-								style="margin-top: 15px; width: 100%; background: #00f7d7; color: #000; border: none; padding: 8px 0; border-radius: 5px;">
-								스펙 달성</button>
-						</div>
-
-						<!-- 카드 복제 -->
-						<div class="certCard">
-							<div style="font-size: 13px; margin-bottom: 15px;">소프트웨어
-								개발, 시스템 운영, 데이터베이스 관리 등 IT 분야 전반의 이론·실무 능력을 평가하는 국가기술자격증입니다.</div>
-							<table>
-								<tr>
-									<td>2025년 5월 11일</td>
-									<td>필기시험</td>
-									<td>D-27</td>
-								</tr>
-								<tr>
-									<td>2025년 6월 14일</td>
-									<td>실기시험</td>
-									<td>D-50</td>
-								</tr>
-								<tr>
-									<td>2025년 6월 24일</td>
-									<td>구술 면접</td>
-									<td>D-60</td>
-								</tr>
-							</table>
-							<div style="font-size: 12px;">
-								<div>
-									<input type="checkbox" checked> <a href="#">신나공
-										정보처리기사 기출문제집</a>
-								</div>
-								<div style="margin-top: 8px;">
-									<input type="checkbox"> <a href="#">코세라 YY 강의 시청</a>
-								</div>
-							</div>
-							<button class="button"
-								style="margin-top: 15px; width: 100%; background: #00f7d7; color: #000; border: none; padding: 8px 0; border-radius: 5px;">
-								스펙 달성</button>
-						</div>
-						<div class="certCard">
-							<div style="font-size: 13px; margin-bottom: 15px;">소프트웨어
-								개발, 시스템 운영, 데이터베이스 관리 등 IT 분야 전반의 이론·실무 능력을 평가하는 국가기술자격증입니다.</div>
-							<table>
-								<tr>
-									<td>2025년 5월 11일</td>
-									<td>필기시험</td>
-									<td>D-27</td>
-								</tr>
-								<tr>
-									<td>2025년 6월 14일</td>
-									<td>실기시험</td>
-									<td>D-50</td>
-								</tr>
-								<tr>
-									<td>2025년 6월 24일</td>
-									<td>구술 면접</td>
-									<td>D-60</td>
-								</tr>
-							</table>
-							<div style="font-size: 12px;">
-								<div>
-									<input type="checkbox" checked> <a href="#">신나공
-										정보처리기사 기출문제집</a>
-								</div>
-								<div style="margin-top: 8px;">
-									<input type="checkbox"> <a href="#">코세라 YY 강의 시청</a>
-								</div>
-							</div>
-							<button class="button"
-								style="margin-top: 15px; width: 100%; background: #00f7d7; color: #000; border: none; padding: 8px 0; border-radius: 5px;">
-								스펙 달성</button>
-						</div>
+						<h1>직업을 선택하세요</h1>
+						
 					</div>
 				</div>
 
