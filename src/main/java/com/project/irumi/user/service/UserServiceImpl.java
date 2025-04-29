@@ -1,5 +1,8 @@
 package com.project.irumi.user.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,5 +55,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserBySocialId(String socialId, int loginType) {
         return userDao.findUserBySocialId(socialId, loginType);
+    }
+    @Override
+    public void updateUserProfile(Map<String, Object> userData) {
+        String userId = (String) userData.get("userId");
+        if (userId == null) throw new IllegalArgumentException("User ID is required");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        if (userData.containsKey("password") && userData.get("password") != null) {
+            String encodedPassword = bcryptPasswordEncoder.encode((String) userData.get("password"));
+            params.put("userPwd", encodedPassword);
+        }
+        if (userData.containsKey("email") && userData.get("email") != null) {
+            params.put("userEmail", userData.get("email"));
+        }
+        if (userData.containsKey("university") && userData.get("university") != null) {
+            params.put("userUniversity", userData.get("university"));
+        }
+        if (userData.containsKey("degree") && userData.get("degree") != null) {
+            params.put("userDegree", userData.get("degree"));
+        }
+        if (userData.containsKey("graduated") && userData.get("graduated") != null) {
+            params.put("userGradulate", userData.get("graduated"));
+        }
+        if (userData.containsKey("point") && userData.get("point") != null) {
+            params.put("userPoint", userData.get("point"));
+        }
+
+        userDao.updateUserProfile(params);
     }
 }
