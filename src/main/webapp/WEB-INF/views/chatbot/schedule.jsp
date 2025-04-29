@@ -54,13 +54,18 @@ document.addEventListener("DOMContentLoaded", function() {
 	  }
 	
 	document.querySelector(".add-btn").addEventListener("click", function() {
-		  const input = document.querySelector(".manual-input");
-		  const val = input.value.trim();
-		  if (val) {
-		    addToActivityList([val]);
-		    input.value = "";
+		  const dateInput = document.getElementById("manualDate").value.trim();
+		  const commentInput = document.getElementById("manualComment").value.trim();
+		  
+		  if (dateInput && commentInput) {
+		    const combinedText = dateInput + " / " + commentInput;
+		    addToActivityList([combinedText]);
+		    
+		    // 입력창 초기화
+		    document.getElementById("manualDate").value = "";
+		    document.getElementById("manualComment").value = "";
 		  } else {
-		    alert("활동을 입력해 주세요!");
+		    alert("날짜와 코멘트를 모두 입력해 주세요!");
 		  }
 		});
 	
@@ -74,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	    const chatArea = document.getElementById("chatArea");
 	    const div = document.createElement("div");
 	    div.className = "message " + cls;
-	    div.textContent = message;
+	    div.innerHTML = message;
 	    chatArea.appendChild(div);
 	  }
 	  
@@ -189,6 +194,11 @@ body {
    padding-left: 40px;
    display: flex;
    flex-direction: column;
+}
+
+a {
+  color: #BAAC80; /* 초록색 */
+  text-decoration: underline; /* 밑줄 */
 }
 
 /* 사이드바 ************************************************************************************* */
@@ -344,18 +354,29 @@ body {
 }
 
 
-/*  */
+/* 오른쪽 입력 박스 부분  */
 .manual-input-box {
    display: flex;
-   align-items: center;
    background: #232323;
    border-radius: 8px;
    padding: 6px 10px;
    margin-top: 12px;
+   flex-direction: column;
    gap: 6px;
+   align-items : center;
 }
 
 .manual-input-box .manual-input {
+   flex: 1;
+   background: transparent;
+   border: none;
+   color: #BAAC80;
+   font-size: 14px;
+   padding: 8px 4px;
+   outline: none;
+}
+
+.manual-input-box .manual-date {
    flex: 1;
    background: transparent;
    border: none;
@@ -373,17 +394,20 @@ body {
    width: 28px;
    height: 28px;
    display: flex;
-   align-items: center;
    justify-content: center;
    cursor: pointer;
    font-size: 18px;
    margin-left: 4px;
+   align-self: flex-end;
 }
 
 .manual-input-box .add-btn:hover {
    background: #BAAC80;
    color: #232323;
 }
+
+
+
 
 
 .saved-schedule-section {
@@ -619,7 +643,8 @@ body {
         
         
    <div class="manual-input-box">
-    <input type="text" placeholder="직접 일정 입력" class="manual-input"/>
+   <input type="date" class="manual-date" id="manualDate" placeholder="날짜 선택"/>
+    <input type="text" placeholder="코멘트 입력" class="manual-input" id="manualComment"/>
     <button class="add-btn"><i class="fa fa-plus"> + </i></button>
 </div>
 </div>
