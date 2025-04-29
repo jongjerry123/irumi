@@ -293,7 +293,12 @@ public class PostDAO {
     public List<String> findWritersByCommentIds(List<Long> commentIds) {
         return sqlSession.selectList("boardMapper.findWritersByCommentIds", commentIds);
     }
-
     
-    
+ // ✅ 불량 이용자 등록 기록 남기기
+    public void insertReport(String reportedBy, String reason) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("reportedBy", reportedBy);
+        param.put("reason", reason);
+        sqlSession.insert("boardMapper.insertReport", param);
+    }
 }

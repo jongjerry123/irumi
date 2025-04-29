@@ -9,117 +9,28 @@
   <meta charset="UTF-8">
   <title>신고된 댓글 관리</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #111;
-      color: #fff;
-    }
-    .main-content {
-      padding: 40px 140px;
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-    .category-bar {
-      display: flex;
-      align-items: center;
-      gap: 30px;
-      margin-bottom: 30px;
-    }
-    .category-bar h2 {
-      margin: 0;
-    }
-    .tabs {
-      display: flex;
-      gap: 12px;
-    }
-    .tabs button {
-      background-color: #222;
-      color: #fff;
-      padding: 10px 24px;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .tabs .active {
-      border: 1px solid #A983A3;
-      color: #A983A3;
-    }
-    .admin-btn {
-      background-color: #222;
-      border: 1px solid #ff4c4c;
-      border-radius: 10px;
-      padding: 8px;
-      cursor: pointer;
-    }
-    .admin-btn.active {
-      border: 2px solid #ff4c4c;
-      background-color: #1a1a1a;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 40px 0 20px 0;
-    }
-    th, td {
-      border: 1px solid #444;
-      padding: 14px;
-      text-align: center;
-    }
-    th {
-      background-color: #222;
-    }
-    td {
-      background-color: #1a1a1a;
-    }
-    .bottom-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 60px;
-    }
-    .bottom-bar .left {
-      font-size: 14px;
-    }
-    .bottom-bar .right {
-      display: flex;
-      gap: 10px;
-    }
-    .btn-action {
-      background-color: transparent;
-      border: 1px solid #A983A3;
-      color: #A983A3;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .btn-danger {
-      border: 1px solid #ff4c4c;
-      color: #ff4c4c;
-    }
-    .pagination {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .pagination button {
-      background-color: #222;
-      color: #fff;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .pagination button.selected {
-      border: 1px solid #A983A3;
-      color: #A983A3;
-    }
-    input[type="checkbox"] {
-      accent-color: #A983A3;
-      width: 18px;
-      height: 18px;
-    }
+    body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #111; color: #fff; }
+    .main-content { padding: 40px 140px; max-width: 1280px; margin: 0 auto; }
+    .category-bar { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; }
+    .category-bar h2 { margin: 0; }
+    .tabs { display: flex; gap: 12px; }
+    .tabs button { background-color: #222; color: #fff; padding: 10px 24px; border: 1px solid transparent; border-radius: 10px; cursor: pointer; }
+    .tabs .active { border: 1px solid #A983A3; color: #A983A3; }
+    .admin-btn { background-color: #222; border: 1px solid #ff4c4c; border-radius: 10px; padding: 8px; cursor: pointer; }
+    .admin-btn.active { border: 2px solid #ff4c4c; background-color: #1a1a1a; }
+    table { width: 100%; border-collapse: collapse; margin: 40px 0 20px 0; }
+    th, td { border: 1px solid #444; padding: 14px; text-align: center; }
+    th { background-color: #222; }
+    td { background-color: #1a1a1a; }
+    .bottom-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 60px; }
+    .bottom-bar .left { font-size: 14px; }
+    .bottom-bar .right { display: flex; gap: 10px; }
+    .btn-action { background-color: transparent; border: 1px solid #A983A3; color: #A983A3; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+    .btn-danger { border: 1px solid #ff4c4c; color: #ff4c4c; }
+    .pagination { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+    .pagination button { background-color: #222; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    .pagination button.selected { border: 1px solid #A983A3; color: #A983A3; }
+    input[type="checkbox"] { accent-color: #A983A3; width: 18px; height: 18px; }
   </style>
 
   <script>
@@ -193,7 +104,6 @@
         <tr>
           <th>작성자</th>
           <th>댓글 내용</th>
-          <th>원본 게시글 제목</th>
           <th>신고수</th>
           <th>선택</th>
         </tr>
@@ -202,8 +112,9 @@
         <c:forEach var="comment" items="${reportedCommentList}">
           <tr>
             <td>${comment.comWrId}</td>
-            <td>${comment.comContent}</td>
-            <td>-</td>
+            <td><a href="postDetail.do?postId=${comment.postId}" style="color: #A983A3; text-decoration: underline;">
+    ${comment.comContent}
+  </a></td>
             <td>${comment.comReportCount}</td>
             <td><input type="checkbox" name="selectedComments" value="${comment.comId}" /></td>
           </tr>

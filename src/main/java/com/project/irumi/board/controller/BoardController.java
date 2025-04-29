@@ -333,8 +333,9 @@ public class BoardController {
     
  // ✅ 댓글 작성자 불량 등록
     @PostMapping("/registerBadUsersFromComments.do")
-    public String registerBadUsersFromComments(@RequestParam("selectedComments") List<Long> commentIds) {
-        postService.registerBadUsersFromComments(commentIds);
-        return "redirect:/reportedComments.do";
+    public String registerBadUsersFromComments(@RequestParam List<Long> selectedComments,
+                                               @RequestParam String reason) {
+        postService.registerBadUsersFromComments(selectedComments, reason);
+        return "redirect:reportedComments.do";
     }
 }

@@ -1,10 +1,15 @@
 package com.project.irumi.board.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
+
 import com.project.irumi.board.dao.PostDAO;
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
+
 import jakarta.annotation.Resource;
 
 @Service
@@ -167,11 +172,15 @@ public class PostService {
     // ✅ 신고된 게시글 수 조회
     public int countReportedPosts() { return postDAO.countReportedPosts(); }
     
-    public void registerBadUsersFromComments(List<Long> commentIds) {
-        if (commentIds == null || commentIds.isEmpty()) return; // ✅ 방어 코드 꼭 추가!
-        List<String> userIds = postDAO.findWritersByCommentIds(commentIds);
+    public void registerBadUsersFromComments(List<Long> commentIds, String reason) {
+        List<String> userIds = postDAO.findWritersByCommentIds(commentIds);  // 댓글 작성자 조회
         if (userIds != null && !userIds.isEmpty()) {
-            postDAO.updateUsersToBad(userIds);
+            postDAO.updateUsersToBad(userIds);  // 불량 사용자로 업데이트
+
+            // ✅ 신고 테이블에 사유와 함께 기록 남기기
+            for (String userId : userIds) {
+                postDAO.insertReport(userId, reason);  // 그냥 String 2개 넘김 (Map 아님!)
+            }
         }
     }
 } 
