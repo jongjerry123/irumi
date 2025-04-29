@@ -647,4 +647,35 @@ public class UserController {
             return "user/registerSocialUser";
         }
     }
+    @RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                response.put("success", false);
+                response.put("message", "로그인이 필요합니다.");
+                return response;
+            }
+            userData.put("userId", loginUser.getUserId()); // 현재 로그인한 사용자의 ID 추가
+            userservice.updateUserProfile(userData); // 서비스 호출
+            // 세션 업데이트
+            User updatedUser = userservice.selectUser(loginUser);
+            session.setAttribute("loginUser", updatedUser);
+            response.put("success", true);
+            response.put("message", "업데이트 성공");
+        } catch (Exception e) {
+            logger.error("updateUserProfile.do: Error updating profile", e);
+            response.put("success", false);
+            response.put("message", "업데이트 실패: " + e.getMessage());
+        }
+        return response;
+    }
+    @RequestMapping("myPage.do")
+    public String movemyPage() {
+        logger.info("movemyPage: Displaying myPage");
+        return "user/myPage";
+    }
+
 }

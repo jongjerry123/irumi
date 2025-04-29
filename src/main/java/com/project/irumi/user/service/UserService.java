@@ -1,5 +1,7 @@
 package com.project.irumi.user.service;
 
+import java.util.Map;
+
 import com.project.irumi.user.model.dto.User;
 
 public interface UserService {
@@ -11,4 +13,5 @@ public interface UserService {
     boolean checkUserMatch(String userId, String email);
     void updatePassword(String userId, String encodedPassword);
     User findUserBySocialId(String socialId, int loginType);
+    void updateUserProfile(Map<String, Object> userData);
 }

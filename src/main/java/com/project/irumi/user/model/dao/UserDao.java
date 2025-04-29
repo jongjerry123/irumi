@@ -60,4 +60,8 @@ public class UserDao {
         params.put("loginType", loginType);
         return sqlSessionTemplate.selectOne("userMapper.findUserBySocialId", params);
     }
+	//마이페이지 수정
+	public void updateUserProfile(Map<String, Object> params) {
+        sqlSessionTemplate.update("userMapper.updateUserProfile", params);
+    }
 }
