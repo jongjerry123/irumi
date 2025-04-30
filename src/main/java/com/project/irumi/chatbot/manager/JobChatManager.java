@@ -31,6 +31,9 @@ public class JobChatManager {
 	
 		switch (state) {
 				// 성격 정보를 저장.
+		case START:
+				// chatbotService로 챗봇의 첫 chatMsg 저장
+			
 		case ASK_PERSONALITY:
 				session.addToContextHistory("유저는 자신에 대해 다음과 같이 설명함: "+userMsg);
 				session.setChatState(StateJobChat.ASK_JOB_CHARACTERISTIC);

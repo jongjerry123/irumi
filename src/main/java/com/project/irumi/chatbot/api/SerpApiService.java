@@ -2,21 +2,87 @@ package com.project.irumi.chatbot.api;
 
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 
 @Service
 public class SerpApiService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SerpApiService.class);
 
     private static final String API_KEY = "c009b6b2d8a1ad805eb1492ee8b31de1f2ed97a873d778afc0c0fb4cb3c498ec"; 
     private static final String BASE_URL = "https://serpapi.com/search";
+
+    public String searchJobSpec(String query) {
+    	try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
+
+
+            URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+            	    .queryParam("q", encodedQuery) // 인코딩된 검색어
+            	    .queryParam("hl", "ko")
+            	    .queryParam("gl", "kr")
+            	    .queryParam("engine", "google")
+            	    .queryParam("api_key", API_KEY)
+            	    .build(true)
+            	    .toUri();
+
+            // API 호출
+            String response = restTemplate.getForObject(uri, String.class);
+            JSONObject serpJson = new JSONObject(response);
+
+         // 1. answer_box에서 자격증 목록 가져오기
+            List<Map<String, String>> certs = serpJson
+                .getJSONObject("answer_box")
+                .getJSONObject("contents")
+                .getJSONArray("formatted")
+                .toList()
+                .stream()
+                .map(o -> (Map<String, String>) o)
+                .collect(Collectors.toList());
+
+            // 2. organic_results에서 설명 추출
+            List<String> descriptions = serpJson
+                .getJSONArray("organic_results")
+                .toList()
+                .stream()
+                .map(obj -> ((Map<String, Object>) obj).get("snippet").toString())
+                .collect(Collectors.toList());
+
+            // 3. GPT에 넘길 문장 조합 (최대 3~5개 정도 추려서 사용)
+            List<String> gptInputLines = new ArrayList<>();
+            for (int i = 0; i < Math.min(certs.size(), descriptions.size()); i++) {
+                String cert = certs.get(i).get("자격증_종류");
+                String desc = descriptions.get(i);
+                gptInputLines.add(cert + ": " + desc);
+            }
+
+            String gptInput = String.join("\n", gptInputLines);
+
+            logger.info("serpapi 검색결과: " +gptInput);
+            return gptInput;//parseSearchResult(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "검색 중 오류가 발생했습니다.";
+        }
+	}
+
 
     public String searchExamSchedule(String query) {
         try {
@@ -75,6 +141,8 @@ public class SerpApiService {
             return "검색 결과를 파싱하는 도중 오류가 발생했습니다.";
         }
     }
+
+	
     
 
 }
