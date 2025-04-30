@@ -115,6 +115,24 @@ $(function() {
 	      }
 	      addToJobList(checked);
 	      removeCheckboxList();
+	      
+	      
+	   // DB에 저장    ----------- 변경사항
+	      checked.forEach(function(jobName) {
+	    	  $.ajax({
+	    	    type: "POST",
+	    	    url: "insertJob.do",
+	    	    data: { jobName: jobName },
+	    	    success: function() {
+	    	      console.log("직무 저장 성공:", jobName);
+	    	    },
+	    	    error: function() {
+	    	      console.error("직무 저장 실패:", jobName);
+	    	    }
+	    	  });
+	    	});
+	   
+	   
 	    });
 
 	    $listWrap.append($submitBtn);
@@ -171,6 +189,21 @@ $(function() {
 	    const val = $input.val().trim();
 	    if (val) {
 	      addToJobList([val]);
+	      
+	      // DB에 저장    ----------- 변경사항
+	      $.ajax({
+	        type: "POST",
+	        url: "insertJob.do",
+	        data: { jobName: val },
+	        success: function() {
+	          console.log("직무 추가 성공");
+	        },
+	        error: function() {
+	          alert("직무 추가 실패!");
+	        }
+	      });
+	      
+	      
 	      $input.val("");
 	    } else {
 	      alert("직무를 입력해 주세요!");

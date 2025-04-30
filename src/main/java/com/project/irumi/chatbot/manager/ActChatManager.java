@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.project.irumi.chatbot.api.GptApiService;
-import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateActChat;
@@ -23,9 +22,6 @@ public class ActChatManager {
 	@Autowired
 	private ConvSessionManager convManager;
 	
-	@Autowired
-	private SerpApiService serpApiService;
-	
 	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
 		// TODO Auto-generated method stub
 		return null;
@@ -36,6 +32,7 @@ public class ActChatManager {
         if (state == null) state = StateActChat.START;
         String lastSpec = session.getLastTopic();
         String lastActivityType = (String) session.getLastActivityType();
+        
 
         switch (state) {
             case START:
@@ -46,17 +43,27 @@ public class ActChatManager {
 
             case INPUT_SPEC:
                 if (userMsg != null && !userMsg.isBlank()) {
-                    session.setLastTopic(userMsg.trim());
-                    session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
-                    return new ChatbotResponseDto(
-                        "'" + userMsg + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?",
-                        List.of("도서 추천", "영상 추천", "기타 활동 추천")
-                    );
-                } else {
-                    return new ChatbotResponseDto(
-                        "추천받고 싶은 스펙(분야/자격증 등)을 입력해 주세요."
-                    );
-                }
+                    boolean isMeaningful = isSpecRelatedInput(userMsg);
+                    
+                    if(isMeaningful) {
+                    	session.setLastTopic(userMsg.trim());
+                        session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
+                        return new ChatbotResponseDto(
+                            "'" + userMsg + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?",
+                            List.of("도서 추천", "영상 추천", "기타 활동 추천")
+                        );
+                    } else {
+                    	session.setChatState(StateActChat.INPUT_SPEC);
+                        return new ChatbotResponseDto(
+                            "스펙 관련 입력이 아닌 것 같아요. 자격증, 분야, 기술 등과 관련된 주제로 다시 입력해 주세요."
+                        );
+                    }
+                  } else {
+                	  session.setChatState(StateActChat.INPUT_SPEC);
+                      return new ChatbotResponseDto("빈 응답이 기록되었습니다. 다시 입력해 주세요.");
+                  }
+                	
+                    
 
             case CHOOSE_ACTIVITY_TYPE:
                 // 버튼 또는 텍스트 입력 모두 허용
@@ -94,14 +101,13 @@ public class ActChatManager {
                         List.of("다른 유형", "종료")
                     );
                 }
-
+                
             default:
                 session.setChatState(StateActChat.START);
                 return new ChatbotResponseDto("오류가 발생했습니다. 처음부터 다시 시도해 주세요.");
         }
     }
 
-    /** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
 	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session) {
 	    // 🔹 GPT 프롬프트 생성
@@ -142,6 +148,19 @@ public class ActChatManager {
                      .map(String::trim)
                      .collect(Collectors.toList());
     }
+    
+    
+    // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
+    private boolean isSpecRelatedInput(String input) {
+        String prompt = """
+            다음 문장이 자격증, 직무, 공부, 기술 분야와 관련된 내용이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
+            입력: "%s"
+            """.formatted(input);
+
+        String reply = gptApiService.callGPT(prompt);
+        return reply != null && reply.trim().startsWith("예");
+    }
+
 
 }
 
