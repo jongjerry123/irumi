@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateActChat;
+import com.project.irumi.chatbot.context.StateJobChat;
 import com.project.irumi.chatbot.context.StateSpecChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 
@@ -32,11 +33,19 @@ public class SpecChatManager {
         switch (state) {
 
             case TEXT_CURRENT_SPEC:
-            	session.addToContextHistory("유저가 현재 보유한 스펙: " + userMsg);
-            	session.setGettedSpec(userMsg);   /// 수정 - 이미 갖고 있는 스펙 저장 (gpt 가 자꾸 보유 스펙 저걸 무시해서 걍 필드생성)
-            	session.setChatState(StateSpecChat.OPT_SPEC_TYPE);
-                return new ChatbotResponseDto("어떤 종류의 스펙 추천을 받고 싶으신가요?", 
-                        List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타"));
+				boolean isMeaningful = isSpecRelatedInput(userMsg);
+            	if(isMeaningful) {
+            		session.addToContextHistory("유저가 현재 보유한 스펙: " + userMsg);
+                	session.setGettedSpec(userMsg);   /// 수정 - 이미 갖고 있는 스펙 저장 (gpt 가 자꾸 보유 스펙 저걸 무시해서 걍 필드생성)
+                	session.setChatState(StateSpecChat.OPT_SPEC_TYPE);
+                    return new ChatbotResponseDto("어떤 종류의 스펙 추천을 받고 싶으신가요?", 
+                            List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타"));
+            	} else {
+            		session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
+	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 스펙 추천 세션입니다.\r\n"
+	            			+ "현재 보유하고 있는 스펙이나 경험을 말씀해 주세요.");
+            	}
+            	
 
             case OPT_SPEC_TYPE:
             	session.addToContextHistory("유저가 관심 있는 스펙 타입: " + userMsg);
@@ -105,4 +114,15 @@ public class SpecChatManager {
         return new ChatbotResponseDto("선택하신 스펙 옵션에 대해 추가 안내를 준비 중입니다. (아직 미구현)", null);
     }
     
+    private boolean isSpecRelatedInput(String input) {
+        String prompt = """
+        		입력 문장이 사용자가 실제로 보유하고 있을 수 있는 스펙이나 경험(예: 자격증, 어학, 활동, 대외 경험 등)과 관련된 내용이면 '예', 그렇지 않으면 '아니오'라고만 답하세요.
+        		다른 설명은 하지 마세요.
+
+        		입력: "%s"
+        		""".formatted(input);
+
+        String reply = gptApiService.callGPT(prompt);
+        return reply != null && reply.trim().startsWith("예");
+    }
 }
