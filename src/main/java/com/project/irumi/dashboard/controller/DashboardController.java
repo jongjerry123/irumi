@@ -51,11 +51,17 @@ public class DashboardController {
 		}
 	}
 	
-	
-	
-	@RequestMapping("addSpec.do")
-	public String moveToAddSpec() {
-		return "dashboard/newSpec";
+	@RequestMapping("movetoAddSpec.do")
+	public String moveToSpecPage(@RequestParam("jobId") String jobId, Model model) {
+		Job job = dashboardService.selectJob(jobId);
+		
+		if (job != null) {
+			model.addAttribute("job", job);
+			return "dashboard/newSpec";
+		}
+		
+		model.addAttribute("message", "스펙 추가하는 직무 조회 실패!");
+		return "common/error";
 	}
 	
 	@RequestMapping("searchJob.do")
@@ -80,6 +86,22 @@ public class DashboardController {
 		if (loginUser != null) {
 			String userId = loginUser.getUserId();
 			return dashboardService.selectUserSpec(userId);	// 서비스로 userId를 보내고 그 유저의 학력정보를 받음
+		}
+		return null;	// userId 조회결과가 없을 시 ajax에서 에러가 발생함
+		
+	}
+	
+	@RequestMapping(value="userCurrSpecView.do", method=RequestMethod.POST, produces="application/json; charset:UTF-8")
+	@ResponseBody
+	public ArrayList<Spec> selectUserCurrSpec(HttpSession session) {
+		
+		// 로그인 유저 불러오기
+		User loginUser = (User) session.getAttribute("loginUser");
+		
+		
+		if (loginUser != null) {
+			String userId = loginUser.getUserId();
+			return dashboardService.selectCurrUserSpec(userId);	// 서비스로 userId를 보내고 그 유저의 현재 스펙 정보를 받음
 		}
 		return null;	// userId 조회결과가 없을 시 ajax에서 에러가 발생함
 		
@@ -123,7 +145,7 @@ public class DashboardController {
 	
 	@RequestMapping(value = "userSpecStuff.do", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public Map<String, Object> noticeNewTop3Method(@RequestParam("jobId") String jobId, @RequestParam("specId") String specId, Model model, HttpSession session) { // Jackson 라이브러리 사용시 리턴방식
+	public Map<String, Object> selectUserSpecAndSchedule(@RequestParam("jobId") String jobId, @RequestParam("specId") String specId, Model model, HttpSession session) { // Jackson 라이브러리 사용시 리턴방식
 		
 		User loginUser = (User) session.getAttribute("loginUser");
 		Specific specific = new Specific();
@@ -222,7 +244,7 @@ public class DashboardController {
 
 		if (jobList != null) {
 			mv.addObject("jobList", jobList);
-			mv.setViewName("dashboard/newSpec");
+			mv.setViewName("dashboard/jobDetail");
 		} else {
 			mv.addObject("message", "직무 상세보기 요청 실패!");
 			mv.setViewName("common/error");
@@ -255,6 +277,59 @@ public class DashboardController {
 		}
 
 		return mv;
+	}
+	
+	@RequestMapping("deleteSpec.do")
+	public String deleteSpecMethod(@RequestParam("specId") String specId, Model model, HttpSession session) {
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setSpecId(String.valueOf(specId));
+		
+		if (dashboardService.deleteSpecLink(specific) > 0 && dashboardService.deleteSpec(specId) > 0) {
+			
+			return "redirect:dashboard.do";
+		} else {
+			model.addAttribute("message", "스펙 삭제 실패!");
+			return "common/error";
+		}
+	}
+	
+	@RequestMapping(value = "insertSpec.do", method = RequestMethod.POST)
+	public ModelAndView insertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, ModelAndView mv, HttpSession session) {
+		
+		int specId = dashboardService.selectMaxSpecId() + 1;
+		spec.setSpecId(String.valueOf(specId));
+		
+		int resultOne = dashboardService.insertSpec(spec);
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		specific.setSpecId(String.valueOf(specId));
+		
+		int resultTwo = dashboardService.insertSpecLink(specific);
+		if (resultOne > 0 && resultTwo > 0) {
+			mv.addObject("spec", spec);
+			mv.setViewName("chatbot/act");
+		} else {
+			mv.addObject("message", "스펙 추가 실패!");
+			mv.setViewName("common/error");
+		}
+
+		return mv;
+	}
+	
+	@RequestMapping("updateSpecStatus.do")
+	public String updateSpecStatusMethod(@RequestParam("specId") String specId, Model model) {
+		
+		if (dashboardService.updateAccomplishSpecState(specId) > 0) {
+			return "redirect:dashboard.do";
+		}
+		model.addAttribute("message", "스펙 업데이트 실패!");
+		return "common/error";
 	}
 	
 }

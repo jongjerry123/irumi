@@ -1,7 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp" />
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,8 +30,19 @@ body {
     border-radius: 10px;
     width: 300px;
     position: fixed;
-    top: 100px; /* Adjust this value to position it vertically */
-    left: 50px; /* Adjust this value to position it horizontally */
+    top: 200px; /* Adjust this value to position it vertically */
+    left: 300px; /* Adjust this value to position it horizontally */
+    z-index: 1000; /* Ensures it stays above other content */
+}
+
+.spec-info {
+    padding: 20px;
+    background: #303030;
+    border-radius: 10px;
+    width: 300px;
+    position: fixed;
+    top: 200px; /* Adjust this value to position it vertically */
+    right: 300px; /* Adjust this value to position it horizontally */
     z-index: 1000; /* Ensures it stays above other content */
 }
 
@@ -131,7 +144,22 @@ body {
 				$('#gpa').append(data.userPoint || ' 학점을 기입해주세요');
 			}
 		});
-
+		
+		$.ajax({
+			url: 'userCurrSpecView.do',
+			method: 'POST',
+			dataType: 'json',
+			contentType: 'application/json; charset=UTF-8',
+			success: function(data) {
+				$('#currSpecs').html('<table>');
+				data.forEach(function(item) {
+					console.log(item.specId);
+					$('#currSpecs').append('<tr><td width=\"250px\">' + item.specName + ' </td><td><button style="border-radius: 20px;" onclick=\"deleteSpec(' + item.specId + ')\">×</button></td></tr>');					
+				});
+				$('#currSpecs').append('</table>');
+			}
+		});
+		
 		$.ajax({
 			url: 'userJobView.do',
 			method: 'POST',
@@ -160,16 +188,22 @@ body {
 
 	function viewSpecs(jobId) {
 	    $.ajax({
-	        url: 'userSpecsView.do',
-	        method: 'POST',
-	        data: { jobId: jobId },
-	        dataType: 'json',
-	        success: function(data) {
-	            $('#certCards').empty();
-	            if (!data) {
-	            	/* TODO: 여기에 스펙 정보가 없을 경우 출력할 HTML */
-	            }
-	            $.each(data, function(index, item) {
+			url: 'userSpecsView.do',
+			method: 'POST',
+			data: { jobId: jobId },
+			dataType: 'json',
+			success: function(data) {
+				$('#certCards').empty();
+				if (!data || data.length === 0) {
+	                $('#certCards').append('<div>등록된 스펙이 없습니다.</div>');
+	                var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 340px;\">목표 스펙 추가하기</button></div>';
+					$('#certCards').append(buttonHtml);
+	                return;
+				}
+				
+				let remaining = data.length;
+				
+				$.each(data, function(index, item) {
 	                var cardHtml = 
 	                    '<div class="certCard">' +
 	                      '<h3>' + item.specName + '</h3>' +
@@ -197,26 +231,54 @@ body {
 	                                '<a href=\"#\">' + act.actContent + '</a>' +
 	                              '</div>';
 	                        });
-
-	                        cardHtml += '</div></div>';
+							
+	                        cardHtml += '</div>' +
+	                        			'<div class="buttons">' +
+	                        			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
+	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 150px;\">삭제</button>' +
+	                        			'</div>' +
+	                        			'<div class="buttons">' +
+	                        			'<button onclick=\"movetoAccomplishSpec(' + item.specId + ')\" style=\"width: 300px;\">스펙 달성</button>' +
+	                        			'</div>' +
+										'</div>';
 	                        $('#certCards').append(cardHtml);
+	                        
+	                        remaining--;
+	                        
+	                        if (remaining === 0) {
+	                        	var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 340px;\">목표 스펙 추가하기</button></div>';
+								$('#certCards').append(buttonHtml);
+	                        }
 	                    }
 	                });
 	            });
-	        }
+				
+			}
 	    });
 	}
 
+	function deleteSpec(specId) {
+		location.href = 'deleteSpec.do?specId=' + specId;
+	}
+	
+	function movetoUpdateSpec(specId) {
+		location.href = 'updateSpec.do?specId=' + specId;
+	}
+	
+	function movetoAccomplishSpec(specId) {
+		location.href = 'updateSpecStatus.do?specId=' + specId;
+	}
+	
+	function movetoAddSpec(jobId) {
+		location.href = 'movetoAddSpec.do?jobId=' + jobId;
+	}
+	
 	function addJob() {
 		location.href = 'addJob.do?page=1';
 	}
 
 	function searchJob() {
 		location.href = 'searchJob.do';
-	}
-
-	function addSpec() {
-		location.href = 'addSpec.do';
 	}
 
 	function searchSpec() {
@@ -238,9 +300,7 @@ body {
 </head>
 
 <body>
-	<c:if test="${ empty sessionScope.loginUser }">
-		<jsp:forward page="/WEB-INF/views/user/login.jsp" />
-	</c:if>
+	
 	<c:set var="menu" value="dashboard" scope="request" />
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
@@ -249,9 +309,14 @@ body {
 	<div class="dashboard-wrapper clearfix">
 		<div class="education-info">
 			<h2>학력 정보</h2>
-			<label id="university">대학교: </label><br> <label id="degree">학위:
-			</label><br> <label id="graduation">졸업 여부: </label><br> <label
-				id="gpa">학점: </label><br>
+			<label id="university">대학교: </label>
+			<br>
+			<label id="degree">학위: </label>
+			<br>
+			<label id="graduation">졸업 여부: </label>
+			<br>
+			<label id="gpa">학점: </label>
+			<br>
 			<div class="buttons">
 				<button onclick="movetoUpDash()">수정하기</button>
 			</div>
@@ -273,13 +338,16 @@ body {
 				<div id="certSection">
 					<div id="certCards" style="display: none;">
 						<h1>직업을 선택하세요</h1>
-						
 					</div>
 				</div>
 
 			</div>
 		</div>
-
+		
+		<div class="spec-info">
+			<h2>현재 스펙</h2>
+			<label id="currSpecs"></label><br>
+		</div>
 	</div>
 
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
