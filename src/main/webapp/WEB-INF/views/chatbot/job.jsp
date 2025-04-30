@@ -665,7 +665,8 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 
 			<!-- 콘텐츠 영역 -->
 			<div class="content-box">
-
+				
+   
 				<div class="chat-area" id="chatArea">
 					<div class="message bot-msg">
 						내게 맞는 직무 찾기 세션입니다.<br> 먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점,

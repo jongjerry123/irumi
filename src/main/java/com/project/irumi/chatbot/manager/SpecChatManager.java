@@ -77,7 +77,7 @@ public class SpecChatManager {
             case ASK_WANT_MORE_OPT:
                 if ("네".equals(userMsg)) {
                     session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC); // 루프 예시
-                    return new ChatbotResponseDto("그럼 다시 현재 가지고 있는 스펙이나 경험을 알려주세요.", null);
+                    return new ChatbotResponseDto("그렇다면 다시 현재 보유한 스펙이나 경험을 말해주세요", null);
                 } else {
                     session.setChatState(StateSpecChat.COMPLETE);
                     return new ChatbotResponseDto("추천을 완료했습니다. 준비 잘하시길 응원합니다!", null);
