@@ -42,10 +42,10 @@ public class ChatbotResponseDto {
 //		this.options = options;
 //	}
 	
-	public ChatbotResponseDto(String gptAnswer, List<CareerItemDto> checkboxOptions, List<String> options) {
+	public ChatbotResponseDto(String gptAnswer, List<CareerItemDto> checkboxOption, List<String> options) {
 		super();
 		this.gptAnswer = gptAnswer;
-		this.checkboxOptions = checkboxOptions;
+		this.checkboxOptions = checkboxOption;
 		this.options = options;
 	}
 

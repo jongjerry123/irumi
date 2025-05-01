@@ -14,6 +14,7 @@ import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.service.ChatbotService;
+import com.project.irumi.chatbot.model.dto.CareerItemDto;
 
 @Component
 public class ActChatManager {
@@ -216,7 +217,7 @@ public class ActChatManager {
 	    
 
 	    // 🔹 체크박스 항목 추출
-	    List<String> checkboxList = extractCheckboxItems(gptAnswer);
+	    List<CareerItemDto> checkboxList = extractCheckboxItems(gptAnswer);
 
 	    // 🔹 최종 메시지 조합
 	    StringBuilder finalMsg = new StringBuilder();
@@ -227,17 +228,26 @@ public class ActChatManager {
 	    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
 
 	    return new ChatbotResponseDto(
-	        finalMsg.toString(),
-	        checkboxList,
-	        List.of("다른 유형", "종료")
-	    );
+		        finalMsg.toString(),
+		        checkboxList,
+		        List.of("다른 유형", "종료")
+		    );
 	}
 
 
-	private List<String> extractCheckboxItems(String gptAnswer) {
-		return Arrays.stream(gptAnswer.split("\n")).filter(line -> line.trim().matches("^\\d+\\..*")) // 번호 있는 줄만
-				.map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
-				.collect(Collectors.toList());
+	private List<CareerItemDto> extractCheckboxItems(String gptAnswer) {
+	    return Arrays.stream(gptAnswer.split("\n"))
+	        .filter(line -> line.trim().matches("^\\d+\\..*"))  // 1. ~~ 형식만 필터링
+	        .map(line -> {
+	            String content = line.replaceAll("^\\d+\\.\\s*", ""); // 번호 제거
+	            
+	            CareerItemDto dto = new CareerItemDto();
+	            dto.setTitle(content);          // 줄 전체를 title로 설정
+	            dto.setExplain("");             // 필요 시 파싱해서 설명 넣을 수 있음
+	            dto.setType("spec");            // 고정 타입 지정
+	            return dto;
+	        })
+	        .collect(Collectors.toList());
 	}
     
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절

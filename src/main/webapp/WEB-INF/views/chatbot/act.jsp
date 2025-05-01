@@ -61,10 +61,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	      label.className = "custom-checkbox";
 	      const input = document.createElement("input");
 	      input.type = "checkbox";
-	      input.value = opt;
+	      input.value = opt.title;
 	      const textSpan = document.createElement("span");
 	      textSpan.className = "checkbox-text";
-	      textSpan.textContent = opt;
+	      textSpan.textContent = opt.title;
 	      const checkMark = document.createElement("span");
 	      checkMark.className = "checkmark";
 	      checkMark.innerHTML = "&#10003;";
