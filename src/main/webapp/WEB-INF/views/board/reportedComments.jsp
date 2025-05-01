@@ -48,35 +48,33 @@
       return selected;
     }
 
-    function deleteSelectedComments() {
-      const selected = validateSelectionOrAlert();
-      if (!selected) return;
-      document.getElementById("deleteCommentForm").submit();
-    }
-
     function registerBadUsers() {
         const selected = validateSelectionOrAlert();
         if (!selected) return;
 
         const reason = prompt("신고 사유를 입력해주세요.");
         if (!reason || reason.trim() === "") {
-          alert("신고 사유는 필수입니다.");
-          return;
+            alert("신고 사유는 필수입니다.");
+            return;
         }
 
-      fetch("registerBadUsersFromComments.do", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: selected.map(id => `selectedComments=${id}`).join("&")
-      })
-      .then(res => {
-        if (res.redirected) {
-        	alert("등록되었습니다.");
-          window.location.href = res.url;
-        } else {
-          alert("등록 실패");
-        }
-      });
+        const formData = new URLSearchParams();
+        selected.forEach(id => formData.append("selectedComments", id));
+        formData.append("reason", reason);  // ✅ 여기!
+
+        fetch("registerBadUsersFromComments.do", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+        })
+        .then(res => {
+            if (res.redirected) {
+                alert("등록되었습니다.");
+                window.location.href = res.url;
+            } else {
+                alert("등록 실패");
+            }
+        });
     }
   </script>
 </head>

@@ -171,10 +171,10 @@ public class PostService {
         postDAO.deleteComments(commentIds);                      // 3. 댓글 삭제
     }
     
-    // ✅ 게시글 ID로 작성자 ID 조회 후 불량이용자로 등록
-    public void registerBadUsersFromPosts(List<Long> postIds, String reason) {
+ // ✅ 게시글 ID로 작성자 ID 조회 후 불량이용자로 등록
+    public void registerBadUsersFromPosts(List<Long> postIds, String reason, String reportedBy) {
         for (Long postId : postIds) {
-            postDAO.insertPostReport(postId, reason); // 여기에 reason 반영
+            postDAO.insertPostReport(postId, reason, reportedBy);  // 변경됨
             postDAO.updateUserAuthorityByPostId(postId);
         }
     }
@@ -185,13 +185,14 @@ public class PostService {
     // ✅ 신고된 게시글 수 조회
     public int countReportedPosts() { return postDAO.countReportedPosts(); }
     
-    public void registerBadUsersFromComments(List<Long> commentIds, String reason) {
+ // ✅ 댓글 ID로 작성자 ID 조회 후 불량이용자로 등록
+    public void registerBadUsersFromComments(List<Long> commentIds, String reason, String reportedBy) {
         for (Long commentId : commentIds) {
             // 댓글 작성자 ID 조회
             String userId = postDAO.findCommentWriterByCommentId(commentId);
 
             // 신고 테이블에 insert
-            postDAO.insertCommentReport(commentId, reason);
+            postDAO.insertCommentReport(commentId, reason, reportedBy);  // 변경됨
 
             // 사용자 권한을 불량으로 변경
             postDAO.updateUserAuthorityToBad(userId);

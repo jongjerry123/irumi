@@ -296,23 +296,24 @@ public class PostDAO {
     }
     
  // ✅ 불량 이용자 등록 기록 남기기
-    public void insertPostReport(@Param("postId") Long postId,
-            @Param("reason") String reason) {
-sqlSession.insert("boardMapper.insertPostReport", Map.of(
-"postId", postId,
-"reason", reason
-));
-}
+    public void insertPostReport(Long postId, String reason, String reportedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("postId", postId);
+        map.put("reason", reason);
+        map.put("reportedBy", reportedBy);
+        sqlSession.insert("boardMapper.insertPostReport", map);
+    }
     
     public String findCommentWriterByCommentId(Long commentId) {
         return sqlSession.selectOne("boardMapper.findCommentWriterByCommentId", commentId);
     }
 
-    public void insertCommentReport(Long commentId, String reason) {
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("commentId", commentId);
-        paramMap.put("reason", reason);
-        sqlSession.insert("boardMapper.insertCommentReport", paramMap);
+    public void insertCommentReport(Long commentId, String reason, String reportedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("commentId", commentId);
+        map.put("reason", reason);
+        map.put("reportedBy", reportedBy);
+        sqlSession.insert("boardMapper.insertCommentReport", map);
     }
 
     public void updateUserAuthorityToBad(String userId) {

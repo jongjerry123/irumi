@@ -126,33 +126,33 @@
   }
 
   function registerBadUsers() {
-    const selected = validatePostSelectionOrAlert();
-    if (!selected) return;
+	  const selected = validatePostSelectionOrAlert();
+	  if (!selected) return;
 
-    const reason = prompt("등록 사유를 입력해주세요.");
-    if (!reason || reason.trim() === "") {
-      alert("등록 사유는 필수입니다.");
-      return;
-    }
+	  const reason = prompt("등록 사유를 입력해주세요.");
+	  if (!reason || reason.trim() === "") {
+	    alert("등록 사유는 필수입니다.");
+	    return;
+	  }
 
-    const formData = new URLSearchParams();
-    selected.forEach(id => formData.append("selectedPosts", id));
-    formData.append("reason", encodeURIComponent(reason)); // JS 안에서만 encodeURIComponent 사용
+	  const formData = new URLSearchParams();
+	  selected.forEach(id => formData.append("selectedPosts", id));
+	  formData.append("reason", reason);  // ✅ 수정됨
 
-    fetch("registerBadUsers.do", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData.toString()
-    })
-    .then(res => {
-      if (res.redirected) {
-    	  alert("등록되었습니다.");
-        window.location.href = res.url;
-      } else {
-        alert("등록 실패");
-      }
-    });
-  }
+	  fetch("registerBadUsers.do", {
+	    method: "POST",
+	    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	    body: formData.toString()
+	  })
+	  .then(res => {
+	    if (res.redirected) {
+	      alert("등록되었습니다.");
+	      window.location.href = res.url;
+	    } else {
+	      alert("등록 실패");
+	    }
+	  });
+	}
 </script>
 
 <c:import url="/WEB-INF/views/common/footer.jsp" />
