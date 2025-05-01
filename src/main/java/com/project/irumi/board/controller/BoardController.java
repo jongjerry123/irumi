@@ -235,10 +235,10 @@ public class BoardController {
     }
 
     // 게시글 수정
-    @PostMapping("/updatePost.do")
-    public String updatePost(@ModelAttribute PostDTO post) {
-        postService.updatePost(post);
-        return "redirect:/postDetail.do?postId=" + post.getPostId();
+    @PostMapping("updatePost.do")
+    public String updatePost(PostDTO postDTO) {
+        postService.updatePost(postDTO);
+        return "redirect:postDetail.do?postId=" + postDTO.getPostId();
     }
 
     // 게시글 수정 화면
@@ -338,4 +338,5 @@ public class BoardController {
         postService.registerBadUsersFromComments(selectedComments, reason);
         return "redirect:reportedComments.do";
     }
+    
 }

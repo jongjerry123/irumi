@@ -47,7 +47,7 @@
     </div>
     <div class="post-actions">
       <c:choose>
-        <c:when test="${loginUser.userId == post.postWriter}">
+        <c:when test="${loginUser.userId == post.postWriter || loginUser.userAuthority == 2}">
           <button class="btn" onclick="location.href='editPost.do?postId=${post.postId}'">수정</button>
           <form action="deletePost.do" method="post">
             <input type="hidden" name="postId" value="${post.postId}" />
@@ -113,7 +113,10 @@
         <div class="comment-item ${comment.comParentId != null ? 'reply' : ''}" style="margin-left: ${comment.lvl * 20}px;">
           <div class="comment-meta">
             <c:if test="${comment.comParentId != null}">↪️</c:if>
-            ${comment.comWrId} (${comment.comTime})
+            ${comment.comWrId}
+<c:if test="${comment.comWrId == post.postWriter}"><span style="color:#A983A3;"> (글쓴이)</span></c:if>
+<c:if test="${comment.comWrId == 'admin' || comment.comWrId == 'administrator' || comment.comWrId == '관리자'}"><span style="color:#ff4c4c;"> (관리자)</span></c:if>
+(${comment.comTime})
           </div>
           <div class="comment-content">${comment.comContent}</div>
           <div class="comment-actions">
@@ -130,13 +133,13 @@
             <form onsubmit="return false;">
               <button type="button" onclick="toggleReply(${comment.comId})">답글</button>
             </form>
-            <c:if test="${loginUser.userId == comment.comWrId}">
-              <form action="deleteComment.do" method="post">
-                <input type="hidden" name="commentId" value="${comment.comId}" />
-                <input type="hidden" name="postId" value="${post.postId}" />
-                <button type="submit">댓글 삭제</button>
-              </form>
-            </c:if>
+            <c:if test="${loginUser.userId == comment.comWrId || loginUser.userAuthority == 2}">
+  <form action="deleteComment.do" method="post">
+    <input type="hidden" name="commentId" value="${comment.comId}" />
+    <input type="hidden" name="postId" value="${post.postId}" />
+    <button type="submit">댓글 삭제</button>
+  </form>
+</c:if>
           </div>
 
           <div class="reply-form" id="reply-form-${comment.comId}">
