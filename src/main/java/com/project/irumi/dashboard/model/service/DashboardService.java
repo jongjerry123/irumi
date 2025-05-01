@@ -27,14 +27,18 @@ public interface DashboardService {
 	int selectSearchJobCount(String keyword);
 	ArrayList<JobList> selectSearchJob(Search search);
 	JobList selectOneJobList(String jobListId);
-	int selectMaxJobId();
+	int selectNextJobId();
 	int insertJob(Job job);
 	int insertJobLink(Specific specific);
-	int deleteSpecLink(Specific specific);
 	int deleteSpec(String specId);
-	int selectMaxSpecId();
+	int selectNextSpecId();
 	int insertSpec(Spec spec);
 	int insertSpecLink(Specific specific);
 	int updateAccomplishSpecState(String specId);
-	
+	int selectNextActId();
+	int insertAct(Activity act);
+	int insertActLink(Specific specific);
+	int selectNextSsId();
+	int insertSs(SpecSchedule ss);
+	Spec selectSpec(String specId);
 }

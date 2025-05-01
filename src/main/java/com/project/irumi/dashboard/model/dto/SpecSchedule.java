@@ -21,6 +21,7 @@ public class SpecSchedule implements java.io.Serializable {
 		this.ssType = ssType;
 		this.ssDate = ssDate;
 	}
+	
 	public String getSpecId() {
 		return specId;
 	}

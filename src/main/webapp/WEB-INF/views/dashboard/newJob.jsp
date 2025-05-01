@@ -2,6 +2,9 @@
 	pageEncoding="UTF-8" errorPage="error.jsp"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp"/>
+</c:if>
 <c:set var="nowpage" value="1" />
 <c:if test="${ !empty requestScope.paging.currentPage }">
 	<c:set var="nowpage" value="${ requestScope.paging.currentPage }" />
@@ -29,9 +32,6 @@ header {
 </style>
 </head>
 <body>
-	<c:if test="${ empty sessionScope.loginUser }">
-		<jsp:forward page="/WEB-INF/views/user/login.jsp" />
-	</c:if>
 	<c:set var="menu" value="dashboard" scope="request" />
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	
