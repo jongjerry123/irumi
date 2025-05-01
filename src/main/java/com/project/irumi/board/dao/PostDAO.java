@@ -19,28 +19,28 @@ public class PostDAO {
 	@Resource(name = "sqlSessionTemplate")
 	private SqlSession sqlSession;
 
-	// ✅ 게시글 등록
+	// 게시글 등록
 	public void insertPost(PostDTO post) {
 		sqlSession.insert("boardMapper.insertPost", post);
 	}
 
-	// ✅ 게시글 등록 후 ID 반환
+	// 게시글 등록 후 ID 반환
 	public Long insertPostAndReturnId(PostDTO post) {
 		sqlSession.insert("boardMapper.insertPost", post);
 		return sqlSession.selectOne("boardMapper.selectLastPostId");
 	}
 
-	// ✅ 게시글 단건 조회
+	// 게시글 단건 조회
 	public PostDTO getPostById(Long postId) {
 		return sqlSession.selectOne("boardMapper.selectPostById", postId);
 	}
 
-	// ✅ 게시글 댓글 전체 조회 (대댓글 순서 수정)
+	// 게시글 댓글 전체 조회 (대댓글 순서 수정)
 	public List<CommentDTO> getCommentsByPostId(Long postId) {
 		return sqlSession.selectList("boardMapper.selectCommentsByPostIdOrdered", postId);
 	}
 
-	// ✅ 자유게시판/질문게시판 필터+정렬+검색 조회
+	// 자유게시판/질문게시판 필터+정렬+검색 조회
 	public List<PostDTO> selectFilteredPosts(String postType, String period, String sort, String keyword, int offset,
 			int pageSize) {
 		Map<String, Object> param = new HashMap<>();
@@ -53,7 +53,7 @@ public class PostDAO {
 		return sqlSession.selectList("boardMapper.selectFilteredPosts", param);
 	}
 
-	// ✅ 자유게시판/질문게시판 필터+검색된 게시글 수
+	// 자유게시판/질문게시판 필터+검색된 게시글 수
 	public int countFilteredPosts(String postType, String period, String keyword) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("postType", postType);
@@ -62,17 +62,17 @@ public class PostDAO {
 		return sqlSession.selectOne("boardMapper.countFilteredPosts", param);
 	}
 
-	// ✅ 게시글 조회수 증가
+	// 게시글 조회수 증가
 	public void updatePostViewCount(Long postId) {
 		sqlSession.update("boardMapper.updatePostViewCount", postId);
 	}
 
-	// ✅ 타입별 게시글 조회
+	// 타입별 게시글 조회
 	public List<PostDTO> selectByType(String postType) {
 		return sqlSession.selectList("boardMapper.selectByType", postType);
 	}
 
-	// ✅ 타입별 게시글 페이징 조회
+	// 타입별 게시글 페이징 조회
 	public List<PostDTO> selectByTypeWithPaging(String postType, int offset, int pageSize) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("postType", postType);
@@ -81,12 +81,12 @@ public class PostDAO {
 		return sqlSession.selectList("boardMapper.selectByTypeWithPaging", param);
 	}
 
-	// ✅ 타입별 게시글 수 조회
+	// 타입별 게시글 수 조회
 	public int countPostsByType(String postType) {
 		return sqlSession.selectOne("boardMapper.countPostsByType", postType);
 	}
 
-	// ✅ 내 QnA 질문 목록 조회
+	// 내 QnA 질문 목록 조회
 	public List<PostDTO> selectMyOwnPosts(String userId, int offset, int pageSize) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userId", userId);
@@ -95,23 +95,23 @@ public class PostDAO {
 		return sqlSession.selectList("boardMapper.selectMyQnaPosts", param);
 	}
 
-	// ✅ 내 QnA 질문 수 조회
+	// 내 QnA 질문 수 조회
 	public int countMyQnaPosts(String userId) {
 		return sqlSession.selectOne("boardMapper.countMyQnaPosts", userId);
 	}
 
-	// ✅ QnA 답변 여부 조회
+	// QnA 답변 여부 조회
 	public boolean existsAnswerByPostId(Long postId) {
 		Integer count = sqlSession.selectOne("boardMapper.countAnswersByPostId", postId);
 		return count != null && count > 0;
 	}
 
-	// ✅ 신고된 게시글 수
+	// 신고된 게시글 수
 	public int countReportedPosts() {
 		return sqlSession.selectOne("boardMapper.countReportedPosts");
 	}
 
-	// ✅ 신고된 댓글 목록
+	// 신고된 댓글 목록
 	public List<CommentDTO> selectReportedComments(int offset, int pageSize) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("offset", offset);
@@ -119,7 +119,7 @@ public class PostDAO {
 		return sqlSession.selectList("boardMapper.selectReportedComments", param);
 	}
 
-	// ✅ 신고된 댓글 수
+	// 신고된 댓글 수
 	public int countReportedComments() {
 		return sqlSession.selectOne("boardMapper.countReportedComments");
 	}
@@ -129,42 +129,42 @@ public class PostDAO {
 		sqlSession.delete("boardMapper.deleteComment", commentId);
 	}
 
-	// ✅ 게시글 수정
+	// 게시글 수정
 	public void updatePost(PostDTO post) {
 		sqlSession.update("boardMapper.updatePost", post);
 	}
 
-	// ✅ 게시글 삭제
+	// 게시글 삭제
 	public void deletePost(Long postId) {
 		sqlSession.delete("boardMapper.deletePost", postId);
 	}
 
-	// ✅ 게시글 추천 수 증가
+	// 게시글 추천 수 증가
 	public void increaseRecommend(Long postId) {
 		sqlSession.update("boardMapper.increaseRecommend", postId);
 	}
 
-	// ✅ 게시글 신고 수 증가
+	// 게시글 신고 수 증가
 	public void increaseReport(Long postId) {
 		sqlSession.update("boardMapper.increaseReport", postId);
 	}
 
-	// ✅ 댓글 등록
+	// 댓글 등록
 	public void insertComment(CommentDTO comment) {
 		sqlSession.insert("boardMapper.insertComment", comment);
 	}
 
-	// ✅ 댓글 추천 수 증가
+	// 댓글 추천 수 증가
 	public void increaseCommentRecommend(Long commentId) {
 		sqlSession.update("boardMapper.increaseCommentRecommend", commentId);
 	}
 
-	// ✅ 댓글 신고 수 증가
+	// 댓글 신고 수 증가
 	public void increaseCommentReport(Long commentId) {
 		sqlSession.update("boardMapper.increaseCommentReport", commentId);
 	}
 
-	// ✅ 게시글 추천 중복 여부 확인
+	// 게시글 추천 중복 여부 확인
 	public int countPostRecommend(String userId, Long postId) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userId", userId);
@@ -172,7 +172,7 @@ public class PostDAO {
 		return sqlSession.selectOne("boardMapper.countPostRecommend", param);
 	}
 
-	// ✅ 댓글 추천 중복 여부 확인
+	// 댓글 추천 중복 여부 확인
 	public int countCommentRecommend(String userId, Long commentId) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userId", userId);
@@ -180,7 +180,7 @@ public class PostDAO {
 		return sqlSession.selectOne("boardMapper.countCommentRecommend", param);
 	}
 
-	// ✅ 게시글 추천 기록 삽입
+	// 게시글 추천 기록 삽입
 	public void insertPostRecommend(String userId, Long postId) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userId", userId);
@@ -188,7 +188,7 @@ public class PostDAO {
 		sqlSession.insert("boardMapper.insertPostRecommend", param);
 	}
 
-	// ✅ 댓글 추천 기록 삽입
+	// 댓글 추천 기록 삽입
 	public void insertCommentRecommend(String userId, Long commentId) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userId", userId);
@@ -280,17 +280,17 @@ public class PostDAO {
 		sqlSession.delete("boardMapper.deletePostRecommends", postIds);
 	}
 
-	// ✅ 댓글 추천 삭제
+	// 댓글 추천 삭제
 	public void deleteCommentRecommendsByCommentIds(List<Long> commentIds) {
 		sqlSession.delete("boardMapper.deleteCommentRecommendsByCommentIds", commentIds);
 	}
 
-	// ✅ 댓글 신고 삭제
+	// 댓글 신고 삭제
 	public void deleteCommentReportsByCommentIds(List<Long> commentIds) {
 		sqlSession.delete("boardMapper.deleteCommentReportsByCommentIds", commentIds);
 	}
 
-	// ✅ 댓글 삭제
+	// 댓글 삭제
 	public void deleteComments(List<Long> commentIds) {
 		sqlSession.delete("boardMapper.deleteComments", commentIds);
 	}
