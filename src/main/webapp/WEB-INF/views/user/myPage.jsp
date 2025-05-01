@@ -174,16 +174,21 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="/resources/js/jquery-3.7.1.min.js"><\/script>');
+        }
+    </script>
+    <script>
         $(document).ready(function() {
             try {
-                // DOM 요소 캐싱
-                const $newPasswordInput = $('#new-password');
-                const $confirmPasswordInput = $('#confirm-password');
-                const $emailInput = $('#email');
-                const $changeEmailButton = $('#change-email');
-                const $verificationCodeInput = $('#verification-code');
-                const $verifyCodeButton = $('#verify-code');
-                const $timerDisplay = $('#timer');
+                // DOM 요소 캐싱 (존재 여부 확인)
+                const $newPasswordInput = $('#new-password').length ? $('#new-password') : null;
+                const $confirmPasswordInput = $('#confirm-password').length ? $('#confirm-password') : null;
+                const $emailInput = $('#email').length ? $('#email') : null;
+                const $changeEmailButton = $('#change-email').length ? $('#change-email') : null;
+                const $verificationCodeInput = $('#verification-code').length ? $('#verification-code') : null;
+                const $verifyCodeButton = $('#verify-code').length ? $('#verify-code') : null;
+                const $timerDisplay = $('#timer').length ? $('#timer') : null;
                 const $universityInput = $('#university');
                 const $degreeInput = $('#degree');
                 const $graduatedInput = $('#graduated');
@@ -196,7 +201,7 @@
                 const $degreeMessage = $('#degree-message');
                 const $graduatedMessage = $('#graduated-message');
                 const $pointMessage = $('#point-message');
-                const $verificationGroup = $('.verification-group');
+                const $verificationGroup = $('.verification-group').length ? $('.verification-group') : null;
                 const $cancelButton = $('#cancel');
                 const $submitButton = $('#submit');
 
@@ -207,7 +212,9 @@
                 let isEmailAvailable = false;
                 let isEmailVerified = false;
                 let isEmailChanged = false;
+                let isPasswordSameAsCurrent = false;
                 let timerInterval = null;
+                let debounceTimer = null;
 
                 // 비밀번호 유효성 검사
                 function validatePassword(password) {
@@ -219,7 +226,6 @@
                         $newPasswordMessage.text('').removeClass('error');
                         return false;
                     } else if (hasLetter && hasNumber && hasSpecialChar && isValidLength) {
-                        $newPasswordMessage.text('').removeClass('error');
                         return true;
                     } else {
                         $newPasswordMessage.text('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.').addClass('error');
@@ -227,14 +233,61 @@
                     }
                 }
 
+                // 현재 비밀번호와 동일한지 확인
+                function checkPasswordSameAsCurrent(password) {
+                    if (!password || !$newPasswordInput) {
+                        isPasswordSameAsCurrent = false;
+                        $newPasswordMessage.text('').removeClass('error');
+                        validatePasswordMatch();
+                        return;
+                    }
+                    $.ajax({
+                        url: 'checkPassword.do',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ password: password }),
+                        headers: {
+                            'X-CSRF-TOKEN': $('[name=_csrf]').val()
+                        },
+                        success: function(response) {
+                            console.log('Check password response:', response);
+                            if (response.success) {
+                                isPasswordSameAsCurrent = response.isSame;
+                                if (isPasswordSameAsCurrent) {
+                                    $newPasswordMessage.text(response.message).addClass('error');
+                                } else if (validatePassword(password)) {
+                                    $newPasswordMessage.text('').removeClass('error');
+                                } else {
+                                    $newPasswordMessage.text('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.').addClass('error');
+                                }
+                            } else {
+                                $newPasswordMessage.text(response.message).addClass('error');
+                                isPasswordSameAsCurrent = false;
+                            }
+                            validatePasswordMatch();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error('Check password error:', textStatus, errorThrown);
+                            $newPasswordMessage.text('비밀번호 확인 중 오류가 발생했습니다.').addClass('error');
+                            isPasswordSameAsCurrent = false;
+                            validatePasswordMatch();
+                        }
+                    });
+                }
+
                 // 비밀번호 확인 일치 여부
                 function validatePasswordMatch() {
+                    if (!$newPasswordInput || !$confirmPasswordInput) return false;
                     const newPassword = $newPasswordInput.val().trim();
                     const confirmPassword = $confirmPasswordInput.val().trim();
                     if (!confirmPassword) {
                         $confirmPasswordMessage.text('').removeClass('error success');
                         return false;
                     } else if (newPassword === confirmPassword) {
+                        if (isPasswordSameAsCurrent) {
+                            $confirmPasswordMessage.text('새 비밀번호는 현재 비밀번호와 달라야 합니다.').addClass('error').removeClass('success');
+                            return false;
+                        }
                         $confirmPasswordMessage.text('비밀번호가 일치합니다.').removeClass('error').addClass('success');
                         return true;
                     } else {
@@ -247,7 +300,7 @@
                 function validateEmail(email) {
                     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                     if (!email) {
-                        $emailMessage.text('').removeClass('error');
+                        $emailMessage.text('이메일을 입력해주세요.').addClass('error');
                         return false;
                     } else if (emailPattern.test(email)) {
                         $emailMessage.text('').removeClass('error');
@@ -277,6 +330,7 @@
 
                 // 이메일 중복 확인
                 function checkEmailAvailability(email) {
+                    if (!$emailInput) return;
                     console.log('Checking email availability:', email);
                     $.ajax({
                         url: 'checkEmail.do',
@@ -291,36 +345,43 @@
                             if (data.available || email === '${sessionScope.loginUser.userEmail}') {
                                 $emailMessage.text('사용 가능한 이메일입니다.').addClass('success').removeClass('error');
                                 isEmailAvailable = true;
-                                $changeEmailButton.prop('disabled', false).css({
-                                    'background-color': '#2ccfcf',
-                                    'color': 'black',
-                                    'cursor': 'pointer'
-                                });
+                                if ($changeEmailButton) {
+                                    $changeEmailButton.prop('disabled', false).css({
+                                        'background-color': '#2ccfcf',
+                                        'color': 'black',
+                                        'cursor': 'pointer'
+                                    });
+                                }
                             } else {
                                 $emailMessage.text('이미 등록된 이메일입니다. 다른 이메일을 입력해주세요.').addClass('error').removeClass('success');
                                 isEmailAvailable = false;
-                                $changeEmailButton.prop('disabled', true).css({
-                                    'background-color': 'black',
-                                    'color': 'white',
-                                    'cursor': 'not-allowed'
-                                });
+                                if ($changeEmailButton) {
+                                    $changeEmailButton.prop('disabled', true).css({
+                                        'background-color': 'black',
+                                        'color': 'white',
+                                        'cursor': 'not-allowed'
+                                    });
+                                }
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.error('Email check error:', textStatus, errorThrown);
                             $emailMessage.text('이메일 확인 중 오류가 발생했습니다.').addClass('error').removeClass('success');
                             isEmailAvailable = false;
-                            $changeEmailButton.prop('disabled', true).css({
-                                'background-color': 'black',
-                                'color': 'white',
-                                'cursor': 'not-allowed'
-                            });
+                            if ($changeEmailButton) {
+                                $changeEmailButton.prop('disabled', true).css({
+                                    'background-color': 'black',
+                                    'color': 'white',
+                                    'cursor': 'not-allowed'
+                                });
+                            }
                         }
                     });
                 }
 
                 // 인증번호 전송
                 async function sendVerification() {
+                    if (!$emailInput || !$verificationGroup) return;
                     const email = $emailInput.val().trim();
                     console.log('Sending verification to:', email);
                     if (!isEmailValid || !isEmailAvailable) {
@@ -365,7 +426,7 @@
                             });
                         }
                         setTimeout(() => {
-                            if (isEmailValid && isEmailAvailable) {
+                            if (isEmailValid && isEmailAvailable && $changeEmailButton) {
                                 $changeEmailButton.prop('disabled', false).css({
                                     'background-color': '#2ccfcf',
                                     'color': 'black',
@@ -384,7 +445,7 @@
                             'cursor': 'not-allowed'
                         });
                         setTimeout(() => {
-                            if (isEmailValid && isEmailAvailable) {
+                            if (isEmailValid && isEmailAvailable && $changeEmailButton) {
                                 $changeEmailButton.prop('disabled', false).css({
                                     'background-color': '#2ccfcf',
                                     'color': 'black',
@@ -397,6 +458,7 @@
 
                 // 인증번호 검증
                 function verifyCode() {
+                    if (!$verificationCodeInput || !$verifyCodeButton) return;
                     console.log('Verifying code');
                     const code = $verificationCodeInput.val().trim();
                     if (code.length !== 6 || !/^\d+$/.test(code)) {
@@ -440,6 +502,7 @@
 
                 // 타이머 시작
                 function startTimer() {
+                    if (!$timerDisplay) return;
                     console.log('Starting timer');
                     if (timerInterval !== null) {
                         clearInterval(timerInterval);
@@ -473,60 +536,127 @@
                     return `${minutes.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
                 }
 
-                // 비밀번호 입력 실시간 검사
-                $newPasswordInput.on('input', function() {
-                    isPasswordValid = validatePassword($newPasswordInput.val().trim());
-                    validatePasswordMatch();
-                });
+                // 비밀번호 입력 실시간 검사 (디바운싱 적용)
+                if ($newPasswordInput) {
+                    $newPasswordInput.on('input', function() {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() => {
+                            const password = $newPasswordInput.val().trim();
+                            isPasswordValid = validatePassword(password);
+                            checkPasswordSameAsCurrent(password);
+                        }, 300);
+                    });
+                }
 
                 // 비밀번호 확인 입력 실시간 검사
-                $confirmPasswordInput.on('input', function() {
-                    isPasswordMatch = validatePasswordMatch();
-                });
+                if ($confirmPasswordInput) {
+                    $confirmPasswordInput.on('input', function() {
+                        isPasswordMatch = validatePasswordMatch();
+                    });
+                }
 
                 // 이메일 입력 실시간 검사
-                $emailInput.on('blur', function() {
-                    console.log('Email blur:', $emailInput.val());
-                    const email = $emailInput.val().trim();
-                    isEmailValid = validateEmail(email);
-                    isEmailVerified = false;
-                    $verificationCodeInput.prop('disabled', true).val('');
-                    $verifyCodeButton.prop('disabled', true).css({
-                        'background-color': 'black',
-                        'color': 'white',
-                        'cursor': 'not-allowed'
-                    });
-                    $verificationMessage.text('');
-                    $verificationGroup.hide();
-                    if (timerInterval) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        $timerDisplay.hide();
-                    }
-                    if (!isEmailValid) {
-                        isEmailAvailable = false;
-                        $changeEmailButton.text('인증전송').prop('disabled', true).css({
+                if ($emailInput) {
+                    $emailInput.on('blur', function() {
+                        console.log('Email blur:', $emailInput.val());
+                        const email = $emailInput.val().trim();
+                        if ($emailInput.prop('readonly')) {
+                            isEmailValid = true;
+                            isEmailAvailable = true;
+                            isEmailVerified = true;
+                            isEmailChanged = false;
+                            $emailMessage.text('').removeClass('error success');
+                            $changeEmailButton.text('변경하기').prop('disabled', false).css({
+                                'background-color': '#2ccfcf',
+                                'color': 'black',
+                                'cursor': 'pointer'
+                            });
+                            $verificationGroup.hide();
+                            if (timerInterval) {
+                                clearInterval(timerInterval);
+                                timerInterval = null;
+                                $timerDisplay.hide();
+                            }
+                            return;
+                        }
+                        isEmailValid = validateEmail(email);
+                        isEmailVerified = false;
+                        $verificationCodeInput.prop('disabled', true).val('');
+                        $verifyCodeButton.prop('disabled', true).css({
                             'background-color': 'black',
                             'color': 'white',
                             'cursor': 'not-allowed'
                         });
+                        $verificationMessage.text('');
+                        $verificationGroup.hide();
+                        if (timerInterval) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            $timerDisplay.hide();
+                        }
+                        if (!isEmailValid) {
+                            isEmailAvailable = false;
+                            $changeEmailButton.text('인증전송').prop('disabled', true).css({
+                                'background-color': 'black',
+                                'color': 'white',
+                                'cursor': 'not-allowed'
+                            });
+                            return;
+                        }
+                        if (email !== '${sessionScope.loginUser.userEmail}') {
+                            isEmailChanged = true;
+                            checkEmailAvailability(email);
+                        } else {
+                            isEmailChanged = false;
+                            isEmailAvailable = true;
+                            isEmailVerified = true;
+                            $emailMessage.text('').removeClass('error success');
+                            $changeEmailButton.text('변경하기').prop('disabled', false).css({
+                                'background-color': '#2ccfcf',
+                                'color': 'black',
+                                'cursor': 'pointer'
+                            });
+                        }
+                    });
+                }
+
+                // 페이지 로드 시 초기 이메일 유효성 체크
+                (function initializeEmail() {
+                    if (!$emailInput) {
+                        // 소셜 로그인 유저: 이메일 필드 없음
+                        isEmailValid = true;
+                        isEmailAvailable = true;
+                        isEmailVerified = true;
                         return;
                     }
-                    if (email !== '${sessionScope.loginUser.userEmail}') {
-                        isEmailChanged = true;
-                        checkEmailAvailability(email);
-                    } else {
-                        isEmailChanged = false;
+                    const initialEmail = $emailInput.val().trim();
+                    if (initialEmail && validateEmail(initialEmail)) {
+                        isEmailValid = true;
                         isEmailAvailable = true;
                         isEmailVerified = true;
                         $emailMessage.text('').removeClass('error success');
-                        $changeEmailButton.text('변경하기').prop('disabled', false).css({
-                            'background-color': '#2ccfcf',
-                            'color': 'black',
-                            'cursor': 'pointer'
-                        });
+                    } else if (!initialEmail) {
+                        $emailMessage.text('세션에 이메일 정보가 없습니다.').addClass('error');
+                        isEmailValid = false;
+                        if ($changeEmailButton) {
+                            $changeEmailButton.prop('disabled', true).css({
+                                'background-color': 'black',
+                                'color': 'white',
+                                'cursor': 'not-allowed'
+                            });
+                        }
+                    } else {
+                        $emailMessage.text('세션 이메일 형식이 유효하지 않습니다.').addClass('error');
+                        isEmailValid = false;
+                        if ($changeEmailButton) {
+                            $changeEmailButton.prop('disabled', true).css({
+                                'background-color': 'black',
+                                'color': 'white',
+                                'cursor': 'not-allowed'
+                            });
+                        }
                     }
-                });
+                })();
 
                 // 학점 입력 실시간 검사
                 $pointInput.on('input', function() {
@@ -534,25 +664,29 @@
                 });
 
                 // 이메일 변경 버튼 클릭
-                $changeEmailButton.on('click', function(event) {
-                    event.preventDefault();
-                    console.log('Change email button clicked, disabled:', $(this).prop('disabled'));
-                    if ($(this).prop('disabled')) return;
-                    if ($(this).text() === '변경하기') {
-                        $emailInput.prop('readonly', false).focus();
-                        $(this).text('인증전송');
-                    } else {
-                        sendVerification();
-                    }
-                });
+                if ($changeEmailButton) {
+                    $changeEmailButton.on('click', function(event) {
+                        event.preventDefault();
+                        console.log('Change email button clicked, disabled:', $(this).prop('disabled'));
+                        if ($(this).prop('disabled')) return;
+                        if ($(this).text() === '변경하기') {
+                            $emailInput.prop('readonly', false).focus();
+                            $(this).text('인증전송');
+                        } else {
+                            sendVerification();
+                        }
+                    });
+                }
 
                 // 인증 코드 확인
-                $verifyCodeButton.on('click', function(event) {
-                    event.preventDefault();
-                    console.log('Verify code button clicked, disabled:', $(this).prop('disabled'));
-                    if ($(this).prop('disabled')) return;
-                    verifyCode();
-                });
+                if ($verifyCodeButton) {
+                    $verifyCodeButton.on('click', function(event) {
+                        event.preventDefault();
+                        console.log('Verify code button clicked, disabled:', $(this).prop('disabled'));
+                        if ($(this).prop('disabled')) return;
+                        verifyCode();
+                    });
+                }
 
                 // 취소 버튼 클릭
                 $cancelButton.on('click', function(event) {
@@ -565,34 +699,74 @@
                 $submitButton.on('click', function(event) {
                     event.preventDefault();
                     console.log('Submit button clicked');
-                    // 비밀번호 유효성 체크
-                    const newPassword = $newPasswordInput.val().trim();
-                    if (newPassword && (!isPasswordValid || !isPasswordMatch)) {
-                        $newPasswordMessage.text('유효한 비밀번호를 입력해주세요.').addClass('error');
-                        $confirmPasswordMessage.text('비밀번호가 일치하지 않습니다.').addClass('error');
+
+                    // 입력값 가져오기
+                    const newPassword = $newPasswordInput ? $newPasswordInput.val().trim() : '';
+                    const confirmPassword = $confirmPasswordInput ? $confirmPasswordInput.val().trim() : '';
+                    const email = $emailInput ? $emailInput.val().trim() : '';
+                    const university = $universityInput.val().trim();
+                    const degree = $degreeInput.val() || '';
+                    const graduated = $graduatedInput.val() || '';
+                    const point = $pointInput.val().trim();
+
+                    // 세션의 기존 값
+                    const sessionEmail = '${sessionScope.loginUser.userEmail}' || '';
+                    const sessionUniversity = '${sessionScope.loginUser.userUniversity}' || '';
+                    const sessionDegree = '${sessionScope.loginUser.userDegree}' || '';
+                    const sessionGraduated = '${sessionScope.loginUser.userGradulate}' || '';
+                    const sessionPoint = '${sessionScope.loginUser.userPoint}' || '';
+
+                    // 변경 여부 확인
+                    const isPasswordChanged = newPassword && confirmPassword && newPassword === confirmPassword;
+                    const isEmailChangedLocal = $emailInput && isEmailChanged && isEmailVerified && email !== sessionEmail;
+                    const isUniversityChanged = university !== sessionUniversity;
+                    const isDegreeChanged = degree !== sessionDegree;
+                    const isGraduatedChanged = graduated !== sessionGraduated;
+                    const isPointChanged = point !== sessionPoint && (point === '' || validatePoint(point));
+
+                    // 변경된 사항이 없으면 main.do로 이동
+                    if (!isPasswordChanged && !isEmailChangedLocal && !isUniversityChanged && 
+                        !isDegreeChanged && !isGraduatedChanged && !isPointChanged) {
+                        console.log('No changes detected, redirecting to main.do');
+                        location.href = 'main.do';
                         return;
                     }
+
+                    // 비밀번호 유효성 체크
+                    if (newPassword && (!isPasswordValid || !isPasswordMatch || isPasswordSameAsCurrent)) {
+                        if (isPasswordSameAsCurrent) {
+                            $newPasswordMessage.text('새 비밀번호는 현재 비밀번호와 달라야 합니다.').addClass('error');
+                        } else if (!isPasswordValid) {
+                            $newPasswordMessage.text('유효한 비밀번호를 입력해주세요.').addClass('error');
+                        }
+                        if (!isPasswordMatch) {
+                            $confirmPasswordMessage.text('비밀번호가 일치하지 않습니다.').addClass('error');
+                        }
+                        return;
+                    }
+
                     // 이메일 유효성 체크
-                    const email = $emailInput.val().trim();
-                    if (email && !isEmailValid) {
+                    if (email && $emailInput && !isEmailValid) {
                         $emailMessage.text('유효한 이메일을 입력해주세요.').addClass('error').removeClass('success');
                         return;
                     }
-                    if (isEmailChanged && !isEmailVerified) {
+                    if (isEmailChangedLocal && !isEmailVerified) {
                         $emailMessage.text('이메일 인증을 완료해주세요.').addClass('error').removeClass('success');
                         return;
                     }
+
                     // 학점 유효성 체크
-                    const point = $pointInput.val().trim();
-                    if (!validatePoint(point)) return;
+                    if (point && !validatePoint(point)) {
+                        return;
+                    }
 
                     // 데이터 준비
                     const userData = {
                         password: newPassword || undefined,
-                        email: isEmailChanged && isEmailVerified ? email : undefined,
-                        university: $universityInput.val().trim() || undefined,
-                        degree: $degreeInput.val() || undefined,
-                        graduated: $graduatedInput.val() || undefined,
+                        email: isEmailChangedLocal ? email : undefined,
+                        university: university || undefined,
+                        degree: degree || undefined,
+                        graduated: graduated || undefined,
                         point: point ? parseFloat(point) : undefined
                     };
 
@@ -647,7 +821,7 @@
         <form id="myPageForm">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
             <!-- 비밀번호 변경 -->
-            <c:if test="${sessionScope.loginUser.userLoginType != 3 && sessionScope.loginUser.userLoginType != 4 && sessionScope.loginUser.userLoginType != 5}">
+            <c:if test="${not empty sessionScope.loginUser and sessionScope.loginUser.userLoginType != 3 and sessionScope.loginUser.userLoginType != 4 and sessionScope.loginUser.userLoginType != 5}">
                 <div class="input-group">
                     <label for="new-password">새 비밀번호</label>
                     <input type="password" id="new-password" name="newPassword" placeholder="새 비밀번호 입력" maxlength="16">
@@ -660,23 +834,25 @@
                 </div>
             </c:if>
             <!-- 이메일 변경 -->
-            <div class="input-group">
-                <div class="inline-group">
+            <c:if test="${not empty sessionScope.loginUser and sessionScope.loginUser.userLoginType != 3 and sessionScope.loginUser.userLoginType != 4 and sessionScope.loginUser.userLoginType != 5}">
+                <div class="input-group">
                     <label for="email">이메일</label>
-                    <input type="email" id="email" name="email" value="${sessionScope.loginUser.userEmail}" readonly>
-                    <button type="button" class="btn" id="change-email">변경하기</button>
+                    <div class="inline-group">
+                        <input type="email" id="email" name="email" value="${sessionScope.loginUser.userEmail}" readonly>
+                        <button type="button" class="btn" id="change-email">변경하기</button>
+                    </div>
+                    <div id="email-message" class="message"></div>
                 </div>
-                <div id="email-message" class="message"></div>
-            </div>
-            <!-- 인증번호 -->
-            <div class="input-group verification-group" style="display: none;">
-                <div class="inline-group">
-                    <input type="text" id="verification-code" name="verification-code" placeholder="인증번호" maxlength="6" disabled>
-                    <button type="button" class="btn" id="verify-code" disabled>인증확인</button>
+                <!-- 인증번호 -->
+                <div class="input-group verification-group" style="display: none;">
+                    <div class="inline-group">
+                        <input type="text" id="verification-code" name="verification-code" placeholder="인증번호" maxlength="6" disabled>
+                        <button type="button" class="btn" id="verify-code" disabled>인증확인</button>
+                    </div>
+                    <div id="timer" class="timer">00:00</div>
+                    <div id="verification-message" class="message"></div>
                 </div>
-                <div id="timer" class="timer">00:00</div>
-                <div id="verification-message" class="message"></div>
-            </div>
+            </c:if>
             <!-- 대학교 -->
             <div class="input-group">
                 <label for="university">대학교</label>
