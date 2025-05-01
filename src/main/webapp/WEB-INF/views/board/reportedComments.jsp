@@ -55,8 +55,14 @@
     }
 
     function registerBadUsers() {
-      const selected = validateSelectionOrAlert();
-      if (!selected) return;
+        const selected = validateSelectionOrAlert();
+        if (!selected) return;
+
+        const reason = prompt("신고 사유를 입력해주세요.");
+        if (!reason || reason.trim() === "") {
+          alert("신고 사유는 필수입니다.");
+          return;
+        }
 
       fetch("registerBadUsersFromComments.do", {
         method: "POST",

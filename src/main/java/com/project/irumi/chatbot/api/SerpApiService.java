@@ -4,6 +4,7 @@ package com.project.irumi.chatbot.api;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +17,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class SerpApiService {
 	
+
 	private static final Logger logger = LoggerFactory.getLogger(SerpApiService.class);
 
-    private static final String API_KEY = "c009b6b2d8a1ad805eb1492ee8b31de1f2ed97a873d778afc0c0fb4cb3c498ec"; 
+	@Value("${serp.api.key}")
+	private String serpApiKey;
     private static final String BASE_URL = "https://serpapi.com/search";
 
     public String searchJobSpec(String query) {
@@ -97,7 +101,7 @@ public class SerpApiService {
             	    .queryParam("hl", "ko")
             	    .queryParam("gl", "kr")
             	    .queryParam("engine", "google")
-            	    .queryParam("api_key", API_KEY)
+            	    .queryParam("api_key", serpApiKey)
             	    .build(true)
             	    .toUri();
 
@@ -131,7 +135,7 @@ public class SerpApiService {
             	sb.append("📚 입력하신 시험 일정은 관련 링크를 참조해 주세요!<br>")
             	.append("🔗 <a href='").append(link).append("' target='_blank'>공식 사이트 바로가기</a>");
             } else {
-                sb.append("🔗 공식 링크를 찾을 수 없습니다.");
+                sb.append("🔗 공식 링크를 찾을 수 없습니다. 공식 기관 웹사이트를 참고해 보세요.");
             }
 
             return sb.toString();

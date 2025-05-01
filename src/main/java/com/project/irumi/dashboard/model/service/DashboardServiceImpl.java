@@ -26,7 +26,12 @@ public class DashboardServiceImpl implements DashboardService {
 	public Dashboard selectUserSpec(String userId) {
 		return dashboardDao.selectUserSpec(userId);
 	}
-
+	
+	@Override
+	public ArrayList<Spec> selectCurrUserSpec(String userId) {
+		return dashboardDao.selectCurrUserSpec(userId);
+	}
+	
 	@Override
 	public int updateDashboard(Dashboard dashboard) {
 		return dashboardDao.updateDashboard(dashboard);
@@ -36,7 +41,12 @@ public class DashboardServiceImpl implements DashboardService {
 	public ArrayList<Job> selectUserJobs(String userId) {
 		return dashboardDao.selectUserJobs(userId);
 	}
-
+	
+	@Override
+	public Job selectJob(String jobId) {
+		return dashboardDao.selectJob(jobId);
+	}
+	
 	@Override
 	public ArrayList<Spec> selectUserSpecs(Specific specific) {
 		return dashboardDao.selectUserSpecs(specific);
@@ -91,5 +101,37 @@ public class DashboardServiceImpl implements DashboardService {
 	public int insertJobLink(Specific specific) {
 		return dashboardDao.insertJobLink(specific);
 	}
+
+	@Override
+	public int deleteSpecLink(Specific specific) {
+		return dashboardDao.deleteSpecLink(specific);
+	}
+
+	@Override
+	public int deleteSpec(String specId) {
+		return dashboardDao.deleteSpec(specId);
+	}
+
+	@Override
+	public int selectMaxSpecId() {
+		return dashboardDao.selectMaxSpecId();
+	}
+
+	@Override
+	public int insertSpec(Spec spec) {
+		return dashboardDao.insertSpec(spec);
+	}
+
+	@Override
+	public int insertSpecLink(Specific specific) {
+		return dashboardDao.insertSpecLink(specific);
+	}
+
+	@Override
+	public int updateAccomplishSpecState(String specId) {
+		return dashboardDao.updateAccomplishSpecState(specId);
+	}
+
 	
+
 }

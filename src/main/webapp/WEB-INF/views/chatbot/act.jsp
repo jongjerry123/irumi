@@ -85,6 +85,22 @@ document.addEventListener("DOMContentLoaded", function() {
 	      // 오른쪽 활동(도서) 리스트에 추가
 	      addToActivityList(checked);
 	      removeCheckboxList();
+	      
+	   /* // DB에 저장    ----------- 변경사항
+	      checked.forEach(function(actContent) {
+	    	  $.ajax({
+	    	    type: "POST",
+	    	    url: "insertAct.do",   ///   완성시 이름 바꾸기
+	    	    data: { actContent: actContent },
+	    	    success: function() {
+	    	      console.log("활동 저장 성공:", actContent);
+	    	    },
+	    	    error: function() {
+	    	      console.error("활동 저장 실패:", actContent);
+	    	    }
+	    	  });
+	    	}); */
+	      
 	    };
 	    listWrap.appendChild(submitBtn);
 	    chatArea.appendChild(listWrap);
@@ -186,6 +202,21 @@ document.addEventListener("DOMContentLoaded", function() {
 		  const val = input.value.trim();
 		  if (val) {
 		    addToActivityList([val]);
+		    
+		 /* // DB에 저장    ----------- 변경사항
+		      $.ajax({
+		        type: "POST",
+		        url: "insertAct.do",  /// 완성 시 이름 바꾸기
+		        data: { actContent: val },
+		        success: function() {
+		          console.log("활동 추가 성공");
+		        },
+		        error: function() {
+		          alert("활동 추가 실패!");
+		        }
+		      }); */
+		    
+		    
 		    input.value = "";
 		  } else {
 		    alert("활동을 입력해 주세요!");

@@ -15,8 +15,10 @@ import com.project.irumi.dashboard.model.dto.Specific;
 public interface DashboardService {
 	
 	Dashboard selectUserSpec(String userId);
+	ArrayList<Spec> selectCurrUserSpec(String userId);
 	int updateDashboard(Dashboard dashboard);
 	ArrayList<Job> selectUserJobs(String userId);
+	Job selectJob(String jobId);
 	ArrayList<Spec> selectUserSpecs(Specific specific);
 	ArrayList<Activity> selectUserActs(Specific specific);
 	ArrayList<SpecSchedule> selectUserSpecSchedule(String specId);
@@ -28,5 +30,11 @@ public interface DashboardService {
 	int selectMaxJobId();
 	int insertJob(Job job);
 	int insertJobLink(Specific specific);
+	int deleteSpecLink(Specific specific);
+	int deleteSpec(String specId);
+	int selectMaxSpecId();
+	int insertSpec(Spec spec);
+	int insertSpecLink(Specific specific);
+	int updateAccomplishSpecState(String specId);
 	
 }
