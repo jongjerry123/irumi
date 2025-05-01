@@ -42,7 +42,7 @@ public class SerpApiService {
             	    .queryParam("hl", "ko")
             	    .queryParam("gl", "kr")
             	    .queryParam("engine", "google")
-            	    .queryParam("api_key", API_KEY)
+            	    .queryParam("api_key", serpApiKey)
             	    .build(true)
             	    .toUri();
 
@@ -150,5 +150,6 @@ public class SerpApiService {
     
 
 }
+
 
 
