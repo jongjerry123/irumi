@@ -239,7 +239,7 @@ public class ChatbotController {
 			Job job = new Job();
 
 			// insertedItem을 Job으로 전환
-			int jobId = dashboardService.selectMaxJobId() + 1;
+			int jobId = dashboardService.selectNextJobId();
 			job.setJobId(String.valueOf(jobId));
 			job.setJobName(insertedItem.getTitle());
 			job.setJobExplain(insertedItem.getExplain());
