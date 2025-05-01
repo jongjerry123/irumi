@@ -57,8 +57,26 @@ document.addEventListener("DOMContentLoaded", function() {
 		  const dateInput = document.getElementById("manualDate").value.trim();
 		  const commentInput = document.getElementById("manualComment").value.trim();
 		  
-		  if (dateInput && commentInput) {
-		    const combinedText = dateInput + " / " + commentInput;
+		    // db에 저장용 추가 --------------------------
+		    if (dateInput && commentInput) {
+		    	  /* const scheduleData = {
+		    	    ssDate: dateInput,       
+		    	    ssType: commentInput    
+		    	  };
+
+		    	  $.ajax({
+		    	    type: "POST",
+		    	    url: "insertSchedule.do",  //// 완성시 이름 바꾸기
+		    	    data: scheduleData,  
+		    	    success: function() {
+		    	      console.log("일정 저장 성공");
+		    	    },
+		    	    error: function() {
+		    	      alert("일정 저장 실패!");
+		    	    }
+		    	  }); */
+		    	  
+		    const combinedText = dateInput + " / " + commentInput;	  
 		    addToActivityList([combinedText]);
 		    
 		    // 입력창 초기화
@@ -644,7 +662,7 @@ a {
         
    <div class="manual-input-box">
    <input type="date" class="manual-date" id="manualDate" placeholder="날짜 선택"/>
-    <input type="text" placeholder="코멘트 입력" class="manual-input" id="manualComment"/>
+    <input type="text" placeholder="일정 입력" class="manual-input" id="manualComment"/>
     <button class="add-btn"><i class="fa fa-plus"> + </i></button>
 </div>
 </div>

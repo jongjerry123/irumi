@@ -11,6 +11,10 @@ public class ConvSession {
 	private final String topic;          // 대화 주제: job / spec / act / ss
 	private String subtopicId = null;    // 서브 주제 ID (직무 ID or 스펙 ID 등)
 	private String userId;
+	private String gettedSpec;	 	// 갖고 있던 스펙 (자격증 공모전수상 등)
+	
+
+	
 
 	// 추가
 	private String lastTopic;
@@ -111,6 +115,19 @@ public class ConvSession {
     public void setLastActivityType(String lastActivityType) {
         this.lastActivityType = lastActivityType;
     }
+    
+    
+    //  추가
+	public String getGettedSpec() {
+		return gettedSpec;
+	}
+
+	public void setGettedSpec(String gettedSpec) {
+		this.gettedSpec = gettedSpec;
+	}
+
+    
+    
 
 
 }
