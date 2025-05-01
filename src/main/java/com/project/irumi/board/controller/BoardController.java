@@ -2,11 +2,15 @@ package com.project.irumi.board.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
@@ -48,9 +52,20 @@ public class BoardController {
 
     // 공지사항
     @GetMapping("/noticeList.do")
-    public String showNoticeList(Model model) {
-        List<PostDTO> notices = postService.getPostsByType("공지");
+    public String showNoticeList(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                 Model model) {
+        int pageSize = 10;
+        int offset = (page - 1) * pageSize;
+
+        List<PostDTO> notices = postService.getPostsByTypeWithPaging("공지", offset, pageSize);
+        int totalCount = postService.countPostsByType("공지");
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
         model.addAttribute("postList", notices);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalCount", totalCount);
+
         return "board/noticeList";
     }
 
@@ -235,7 +250,7 @@ public class BoardController {
     }
 
     // 게시글 수정
-    @PostMapping("updatePost.do")
+    @PostMapping("/updatePost.do")
     public String updatePost(PostDTO postDTO) {
         postService.updatePost(postDTO);
         return "redirect:postDetail.do?postId=" + postDTO.getPostId();
@@ -308,16 +323,18 @@ public class BoardController {
     
     // ✅ 불량 이용자 목록
     @GetMapping("/badUserList.do")
-    public String showBadUserList(HttpSession session, Model model,
-                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
-            return "redirect:/loginPage.do";
-        }
+    public String showBadUserList(@RequestParam(name = "page", defaultValue = "1") int page, Model model) {
+        int pageSize = 10;
+        int offset = (page - 1) * pageSize;
 
-        model.addAttribute("badUserList", List.of()); // TODO: 실제 데이터 연결 필요
+        List<Map<String, Object>> badUsers = postService.getBadUsers(offset, pageSize);
+        int totalCount = postService.countBadUsers();
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        model.addAttribute("badUserList", badUsers);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", 1);
+        model.addAttribute("totalPages", totalPages);
+
         return "board/badUserList";
     }
     
@@ -339,4 +356,17 @@ public class BoardController {
         return "redirect:reportedComments.do";
     }
     
+    @PostMapping("/restoreBadUsers.do")
+    public String restoreBadUsers(@RequestParam("selectedUsers") List<String> userIds) {
+        postService.updateUserAuthority(userIds, 1); // 일반 유저로 변경
+        return "redirect:badUserList.do";
+    }
+
+    @PostMapping("/withdrawBadUsers.do")
+    public String withdrawBadUsers(@RequestParam("selectedUsers") List<String> userIds) {
+        postService.updateUserAuthority(userIds, 4); // 탈퇴 유저로 변경
+        return "redirect:badUserList.do";
+    }
+    
 }
+

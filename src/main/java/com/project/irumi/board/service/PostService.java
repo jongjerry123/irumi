@@ -33,8 +33,19 @@ public class PostService {
     // ✅ 게시글 타입별 조회
     public List<PostDTO> getPostsByType(String postType) { return postDAO.selectByType(postType); }
 
-    // ✅ 게시글 타입별 페이징 조회
-    public List<PostDTO> getPostsByTypeWithPaging(String postType, int offset, int pageSize) { return postDAO.selectByTypeWithPaging(postType, offset, pageSize); }
+ // ✅ 게시글 타입별 페이징 조회 + QnA 답변 여부 체크
+    public List<PostDTO> getPostsByTypeWithPaging(String postType, int offset, int pageSize) {
+        List<PostDTO> posts = postDAO.selectByTypeWithPaging(postType, offset, pageSize);
+
+        if ("질문".equals(postType)) {
+            for (PostDTO post : posts) {
+                boolean hasAnswer = postDAO.existsAnswerByPostId(post.getPostId());
+                post.setHasAnswer(hasAnswer);
+            }
+        }
+
+        return posts;
+    }
 
     // ✅ 게시글 타입별 수 조회
     public int countPostsByType(String postType) { return postDAO.countPostsByType(postType); }
@@ -70,6 +81,8 @@ public class PostService {
 
     // ✅ 내 QnA 수
     public int countMyQnaPosts(String userId) { return postDAO.countMyQnaPosts(userId); }
+    
+    
 
     // ✅ 게시글 수정
     public void updatePost(PostDTO post) { postDAO.updatePost(post); }
@@ -183,4 +196,20 @@ public class PostService {
             }
         }
     }
+    
+    public void updateUserAuthority(List<String> userIds, int authority) {
+        postDAO.updateUserAuthority(userIds, authority);
+    }
+    
+    //불량 이용자 조회
+    public List<Map<String, Object>> getBadUsers(int offset, int pageSize) {
+        return postDAO.selectBadUsers(offset, pageSize);
+    }
+
+    //불량 이용자 카운트
+    public int countBadUsers() {
+        return postDAO.countBadUsers();
+    }
 } 
+
+

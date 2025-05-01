@@ -301,4 +301,25 @@ public class PostDAO {
         param.put("reason", reason);
         sqlSession.insert("boardMapper.insertReport", param);
     }
+    
+    public void updateUserAuthority(List<String> userIds, int authority) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("userIds", userIds);
+        param.put("authority", authority);
+        sqlSession.update("boardMapper.updateUserAuthority", param);
+    }
+   
+    // 불량 이용자 카운트/조회
+    public List<Map<String, Object>> selectBadUsers(int offset, int pageSize) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("offset", offset);
+        param.put("pageSize", pageSize);
+        return sqlSession.selectList("boardMapper.selectBadUsers", param);
+    }
+
+    public int countBadUsers() {
+        return sqlSession.selectOne("boardMapper.countBadUsers");
+    }
+    
 }
+

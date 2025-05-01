@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8"%> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:import url="/WEB-INF/views/common/header.jsp" />
@@ -104,50 +104,55 @@
 </div>
 
 <script>
-    function getSelectedPostIds() {
-      return Array.from(document.querySelectorAll('input[name="selectedPosts"]:checked'))
-                  .map(cb => cb.value);
+  function getSelectedPostIds() {
+    return Array.from(document.querySelectorAll('input[name="selectedPosts"]:checked'))
+                .map(cb => cb.value);
+  }
+
+  function validatePostSelectionOrAlert() {
+    const selected = getSelectedPostIds();
+    if (selected.length === 0) {
+      alert("게시글을 선택해주세요.");
+      return null;
+    }
+    return selected;
+  }
+
+  function deleteSelectedPosts() {
+    const selected = validatePostSelectionOrAlert();
+    if (!selected) return;
+    document.getElementById("postForm").action = "deleteSelectedPosts.do";
+    document.getElementById("postForm").submit();
+  }
+
+  function registerBadUsers() {
+    const selected = validatePostSelectionOrAlert();
+    if (!selected) return;
+
+    const reason = prompt("등록 사유를 입력해주세요.");
+    if (!reason || reason.trim() === "") {
+      alert("등록 사유는 필수입니다.");
+      return;
     }
 
-    function validatePostSelectionOrAlert() {
-      const selected = getSelectedPostIds();
-      if (selected.length === 0) {
-        alert("게시글을 선택해주세요.");
-        return null;
+    const formData = new URLSearchParams();
+    selected.forEach(id => formData.append("selectedPosts", id));
+    formData.append("reason", encodeURIComponent(reason)); // JS 안에서만 encodeURIComponent 사용
+
+    fetch("registerBadUsers.do", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formData.toString()
+    })
+    .then(res => {
+      if (res.redirected) {
+    	  alert("등록되었습니다.");
+        window.location.href = res.url;
+      } else {
+        alert("등록 실패");
       }
-      return selected;
-    }
-
-    function deleteSelectedPosts() {
-      const selected = validatePostSelectionOrAlert();
-      if (!selected) return;
-      document.getElementById("postForm").action = "deleteSelectedPosts.do";
-      document.getElementById("postForm").submit();
-    }
-
-    function registerBadUsers() {
-      const selected = validatePostSelectionOrAlert();
-      if (!selected) return;
-
-      const reason = prompt("신고 사유를 입력해주세요.");
-      if (!reason || reason.trim() === "") {
-        alert("신고 사유는 필수입니다.");
-        return;
-      }
-
-      fetch("registerBadUsersFromPosts.do", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: selected.map(id => `selectedPosts=${id}`).join("&") + `&reason=${encodeURIComponent(reason)}`
-      })
-      .then(res => {
-        if (res.redirected) {
-          window.location.href = res.url;
-        } else {
-          alert("등록 실패");
-        }
-      });
-    }
+    });
+  }
 </script>
 
 <c:import url="/WEB-INF/views/common/footer.jsp" />

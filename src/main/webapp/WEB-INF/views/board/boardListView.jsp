@@ -38,6 +38,7 @@
     .board-footer-top { display: flex; justify-content: space-between; align-items: center; }
     .board-footer .pagination { display: flex; gap: 10px; justify-content: center; }
     .board-footer .pagination button { background-color: #222; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    .board-footer .pagination button.selected { border: 1px solid #A983A3; color: #A983A3; }
     .board-footer .search-box { display: flex; gap: 6px; align-items: center; }
     .board-footer input[type="text"] { padding: 8px; border-radius: 4px; border: 2px solid transparent; outline: none; background-color: #1a1a1a; color: #fff; transition: border 0.3s, background-color 0.3s; }
     .board-footer input[type="text"]:focus { border: 2px solid #A983A3; background-color: #222; }

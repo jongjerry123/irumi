@@ -71,6 +71,7 @@
       })
       .then(res => {
         if (res.redirected) {
+        	alert("등록되었습니다.");
           window.location.href = res.url;
         } else {
           alert("등록 실패");
