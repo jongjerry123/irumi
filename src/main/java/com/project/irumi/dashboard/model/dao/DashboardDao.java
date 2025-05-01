@@ -27,6 +27,11 @@ public class DashboardDao {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectUserSpec", userId);
 	}
 	
+	public ArrayList<Spec> selectCurrUserSpec(String userId) {
+		List<Spec> list = sqlSessionTemplate.selectList("dashboardMapper.selectCurrUserSpec", userId);
+		return (ArrayList<Spec>) list;
+	}
+	
 	public int updateDashboard(Dashboard dashboard) {
 		return sqlSessionTemplate.update("dashboardMapper.updateDashboard", dashboard);
 	}
@@ -34,6 +39,10 @@ public class DashboardDao {
 	public ArrayList<Job> selectUserJobs(String userId) {
 		List<Job> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserJobs", userId);
 		return (ArrayList<Job>) list;
+	}
+	
+	public Job selectJob(String jobId) {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectJob", jobId);
 	}
 	
 	public ArrayList<Spec> selectUserSpecs(Specific specific) {
@@ -73,16 +82,44 @@ public class DashboardDao {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectOneJobList", jobListId);
 	}
 	
-	public int selectMaxJobId() {
-		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxJobId");
+	public int updateAccomplishSpecState(String specId) {
+		return sqlSessionTemplate.update("dashboardMapper.updateAccomplishSpecState", specId);
 	}
 	
+	//직무 추가
+	public int selectMaxJobId() {
+		if (sqlSessionTemplate.selectOne("dashboardMapper.selectMaxJobId") == null) {
+			return 0;
+		}
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxJobId");
+	}
 	public int insertJob(Job job) {
 		return sqlSessionTemplate.insert("dashboardMapper.insertJob", job);
 	}
-	
 	public int insertJobLink(Specific specific) {
 		return sqlSessionTemplate.insert("dashboardMapper.insertJobLink", specific);
+	}
+	
+	//스펙 삭제
+	public int deleteSpecLink(Specific specific) {
+		return sqlSessionTemplate.delete("dashboardMapper.deleteSpecLink", specific);
+	}
+	public int deleteSpec(String specId) {
+		return sqlSessionTemplate.delete("dashboardMapper.deleteSpec", specId);
+	}
+	
+	// 스펙 추가
+	public int selectMaxSpecId() {
+		if (sqlSessionTemplate.selectOne("dashboardMapper.selectMaxSpecId") == null) {
+			return 0;
+		}
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxSpecId");
+	}
+	public int insertSpec(Spec spec) {
+		return sqlSessionTemplate.insert("dashboardMapper.insertSpec", spec);
+	}
+	public int insertSpecLink(Specific specific) {
+		return sqlSessionTemplate.insert("dashboardMapper.insertSpecLink", specific);
 	}
 	
 }
