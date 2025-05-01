@@ -1,5 +1,6 @@
 package com.project.irumi.user.model.dao;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,4 +65,23 @@ public class UserDao {
 	public void updateUserProfile(Map<String, Object> params) {
         sqlSessionTemplate.update("userMapper.updateUserProfile", params);
     }
+	
+	public User selectUserById(String userId) {
+        return sqlSessionTemplate.selectOne("userMapper.findByUserId", userId);
+    }
+
+    public void updateUserAuthority(String userId, String userAuthority) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("userAuthority", userAuthority);
+        sqlSessionTemplate.update("userMapper.updateAuthority", params);
+    }
+ // CH_PWD 업데이트
+    public void updateChPwd(String userId, Date chPwd) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("chPwd", chPwd);
+        sqlSessionTemplate.update("userMapper.updateChPwd", params);
+    }
+
 }

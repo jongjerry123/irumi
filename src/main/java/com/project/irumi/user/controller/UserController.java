@@ -1,14 +1,45 @@
 package com.project.irumi.user.controller;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.SecureRandom;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -18,34 +49,13 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.project.irumi.user.model.dto.User;
 import com.project.irumi.user.service.UserService;
+
+import jakarta.mail.Message.RecipientType;
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.Message.RecipientType;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Date;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-// --- 소셜 로그인 통합 추가 ---
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 public class UserController {
@@ -54,8 +64,9 @@ public class UserController {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     private static final String FROM_EMAIL = "yourapp@gmail.com";
+    private static final String RANDOM_PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    private static final int PASSWORD_LENGTH = 12;
 
-    // --- 소셜 로그인 통합 추가: 클라이언트 ID/시크릿을 application.properties에서 주입 ---
     @Value("${google.client.id}")
     private String GOOGLE_CLIENT_ID;
     @Value("${google.client.secret}")
@@ -66,8 +77,6 @@ public class UserController {
     private String NAVER_CLIENT_SECRET;
     @Value("${kakao.client.id}")
     private String KAKAO_CLIENT_ID;
-    @Value("${kakao.client.secret}")
-    private String KAKAO_CLIENT_SECRET;
 
     @Autowired
     private UserService userservice;
@@ -75,7 +84,6 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder bcryptPasswordEncoder;
 
-    // --- 소셜 로그인 통합 추가: RestTemplate으로 네이버/카카오 API 호출 ---
     @Autowired
     private RestTemplate restTemplate;
 
@@ -134,6 +142,15 @@ public class UserController {
         return message;
     }
 
+    private String generateRandomPassword() {
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
+        for (int i = 0; i < PASSWORD_LENGTH; i++) {
+            password.append(RANDOM_PASSWORD_CHARS.charAt(random.nextInt(RANDOM_PASSWORD_CHARS.length())));
+        }
+        return password.toString();
+    }
+
     @RequestMapping("/")
     public String home() {
         logger.info("home: Redirecting to main page");
@@ -164,16 +181,40 @@ public class UserController {
             logger.info("login.do: Selected user = {}", loginUser);
             if (loginUser == null) {
                 logger.warn("login.do: No user found for userId = {}", user.getUserId());
-                model.addAttribute("message", "아이디가 존재하지 않습니다.");
+                model.addAttribute("message", "아이디 또는 비밀번호가 올바르지 않습니다.");
                 return "user/login";
             }
             if (bcryptPasswordEncoder.matches(user.getUserPwd(), loginUser.getUserPwd())) {
                 logger.info("login.do: Login successful for userId = {}", user.getUserId());
                 session.setAttribute("loginUser", loginUser);
+
+                // 소셜 로그인 사용자는 비밀번호 변경 제외
+                if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+                    logger.info("login.do: Social login user (type={}), skipping password change check", loginUser.getUserLoginType());
+                    return "common/main";
+                }
+
+                // CH_PWD 확인
+                Date chPwd = loginUser.getChPWD();
+                if (chPwd != null) {
+                    LocalDate pwdChangeDate = chPwd.toLocalDate();
+                    LocalDate currentDate = LocalDate.now();
+                    long daysSinceChange = ChronoUnit.DAYS.between(pwdChangeDate, currentDate);
+                    if (daysSinceChange >= 180) {
+                        logger.info("login.do: Password change required for userId = {}, days since change = {}", 
+                                    user.getUserId(), daysSinceChange);
+                        return "redirect:/6MChangPwd.do";
+                    }
+                } else {
+                    logger.info("login.do: CH_PWD is null for userId = {}, redirecting to change password", 
+                                user.getUserId());
+                    return "redirect:/6MChangPwd.do";
+                }
+
                 return "common/main";
             } else {
                 logger.warn("login.do: Password mismatch for userId = {}", user.getUserId());
-                model.addAttribute("message", "비밀번호가 올바르지 않습니다.");
+                model.addAttribute("message", "아이디 또는 비밀번호가 올바르지 않습니다.");
                 return "user/login";
             }
         } catch (Exception e) {
@@ -181,6 +222,22 @@ public class UserController {
             model.addAttribute("message", "로그인 중 오류가 발생했습니다.");
             return "user/login";
         }
+    }
+
+    @RequestMapping(value = "6MChangPwd.do", method = RequestMethod.GET)
+    public String changePasswordPage(HttpSession session, Model model) {
+        logger.info("6MChangPwd.do: Displaying password change page");
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            logger.warn("6MChangPwd.do: No user in session, redirecting to login");
+            model.addAttribute("message", "로그인이 필요합니다.");
+            return "redirect:/loginPage.do";
+        }
+        if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+            logger.warn("6MChangPwd.do: Social login user (type={}), redirecting to main", loginUser.getUserLoginType());
+            return "user/main";
+        }
+        return "user/6MChangPwd";
     }
 
     @RequestMapping("resister.do")
@@ -371,10 +428,10 @@ public class UserController {
 
     @PostMapping("checkUser.do")
     @ResponseBody
-    public Map<String, Object> checkUser(
-            @RequestParam(name = "userId") String userId,
-            @RequestParam(name = "email") String email) {
-        logger.info("checkUser.do: Checking userId = {}, email = {}", userId, email);
+    public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data) {
+        String userId = data.get("userId");
+        String email = data.get("email");
+        logger.info("checkMaUser.do: Checking userId = {}, email = {}", userId, email);
         boolean matched = userservice.checkUserMatch(userId, email);
         Map<String, Object> response = new HashMap<>();
         response.put("matched", matched);
@@ -383,10 +440,7 @@ public class UserController {
     }
 
     @GetMapping("resetPassword.do")
-    public String resetPassword(
-            @RequestParam(name = "userId") String userId,
-            HttpSession session,
-            Model model) {
+    public String resetPassword(@RequestParam(name = "userId") String userId, HttpSession session, Model model) {
         logger.info("resetPassword.do: Processing for userId = {}", userId);
         Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
         if (emailVerified != null && emailVerified) {
@@ -398,155 +452,237 @@ public class UserController {
         }
     }
 
-    @PostMapping("updatePassword.do")
-    public String updatePassword(
-            @RequestParam(name = "userId") String userId,
-            @RequestParam(name = "newPassword") String newPassword,
-            HttpSession session,
-            Model model) {
+    @RequestMapping(value = "updatePassword.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updatePassword(@RequestParam(name = "userId") String userId, 
+                                             @RequestParam(name = "newPassword") String newPassword, 
+                                             HttpSession session) {
         logger.info("updatePassword.do: Updating password for userId = {}", userId);
-        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
-        if (emailVerified != null && emailVerified) {
-            try {
-                userservice.updatePassword(userId, bcryptPasswordEncoder.encode(newPassword));
-                session.removeAttribute("emailVerified");
-                session.removeAttribute("verificationCode");
-                session.removeAttribute("verificationEmail");
-                session.removeAttribute("emailTokenExpiry");
-                model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
-                return "user/login";
-            } catch (Exception e) {
-                logger.error("updatePassword.do: Error updating password for userId = {}", userId, e);
-                model.addAttribute("message", "비밀번호 변경 중 오류가 발생했습니다.");
-                return "user/resetPassword";
-            }
-        } else {
-            logger.warn("updatePassword.do: Email not verified for userId = {}", userId);
-            return "redirect:/findPassword.do";
+        Map<String, Object> response = new HashMap<>();
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !loginUser.getUserId().equals(userId)) {
+            logger.warn("updatePassword.do: Invalid session or userId mismatch for userId = {}", userId);
+            response.put("success", false);
+            response.put("message", "로그인 정보가 유효하지 않습니다.");
+            return response;
         }
+        if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+            logger.info("updatePassword.do: Social login user (type={}) cannot change password", loginUser.getUserLoginType());
+            response.put("success", false);
+            response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+            return response;
+        }
+        try {
+            String encodedPassword = bcryptPasswordEncoder.encode(newPassword);
+            userservice.updatePassword(userId, encodedPassword); // CH_PWD는 매퍼에서 sysdate로 자동 업데이트
+            logger.info("updatePassword.do: Password and CH_PWD updated for userId = {}", userId);
+            response.put("success", true);
+            response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            logger.error("updatePassword.do: Error updating password for userId = {}", userId, e);
+            response.put("success", false);
+            response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
+        }
+        return response;
     }
 
-    // --- 소셜 로그인 통합 추가: Google 로그인 ---
-    @GetMapping("googleLogin.do")
-    public String googleLogin(HttpSession session) throws Exception {
-        logger.info("googleLogin.do: Initiating Google OAuth flow");
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        InputStream in = UserController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new IllegalStateException("Credentials file not found at: " + CREDENTIALS_FILE_PATH);
+    @RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, 
+                                                  HttpSession session) {
+        logger.info("deferPasswordChange.do: Deferring password change for userId = {}", userId);
+        Map<String, Object> response = new HashMap<>();
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !loginUser.getUserId().equals(userId)) {
+            logger.warn("deferPasswordChange.do: Invalid session or userId mismatch for userId = {}", userId);
+            response.put("success", false);
+            response.put("message", "로그인 정보가 유효하지 않습니다.");
+            return response;
         }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets,
-                Arrays.asList("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"))
-                .setAccessType("offline")
-                .build();
-        String authUrl = flow.newAuthorizationUrl().setRedirectUri("http://localhost:8080/socialCallback.do?provider=google").build();
+        if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+            logger.info("deferPasswordChange.do: Social login user (type={}) cannot defer password change", loginUser.getUserLoginType());
+            response.put("success", false);
+            response.put("message", "소셜 로그인 사용자는 비밀번호 변경 연기를 할 수 없습니다.");
+            return response;
+        }
+        try {
+            // CH_PWD를 현재 날짜에서 120일 전으로 설정
+            long pastChPwdMillis = System.currentTimeMillis() - (120L * 24 * 60 * 60 * 1000);
+            userservice.updateChPwd(userId, new Date(pastChPwdMillis));
+            logger.info("deferPasswordChange.do: CH_PWD set to 120 days ago for userId = {}", userId);
+            response.put("success", true);
+            response.put("message", "비밀번호 변경 주기가 120일 전으로 설정되었습니다.");
+        } catch (Exception e) {
+            logger.error("deferPasswordChange.do: Error deferring password change for userId = {}", userId, e);
+            response.put("success", false);
+            response.put("message", "연기 처리 중 오류가 발생했습니다.");
+        }
+        return response;
+    }
+    @GetMapping("/googleLogin.do")
+    public String googleLogin(HttpServletRequest request) {
+        logger.info("googleLogin.do: Initiating Google OAuth flow");
+        String state = String.valueOf((int)(Math.random() * 900000) + 100000);
+        String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" +
+                request.getServerPort() + "/irumi/socialCallback.do?provider=google";
+        String authUrl = String.format(
+                "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=%s&redirect_uri=%s&scope=email%%20profile&state=%s",
+                GOOGLE_CLIENT_ID, redirectUri, state);
+        logger.info("googleLogin.do: Redirecting to auth URL: {}", authUrl);
         return "redirect:" + authUrl;
     }
 
-    // --- 소셜 로그인 통합 추가: 네이버 로그인 ---
-    @GetMapping("naverLogin.do")
-    public String naverLogin() {
+    @GetMapping("/naverLogin.do")
+    public String naverLogin(HttpServletRequest request) {
         logger.info("naverLogin.do: Initiating Naver OAuth flow");
-        String state = String.valueOf((int)(Math.random() * 900000) + 100000); // CSRF 방지용
+        String state = String.valueOf((int)(Math.random() * 900000) + 100000);
+        String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" +
+                request.getServerPort() + request.getContextPath() + "/socialCallback.do?provider=naver";
         String authUrl = String.format(
                 "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s",
-                NAVER_CLIENT_ID, "http://localhost:8080/socialCallback.do?provider=naver", state);
+                NAVER_CLIENT_ID, redirectUri, state);
+        logger.info("naverLogin.do: Redirecting to auth URL: {}", authUrl);
         return "redirect:" + authUrl;
     }
 
-    // --- 소셜 로그인 통합 추가: 카카오 로그인 ---
-    @GetMapping("kakaoLogin.do")
-    public String kakaoLogin() {
+    @GetMapping("/kakaoLogin.do")
+    public String kakaoLogin(HttpServletRequest request) {
         logger.info("kakaoLogin.do: Initiating Kakao OAuth flow");
+        String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" +
+                request.getServerPort() + request.getContextPath() + "/socialCallback.do?provider=kakao";
         String authUrl = String.format(
                 "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=%s&redirect_uri=%s",
-                KAKAO_CLIENT_ID, "http://localhost:8080/socialCallback.do?provider=kakao", "&response_type=code&","scope=profile_nickname ");
+                KAKAO_CLIENT_ID, redirectUri);
+        logger.info("kakaoLogin.do: Redirecting to auth URL: {}", authUrl);
         return "redirect:" + authUrl;
     }
 
-    // --- 소셜 로그인 통합 추가: 통합 콜백 엔드포인트 ---
-    @GetMapping("socialCallback.do")
-    public String socialCallback(
-            @RequestParam("code") String code,
-            @RequestParam(value = "provider", defaultValue = "google") String provider,
-            HttpSession session, Model model) {
-        logger.info("socialCallback.do: Processing {} callback with code", provider);
+    @GetMapping("/socialCallback.do")
+    public String socialCallback(@RequestParam("code") String code,
+                                @RequestParam(value = "provider", defaultValue = "google") String provider,
+                                HttpSession session,
+                                Model model,
+                                HttpServletRequest request) {
+        logger.info("socialCallback.do: Received request for provider: {}, code: {}, contextPath: {}",
+                provider, code, request.getContextPath());
         try {
             int loginType;
             String socialId, email, name;
+            String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" +
+                    request.getServerPort() + request.getContextPath() + "/socialCallback.do?provider=" + provider;
+            logger.debug("socialCallback.do: Using redirectUri: {}", redirectUri);
 
             if ("google".equalsIgnoreCase(provider)) {
                 loginType = 3;
-                final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-                InputStream in = UserController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-                if (in == null) {
-                    throw new IllegalStateException("Credentials file not found at: " + CREDENTIALS_FILE_PATH);
+                // Google 토큰 요청
+                String tokenUrl = String.format(
+                        "https://oauth2.googleapis.com/token?grant_type=authorization_code&client_id=%s&client_secret=%s&redirect_uri=%s&code=%s",
+                        GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectUri, code);
+                ResponseEntity<String> tokenResponse = restTemplate.postForEntity(tokenUrl, null, String.class);
+                logger.debug("socialCallback.do: Google token response: {}", tokenResponse.getBody());
+                if (tokenResponse.getStatusCode() != HttpStatus.OK) {
+                    throw new IllegalStateException("Google token request failed: " + tokenResponse.getBody());
                 }
-                GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-                GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets,
-                        Arrays.asList("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"))
-                        .setAccessType("offline")
-                        .build();
-                GoogleTokenResponse tokenResponse = flow.newTokenRequest(code)
-                        .setRedirectUri("http://localhost:8080/socialCallback.do?provider=google")
-                        .execute();
-                String idTokenString = tokenResponse.getIdToken();
-                if (idTokenString == null) {
-                    throw new IllegalStateException("No ID token returned");
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode tokenJson = mapper.readTree(tokenResponse.getBody());
+                if (tokenJson.has("error")) {
+                    throw new IllegalStateException("Google token error: " + tokenJson.get("error_description").asText());
                 }
-                GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(HTTP_TRANSPORT, JSON_FACTORY)
-                        .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID))
-                        .build();
-                GoogleIdToken idToken = verifier.verify(idTokenString);
-                if (idToken == null) {
-                    throw new IllegalStateException("Invalid ID token");
+                JsonNode accessTokenNode = tokenJson.get("access_token");
+                if (accessTokenNode == null) {
+                    throw new IllegalStateException("Google token response missing access_token: " + tokenResponse.getBody());
                 }
-                Payload payload = idToken.getPayload();
-                socialId = payload.getSubject();
-                email = payload.getEmail();
-                name = (String) payload.get("name");
+                String accessToken = accessTokenNode.asText();
+
+                // Google 사용자 정보 요청
+                HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(accessToken);
+                HttpEntity<?> entity = new HttpEntity<>(headers);
+                ResponseEntity<String> userResponse = restTemplate.exchange(
+                        "https://www.googleapis.com/oauth2/v2/userinfo", HttpMethod.GET, entity, String.class);
+                logger.debug("socialCallback.do: Google user response: {}", userResponse.getBody());
+                if (userResponse.getStatusCode() != HttpStatus.OK) {
+                    throw new IllegalStateException("Google user info request failed: " + userResponse.getBody());
+                }
+                JsonNode userJson = mapper.readTree(userResponse.getBody());
+                JsonNode idNode = userJson.get("id");
+                if (idNode == null) {
+                    throw new IllegalStateException("Google user response missing 'id' field: " + userResponse.getBody());
+                }
+                socialId = idNode.asText();
+                JsonNode emailNode = userJson.get("email");
+                email = emailNode != null ? emailNode.asText() : null;
+                JsonNode nameNode = userJson.get("name");
+                name = nameNode != null ? nameNode.asText() : null;
                 if (name == null) {
                     name = "Google User";
                 }
+                
+                if (email != null) {
+                    int suffix = 100000 + new java.util.Random().nextInt(900000);;
+                    email = socialId + "@gmail.com" + suffix;
+                    while (!userservice.checkEmailAvailability(email)) {
+                        suffix++;
+                        email = socialId + "@gmail.com" + suffix;
+                    }
+                }
             } else if ("naver".equalsIgnoreCase(provider)) {
                 loginType = 4;
-                // 네이버 토큰 요청
                 String tokenUrl = String.format(
                         "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id=%s&client_secret=%s&code=%s",
                         NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, code);
                 ResponseEntity<String> tokenResponse = restTemplate.getForEntity(tokenUrl, String.class);
+                logger.debug("socialCallback.do: Naver token response: {}", tokenResponse.getBody());
+                if (tokenResponse.getStatusCode() != HttpStatus.OK) {
+                    throw new IllegalStateException("Naver token request failed: " + tokenResponse.getBody());
+                }
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode tokenJson = mapper.readTree(tokenResponse.getBody());
-                String accessToken = tokenJson.get("access_token").asText();
+                if (tokenJson.has("error")) {
+                    throw new IllegalStateException("Naver token error: " + tokenJson.get("error_description").asText());
+                }
+                JsonNode accessTokenNode = tokenJson.get("access_token");
+                if (accessTokenNode == null) {
+                    throw new IllegalStateException("Naver token response missing access_token: " + tokenResponse.getBody());
+                }
+                String accessToken = accessTokenNode.asText();
 
-                // 네이버 사용자 정보 요청
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBearerAuth(accessToken);
                 HttpEntity<?> entity = new HttpEntity<>(headers);
                 ResponseEntity<String> userResponse = restTemplate.exchange(
                         "https://openapi.naver.com/v1/nid/me", HttpMethod.GET, entity, String.class);
+                logger.debug("socialCallback.do: Naver user response: {}", userResponse.getBody());
+                if (userResponse.getStatusCode() != HttpStatus.OK) {
+                    throw new IllegalStateException("Naver user info request failed: " + userResponse.getBody());
+                }
                 JsonNode userJson = mapper.readTree(userResponse.getBody());
-                socialId = userJson.get("response").get("id").asText();
-                email = userJson.get("response").get("email").asText();
-                name = userJson.get("response").get("nickname").asText();
+                JsonNode responseNode = userJson.get("response");
+                if (responseNode == null) {
+                    throw new IllegalStateException("Naver user response missing 'response' field: " + userResponse.getBody());
+                }
+                JsonNode idNode = responseNode.get("id");
+                if (idNode == null) {
+                    throw new IllegalStateException("Naver user response missing 'id' field: " + userResponse.getBody());
+                }
+                socialId = idNode.asText();
+                JsonNode emailNode = responseNode.get("email");
+                email = emailNode != null ? emailNode.asText() : null;
+                JsonNode nicknameNode = responseNode.get("nickname");
+                name = nicknameNode != null ? nicknameNode.asText() : null;
                 if (name == null) {
                     name = "Naver User";
                 }
             } else if ("kakao".equalsIgnoreCase(provider)) {
                 loginType = 5;
-                // 카카오 토큰 요청
                 String tokenUrl = String.format(
                         "https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=%s&redirect_uri=%s&code=%s",
-                        KAKAO_CLIENT_ID, "http://localhost:8080/socialCallback.do?provider=kakao", code);
+                        KAKAO_CLIENT_ID, redirectUri, code);
                 ResponseEntity<String> tokenResponse = restTemplate.postForEntity(tokenUrl, null, String.class);
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode tokenJson = mapper.readTree(tokenResponse.getBody());
                 String accessToken = tokenJson.get("access_token").asText();
 
-                // 카카오 사용자 정보 요청
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBearerAuth(accessToken);
                 HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -563,12 +699,10 @@ public class UserController {
                 throw new IllegalArgumentException("Unsupported provider: " + provider);
             }
 
-            // 이메일이 없으면 기본값 설정
             if (email == null) {
                 email = socialId + "@" + provider.toLowerCase() + ".com";
             }
 
-            // 기존 사용자 확인
             User existingUser = userservice.findUserBySocialId(socialId, loginType);
             if (existingUser != null) {
                 logger.info("socialCallback.do: Existing {} user found, userId = {}", provider, existingUser.getUserId());
@@ -576,7 +710,6 @@ public class UserController {
                 return "redirect:/main.do";
             }
 
-            // 신규 사용자: 세션에 정보 저장 후 등록 페이지로 이동
             session.setAttribute("socialId", socialId);
             session.setAttribute("socialEmail", email);
             session.setAttribute("socialName", name);
@@ -591,12 +724,8 @@ public class UserController {
         }
     }
 
-    // --- 소셜 로그인 통합 추가: 통합 사용자 등록 ---
-    @PostMapping("registerSocialUser.do")
-    public String registerSocialUser(
-            @RequestParam(name = "userName") String userName,
-            HttpSession session,
-            Model model) {
+    @PostMapping("/registerSocialUser.do")
+    public String registerSocialUser(@RequestParam(name = "userName") String userName, HttpSession session, Model model) {
         logger.info("registerSocialUser.do: Registering new social user, userName = {}", userName);
         try {
             String socialId = (String) session.getAttribute("socialId");
@@ -610,7 +739,6 @@ public class UserController {
                 return "user/login";
             }
 
-            // 사용자 정보 설정
             User newUser = new User();
             String prefix = loginType == 3 ? "google_" : loginType == 4 ? "naver_" : "kakao_";
             String baseId = prefix + socialId.substring(0, Math.min(10, socialId.length()));
@@ -627,14 +755,16 @@ public class UserController {
             newUser.setUserAuthority("1");
             newUser.setEmailVerification("Y");
 
-            // 사용자 등록
+            // 랜덤 비밀번호 생성 및 암호화
+            String randomPassword = generateRandomPassword();
+            newUser.setUserPwd(bcryptPasswordEncoder.encode(randomPassword));
+            logger.debug("registerSocialUser.do: Generated random password for userId = {}", userId);
+
             userservice.registerUser(newUser);
             logger.info("registerSocialUser.do: New social user registered, userId = {}", newUser.getUserId());
 
-            // 세션에 로그인 정보 저장
             session.setAttribute("loginUser", newUser);
 
-            // 세션 정리
             session.removeAttribute("socialId");
             session.removeAttribute("socialEmail");
             session.removeAttribute("socialName");
@@ -647,6 +777,59 @@ public class UserController {
             return "user/registerSocialUser";
         }
     }
+
+    @RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> checkPassword(@RequestBody Map<String, String> data, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                logger.warn("checkPassword.do: No user in session");
+                response.put("success", false);
+                response.put("message", "로그인이 필요합니다.");
+                return response;
+            }
+
+            if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+                logger.info("checkPassword.do: Social login user (type={}) cannot change password", loginUser.getUserLoginType());
+                response.put("success", false);
+                response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+                return response;
+            }
+
+            String currentPassword = loginUser.getUserPwd();
+            if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
+                logger.error("checkPassword.do: Invalid or missing password hash for userId={}", loginUser.getUserId());
+                response.put("success", false);
+                response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
+                return response;
+            }
+
+            String newPassword = data.get("password");
+            logger.debug("checkPassword.do: Checking password for userId={}, input length={}", 
+                        loginUser.getUserId(), newPassword != null ? newPassword.length() : 0);
+
+            if (newPassword == null || newPassword.isEmpty()) {
+                response.put("success", true);
+                response.put("isSame", false);
+                response.put("message", "");
+                return response;
+            }
+
+            boolean isSame = bcryptPasswordEncoder.matches(newPassword, currentPassword);
+            response.put("success", true);
+            response.put("isSame", isSame);
+            response.put("message", isSame ? "새 비밀번호는 현재 비밀번호와 달라야 합니다." : "");
+            logger.debug("checkPassword.do: Password comparison result: isSame={}", isSame);
+        } catch (Exception e) {
+            logger.error("checkPassword.do: Error checking password", e);
+            response.put("success", false);
+            response.put("message", "비밀번호 확인 중 오류: " + e.getMessage());
+        }
+        return response;
+    }
+
     @RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
@@ -654,15 +837,52 @@ public class UserController {
         try {
             User loginUser = (User) session.getAttribute("loginUser");
             if (loginUser == null) {
+                logger.warn("updateUserProfile.do: No user in session");
                 response.put("success", false);
                 response.put("message", "로그인이 필요합니다.");
                 return response;
             }
-            userData.put("userId", loginUser.getUserId()); // 현재 로그인한 사용자의 ID 추가
-            userservice.updateUserProfile(userData); // 서비스 호출
-            // 세션 업데이트
+
+            if (userData.get("password") != null && !userData.get("password").toString().isEmpty() && 
+                Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+                logger.info("updateUserProfile.do: Social login user (type={}) cannot change password", 
+                           loginUser.getUserLoginType());
+                response.put("success", false);
+                response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+                return response;
+            }
+
+            if (userData.get("password") != null && !userData.get("password").toString().isEmpty()) {
+                String currentPassword = loginUser.getUserPwd();
+                if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
+                    logger.error("updateUserProfile.do: Invalid or missing password hash for userId={}", 
+                                loginUser.getUserId());
+                    response.put("success", false);
+                    response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
+                    return response;
+                }
+
+                if (bcryptPasswordEncoder.matches(userData.get("password").toString(), currentPassword)) {
+                    logger.debug("updateUserProfile.do: New password matches current password for userId={}", 
+                                loginUser.getUserId());
+                    response.put("success", false);
+                    response.put("message", "새 비밀번호는 현재 비밀번호와 달라야 합니다.");
+                    return response;
+                }
+                userData.put("password", bcryptPasswordEncoder.encode(userData.get("password").toString()));
+                logger.debug("updateUserProfile.do: Password encrypted for userId={}", loginUser.getUserId());
+            }
+
+            userData.put("userId", loginUser.getUserId());
+            logger.debug("updateUserProfile.do: Updating profile for userId={}, data={}", 
+                        loginUser.getUserId(), userData);
+
+            userservice.updateUserProfile(userData);
+
             User updatedUser = userservice.selectUser(loginUser);
             session.setAttribute("loginUser", updatedUser);
+            logger.info("updateUserProfile.do: Profile updated successfully for userId={}", loginUser.getUserId());
+
             response.put("success", true);
             response.put("message", "업데이트 성공");
         } catch (Exception e) {
@@ -672,10 +892,110 @@ public class UserController {
         }
         return response;
     }
+
     @RequestMapping("myPage.do")
-    public String movemyPage() {
-        logger.info("movemyPage: Displaying myPage");
+    public String moveMyPage() {
+        logger.info("moveMyPage: Displaying myPage");
         return "user/myPage";
     }
 
+    @RequestMapping("changeManage.do")
+    public String changeManage(HttpSession session) {
+        logger.info("changeManage: Displaying changeManage page");
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+            logger.warn("changeManage: Unauthorized access attempt by userId={}", 
+                        loginUser != null ? loginUser.getUserId() : "null");
+            return "redirect:/loginPage.do";
+        }
+        return "user/changeManage";
+    }
+
+    @RequestMapping(value = "checkMaUser.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+                logger.warn("checkMaUser.do: Unauthorized access attempt by userId={}", 
+                            loginUser != null ? loginUser.getUserId() : "null");
+                response.put("success", false);
+                response.put("message", "관리자 권한이 필요합니다.");
+                return response;
+            }
+
+            String userId = data.get("userId");
+            logger.info("checkMaUser.do: Checking userId={}", userId);
+            if (userId == null || userId.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "유저 ID를 입력해주세요.");
+                return response;
+            }
+
+            User user = userservice.selectUserById(userId.trim());
+            if (user != null) {
+                response.put("success", true);
+                response.put("exists", true);
+                response.put("message", "존재하는 유저입니다.");
+                response.put("userId", user.getUserId());
+                response.put("currentAuthority", user.getUserAuthority());
+                logger.debug("checkMaUser.do: User found, userId={}, authority={}", 
+                            user.getUserId(), user.getUserAuthority());
+            } else {
+                response.put("success", true);
+                response.put("exists", false);
+                response.put("message", "존재하지 않는 유저입니다.");
+                logger.debug("checkMaUser.do: User not found, userId={}", userId);
+            }
+        } catch (Exception e) {
+            logger.error("checkMaUser.do: Error checking user", e);
+            response.put("success", false);
+            response.put("message", "유저 확인 중 오류: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "updateAuthority.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updateAuthority(@RequestBody Map<String, Object> data, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+                logger.warn("updateAuthority.do: Unauthorized access attempt by userId={}", 
+                            loginUser != null ? loginUser.getUserId() : "null");
+                response.put("success", false);
+                response.put("message", "관리자 권한이 필요합니다.");
+                return response;
+            }
+
+            String userId = (String) data.get("userId");
+            String authority = data.get("authority").toString();
+            logger.info("updateAuthority.do: Updating userId={}, authority={}", userId, authority);
+            if (userId == null || userId.trim().isEmpty() || authority == null || (!"1".equals(authority) && !"2".equals(authority))) {
+                response.put("success", false);
+                response.put("message", "유효하지 않은 입력입니다.");
+                return response;
+            }
+
+            User user = userservice.selectUserById(userId.trim());
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "존재하지 않는 유저입니다.");
+                return response;
+            }
+
+            userservice.updateUserAuthority(userId, authority);
+            logger.info("updateAuthority.do: Authority updated for userId={}, newAuthority={}", 
+                        userId, authority);
+            response.put("success", true);
+            response.put("message", "권한이 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            logger.error("updateAuthority.do: Error updating authority", e);
+            response.put("success", false);
+            response.put("message", "권한 변경 중 오류: " + e.getMessage());
+        }
+        return response;
+    }
 }

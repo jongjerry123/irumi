@@ -2,6 +2,8 @@ package com.project.irumi.chatbot.manager;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +12,9 @@ import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateSsChat;
+import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.service.ChatbotService;
 
 @Component
 public class SsChatManager {
@@ -24,6 +28,12 @@ public class SsChatManager {
 	@Autowired
 	private ConvSessionManager convManager;
 	
+	@Autowired
+	private ChatbotService chatbotService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
+
+	
 	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
 		// TODO Auto-generated method stub
 		return null;
@@ -34,21 +44,98 @@ public class SsChatManager {
 	
 
 	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+
+		ChatMsg botChatMsg = new ChatMsg();
+
+		// 보내온 유저의 메세지 tb에 저장
+		ChatMsg userChatMsg = new ChatMsg();
+		userChatMsg.setConvId(session.getConvId());
+		botChatMsg.setConvId(session.getConvId());
+		userChatMsg.setConvTopic(session.getTopic());
+		botChatMsg.setConvTopic(session.getTopic());
+		switch (session.getTopic()) {
+		case "job":
+			userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		case "spec":
+			userChatMsg.setConvSubTopicJobId(session.getSubtopicId());
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		case "ss":
+			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		case "act":
+			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		default: // topic 없으면
+			return new ChatbotResponseDto("현재 세션 토픽 정보가 없습니다.", null);
+
+		}
+		userChatMsg.setMsgContent(userMsg);
+
+		userChatMsg.setRole("USER");
+		botChatMsg.setRole("BOT");
+
+		userChatMsg.setUserId(session.getUserId());
+		botChatMsg.setUserId(session.getUserId());
+
+		
 	    StateSsChat state = (StateSsChat) session.getChatState();
-	    if (state == null) state = StateSsChat.START;
+	    if (state == null) {
+	    	session.setChatState(StateSsChat.SERP_SEARCH); 
+	    }
 
 	    switch (state) {
-	        case START:
-	            session.setChatState(StateSsChat.SERP_SEARCH);
-	            return new ChatbotResponseDto("어떤 시험 일정이 궁금하신가요? (예: 정보처리기사 정보처리기능사)");
 
 	        case SERP_SEARCH:
+	        	
 	            if (userMsg != null && !userMsg.isBlank()) {
 	            boolean isMeaningful = isSpecRelatedInput(userMsg);
 	            
+	            String initMsg = """
+	    	            이곳은 일정 찾기 세션입니다.
+	    	            어떤 시험 일정이 궁금하신가요? 알고 싶으신 시험의 명칭을 입력해주세요!
+	    	            (예: 정보처리기사 정보처리기능사)
+	    	            """;
+
+	    	        ChatMsg botMsg = new ChatMsg();
+	    	        botMsg.setConvId(session.getConvId());
+	    	        botMsg.setConvTopic(session.getTopic());
+	    	        botMsg.setConvSubTopicSpecId(session.getSubtopicId());
+	    	        botMsg.setUserId(session.getUserId());
+	    	        botMsg.setRole("BOT");
+	    	        botMsg.setMsgContent(initMsg);
+
+	    	        chatbotService.insertChatMsg(botMsg); 
+	            
 	            if(isMeaningful) {
 	            	// SerpAPI 호출
+	            	ChatMsg Umsg = new ChatMsg();
+	            	Umsg.setConvId(session.getConvId());
+	            	Umsg.setConvTopic(session.getTopic());
+	            	Umsg.setConvSubTopicSpecId(session.getSubtopicId()); // 필요 시 맞춰 수정
+	            	Umsg.setUserId(session.getUserId());
+	            	Umsg.setRole("USER");
+	            	Umsg.setMsgContent(userMsg);
+
+	            	chatbotService.insertChatMsg(Umsg);
+
+	           	            	
 	                String serpResult = serpApiService.searchExamSchedule(userMsg);
+	                ChatMsg serpMsg = new ChatMsg();
+	                
+	                serpMsg.setConvId(session.getConvId());
+	                serpMsg.setConvTopic(session.getTopic());
+	                serpMsg.setConvSubTopicSpecId(session.getSubtopicId());
+	                serpMsg.setUserId(session.getUserId());
+	                serpMsg.setRole("BOT");
+	                serpMsg.setMsgContent(serpResult);
+
+	                chatbotService.insertChatMsg(serpMsg);
+	                
 	                session.setChatState(StateSsChat.ASK_WANT_MORE);
 	                return new ChatbotResponseDto(
 	                    serpResult,
@@ -56,7 +143,7 @@ public class SsChatManager {
 	                );
 	            } else {
 	            	session.setChatState(StateSsChat.SERP_SEARCH);
-	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 다시 입력해주세요. (예 : 정보처리기사 청보처리기능사)");
+	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 알고 싶으신 시험의 명칭을 입력해주세요! (예 : 정보처리기사 청보처리기능사)");
 	            }
 	            	
 	            } else {
@@ -65,9 +152,17 @@ public class SsChatManager {
 
 	        case ASK_WANT_MORE:
 	            if ("다른 시험 검색".equals(userMsg)) {
+	            	botChatMsg.setMsgContent("다른 시험 검색");
+					chatbotService.insertChatMsg(botChatMsg);
 	                session.setChatState(StateSsChat.SERP_SEARCH);
-	                return new ChatbotResponseDto("어떤 시험 일정이 궁금하신가요? (예: 정보처리기사 정보처리기능사)");
+	                botChatMsg.setMsgContent("어떤 시험 일정이 궁금하신가요? (예: 정보처리기사 정보처리기능사)");
+					chatbotService.insertChatMsg(botChatMsg);
+	                return new ChatbotResponseDto("어떤 시험 일정이 궁금하신가요? 알고 싶으신 시험의 명칭을 입력해주세요! (예: 정보처리기사 정보처리기능사)");
 	            } else {
+	            	botChatMsg.setMsgContent("종료");
+					chatbotService.insertChatMsg(botChatMsg);
+	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
+					chatbotService.insertChatMsg(botChatMsg);
 	            	convManager.endSession(session.getUserId());
 	                return new ChatbotResponseDto("이용해주셔서 감사합니다!");
 	            }
@@ -94,4 +189,4 @@ public class SsChatManager {
 
 }
 
-	
+

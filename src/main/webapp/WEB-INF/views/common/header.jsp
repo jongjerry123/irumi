@@ -126,7 +126,7 @@ function moveToMain() {
         <c:choose>
             <c:when test="${not empty sessionScope.loginUser}">
                 <c:if test="${sessionScope.loginUser.userAuthority == '2'}">
-                    <button onclick="location.href='adminPage.do'">관리자 기능</button>
+                    <button onclick="location.href='changeManage.do'">관리자 기능</button>
                 </c:if>
                 <c:if test="${sessionScope.loginUser.userAuthority == '1'}">
                     <button onclick="location.href='myPage.do'">마이페이지</button>
