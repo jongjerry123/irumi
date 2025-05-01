@@ -10,17 +10,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.project.irumi.chatbot.api.GptApiService;
+import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
+
 import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.context.StateJobChat;
 import com.project.irumi.chatbot.context.StateSpecChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.dashboard.model.service.DashboardService;
+
+
+
 
 @Component
 public class SpecChatManager {
     
     @Autowired
     private GptApiService gptApiService;
+    
+    @Autowired
+	private SerpApiService serpApiService;
+    
+    @Autowired
+    private DashboardService dashboardService;
     
     private static final Logger logger = LoggerFactory.getLogger(SpecChatManager.class);
 
@@ -49,7 +61,26 @@ public class SpecChatManager {
 
             case OPT_SPEC_TYPE:
             	session.addToContextHistory("유저가 관심 있는 스펙 타입: " + userMsg);
-            	String specType = userMsg.trim(); // 수정 -- 스펙 타입 저장 (gpt 가 스펙 타입 무시해서 제대로 알아듣게 필드생성)
+
+            	
+            	// 유저 응답에 따라 관련 스펙 리스트 검색
+            	
+            	// 현재 타겟 직업은 job service에서 selectOneJob 개발시 설정
+            	//String targetJob = session.getSubtopicId();
+            	String targetJob = "소프트웨어 개발자";
+            	String serpQuery = targetJob+ "되기 위해 필요한 " +userMsg + "리스트";
+                String serpResult = serpApiService.searchJobSpec(serpQuery);
+            	
+                String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저가 [소프트웨어 개발자]직무에 지원할 때 이력으로 적으면 좋을 만한 스펙들을 3개 추천해 줘."
+                																				+ "유저가 이미 보유한 스펙과 이미 저장한 스펙은 제외해 줘."
+                																				+ "한 줄에 1개씩 출력해줘, "
+                																				+"스펙명: 어떠한 능력을 보는 어떤 특징을 가진 스펙인지 간단히 설명하는 형태로."+
+                																				String.join(" ", session.getContextHistory())+
+                																				"참고용 검색 결과: " + serpResult
+                																				// specific db 구현 후 
+                																				//+"\n 유저가 저장한 스펙 리스트: "+ String.join(" ", dashboardService. )
+                																				);
+            String specType = userMsg.trim(); // 수정 -- 스펙 타입 저장 (gpt 가 스펙 타입 무시해서 제대로 알아듣게 필드생성)
             	
             	
             	String gotSpec = session.getGettedSpec(); /// 수정 -- 이미 갖고 있는 스펙 가져오기
@@ -78,8 +109,8 @@ public class SpecChatManager {
 						개인 포트폴리오 - 실제로 개발한 프로젝트로 실무 능력을 보여줄 수 있습니다.
 						공모전 수상 - 문제 해결력과 창의성을 평가받을 수 있는 활동입니다.
 						""".formatted(specType, specText, String.join(" ", session.getContextHistory()));
-
-            			String gptAnswer = gptApiService.callGPT(prompt);
+              
+            //String gptAnswer = gptApiService.callGPT(prompt);
 
             	
             	List<String> specList = Arrays.stream(gptAnswer.split("\n"))
@@ -93,7 +124,7 @@ public class SpecChatManager {
             case ASK_WANT_MORE_OPT:
                 if ("네".equals(userMsg)) {
                     session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC); // 루프 예시
-                    return new ChatbotResponseDto("그럼 다시 현재 가지고 있는 스펙이나 경험을 알려주세요.", null);
+                    return new ChatbotResponseDto("그렇다면 다시 현재 보유한 스펙이나 경험을 말해주세요", null);
                 } else {
                     session.setChatState(StateSpecChat.COMPLETE);
                     return new ChatbotResponseDto("추천을 완료했습니다. 준비 잘하시길 응원합니다!", null);

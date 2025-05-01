@@ -1,5 +1,7 @@
 package com.project.irumi.chatbot.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -21,6 +23,8 @@ import com.project.irumi.chatbot.manager.SpecChatManager;
 import com.project.irumi.chatbot.manager.SsChatManager;
 import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.dashboard.model.dto.Job;
+import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,6 +44,9 @@ public class ChatbotController {
 		// 추가
 		@Autowired
 		private GptApiService gptApiService;
+		
+		@Autowired
+		private DashboardService dashboardService;
 
 		
 	@Autowired
@@ -72,18 +79,19 @@ public class ChatbotController {
 		return "chatbot/schedule";
 	}
 
-	// 유저가 탭 내에서 대화 시작하기 버튼 누른 경우 ===========================
+	// 유저가 탭 보여주는 경우 ===========================
 	// 세션매니저 관리 시작 (tab 유형에 따라 현재 로그인한 유저가 진행중인 session 정보)
 	@RequestMapping(value = "startChatSession.do", method = RequestMethod.POST)
 	@ResponseBody
-	public void startChatSession(
+	public List<Job> startChatSession(
 			@RequestParam("topic") String topic, 
 			HttpSession loginSession) {
 		
 		String userId = (String) loginSession.getAttribute("userId");
 		ConvSession session = convManager.createNewSession(userId, topic);
 		
-		
+		ArrayList<Job> userJobs = dashboardService.selectUserJobs(userId);
+		return userJobs;
 	}
 
 	// 대화 시작하고 서브 토픽 설정 클릭 ===========================

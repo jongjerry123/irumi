@@ -1,6 +1,7 @@
 package com.project.irumi.chatbot.model.dto;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class ChatMsg implements java.io.Serializable {
 
@@ -54,10 +55,10 @@ public class ChatMsg implements java.io.Serializable {
 	public void setMsgContent(String msgContent) {
 		this.msgContent = msgContent;
 	}
-	public Date getMsgTime() {
+	public Timestamp getMsgTime() {
 		return msgTime;
 	}
-	public void setMsgTime(Date msgTime) {
+	public void setMsgTime(Timestamp msgTime) {
 		this.msgTime = msgTime;
 	}
 	public static long getSerialversionuid() {
@@ -70,7 +71,7 @@ public class ChatMsg implements java.io.Serializable {
 	private String convSubTopicSpecId;
 	private String role;
 	private String msgContent;
-	private Date msgTime;
+	private Timestamp msgTime;
 	
 	
 	
