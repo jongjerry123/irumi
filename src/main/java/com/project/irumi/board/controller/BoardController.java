@@ -332,28 +332,34 @@ public class BoardController {
 
 	// 불량 이용자 등록
 	@PostMapping("/registerBadUsers.do")
-	public String registerBadUsers(@RequestParam("selectedPosts") List<Long> postIds,
-			@RequestParam("reason") String reason, HttpSession session) {
+	public void registerBadUsers(@RequestParam("selectedPosts") List<Long> postIds,
+			@RequestParam("reason") String reason, HttpSession session, HttpServletResponse response)
+			throws IOException {
 		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null)
-			return "redirect:/loginPage.do";
 
-		String reportedBy = loginUser.getUserId();
-		postService.registerBadUsersFromPosts(postIds, reason, reportedBy);
-		return "redirect:/reportedPosts.do";
+		try {
+			postService.registerBadUsersFromPosts(postIds, reason, loginUser.getUserId());
+			response.sendRedirect("reportedPosts.do");
+		} catch (IllegalStateException e) {
+			response.setContentType("text/html; charset=UTF-8");
+			response.getWriter().write("<script>alert('" + e.getMessage() + "'); history.back();</script>");
+		}
 	}
 
 	// ✅ 댓글 작성자 불량 등록
 	@PostMapping("/registerBadUsersFromComments.do")
-	public String registerBadUsersFromComments(@RequestParam("selectedComments") List<Long> commentIds,
-			@RequestParam("reason") String reason, HttpSession session) {
+	public void registerBadUsersFromComments(@RequestParam("selectedComments") List<Long> commentIds,
+			@RequestParam("reason") String reason, HttpSession session, HttpServletResponse response)
+			throws IOException {
 		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null)
-			return "redirect:/loginPage.do";
 
-		String reportedBy = loginUser.getUserId();
-		postService.registerBadUsersFromComments(commentIds, reason, reportedBy);
-		return "redirect:/reportedComments.do";
+		try {
+			postService.registerBadUsersFromComments(commentIds, reason, loginUser.getUserId());
+			response.sendRedirect("reportedComments.do");
+		} catch (IllegalStateException e) {
+			response.setContentType("text/html; charset=UTF-8");
+			response.getWriter().write("<script>alert('" + e.getMessage() + "'); history.back();</script>");
+		}
 	}
 
 	@PostMapping("/restoreBadUsers.do")
