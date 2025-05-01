@@ -77,6 +77,22 @@ $(function() {
 	      // ✕ 삭제 버튼
 	      const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
 	        $card.remove(); // 클릭 시 카드 삭제
+	        
+	        // 삭제 클릭시 DB에서도 삭제되게 함
+	        // Dashboard Service 구현 후
+	        $.ajax({
+	            type: "POST",
+	            url: "/irumi/deleteSavedOption.do",
+	            contentType: "application/json",
+	            data: JSON.stringify(jobCI),  // jobCI는 현재 카드에 해당하는 CareerItemDto 객체
+	            success: function () {
+	              console.log("DB에서 항목 삭제 성공:", jobCI.title);
+	            },
+	            error: function () {
+	              console.error("DB에서 항목 삭제 실패:", jobCI.title);
+	            }
+	          });
+	        
 	      });
 
 	      // 직무명 텍스트만 표시

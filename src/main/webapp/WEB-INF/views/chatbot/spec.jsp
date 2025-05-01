@@ -456,6 +456,41 @@ function moveActPage() { location.href = 'viewActRecChat.do'; }
 
 <script>
 $(function() {
+	// document ready시 바로 startChatSession
+	$.ajax({
+        type: "POST",
+        url: "startChatSession.do",
+        data: { topic: "spec" }, // 필요 시 동적으로 변경
+        success: function (sessionTopicOpts) {
+            const $jobBtnList = $(".select-job-btn-list");
+            $jobBtnList.empty();
+            if (sessionTopicOpts.jobList && sessionTopicOpts.jobList.length > 0) {
+            	sessionTopicOpts.jobList.forEach((job, index) => {
+                    const btn = $("<button>")
+                        .addClass("select-btn")
+                        .toggleClass("active", index === 0)
+                        .text(job.jobName);
+                    $jobBtnList.append(btn);
+                });
+            }
+
+            const $specBtnList = $(".select-spec-btn-list");
+            $specBtnList.empty();
+            if (sessionTopicOpts.specList && sessionTopicOpts.specList.length > 0) {
+            	sessionTopicOpts.specList.forEach((spec, index) => {
+                    const btn = $("<button>")
+                        .addClass("select-btn")
+                        .toggleClass("active", index === 0)
+                        .text(spec.title); // 예시
+                    $specBtnList.append(btn);
+                });
+            }
+        },
+        error: function () {
+            alert("사용자 정보를 불러오지 못했습니다.");
+        }
+    });
+
     function sendMessage(message) {
         addMessageToChat(message, "user-msg");
 
@@ -484,30 +519,7 @@ $(function() {
             error: function() {
                 addMessageToChat("서버 오류 또는 JSON 파싱 실패!", "bot-msg");
             }
-        });// sendMessageToChatbot.do
-        $(document).ready(function () {
-            $.ajax({
-              type: "POST",
-              url: "startChatSession.do",
-              data: { topic: "spec" }, // 필요 시 동적으로 변경
-              success: function (jobList) {
-                const $btnList = $(".select-btn-list");
-                $btnList.empty(); // 기존 버튼 제거
-
-                jobList.forEach((job, index) => {
-                  const btn = $("<button>")
-                    .addClass("select-btn")
-                    .toggleClass("active", index === 0) // 버튼이 리스트 첫 번째인 경우 .active 추가
-                    .text(job.jobName); // 또는 job.name, 필드명 확인
-                  $btnList.append(btn);
-                });
-              },
-              error: function () {
-                alert("직무 정보를 불러오지 못했습니다.");
-              }
-            });
-          });
-        
+        });// sendMessageToChatbot.do   
     }
 
     function addToSpecList(specs) {
@@ -523,6 +535,7 @@ $(function() {
         });
     }
 
+    //대화중 스펙 버튼을 출력하는 함수
     function renderCheckboxList(options) {
         removeCheckboxList();
         const $chatArea = $("#chatArea");
@@ -551,6 +564,7 @@ $(function() {
         $chatArea.append($listWrap);
     }
 
+    //대화 중 대화 옵션 선택하는 함수
     function renderOptionButtons(options) {
         removeOptionButtons();
         const $chatArea = $("#chatArea");
@@ -566,6 +580,7 @@ $(function() {
         $chatArea.append($btnWrap);
     }
 
+    //키보드 엔터시 메세지 보내게 설정
     $("#userInput").on("keyup", function(event) {
         if (event.key === "Enter") {
             const val = $(this).val().trim();
@@ -575,7 +590,7 @@ $(function() {
             }
         }
     });
-
+	//send 버튼 클릭시 메세지 보내게 설정
     $(".chat-send-btn").on("click", function() {
         const $input = $("#userInput");
         const val = $input.val().trim();
@@ -584,7 +599,7 @@ $(function() {
             $input.val("");
         }
     });
-
+	// + 버튼 클릭시 직접 입력한 스펙 보내게 설정
     $(".add-btn").on("click", function() {
         const $input = $(".manual-input");
         const val = $input.val().trim();
@@ -595,17 +610,19 @@ $(function() {
             alert("스펙을 입력해 주세요!");
         }
     });
-
+	// 입력한 메세지를 채팅창 말풍선으로 추가
     function addMessageToChat(message, cls) {
         const $chatArea = $("#chatArea");
         const $div = $("<div>").addClass("message " + cls).text(message);
         $chatArea.append($div);
     }
-
+	
+	//이전 선택 체크박스 사라지게 함
     function removeCheckboxList() {
         $("#checkbox-list").remove();
     }
 
+	// 이전 선택 옵션들 사라지게 함
     function removeOptionButtons() {
         $("#option-buttons").remove();
     }
@@ -637,9 +654,12 @@ $(function() {
 				<div class="select-bar">
 					<div class="select-group">
 						<span class="select-label">스펙 대상 직무 선택</span>
-						<div class="select-btn-list">
-							<button class="select-btn active">프론트엔드 개발자</button>
-							<button class="select-btn">백엔드 개발자</button>
+						<div class="select-job-btn-list">
+							<!-- <button class="select-btn active">프론트엔드 개발자</button>
+							<button class="select-btn">백엔드 개발자</button> -->
+						</div>
+						<!--  스펙 페이지에는 필요없지만 넣어봄 -->
+						<div class="select-spec-btn-list">
 						</div>
 					</div>
 					<div class="confirm-select-box">
