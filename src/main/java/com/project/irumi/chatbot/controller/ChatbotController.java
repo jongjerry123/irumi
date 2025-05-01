@@ -1,6 +1,7 @@
 package com.project.irumi.chatbot.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -94,40 +95,80 @@ public class ChatbotController {
 		ConvSession session = convManager.createNewSession(userId, topic);
 		
 		SessionTopicOpts sessionTopicOpts = new SessionTopicOpts();
+		
+		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
 		ArrayList<Spec> userSpecs;
 		
+		// CareerItemDto 리스트로 변환하여 저장
+	    List<CareerItemDto> jobCItemList = new ArrayList<>();
+	    List<CareerItemDto> specCItemList = new ArrayList<>();
+	    
 		switch (topic) {
 			case "job":
 				break;
 			case "spec":
 				 userJobs= dashboardService.selectUserJobs(userId);
-				sessionTopicOpts.setJobList(userJobs);
+				 for (Job job : userJobs) {
+		                CareerItemDto dto = new CareerItemDto();
+		                dto.setItemId(job.getJobId());
+		                dto.setTitle(job.getJobName());
+		                dto.setExplain(job.getJobExplain());
+		                dto.setType("job");
+		                jobCItemList.add(dto);
+		            }
+		            sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 				break;
+				
 			case "ss":
+				//job setting
 				userJobs = dashboardService.selectUserJobs(userId);
-				sessionTopicOpts.setJobList(userJobs);
+				 for (Job job : userJobs) {
+		                CareerItemDto dto = new CareerItemDto();
+		                dto.setItemId(job.getJobId());
+		                dto.setTitle(job.getJobName());
+		                dto.setExplain(job.getJobExplain());
+		                dto.setType("job");
+		                jobCItemList.add(dto);
+		            }
+		            sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+		        // spec setting
 				// 유저 직무 선택에 따라 sub 주제 세팅
 				//userSpecs = dashboardService.selectUserSpecs(...);
 				break;
 
 			case "act":
+				//job setting
 				userJobs = dashboardService.selectUserJobs(userId);
-				sessionTopicOpts.setJobList(userJobs);
-				// 유저 선택에 따라 sub 주제 세팅
+				 for (Job job : userJobs) {
+		                CareerItemDto dto = new CareerItemDto();
+		                dto.setItemId(job.getJobId());
+		                dto.setTitle(job.getJobName());
+		                dto.setExplain(job.getJobExplain());
+		                dto.setType("job");
+		                jobCItemList.add(dto);
+		            }
+		            sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+		        // spec setting
+				// 유저 직무 선택에 따라 sub 주제 세팅
 				//userSpecs = dashboardService.selectUserSpecs(...);
 				break;
 			default:
 					break;
 		}
+		//
 		return sessionTopicOpts;
 	}
 
 	// 대화 시작하고 서브 토픽 설정 클릭 ===========================
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
-	@RequestMapping(value = "setConvSubTopic.do", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "setConvSubTopic.do", 
+			method = RequestMethod.POST)
 	@ResponseBody
-	public void setConvSubTopic(@RequestBody CareerItemDto selectedItem, HttpSession loginSession) {
+	public void setConvSubTopic(
+			@RequestBody CareerItemDto selectedItem, 
+			HttpSession loginSession) {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
@@ -135,6 +176,8 @@ public class ChatbotController {
 
 		// 세션 sub 주제 설정
 		convManager.setConvSubTopic(session, selectedItem);
+		
+		logger.info("지정된 subtopic: "+ selectedItem.getTitle());
 	}
 
 	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우 // 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에

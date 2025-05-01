@@ -455,21 +455,31 @@ function moveActPage() { location.href = 'viewActRecChat.do'; }
 </script>
 
 <script>
+let cacheSessionJobOpts=null; // 서버에서 받아온 유저가 저장한 모든 직무CI 리스트
+let cacheSessionSpecOpts=null; // (스펙챗엔 필요 X)선택한 jobOpt에 따라 서버에서 가져올 내용 
+
+let subTopicJobCI= null; // subtopic 지정 위해 서버로 보낼 CI 객체;
+
 $(function() {
+	
 	// document ready시 바로 startChatSession
-	$.ajax({
+	 // topic 선택용 영역에 서버에서 받은리스트 출력
+	 // 서버는 jobList와  specList를 보냄.(리스트 내부 객체는 모두 CI .)
+	$.ajax({ 
         type: "POST",
         url: "startChatSession.do",
         data: { topic: "spec" }, // 필요 시 동적으로 변경
         success: function (sessionTopicOpts) {
+        	// 유저가 저장한 직무들 전체 프론트에 가지고 있기 위함
+        	cacheSessionJobOpts = sessionTopicOpts.jobList; 
             const $jobBtnList = $(".select-job-btn-list");
             $jobBtnList.empty();
             if (sessionTopicOpts.jobList && sessionTopicOpts.jobList.length > 0) {
-            	sessionTopicOpts.jobList.forEach((job, index) => {
+            	sessionTopicOpts.jobList.forEach((jobCI, index) => {
                     const btn = $("<button>")
                         .addClass("select-btn")
                         .toggleClass("active", index === 0)
-                        .text(job.jobName);
+                        .text(jobCI.title);
                     $jobBtnList.append(btn);
                 });
             }
@@ -477,11 +487,11 @@ $(function() {
             const $specBtnList = $(".select-spec-btn-list");
             $specBtnList.empty();
             if (sessionTopicOpts.specList && sessionTopicOpts.specList.length > 0) {
-            	sessionTopicOpts.specList.forEach((spec, index) => {
+            	sessionTopicOpts.specList.forEach((specCI, index) => {
                     const btn = $("<button>")
                         .addClass("select-btn")
                         .toggleClass("active", index === 0)
-                        .text(spec.title); // 예시
+                        .text(specCI.title); // 예시
                     $specBtnList.append(btn);
                 });
             }
@@ -490,7 +500,54 @@ $(function() {
             alert("사용자 정보를 불러오지 못했습니다.");
         }
     });
+	
+	// 선택 버튼 클릭 시 .active 클래스 부여 (하나만 선택되게)
+	// active된 객체를 저장함.
+	$(document).on("click", ".select-btn", function () {
+	    $(this).siblings().removeClass("active");
+	    $(this).addClass("active");
+	    const clickedJobName = $(this).text();
+	    
+	    //서버에서 받아왔던 cacheSessionJobOpts 중에서
+	    // 선택된 Job에 해당하는 Career Item 객체를 서버로 보내기 위해 저장.
+	    subTopicJobCI = cacheSessionJobOpts.find(jobCI => jobCI.title === clickedJobName);
+	    
+/* 	    //서버에 CI 형태로 보내기 위해 변환 작업
+	    subTopicCareerItem = {
+	    	    title: job.jobName,
+	    	    explain: job.jobExplain,
+	    	    type: "job"
+	    	}; */
+	});
+	
+	// 토픽 선택 후 '선택 완료' 버튼 클릭시 setSubTopic
+	// spec 은 선택한 job을 sub topic으로 하면 됨.
+	// ss, act 는 최종으로 선택된 spec을 sub topic으로 설정해야 함.
+	//subTopicJobCI을 보내면 됨.
+	
+	const $confirmSelectBtn = $(".confirm-select-btn");
+	$confirmSelectBtn.on("click", function(){
+		
 
+	    // 선택된 항목이 있으면 서버에 전송
+	    if (subTopicJobCI && subTopicJobCI.title) {
+	        $.ajax({
+	            type: "POST",
+	            url: "setConvSubTopic.do",
+	            data: JSON.stringify(subTopicJobCI),
+	            contentType: "application/json",
+	            success: function () {
+	                console.log("sub topic 설정 완료:", subTopicJobCI.title);
+	            },
+	            error: function () {
+	                alert("서브 토픽 설정에 실패했습니다.");
+	            }
+	        });
+	    } else {
+	        alert("선택된 항목이 없습니다.");
+	    }
+	});
+	
     function sendMessage(message) {
         addMessageToChat(message, "user-msg");
 
@@ -522,6 +579,7 @@ $(function() {
         });// sendMessageToChatbot.do   
     }
 
+    //sidebar
     function addToSpecList(specs) {
         const $specList = $(".saved-spec-list");
         $.each(specs, function(_, spec) {
@@ -537,14 +595,15 @@ $(function() {
 
     //대화중 스펙 버튼을 출력하는 함수
     function renderCheckboxList(options) {
+    	console.log(options);
         removeCheckboxList();
         const $chatArea = $("#chatArea");
         const $listWrap = $("<div>").addClass("custom-checkbox-list").attr("id", "checkbox-list");
 
         $.each(options, function(_, opt) {
             const $label = $("<label>").addClass("custom-checkbox");
-            const $input = $("<input>").attr({ type: "checkbox", value: opt });
-            const $textSpan = $("<span>").addClass("checkbox-text").text(opt);
+            const $input = $("<input>").attr({ type: "checkbox", value: opt.title });
+            const $textSpan = $("<span>").addClass("checkbox-text").text(opt.title);
             const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
             $label.append($input, $textSpan, $checkMark);
             $listWrap.append($label);
