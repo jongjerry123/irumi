@@ -1,9 +1,11 @@
 package com.project.irumi.chatbot.manager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,11 @@ import org.springframework.stereotype.Component;
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateJobChat;
+import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
-import com.project.irumi.chatbot.context.StateSsChat;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.service.ChatbotService;
+import com.project.irumi.dashboard.model.dto.Job;
 
 @Component
 public class JobChatManager {
@@ -120,18 +123,61 @@ public class JobChatManager {
 				if(isMeaningful) {
 					session.addToContextHistory("유저는 다음과 같은 업계를 선호함: "+userMsg);
 					
-	                String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저에게 추천할 만한 직무들을 3개 추천해 줘. 한 줄에 1개씩 출력해줘. "
-	                		+ "그리고 각 직무는  직무명 - 간단한 설명  형식으로 출력해줘"+
-	                																				String.join(" ", session.getContextHistory()));
+	                String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저에게 추천할 만한 직무를 3개 추천해줘.  \r\n"
+	                		+ "아래 형식의 JSON **배열**로만 응답해. 숫자, 설명, 다른 텍스트는 절대 포함하지 마.  \r\n"
+	                		+ "각 직무는 다음과 같은 속성을 가져야 해:\r\n"
+	                		+ "- jobName (직무 이름)\r\n"
+	                		+ "- jobExplain (간단한 설명)\r\n"
+	                		+ "\r\n"
+	                		+ "다음은 예시 형식이다:\r\n"
+	                		+ "\r\n"
+	                		+ "[\r\n"
+	                		+ "  {\r\n"
+	                		+ "    \"jobName\": \"데이터 분석가\",\r\n"
+	                		+ "    \"jobExplain\": \"데이터 기반 의사결정을 지원하는 직무\"\r\n"
+	                		+ "  },\r\n"
+	                		+ "  {\r\n"
+	                		+ "    \"jobName\": \"프론트엔드 개발자\",\r\n"
+	                		+ "    \"jobExplain\": \"사용자 인터페이스를 개발하는 직무\"\r\n"
+	                		+ "  }\r\n"
+	                		+ "]"
+	                		+ "    응답에 참고할 정보: " +String.join(" ", session.getContextHistory()));
 	                
+	                logger.info("gpt JSON 응답?:" + gptAnswer);
+	                //GPT 응답을 CareerItem DTO 리스트로 변환
+	                List<CareerItemDto> jobCIList = new ArrayList<>();
 	                
-	                List<String> jobList = Arrays.stream(gptAnswer.split("\n"))
-	                        .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
-	                        .collect(Collectors.toList());
+	                try {
+	                    // GPT 응답을 JSON 배열로 파싱
+	                    JSONArray jsonArray = new JSONArray(gptAnswer);
+
+	                    // JSON 배열에서 각 객체를 Job 객체로 변환
+	                    for (int i = 0; i < jsonArray.length(); i++) {
+	                        JSONObject jobJson = jsonArray.getJSONObject(i);
+	                        String jobName = jobJson.getString("jobName");
+	                        String jobExplain = jobJson.getString("jobExplain");
+	                   
+//	                        Job job = new Job();
+//	                        job.setJobName(jobName);
+//	                        job.setJobExplain(jobExplain);
+//	                        jobList.add(job); // Job 객체 리스트에 추가
+	                        
+	                        CareerItemDto careerItem = new CareerItemDto();
+	                        careerItem.setTitle(jobName);
+	                        careerItem.setExplain(jobExplain);
+	                        careerItem.setType("job");
+	                        jobCIList.add(careerItem);
+	                    }
+
+	                } catch (JSONException e) {
+	                    e.printStackTrace();  // JSON 파싱 오류 처리
+	                    return new ChatbotResponseDto("직무 추천 처리 중 오류가 발생했습니다.", null);
+	                }
 	                
+	               // 추천하는 직무를 선택하는 체크박스 리스트 보여주기
 	                session.setChatState(StateJobChat.ASK_WANT_MORE_OPT);
 					return new ChatbotResponseDto("더 많은 추천을 받아보고 싶으신가요?", 
-							jobList, List.of("네", "아니요"));
+							jobCIList, List.of("네", "아니요"));
 				} else {
 					session.setChatState(StateJobChat.ASK_WORK_CHARACTERISTIC);
 	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n"

@@ -11,16 +11,16 @@ package com.project.irumi.chatbot.model.dto;
 public class CareerItemDto {
 	 private String itemId;     // jobId, specId, actId, ssId 등 (선택적으로 사용)
 	    private String title;      // 화면에 표시할 이름
-	    private String content;    // 상세 내용, 설명 등
+	    private String explain;    // 상세 내용, 설명 등
 	    private String type;       // "job", "spec", "act", "ss"
 
 	    public CareerItemDto() {}
 
-	    public CareerItemDto(String itemId, String title, String content, String type) {
-	        this.itemId = itemId;
+	    public CareerItemDto(String itemId, String title, String content, String explain) {
+	        this.itemId = null;
 	        this.title = title;
-	        this.content = content;
-	        this.type = type;
+	        this.explain = explain;
+	        this.type = null;
 	    }
 
 	    // Getter & Setter
@@ -30,9 +30,14 @@ public class CareerItemDto {
 	    public String getTitle() { return title; }
 	    public void setTitle(String title) { this.title = title; }
 
-	    public String getContent() { return content; }
-	    public void setContent(String content) { this.content = content; }
 
-	    public String getType() { return type; }
+	    public String getExplain() {
+			return explain;
+		}
+		public void setExplain(String explain) {
+			this.explain = explain;
+		}
+
+		public String getType() { return type; }
 	    public void setType(String type) { this.type = type; }
 }

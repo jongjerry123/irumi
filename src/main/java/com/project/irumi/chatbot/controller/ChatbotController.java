@@ -24,6 +24,7 @@ import com.project.irumi.chatbot.manager.SsChatManager;
 import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.dashboard.model.dto.Job;
+import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
 
@@ -103,7 +104,9 @@ public class ChatbotController {
 			 @RequestBody CareerItemDto selectedItem,
 			HttpSession loginSession) 
 	{
-		String userId = (String) loginSession.getAttribute("userId");
+		User loginUser = (User) loginSession.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+		
 		ConvSession session = convManager.getSession(userId);
 		
 		//세션 sub 주제 설정
@@ -145,18 +148,36 @@ public class ChatbotController {
 	@RequestMapping(value = "insertCareerItem.do", 
 			method = RequestMethod.POST)
 	@ResponseBody
-	public CareerItemDto insertCareerItem(@RequestParam("itemId") String itemId,
+	public CareerItemDto insertCareerItem(
+											// @RequestParam("itemId") String itemId,
+											@RequestBody CareerItemDto insertedItem,
 	                                           HttpSession session) {
-	    String userId = (String) session.getAttribute("userId");
+		User loginUser = (User) session.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+		
 	    ConvSession convSession = convManager.getSession(userId);
 	    String topic = convSession.getTopic();
 	    
-	    //아래 토픽에 따라 manage, 
-	    CareerItemDto insertedItem = new CareerItemDto();
 
 	    switch (topic) {
 	        case "job":
-	          //  jobService.insertJob(insertedItem???); <-- job service 연계 필요
+	        	Job job = new Job();
+	        	
+	        	//insertedItem을 Job으로 전환
+	        	int jobId = dashboardService.selectMaxJobId() + 1;
+	        	job.setJobId(String.valueOf(jobId));
+	        	job.setJobName(insertedItem.getTitle());
+	        	job.setJobExplain(insertedItem.getExplain());
+	    		
+	        	//job table에 추가
+	    		dashboardService.insertJob(job);
+	    		
+	    		Specific specific = new Specific();
+	    		specific.setUserId(userId);
+	    		specific.setJobId(String.valueOf(jobId));
+	    		
+	    		// career plan 테이블에 추가
+	    		dashboardService.insertJobLink(specific);        	
 	            break;
 
 	        case "spec":
