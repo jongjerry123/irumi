@@ -88,8 +88,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public int selectMaxJobId() {
-		return dashboardDao.selectMaxJobId();
+	public int selectNextJobId() {
+		return dashboardDao.selectNextJobId();
 	}
 
 	@Override
@@ -103,18 +103,13 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public int deleteSpecLink(Specific specific) {
-		return dashboardDao.deleteSpecLink(specific);
-	}
-
-	@Override
 	public int deleteSpec(String specId) {
 		return dashboardDao.deleteSpec(specId);
 	}
 
 	@Override
-	public int selectMaxSpecId() {
-		return dashboardDao.selectMaxSpecId();
+	public int selectNextSpecId() {
+		return dashboardDao.selectNextSpecId();
 	}
 
 	@Override
@@ -132,6 +127,34 @@ public class DashboardServiceImpl implements DashboardService {
 		return dashboardDao.updateAccomplishSpecState(specId);
 	}
 
-	
+	@Override
+	public int selectNextActId() {
+		return dashboardDao.selectNextActId();
+	}
+
+	@Override
+	public int insertAct(Activity act) {
+		return dashboardDao.insertAct(act);
+	}
+
+	@Override
+	public int insertActLink(Specific specific) {
+		return dashboardDao.insertActLink(specific);
+	}
+
+	@Override
+	public int selectNextSsId() {
+		return dashboardDao.selectNextSsId();
+	}
+
+	@Override
+	public int insertSs(SpecSchedule ss) {
+		return dashboardDao.insertSs(ss);
+	}
+
+	@Override
+	public Spec selectSpec(String specId) {
+		return dashboardDao.selectSpec(specId);
+	}
 
 }

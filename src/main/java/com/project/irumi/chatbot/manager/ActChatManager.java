@@ -11,7 +11,9 @@ import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateActChat;
+import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.service.ChatbotService;
 
 @Component
 public class ActChatManager {
@@ -22,34 +24,100 @@ public class ActChatManager {
 	@Autowired
 	private ConvSessionManager convManager;
 	
+	@Autowired
+	private ChatbotService chatbotService;
+	
 	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+		ChatMsg botChatMsg = new ChatMsg();
+
+		// 보내온 유저의 메세지 tb에 저장
+		ChatMsg userChatMsg = new ChatMsg();
+		userChatMsg.setConvId(session.getConvId());
+		botChatMsg.setConvId(session.getConvId());
+		userChatMsg.setConvTopic(session.getTopic());
+		botChatMsg.setConvTopic(session.getTopic());
+		switch(session.getTopic()) {
+		case "job":
+				userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+				botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+				break;
+		case "spec":
+			userChatMsg.setConvSubTopicJobId(session.getSubtopicId());
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		case "ss":
+			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		case "act":
+			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+			break;
+		default: // topic 없으면 
+			return new ChatbotResponseDto("현재 세션 토픽 정보가 없습니다.", null);
+			
+		}		
+		userChatMsg.setMsgContent(userMsg);
+		
+		userChatMsg.setRole("USER");
+		botChatMsg.setRole("BOT");
+		
+		userChatMsg.setUserId(session.getUserId());
+		botChatMsg.setUserId(session.getUserId());
+		
+
+		
         StateActChat state = (StateActChat) session.getChatState();
-        if (state == null) state = StateActChat.START;
+        if (state == null) {
+        	state = StateActChat.INPUT_SPEC;
+        }
         String lastSpec = session.getLastTopic();
         String lastActivityType = (String) session.getLastActivityType();
         
 
         switch (state) {
-            case START:
-                session.setChatState(StateActChat.INPUT_SPEC);
-                return new ChatbotResponseDto(
-                    "어떤 스펙(분야/자격증 등)에 대한 활동을 추천받고 싶으신가요?"
-                );
-
             case INPUT_SPEC:
                 if (userMsg != null && !userMsg.isBlank()) {
                     boolean isMeaningful = isSpecRelatedInput(userMsg);
+                    String initMsg = """
+    	    	            이곳은 활동 찾기 세션입니다.
+    	    	            어떤 스펙(자격증/공모전 등) 에 대한 활동을 추천받고 싶으신가요?
+    	    	            """;
+
+    	    	        ChatMsg botMsg = new ChatMsg();
+    	    	        botMsg.setConvId(session.getConvId());
+    	    	        botMsg.setConvTopic(session.getTopic());
+    	    	        botMsg.setConvSubTopicSpecId(session.getSubtopicId());
+    	    	        botMsg.setUserId(session.getUserId());
+    	    	        botMsg.setRole("BOT");
+    	    	        botMsg.setMsgContent(initMsg);
+
+    	    	        chatbotService.insertChatMsg(botMsg); 
                     
                     if(isMeaningful) {
+                    	ChatMsg Umsg = new ChatMsg();
+    	            	Umsg.setConvId(session.getConvId());
+    	            	Umsg.setConvTopic(session.getTopic());
+    	            	Umsg.setConvSubTopicSpecId(session.getSubtopicId()); // 필요 시 맞춰 수정
+    	            	Umsg.setUserId(session.getUserId());
+    	            	Umsg.setRole("USER");
+    	            	Umsg.setMsgContent(userMsg);
+
+    	            	chatbotService.insertChatMsg(Umsg);
+    	            	
                     	session.setLastTopic(userMsg.trim());
                         session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
+                        
+                        String answer = "'" + userMsg + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
+                      botChatMsg.setMsgContent(answer);
+    					chatbotService.insertChatMsg(botChatMsg);
                         return new ChatbotResponseDto(
-                            "'" + userMsg + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?",
+                            answer,
                             List.of("도서 추천", "영상 추천", "기타 활동 추천")
                         );
                     } else {
@@ -64,9 +132,18 @@ public class ActChatManager {
                   }
                 	
                     
-
             case CHOOSE_ACTIVITY_TYPE:
                 // 버튼 또는 텍스트 입력 모두 허용
+            	ChatMsg Umsg = new ChatMsg();
+            	Umsg.setConvId(session.getConvId());
+            	Umsg.setConvTopic(session.getTopic());
+            	Umsg.setConvSubTopicSpecId(session.getSubtopicId()); // 필요 시 맞춰 수정
+            	Umsg.setUserId(session.getUserId());
+            	Umsg.setRole("USER");
+            	Umsg.setMsgContent(userMsg);
+
+            	chatbotService.insertChatMsg(Umsg);
+            	
                 String type = null;
                 if ("도서 추천".equals(userMsg)) type = "도서";
                 else if ("영상 추천".equals(userMsg)) type = "영상";
@@ -87,14 +164,20 @@ public class ActChatManager {
 
             case SHOW_MORE_OPTIONS:
                 if ("다른 유형".equals(userMsg)) {
+	            	botChatMsg.setMsgContent("다른 유형 검색");
+					chatbotService.insertChatMsg(botChatMsg);
                     session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                     return new ChatbotResponseDto(
                         "어떤 유형의 활동을 추천받으시겠어요?",
                         List.of("도서 추천", "영상 추천", "기타 활동 추천")
                     );
                 } else if ("종료".equals(userMsg)) {
+	            	botChatMsg.setMsgContent("종료");
+					chatbotService.insertChatMsg(botChatMsg);
+	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
+					chatbotService.insertChatMsg(botChatMsg);
                     convManager.endSession(session.getUserId());   // 종료 누르면 바로 세션 삭제
-                    return new ChatbotResponseDto("활동 추천을 종료합니다. 궁금한 점이 있으면 언제든 질문해 주세요!");
+                    return new ChatbotResponseDto("이용해주셔서 감사합니다!");
                 } else {
                     return new ChatbotResponseDto(
                         "원하시는 옵션을 선택해 주세요.",
@@ -103,7 +186,7 @@ public class ActChatManager {
                 }
                 
             default:
-                session.setChatState(StateActChat.START);
+                session.setChatState(StateActChat.INPUT_SPEC);
                 return new ChatbotResponseDto("오류가 발생했습니다. 처음부터 다시 시도해 주세요.");
         }
     }
@@ -120,6 +203,17 @@ public class ActChatManager {
 
 	    // 🔹 GPT 호출
 	    String gptAnswer = gptApiService.callGPT(prompt);
+	    
+	    ChatMsg botMsg = new ChatMsg();
+	    botMsg.setConvId(session.getConvId());
+	    botMsg.setConvTopic(session.getTopic());
+	    botMsg.setConvSubTopicSpecId(session.getSubtopicId()); 
+	    botMsg.setUserId(session.getUserId());
+	    botMsg.setRole("BOT");
+	    botMsg.setMsgContent(gptAnswer);
+	    chatbotService.insertChatMsg(botMsg);
+	    
+	    
 
 	    // 🔹 체크박스 항목 추출
 	    List<String> checkboxList = extractCheckboxItems(gptAnswer);
@@ -140,15 +234,11 @@ public class ActChatManager {
 	}
 
 
-
-    
-    private List<String> extractCheckboxItems(String gptAnswer) {
-        return Arrays.stream(gptAnswer.split("\n"))
-                     .filter(line -> line.trim().matches("^[0-9]+\\..*"))  // 1. ~~ 형식만 추출
-                     .map(String::trim)
-                     .collect(Collectors.toList());
-    }
-    
+	private List<String> extractCheckboxItems(String gptAnswer) {
+		return Arrays.stream(gptAnswer.split("\n")).filter(line -> line.trim().matches("^\\d+\\..*")) // 번호 있는 줄만
+				.map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
+				.collect(Collectors.toList());
+	}
     
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isSpecRelatedInput(String input) {
@@ -163,4 +253,5 @@ public class ActChatManager {
 
 
 }
+
 

@@ -2,6 +2,9 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp"/>
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,9 +28,6 @@ header {
 </style>
 </head>
 <body>
-	<c:if test="${ empty sessionScope.loginUser }">
-		<jsp:forward page="/WEB-INF/views/user/login.jsp" />
-	</c:if>
 	<c:set var="menu" value="dashboard" scope="request" />
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	

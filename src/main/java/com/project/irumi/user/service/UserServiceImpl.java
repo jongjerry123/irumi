@@ -1,5 +1,6 @@
 package com.project.irumi.user.service;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,5 +86,18 @@ public class UserServiceImpl implements UserService {
         }
 
         userDao.updateUserProfile(params);
+    }
+    @Override
+    public User selectUserById(String userId) {
+        return userDao.selectUserById(userId);
+    }
+
+    @Override
+    public void updateUserAuthority(String userId, String userAuthority) {
+        userDao.updateUserAuthority(userId, userAuthority);
+    }
+    @Override
+    public void updateChPwd(String userId, Date chPwd) {
+        userDao.updateChPwd(userId, chPwd);
     }
 }

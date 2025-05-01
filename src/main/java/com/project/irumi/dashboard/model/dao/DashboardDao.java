@@ -86,12 +86,13 @@ public class DashboardDao {
 		return sqlSessionTemplate.update("dashboardMapper.updateAccomplishSpecState", specId);
 	}
 	
+	public Spec selectSpec(String specId) {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectSpec", specId);
+	}
+	
 	//직무 추가
-	public int selectMaxJobId() {
-		if (sqlSessionTemplate.selectOne("dashboardMapper.selectMaxJobId") == null) {
-			return 0;
-		}
-		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxJobId");
+	public int selectNextJobId() {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextJobId");
 	}
 	public int insertJob(Job job) {
 		return sqlSessionTemplate.insert("dashboardMapper.insertJob", job);
@@ -101,25 +102,38 @@ public class DashboardDao {
 	}
 	
 	//스펙 삭제
-	public int deleteSpecLink(Specific specific) {
-		return sqlSessionTemplate.delete("dashboardMapper.deleteSpecLink", specific);
-	}
 	public int deleteSpec(String specId) {
 		return sqlSessionTemplate.delete("dashboardMapper.deleteSpec", specId);
 	}
 	
 	// 스펙 추가
-	public int selectMaxSpecId() {
-		if (sqlSessionTemplate.selectOne("dashboardMapper.selectMaxSpecId") == null) {
-			return 0;
-		}
-		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxSpecId");
+	public int selectNextSpecId() {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextSpecId");
 	}
 	public int insertSpec(Spec spec) {
 		return sqlSessionTemplate.insert("dashboardMapper.insertSpec", spec);
 	}
 	public int insertSpecLink(Specific specific) {
 		return sqlSessionTemplate.insert("dashboardMapper.insertSpecLink", specific);
+	}
+	
+	// 활동 추가
+	public int selectNextActId() {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextActId");
+	}
+	public int insertAct(Activity act) {
+		return sqlSessionTemplate.insert("dashboardMapper.insertAct", act);
+	}
+	public int insertActLink(Specific specific) {
+		return sqlSessionTemplate.insert("dashboardMapper.insertActLink", specific);
+	}
+	
+	// 스펙 일정 추가
+	public int selectNextSsId() {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextSsId");
+	}
+	public int insertSs(SpecSchedule ss) {
+		return sqlSessionTemplate.insert("dashboardMapper.insertSs", ss);
 	}
 	
 }
