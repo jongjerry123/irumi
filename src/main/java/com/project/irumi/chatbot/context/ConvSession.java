@@ -43,9 +43,9 @@ public class ConvSession {
 			case "spec":
 				return StateSpecChat.TEXT_CURRENT_SPEC;
 			case "ss":
-				return StateSsChat.START;
+				return StateSsChat.SERP_SEARCH;
 			case "act":
-				return StateActChat.START;
+				return StateActChat.INPUT_SPEC;
 			default:
 				throw new IllegalArgumentException("Invalid topic: " + topic);
 		}
@@ -131,3 +131,5 @@ public class ConvSession {
 
 
 }
+
+
