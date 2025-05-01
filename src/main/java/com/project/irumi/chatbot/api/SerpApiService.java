@@ -31,6 +31,7 @@ public class SerpApiService {
     private static final String BASE_URL = "https://serpapi.com/search";
 
     public String searchJobSpec(String query) {
+    	String gptInput="";
     	try {
             RestTemplate restTemplate = new RestTemplate();
             
@@ -49,42 +50,53 @@ public class SerpApiService {
             // API 호출
             String response = restTemplate.getForObject(uri, String.class);
             JSONObject serpJson = new JSONObject(response);
+            
+       
 
-         // 1. answer_box에서 자격증 목록 가져오기
-            List<Map<String, String>> certs = serpJson
-                .getJSONObject("answer_box")
-                .getJSONObject("contents")
-                .getJSONArray("formatted")
-                .toList()
-                .stream()
-                .map(o -> (Map<String, String>) o)
-                .collect(Collectors.toList());
+            if (serpJson.has("answer_box")) {
+                JSONObject answerBox = serpJson.getJSONObject("answer_box");
+                // 필요한 필드 사용
+                // 1. answer_box에서 자격증 목록 가져오기
+                List<Map<String, String>> certs = serpJson
+                    .getJSONObject("answer_box")
+                    .getJSONObject("contents")
+                    .getJSONArray("formatted")
+                    .toList()
+                    .stream()
+                    .map(o -> (Map<String, String>) o)
+                    .collect(Collectors.toList());
+                
+                // 2. organic_results에서 설명 추출
+                List<String> descriptions = serpJson
+                    .getJSONArray("organic_results")
+                    .toList()
+                    .stream()
+                    .map(obj -> ((Map<String, Object>) obj).get("snippet").toString())
+                    .collect(Collectors.toList());
 
-            // 2. organic_results에서 설명 추출
-            List<String> descriptions = serpJson
-                .getJSONArray("organic_results")
-                .toList()
-                .stream()
-                .map(obj -> ((Map<String, Object>) obj).get("snippet").toString())
-                .collect(Collectors.toList());
-
-            // 3. GPT에 넘길 문장 조합 (최대 3~5개 정도 추려서 사용)
-            List<String> gptInputLines = new ArrayList<>();
-            for (int i = 0; i < Math.min(certs.size(), descriptions.size()); i++) {
-                String cert = certs.get(i).get("자격증_종류");
-                String desc = descriptions.get(i);
-                gptInputLines.add(cert + ": " + desc);
+                // 3. GPT에 넘길 문장 조합 (최대 3~5개 정도 추려서 사용)
+                List<String> gptInputLines = new ArrayList<>();
+                for (int i = 0; i < Math.min(certs.size(), descriptions.size()); i++) {
+                    String cert = certs.get(i).get("자격증_종류");
+                    String desc = descriptions.get(i);
+                    gptInputLines.add(cert + ": " + desc);
+                }
+                gptInput = String.join("\n", gptInputLines);
+                logger.info("serpapi 검색결과: " +gptInput);
+                return gptInput;//parseSearchResult(response);
+                
+            } else {
+                logger.warn("answer_box가 SerpAPI 응답에 존재하지 않음. 대체 정보 사용.");
+                // fallback 처리: organic_results 등 다른 필드를 활용하거나 빈 문자열 반환
             }
 
-            String gptInput = String.join("\n", gptInputLines);
-
-            logger.info("serpapi 검색결과: " +gptInput);
-            return gptInput;//parseSearchResult(response);
+          
             
         } catch (Exception e) {
             e.printStackTrace();
             return "검색 중 오류가 발생했습니다.";
         }
+    	return gptInput;
 	}
 
 
@@ -119,7 +131,9 @@ public class SerpApiService {
     private String parseSearchResult(String json) {
         try {
             JSONObject obj = new JSONObject(json);
-
+            
+            
+            
             // 첫 번째 검색 결과 링크
             String link = "";
             JSONArray results = obj.optJSONArray("organic_results");
