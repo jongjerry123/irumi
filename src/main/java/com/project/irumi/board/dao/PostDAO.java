@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
@@ -295,11 +296,27 @@ public class PostDAO {
     }
     
  // ✅ 불량 이용자 등록 기록 남기기
-    public void insertReport(String reportedBy, String reason) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("reportedBy", reportedBy);
-        param.put("reason", reason);
-        sqlSession.insert("boardMapper.insertReport", param);
+    public void insertPostReport(@Param("postId") Long postId,
+            @Param("reason") String reason) {
+sqlSession.insert("boardMapper.insertPostReport", Map.of(
+"postId", postId,
+"reason", reason
+));
+}
+    
+    public String findCommentWriterByCommentId(Long commentId) {
+        return sqlSession.selectOne("boardMapper.findCommentWriterByCommentId", commentId);
+    }
+
+    public void insertCommentReport(Long commentId, String reason) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("commentId", commentId);
+        paramMap.put("reason", reason);
+        sqlSession.insert("boardMapper.insertCommentReport", paramMap);
+    }
+
+    public void updateUserAuthorityToBad(String userId) {
+        sqlSession.update("boardMapper.updateUserAuthorityToBad", userId);
     }
     
     public void updateUserAuthority(List<String> userIds, int authority) {
@@ -308,15 +325,17 @@ public class PostDAO {
         param.put("authority", authority);
         sqlSession.update("boardMapper.updateUserAuthority", param);
     }
+    
+    public void updateUserAuthorityByPostId(Long postId) {
+        sqlSession.update("boardMapper.updateUserAuthorityByPostId", postId);
+    }
    
-    // 불량 이용자 카운트/조회
-    public List<Map<String, Object>> selectBadUsers(int offset, int pageSize) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("offset", offset);
-        param.put("pageSize", pageSize);
-        return sqlSession.selectList("boardMapper.selectBadUsers", param);
+ // 불량 이용자 전체 조회 (페이징 X, 전체 조회용이면 그대로 사용)
+    public List<Map<String, Object>> selectBadUsers() {
+        return sqlSession.selectList("boardMapper.selectBadUsers");
     }
 
+    // 불량 이용자 수 카운트
     public int countBadUsers() {
         return sqlSession.selectOne("boardMapper.countBadUsers");
     }

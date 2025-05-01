@@ -172,10 +172,10 @@ public class PostService {
     }
     
     // ✅ 게시글 ID로 작성자 ID 조회 후 불량이용자로 등록
-    public void registerBadUsersFromPosts(List<Long> postIds) {
-        List<String> userIds = postDAO.findWritersByPostIds(postIds);
-        if (userIds != null && !userIds.isEmpty()) {
-            postDAO.updateUsersToBad(userIds);
+    public void registerBadUsersFromPosts(List<Long> postIds, String reason) {
+        for (Long postId : postIds) {
+            postDAO.insertPostReport(postId, reason); // 여기에 reason 반영
+            postDAO.updateUserAuthorityByPostId(postId);
         }
     }
 
@@ -186,14 +186,15 @@ public class PostService {
     public int countReportedPosts() { return postDAO.countReportedPosts(); }
     
     public void registerBadUsersFromComments(List<Long> commentIds, String reason) {
-        List<String> userIds = postDAO.findWritersByCommentIds(commentIds);  // 댓글 작성자 조회
-        if (userIds != null && !userIds.isEmpty()) {
-            postDAO.updateUsersToBad(userIds);  // 불량 사용자로 업데이트
+        for (Long commentId : commentIds) {
+            // 댓글 작성자 ID 조회
+            String userId = postDAO.findCommentWriterByCommentId(commentId);
 
-            // ✅ 신고 테이블에 사유와 함께 기록 남기기
-            for (String userId : userIds) {
-                postDAO.insertReport(userId, reason);  // 그냥 String 2개 넘김 (Map 아님!)
-            }
+            // 신고 테이블에 insert
+            postDAO.insertCommentReport(commentId, reason);
+
+            // 사용자 권한을 불량으로 변경
+            postDAO.updateUserAuthorityToBad(userId);
         }
     }
     
@@ -202,8 +203,8 @@ public class PostService {
     }
     
     //불량 이용자 조회
-    public List<Map<String, Object>> getBadUsers(int offset, int pageSize) {
-        return postDAO.selectBadUsers(offset, pageSize);
+    public List<Map<String, Object>> getBadUsers() {
+        return postDAO.selectBadUsers();
     }
 
     //불량 이용자 카운트

@@ -323,31 +323,20 @@ public class BoardController {
     
     // ✅ 불량 이용자 목록
     @GetMapping("/badUserList.do")
-    public String showBadUserList(@RequestParam(name = "page", defaultValue = "1") int page, Model model) {
-        int pageSize = 10;
-        int offset = (page - 1) * pageSize;
-
-        List<Map<String, Object>> badUsers = postService.getBadUsers(offset, pageSize);
-        int totalCount = postService.countBadUsers();
-        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
-
-        model.addAttribute("badUserList", badUsers);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-
+    public String showBadUserList(Model model) {
+        List<Map<String, Object>> badUserList = postService.getBadUsers();
+        model.addAttribute("badUserList", badUserList);
         return "board/badUserList";
     }
-    
-    
-    
 
     // 불량 이용자 등록
     @PostMapping("/registerBadUsers.do")
-    public String registerBadUsers(@RequestParam("selectedPosts") List<Long> postIds) {
-        postService.registerBadUsersFromPosts(postIds);
+    public String registerBadUsers(@RequestParam("selectedPosts") List<Long> postIds,
+                                   @RequestParam("reason") String reason) {
+        postService.registerBadUsersFromPosts(postIds, reason);
         return "redirect:/reportedPosts.do";
     }
-    
+     
  // ✅ 댓글 작성자 불량 등록
     @PostMapping("/registerBadUsersFromComments.do")
     public String registerBadUsersFromComments(@RequestParam List<Long> selectedComments,
