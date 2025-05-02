@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:if test="${ empty sessionScope.loginUser }">
 	<jsp:forward page="/WEB-INF/views/user/login.jsp" />
@@ -7,7 +7,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>chatbot 스펙 찾기</title>
@@ -20,14 +21,17 @@ body {
 	padding: 0;
 	min-height: 70vh;
 }
+
 .container {
 	display: flex;
 	min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
 	margin-top: 20px; /* header 높이만큼 아래로 */
 }
+
 .sidebar, .right-panel {
 	height: auto; /* 높이 자동 (100vh 등 절대값 X) */
 }
+
 .sidebar {
 	width: 200px;
 	background-color: #141414;
@@ -36,6 +40,7 @@ body {
 	flex-direction: column;
 	gap: 20px;
 }
+
 .sidebar button {
 	background-color: #222;
 	border: none;
@@ -48,26 +53,29 @@ body {
 	text-align: center;
 	font-weight: bold;
 }
+
 .sidebar button:hover {
 	background-color: #BAAC80;
 	color: black;
 }
+
 .sidebar button.active {
- background-color: #BAAC80;
- color: black;
+	background-color: #BAAC80;
+	color: black;
 }
+
 .main {
 	flex: 1;
 	padding-right: 40px;
 	padding-left: 40px;
 	display: flex;
 	flex-direction: column;
-	height:100%;
+	height: 100%;
 }
+
 .content-box {
 	background-color: #1e1e1e;
-	max-width: 700px;
-	padding-right: 20px;
+	max-width: 700px; padding-right : 20px;
 	padding-left: 20px;
 	border-radius: 12px;
 	line-height: 1.7;
@@ -77,22 +85,26 @@ body {
 	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
 	display: flex;
 	flex-direction: column;
-	
 	/*위아래 패딩 추가*/
 	padding-top: 30px;
+	padding-right: 20px;
 }
+
 .content-box::-webkit-scrollbar {
 	width: 9px;
 	background: #222;
 }
+
 .content-box::-webkit-scrollbar-thumb {
 	background: #BAAC80;
 	border-radius: 6px;
 }
+
 .content-box {
 	scrollbar-color: #BAAC80 #222;
 	scrollbar-width: thin;
 }
+
 .right-panel {
 	width: 230px;
 	padding-right: 20px;
@@ -101,34 +113,41 @@ body {
 	flex-direction: column;
 	gap: 30px;
 }
+
 .right-panel .spec-value {
 	color: #fff;
 	font-size: 9px;
 	margin-left: 4px;
 }
+
 .right-panel .citem-value {
 	color: #fff;
 	font-size: 9px;
 	margin-left: 4px;
 }
-.right-panel .info-row{
-  align-items: center;
-  margin-bottom: 10px;
-  flex-direction: column; /*세로 정렬*/
+
+.right-panel .info-row {
+	align-items: center;
+	margin-bottom: 10px;
+	flex-direction: column; /*세로 정렬*/
 }
+
 .right-panel .label {
- font-size : 14px;
- color: #BAAC80;
-  font-weight: bold;
+	font-size: 14px;
+	color: #BAAC80;
+	font-weight: bold;
 }
+
 .right-panel .value {
- color: #fff;
- font-size : 14px;
- margin-left : 4px;
+	color: #fff;
+	font-size: 14px;
+	margin-left: 4px;
 }
+
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
+
 .chat-input-box {
 	display: flex;
 	align-items: center;
@@ -138,6 +157,7 @@ body {
 	margin-top: 40px;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
+
 .chat-input-box .chat-input {
 	flex: 1;
 	background: transparent;
@@ -147,6 +167,7 @@ body {
 	padding: 8px;
 	outline: none;
 }
+
 .chat-input-box .chat-send-btn {
 	width: 36px;
 	height: 36px;
@@ -162,9 +183,11 @@ body {
 	cursor: pointer;
 	transition: background 0.2s;
 }
+
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
+
 .manual-input-box {
 	display: flex;
 	align-items: center;
@@ -174,6 +197,7 @@ body {
 	margin-top: 12px;
 	gap: 6px;
 }
+
 .manual-input-box .manual-input {
 	flex: 1;
 	background: transparent;
@@ -183,6 +207,7 @@ body {
 	padding: 8px 4px;
 	outline: none;
 }
+
 .manual-input-box .add-btn {
 	background: #232323;
 	border: 1px solid #BAAC80;
@@ -197,21 +222,23 @@ body {
 	font-size: 18px;
 	margin-left: 4px;
 }
+
 .manual-input-box .add-btn:hover {
 	background: #BAAC80;
 	color: #232323;
 }
+
 .content-box .custom-checkbox-list {
 	margin: 24px 0 0 0;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 }
+
 .content-box .custom-checkbox {
 	/* 추가*/
-	flex-direction: column;  /* 세로로 배치 */
-    align-items: flex-start;  /* 왼쪽 정렬 */
-    
+	flex-direction: column; /* 세로로 배치 */
+	align-items: flex-start; /* 왼쪽 정렬 */
 	display: flex;
 	align-items: left;
 	justify-content: space-between;
@@ -227,20 +254,22 @@ body {
 	min-width: 210px;
 	max-width: 340px;
 }
+
 .content-box .custom-checkbox input[type="checkbox"] {
 	display: none;
 }
+
 .content-box .custom-checkbox .checkbox-explain {
 	color: #fff;
 	font-size: 12px;
-   margin-top: 5px;  /* 제목과 설명 사이에 여백 */
+	margin-top: 5px; /* 제목과 설명 사이에 여백 */
 	letter-spacing: 0.5px;
 }
 
 .content-box .custom-checkbox .checkbox-text {
-    color: #BAAC80;  /* 설명 색상 */
-    font-size: 15px;
-    font-weight:bold;
+	color: #BAAC80; /* 설명 색상 */
+	font-size: 15px;
+	font-weight: bold;
 }
 
 .content-box .custom-checkbox .checkmark {
@@ -254,33 +283,40 @@ body {
 	.checkmark {
 	display: block;
 }
+
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkbox-text {
 	color: #BAAC80;
 	font-weight: 600;
 }
+
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkmark {
 	color: #BAAC80;
 }
+
 .content-box .custom-checkbox:hover {
 	background: #222;
 }
+
 .saved-citem-section {
 	margin-bottom: 20px;
 }
+
 .section-title {
 	color: #BAAC80;
 	font-weight: bold;
 	font-size: 15px;
 	margin: 35px 0 10px 0;
 }
+
 .saved-citem-list {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	margin-bottom: 14px;
 }
+
 .citem-card {
 	background: #232323;
 	border: 1.5px solid #444;
@@ -293,6 +329,7 @@ body {
 	color: #fff;
 	position: relative;
 }
+
 .remove-btn {
 	background: none;
 	border: none;
@@ -302,9 +339,11 @@ body {
 	cursor: pointer;
 	transition: color 0.2s;
 }
+
 .remove-btn:hover {
 	color: #f87171;
 }
+
 .add-citem-btn {
 	margin-top: 10px;
 	width: 100%;
@@ -322,27 +361,31 @@ body {
 	gap: 8px;
 	transition: background 0.2s, color 0.2s;
 }
+
 .add-citem-btn span {
 	font-size: 18px;
 	font-weight: bold;
 }
+
 .add-citem-btn:hover {
 	background: #BAAC80;
 	color: #232323;
 }
+
 .select-group {
 	display: flex;
 	flex-direction: column; /* 세로 정렬 */
 	align-items: flex-start; /* 좌측 정렬 */
 	gap: 8px;
-	
 }
+
 .select-label {
 	color: #d9d9d9;
 	font-size: 18px;
 	font-weight: 600;
 	margin-bottom: 2px; /* 라벨 아래 약간 여백 */
 }
+
 .select-btn {
 	background: none;
 	border: 1.5px solid #BAAC80;
@@ -358,7 +401,7 @@ body {
 }
 
 /*select-job-btn-list 와 같이 option-buttons내의 버튼들이 정렬되도록 고쳐줘. 한 버튼은 텍스트 크기 만해야 해*/
-.select-btn:hover{
+.select-btn:hover {
 	background: #BAAC80;
 	border: 1.5px solid #BAAC80;
 	color: #1e1e1e;
@@ -372,16 +415,18 @@ body {
 	margin-bottom: 4px; /* 버튼들끼리 간격 */
 	opacity: 0.5;
 }
+
 .select-btn-list {
 	display: flex;
 	flex-direction: row;
 	gap: 8px; /* 버튼 사이 간격 */
 	flex-wrap: nowrap;
-	
 }
+
 .select-job-btn-list {
 	padding: 10px 10px 0px 10px;
 }
+
 .select-btn.active {
 	background: #BAAC80;
 	color: #232323;
@@ -389,14 +434,13 @@ body {
 }
 
 .option-buttons {
-	    display: flex; /* 버튼을 가로로 배치 */
-	    flex-direction: row; /* 수평 정렬 */
-	    gap: 8px; /* 버튼 사이의 간격 */
-	    flex-wrap: wrap; /* 버튼들이 화면에 맞게 자동으로 줄바꿈되게 */
-	    justify-content: flex-start; /* 왼쪽 정렬 */
-	    
-	     margin: 0; /* 부모 요소에서 오는 불필요한 여백 제거 */
-  		  padding: 0; /* 불필요한 내부 여백 제거 */
+	display: flex; /* 버튼을 가로로 배치 */
+	flex-direction: row; /* 수평 정렬 */
+	gap: 8px; /* 버튼 사이의 간격 */
+	flex-wrap: wrap; /* 버튼들이 화면에 맞게 자동으로 줄바꿈되게 */
+	justify-content: flex-start; /* 왼쪽 정렬 */
+	margin: 0; /* 부모 요소에서 오는 불필요한 여백 제거 */
+	padding: 0; /* 불필요한 내부 여백 제거 */
 }
 
 /*************************************************************************** */
@@ -466,14 +510,16 @@ body {
 	font-size: 0.95em;
 	word-wrap: break-word;
 }
+
 .user-msg {
-/*배경색, 글씨색 변경*/
-	background-color: #383838; 
+	/*배경색, 글씨색 변경*/
+	background-color: #383838;
 	color: white;
 	align-self: flex-end;
 	text-align: right;
 	/*font-weight: bold;*/
 }
+
 .bot-msg {
 	align-self: flex-start;
 	text-align: left;
@@ -487,34 +533,36 @@ body {
 	padding: 8px 16px;
 	margin-top: 10px;
 }
-.confirm-select-box{
-	  display: flex;
-	  justify-content: center; /* 수평 가운데 정렬 */
-	  align-items: center;     /* 수직 가운데 정렬 (선택사항) */
+
+.confirm-select-box {
+	display: flex;
+	justify-content: center; /* 수평 가운데 정렬 */
+	align-items: center; /* 수직 가운데 정렬 (선택사항) */
 }
 /* 추가 - 선택 버튼 css */
-.confirm-select-box .confirm-select-btn{
+.confirm-select-box .confirm-select-btn {
 	border: 1.5px solid #eeeeee;
 	border-radius: 10px;
 	font-size: 15px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-top : 3px;
-	font-weight : bold;
+	margin-top: 3px;
+	font-weight: bold;
 	text-align: center;
 	color: #eeeeee;
 	background: none;
 	margin-right: 20px;
 }
-.confirm-select-box .confirm-select-btn:hover{
+
+.confirm-select-box .confirm-select-btn:hover {
 	border-radius: 10px;
 	font-size: 15px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-top : 3px;
-	font-weight : bold;
+	margin-top: 3px;
+	font-weight: bold;
 	text-align: center;
 	color: #383838;
 	background: #eeeeee;
@@ -771,8 +819,27 @@ $(function() {
         const $input = $(".manual-input");
         const val = $input.val().trim();
         if (val) {
-            addToSpecList([val]);
-            $input.val("");
+            const specCI={
+            		title:val,
+            		explain:"",
+            		type:"imsi"
+            };
+            
+         // DB에 저장    ----------- 변경사항
+  	      $.ajax({
+  	        type: "POST",
+  	        url: "insertCareerItem.do",
+  	     	 contentType: "application/json",
+  	     	data: JSON.stringify(specCI),
+  	        success: function() {
+  	          console.log("직무에 스펙 추가 성공");
+  	        },
+  	        error: function() {
+  	          alert("직무에 스펙 추가 실패!");
+  	        }
+  	      });
+         
+         $input.val("");
         } else {
             alert("스펙을 입력해 주세요!");
         }
@@ -821,17 +888,17 @@ $(function() {
 <link rel="stylesheet" href="/css/chatbot-style.css">
 </head>
 <body>
-<c:import url="/WEB-INF/views/common/header.jsp"/>
-<c:set var="menu" value="chat" scope="request"/>
-<div class="container">
-   <div class="sidebar">
-       <button onclick="moveJobPage();">직무 찾기</button>
-       <button onclick="moveSpecPage();" class="active">스펙 찾기</button>
-       <button onclick="moveSchedulePage();">일정 찾기</button>
-       <button onclick="moveActPage();">활동 찾기</button>
-   </div>
-   <div class="main">
-       <div class="content-box">
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+	<c:set var="menu" value="chat" scope="request" />
+	<div class="container">
+		<div class="sidebar">
+			<button onclick="moveJobPage();">직무 찾기</button>
+			<button onclick="moveSpecPage();" class="active">스펙 찾기</button>
+			<button onclick="moveSchedulePage();">일정 찾기</button>
+			<button onclick="moveActPage();">활동 찾기</button>
+		</div>
+		<div class="main">
+			<div class="content-box">
 				<div class="select-bar">
 					<div class="select-group">
 						<span class="select-label">스펙 대상 직무 선택</span>
@@ -840,42 +907,44 @@ $(function() {
 							<button class="select-btn">백엔드 개발자</button> -->
 						</div>
 						<!--  스펙 페이지에는 필요없지만 넣어봄 -->
-						<div class="select-spec-btn-list">
-						</div>
+						<div class="select-spec-btn-list"></div>
 					</div>
 					<div class="confirm-select-box">
 						<!--  클릭시 setSubTopic 해야함 -->
-						<button class="confirm-select-btn"> 선택 완료 </button>
+						<button class="confirm-select-btn">선택 완료</button>
 					</div>
 				</div>
 				<div class="chat-container" id="chat-container">
-				<div class="chat-area" id="chatArea">
-					<div class="answer bot-msg">
-						내게 맞는 스펙 추천 세션입니다.<br> 먼저, 현재 보유하고 있는 스펙이나 경험을 말씀해 주세요.
-					</div>
+					<div class="chat-area" id="chatArea">
+						<div class="answer bot-msg">
+							내게 맞는 스펙 추천 세션입니다.<br> 먼저, 현재 보유하고 있는 스펙이나 경험을 말씀해 주세요.
+						</div>
 					</div>
 				</div>
 			</div>
-       <div class="chat-input-box">
-           <input type="text" placeholder="무엇이든 물어보세요" class="chat-input" id="userInput" />
-           <button class="chat-send-btn"><i class="fa fa-paper-plane"></i></button>
-       </div>
-   </div>
-   <div class="right-panel">
-       <div class="saved-schedule-section">
-       	<div class="info-row">
-      		<span class="label">➤ 목표 직무:</span> <span class="value"></span>
-      		</div>
-           <div class="section-title">➤ 저장한 스펙</div>
-           <div class="saved-spec-list"></div>
-           <div class="manual-input-box">
-               <input type="text" placeholder="직접 스펙 입력" class="manual-input" />
-               <button class="add-btn">+</button>
-           </div>
-       </div>
-   </div>
-</div>
-<c:import url="/WEB-INF/views/common/footer.jsp"/>
+			<div class="chat-input-box">
+				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
+					id="userInput" />
+				<button class="chat-send-btn">
+					<i class="fa fa-paper-plane"></i>
+				</button>
+			</div>
+		</div>
+		<div class="right-panel">
+			<div class="saved-schedule-section">
+				<div class="info-row">
+					<span class="label">➤ 목표 직무:</span> <span class="value"></span>
+				</div>
+				<div class="section-title">➤ 저장한 스펙</div>
+				<div class="saved-spec-list"></div>
+				<div class="manual-input-box">
+					<input type="text" placeholder="직접 스펙 입력" class="manual-input" />
+					<button class="add-btn">+</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
 
