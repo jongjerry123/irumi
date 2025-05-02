@@ -7,7 +7,9 @@
 <head>
 <meta charset="UTF-8">
 <title>irumi</title>
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap"
+	rel="stylesheet">
 <style>
 /* ✅ [인트로 오버레이 영역 추가] */
 #introOverlay {
@@ -27,25 +29,26 @@
 	cursor: pointer;
 	transition: transform 0.4s ease;
 }
+
 #introOverlay img:hover {
 	transform: scale(1.2);
 }
 
 .intro-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	gap: 0;
 }
 
 .intro-subtitle {
-  font-family: 'Dancing Script', cursive;
-  font-size: 40px;
-  color: #ccc;
-  margin-top: 0px;
-  margin: 0px;
-  line-height: 1;
+	font-family: 'Dancing Script', cursive;
+	font-size: 40px;
+	color: #ccc;
+	margin-top: 0px;
+	margin: 0px;
+	line-height: 1;
 }
 
 body {
@@ -58,12 +61,12 @@ body {
 }
 
 header {
-  opacity: 0;
-  transition: opacity 1s ease 0.2s;  /* ✅ main-container와 동일하게 */
+	opacity: 0;
+	transition: opacity 1s ease 0.2s; /* ✅ main-container와 동일하게 */
 }
 
 header.active {
-  opacity: 1;
+	opacity: 1;
 }
 
 .main-container {
@@ -76,7 +79,7 @@ header.active {
 }
 
 .main-container.active {
-	opacity: 1; 
+	opacity: 1;
 }
 
 .main-container h2 {
@@ -153,6 +156,7 @@ header.active {
 .card-info.dashboard {
 	background-color: #43B7B7;
 }
+
 .card:hover .card-info.dashboard {
 	background-color: #2f9797;
 }
@@ -160,6 +164,7 @@ header.active {
 .card-info.ai {
 	background-color: #BAAC80;
 }
+
 .card:hover .card-info.ai {
 	background-color: #9d8f61;
 }
@@ -167,6 +172,7 @@ header.active {
 .card-info.community {
 	background-color: #A983A3;
 }
+
 .card:hover .card-info.community {
 	background-color: #8c6c8c;
 }
@@ -180,6 +186,16 @@ header.active {
 .card-desc {
 	font-size: 14px;
 	line-height: 1.4;
+}
+
+.irumi-link {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.irumi-link:hover {
+	color: #ff4c4c;
 }
 </style>
 
@@ -217,41 +233,51 @@ window.addEventListener("DOMContentLoaded", function () {
 <body>
 	<!-- ✅ 인트로 오버레이 (최상단 삽입) -->
 	<div id="introOverlay">
-  <div class="intro-content">
-    <img src="/irumi/resources/images/eye.png" alt="irumi 로고 클릭" />
-    <p class="intro-subtitle">Project Irumi</p>
-  </div>
-</div>
+		<div class="intro-content">
+			<img src="/irumi/resources/images/eye.png" alt="irumi 로고 클릭" />
+			<p class="intro-subtitle">Project Irumi</p>
+		</div>
+	</div>
 
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="main-container">
 		<h2>
-			<strong>이루미</strong>와 함께<br> 원하는 <strong>직무</strong>에 꼭 맞는 <strong>스펙</strong>을
-			발견하고<br> 나만의 성장 스토리를 쌓아보세요.
+			<a href="about.do" class="irumi-link"><strong>이루미</strong></a>와 함께<br>
+			원하는 <strong>직무</strong>에 꼭 맞는 <strong>스펙</strong>을 발견하고<br> 나만의
+			성장 스토리를 쌓아보세요.
 		</h2>
 
 		<div class="card-section">
 			<div class="card" onclick="moveToDash()">
-				<img src="/irumi/resources/images/dashboard5.png" class="card-image" alt="대시보드 이미지" />
+				<img src="/irumi/resources/images/dashboard5.png" class="card-image"
+					alt="대시보드 이미지" />
 				<div class="card-info dashboard">
 					<div class="card-title">내 스펙 대시보드</div>
-					<div class="card-desc">내가 설정한 목표에 따른<br>실행 상황을 살펴볼 수 있습니다.</div>
+					<div class="card-desc">
+						내가 설정한 목표에 따른<br>실행 상황을 살펴볼 수 있습니다.
+					</div>
 				</div>
 			</div>
 
 			<div class="card" onclick="moveToAi()">
-				<img src="/irumi/resources/images/ai1.png" class="card-image" alt="AI 도우미 이미지" />
+				<img src="/irumi/resources/images/ai1.png" class="card-image"
+					alt="AI 도우미 이미지" />
 				<div class="card-info ai">
 					<div class="card-title">대화형 도우미</div>
-					<div class="card-desc">최신 정보를 AI와의 대화를 통해<br>스펙 대시보드에 저장할 수 있습니다.</div>
+					<div class="card-desc">
+						최신 정보를 AI와의 대화를 통해<br>스펙 대시보드에 저장할 수 있습니다.
+					</div>
 				</div>
 			</div>
 
 			<div class="card" onclick="moveToCommu()">
-				<img src="/irumi/resources/images/community3.png" class="card-image" alt="유저 커뮤니티 이미지" />
+				<img src="/irumi/resources/images/community3.png" class="card-image"
+					alt="유저 커뮤니티 이미지" />
 				<div class="card-info community">
 					<div class="card-title">유저 커뮤니티</div>
-					<div class="card-desc">유저들과 취업 팁, 후기를 공유하고<br>스터디 그룹을 구할 수 있습니다.</div>
+					<div class="card-desc">
+						유저들과 취업 팁, 후기를 공유하고<br>스터디 그룹을 구할 수 있습니다.
+					</div>
 				</div>
 			</div>
 		</div>
