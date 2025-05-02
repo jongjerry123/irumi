@@ -223,35 +223,50 @@ public class JobChatManager {
 	
 	// 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isPersonaliltyRelatedInput(String input) {
-        String prompt = """
-        		입력 문장이 사용자의 특성(예: 성격, 강점, 가치관 등)과 관련된 설명이면 '예', 아니면 '아니오'라고만 답하세요.
-        		설명 없이 반드시 '예' 또는 '아니오'로만 대답하세요.
+    	String prompt = """
+    			입력 문장이 다음 조건 중 하나라도 만족하는지 판단하세요:
 
-        		입력: "%s"
-        		""".formatted(input);
+    			- 사용자의 성격, 성향, 성격 유형 (예: 외향적, 꼼꼼함, 적극적)
+    			- 개인의 강점 또는 약점 (예: 문제 해결력, 협업 능력, 리더십)
+    			- 삶의 가치관이나 중요하게 여기는 신념 (예: 워라밸, 성장 지향적)
+
+    			조건을 만족하면 오직 '예', 그렇지 않으면 오직 '아니오'라고만 응답하세요.
+    			추가 설명, 말줄임표, 공백, 기호 없이 하나의 단어로만 응답하세요.
+
+    			입력: "%s"
+    			""".formatted(input);
 
         String reply = gptApiService.callGPT(prompt);
         return reply != null && reply.trim().startsWith("예");
     }
     
     private boolean isHopeJobRelatedInput(String input) {
-        String prompt = """
-        		입력 문장이 희망 직무의 특성(예: 연봉, 문화, 업무 방식 등)에 대한 설명인지 확인하고,
-        		오직 '예' 또는 '아니오'로만 대답하세요.
+    	String prompt = """
+    			입력 문장이 사용자가 원하는 직무의 특성에 대한 설명인지 판단하세요.
 
-        		입력: "%s"
-        		""".formatted(input);
+    			예를 들어 다음과 같은 요소가 포함되면 '예'입니다:
+    			- 연봉, 복지, 야근 여부, 재택 근무, 직무 안정성
+    			- 조직 문화, 협업 방식, 직무의 유연성 또는 고정성
+    			- 성장 가능성, 이직 용이성 등
+
+    			위 조건을 만족하면 반드시 '예', 그렇지 않으면 '아니오'라고만 대답하세요.
+
+    			입력: "%s"
+    			""".formatted(input);
 
         String reply = gptApiService.callGPT(prompt);
         return reply != null && reply.trim().startsWith("예");
     }
     
     private boolean isHopeIndustryRelatedInput(String input) {
-        String prompt = """
-        		입력 문장이 희망 업계(예: IT, 부동산, 연예계 등)에 관한 내용이면 '예', 관련이 없으면 '아니오'라고만 대답하세요.
+    	String prompt = """
+    			입력 문장이 사용자가 관심 있는 업계(예: IT, 금융, 교육, 부동산, 미디어 등)를 언급하는지 확인하세요.
 
-        		입력: "%s"
-        		""".formatted(input);
+    			단어에 업계명이나 산업군 관련 키워드가 포함되면 '예', 그렇지 않으면 '아니오'라고만 대답하세요.
+    			절대 설명하지 말고 오직 '예' 또는 '아니오' 중 하나로만 대답하세요.
+
+    			입력: "%s"
+    			""".formatted(input);
 
         String reply = gptApiService.callGPT(prompt);
         return reply != null && reply.trim().startsWith("예");
