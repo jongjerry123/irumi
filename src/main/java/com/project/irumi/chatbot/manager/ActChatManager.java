@@ -8,19 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.project.irumi.chatbot.api.GptApiService;
+import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateActChat;
+import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.service.ChatbotService;
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
 
 @Component
 public class ActChatManager {
 
 	@Autowired
 	private GptApiService gptApiService;
+	
+	@Autowired
+	private SerpApiService serpApiService;
 
 	@Autowired
 	private ConvSessionManager convManager;
@@ -48,15 +52,15 @@ public class ActChatManager {
 				botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 				break;
 		case "spec":
-			userChatMsg.setConvSubTopicJobId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicJobId(session.getSubSpecTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "ss":
-			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "act":
-			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		default: // topic 없으면 
@@ -93,7 +97,7 @@ public class ActChatManager {
     	    	        ChatMsg botMsg = new ChatMsg();
     	    	        botMsg.setConvId(session.getConvId());
     	    	        botMsg.setConvTopic(session.getTopic());
-    	    	        botMsg.setConvSubTopicSpecId(session.getSubtopicId());
+    	    	        botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
     	    	        botMsg.setUserId(session.getUserId());
     	    	        botMsg.setRole("BOT");
     	    	        botMsg.setMsgContent(initMsg);
@@ -104,7 +108,7 @@ public class ActChatManager {
                     	ChatMsg Umsg = new ChatMsg();
     	            	Umsg.setConvId(session.getConvId());
     	            	Umsg.setConvTopic(session.getTopic());
-    	            	Umsg.setConvSubTopicSpecId(session.getSubtopicId()); // 필요 시 맞춰 수정
+    	            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); // 필요 시 맞춰 수정
     	            	Umsg.setUserId(session.getUserId());
     	            	Umsg.setRole("USER");
     	            	Umsg.setMsgContent(userMsg);
@@ -138,7 +142,7 @@ public class ActChatManager {
             	ChatMsg Umsg = new ChatMsg();
             	Umsg.setConvId(session.getConvId());
             	Umsg.setConvTopic(session.getTopic());
-            	Umsg.setConvSubTopicSpecId(session.getSubtopicId()); // 필요 시 맞춰 수정
+            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); // 필요 시 맞춰 수정
             	Umsg.setUserId(session.getUserId());
             	Umsg.setRole("USER");
             	Umsg.setMsgContent(userMsg);
@@ -194,45 +198,44 @@ public class ActChatManager {
 
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
 	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session) {
-	    // 🔹 GPT 프롬프트 생성
-	    String prompt = switch (activityType) {
-	        case "도서" -> spec + " 을(를) 준비하거나 학습하는 데 실질적으로 도움이 되는 한국 도서 3권을 추천해줘. 단순한 자기계발서나 시간관리 도서는 제외하고, 시험 준비 또는 해당 분야 지식 향상에 도움이 되는 책 중심으로 추천해. 각 책은 아래와 같은 형식으로 출력해줘: 도서명 (저자명, 출판사) 보기";
-	        case "영상" -> spec + " 공부에 추천할 만한 유튜브 채널이나 무료 강의 3개 추천해줘. 그리고 출력방식은 제목 - 링크 \" 보기 \" 이런 식으로 출력해줘.";
-	        case "기타 활동" -> spec + " 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 3가지 추천해줘. 그리고 출력방식은 활동명 - 관련 URL \" 참여하기 \" 이런 식으로 출력해줘.";
-	        default -> spec + "에 도움이 될 활동을 3개 추천해줘. 형식은 자유. 그리고 출력방식은 제목이랑 제목에 맞게 \" 하기 \" 나 \" 보기 \" 같이 알맞는 동사 넣어서 출력해줘";
+	    // 🔹 검색 키워드 생성
+	    String keyword = switch (activityType) {
+	        case "도서" -> spec + " 관련 자격증 공부 도서 추천";
+	        case "영상" -> spec + " 무료 강의 또는 유튜브 채널";
+	        case "기타 활동" -> spec + " 관련 공모전 대외활동 봉사활동";
+	        default -> spec + " 활동 추천";
 	    };
 
-	    // 🔹 GPT 호출
-	    String gptAnswer = gptApiService.callGPT(prompt);
-	    
+	    // 🔹 SerpAPI 호출 → 아래는 예시로 고정된 항목 사용
+	    // 실제 구현 시 serpApiService.searchActivities(keyword) 로 치환
+	    List<CareerItemDto> checkboxList = serpApiService.searchSerpActivity(keyword, activityType);
+	    // 🔹 응답 메시지 문자열 생성
+	    StringBuilder msgBuilder = new StringBuilder();
+	    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
+	    for (CareerItemDto dto : checkboxList) {
+	        msgBuilder.append("- ").append(dto.getTitle()).append(" (").append(dto.getExplain()).append(")\n");
+	    }
+
+	    // 🔹 대화 로그 DB 저장
 	    ChatMsg botMsg = new ChatMsg();
 	    botMsg.setConvId(session.getConvId());
 	    botMsg.setConvTopic(session.getTopic());
-	    botMsg.setConvSubTopicSpecId(session.getSubtopicId()); 
+	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
 	    botMsg.setUserId(session.getUserId());
 	    botMsg.setRole("BOT");
-	    botMsg.setMsgContent(gptAnswer);
+	    botMsg.setMsgContent(msgBuilder.toString());
 	    chatbotService.insertChatMsg(botMsg);
-	    
-	    
-
-	    // 🔹 체크박스 항목 추출
-	    List<CareerItemDto> checkboxList = extractCheckboxItems(gptAnswer);
-
-	    // 🔹 최종 메시지 조합
-	    StringBuilder finalMsg = new StringBuilder();
-
-	    finalMsg.append("아래 추천된 항목 중 원하는 요소를 선택해 주세요!");
 
 	    // 🔹 상태 전이
 	    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
 
 	    return new ChatbotResponseDto(
-		        finalMsg.toString(),
-		        checkboxList,
-		        List.of("다른 유형", "종료")
-		    );
+	        "아래 추천된 항목 중 원하는 요소를 선택해 주세요!",
+	        checkboxList,
+	        List.of("다른 유형", "종료")
+	    );
 	}
+
 
 
 	private List<CareerItemDto> extractCheckboxItems(String gptAnswer) {

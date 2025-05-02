@@ -59,15 +59,15 @@ public class SsChatManager {
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "spec":
-			userChatMsg.setConvSubTopicJobId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicJobId(session.getSubSpecTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "ss":
-			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "act":
-			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		default: // topic 없으면
@@ -104,7 +104,7 @@ public class SsChatManager {
 	    	        ChatMsg botMsg = new ChatMsg();
 	    	        botMsg.setConvId(session.getConvId());
 	    	        botMsg.setConvTopic(session.getTopic());
-	    	        botMsg.setConvSubTopicSpecId(session.getSubtopicId());
+	    	        botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
 	    	        botMsg.setUserId(session.getUserId());
 	    	        botMsg.setRole("BOT");
 	    	        botMsg.setMsgContent(initMsg);
@@ -116,7 +116,7 @@ public class SsChatManager {
 	            	ChatMsg Umsg = new ChatMsg();
 	            	Umsg.setConvId(session.getConvId());
 	            	Umsg.setConvTopic(session.getTopic());
-	            	Umsg.setConvSubTopicSpecId(session.getSubtopicId()); // 필요 시 맞춰 수정
+	            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); // 필요 시 맞춰 수정
 	            	Umsg.setUserId(session.getUserId());
 	            	Umsg.setRole("USER");
 	            	Umsg.setMsgContent(userMsg);
@@ -129,7 +129,7 @@ public class SsChatManager {
 	                
 	                serpMsg.setConvId(session.getConvId());
 	                serpMsg.setConvTopic(session.getTopic());
-	                serpMsg.setConvSubTopicSpecId(session.getSubtopicId());
+	                serpMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
 	                serpMsg.setUserId(session.getUserId());
 	                serpMsg.setRole("BOT");
 	                serpMsg.setMsgContent(serpResult);

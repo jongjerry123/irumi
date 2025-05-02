@@ -4,7 +4,6 @@ package com.project.irumi.chatbot.api;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +13,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import com.project.irumi.chatbot.model.dto.CareerItemDto;
 
 @Service
 public class SerpApiService {
@@ -159,11 +159,83 @@ public class SerpApiService {
             return "검색 결과를 파싱하는 도중 오류가 발생했습니다.";
         }
     }
+    
+    public List<CareerItemDto> searchSerpActivity(String spec, String activityType) {
+        // 예: SerpAPI를 통해 도서 / 영상 / 활동 검색
+        String query = switch (activityType) {
+            case "도서" -> spec + " 공부에 도움이 되는 책 제목과 저자, 출판사만 추천";
+            case "영상" -> spec + " 관련 무료 유튜브 강의 추천 site:youtube.com";
+            case "기타 활동" -> spec + " 관련 공모전, 대외활동, 봉사활동 소개 site:allcon.or.kr";
+            default -> spec + " 관련 유용한 자료 추천";
+        };
+
+        // SerpAPI 호출 (예시로 가짜 응답 구성)
+        List<CareerItemDto> result = new ArrayList<>();
+        // 실제로는 serpApiService.search(query) 처럼 활용
+        result.addAll(search(query, activityType));
+        
+        return result;
+    }
+
+    public List<CareerItemDto> search(String query, String activity) {
+        List<CareerItemDto> results = new ArrayList<>();
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
+
+            URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+                .queryParam("q", encodedQuery)
+                .queryParam("hl", "ko")
+                .queryParam("gl", "kr")
+                .queryParam("engine", "google")
+                .queryParam("api_key", serpApiKey)
+                .build(true)
+                .toUri();
+
+            String response = restTemplate.getForObject(uri, String.class);
+            JSONObject json = new JSONObject(response);
+
+            JSONArray organicResults = json.optJSONArray("organic_results");
+            if (organicResults != null) {
+                for (int i = 0; i < Math.min(3, organicResults.length()); i++) { // 최대 3개만
+                    JSONObject item = organicResults.getJSONObject(i);
+                    String title = item.optString("title", "제목 없음");
+                    String link = item.optString("link", "");
+                    
+                    CareerItemDto dto = new CareerItemDto();
+                    
+                    switch (activity) {
+                    case "도서":
+                        dto.setTitle(title);
+                        break;
+                    case "영상":
+                        dto.setTitle(title + (link.isEmpty() ? "" : " (" + link + ")"));
+                        break;
+                    case "기타 활동":
+                        dto.setTitle(title);
+                        break;
+                    default:
+                        dto.setTitle(title);
+                        break;
+                }
+                    
+                    dto.setType("act");
+
+                    results.add(dto);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("SerpAPI 검색 중 오류 발생", e);
+        }
+
+        return results;
+    }
 
 	
     
 
 }
-
 
 

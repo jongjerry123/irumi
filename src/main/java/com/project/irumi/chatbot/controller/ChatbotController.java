@@ -26,6 +26,8 @@ import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.dto.SessionTopicOpts;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.Activity;
+import com.project.irumi.dashboard.model.dto.SpecSchedule;
 import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
@@ -100,10 +102,14 @@ public class ChatbotController {
 		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
 		ArrayList<Spec> userSpecs;
+		ArrayList<SpecSchedule> userSchedules;
+		ArrayList<Activity> userActs;
 		
 		// CareerItemDto 리스트로 변환하여 저장
 	    List<CareerItemDto> jobCItemList = new ArrayList<>();
 	    List<CareerItemDto> specCItemList = new ArrayList<>();
+	    List<CareerItemDto> scheduleCItemList = new ArrayList<>();
+	    List<CareerItemDto> activityCItemList = new ArrayList<>();
 	    
 		switch (topic) {
 			case "job":
@@ -124,6 +130,7 @@ public class ChatbotController {
 			case "ss":
 				//job setting
 				userJobs = dashboardService.selectUserJobs(userId);
+				userSpecs = dashboardService.selectCurrUserSpec(userId);
 				 for (Job job : userJobs) {
 		                CareerItemDto dto = new CareerItemDto();
 		                dto.setItemId(job.getJobId());
@@ -131,9 +138,20 @@ public class ChatbotController {
 		                dto.setExplain(job.getJobExplain());
 		                dto.setType("job");
 		                jobCItemList.add(dto);
-		            }
-		            sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+				 }
 		        // spec setting
+		        for (Spec spec : userSpecs) {
+		        	CareerItemDto dto = new CareerItemDto();
+		        	dto.setItemId(spec.getSpecId());
+		        	dto.setTitle(spec.getSpecName());
+		        	dto.setExplain(spec.getSpecExplain());
+		        	dto.setType("spec");
+		        	specCItemList.add(dto);
+		        }
+		        sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+		        
+		        
+		           
 				// 유저 직무 선택에 따라 sub 주제 세팅
 				//userSpecs = dashboardService.selectUserSpecs(...);
 				break;
@@ -141,16 +159,25 @@ public class ChatbotController {
 			case "act":
 				//job setting
 				userJobs = dashboardService.selectUserJobs(userId);
-				 for (Job job : userJobs) {
-		                CareerItemDto dto = new CareerItemDto();
-		                dto.setItemId(job.getJobId());
-		                dto.setTitle(job.getJobName());
-		                dto.setExplain(job.getJobExplain());
-		                dto.setType("job");
-		                jobCItemList.add(dto);
-		            }
-		            sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
-		        // spec setting
+				userSpecs = dashboardService.selectCurrUserSpec(userId);
+				for (Job job : userJobs) {
+					CareerItemDto dto = new CareerItemDto();
+					dto.setItemId(job.getJobId());
+					dto.setTitle(job.getJobName());
+					dto.setExplain(job.getJobExplain());
+					dto.setType("job");
+					jobCItemList.add(dto);
+				}
+				// spec setting
+				for (Spec spec : userSpecs) {
+					CareerItemDto dto = new CareerItemDto();
+					dto.setItemId(spec.getSpecId());
+					dto.setTitle(spec.getSpecName());
+					dto.setExplain(spec.getSpecExplain());
+					dto.setType("spec");
+					specCItemList.add(dto);
+				}
+				sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 				// 유저 직무 선택에 따라 sub 주제 세팅
 				//userSpecs = dashboardService.selectUserSpecs(...);
 				break;
@@ -295,10 +322,32 @@ public class ChatbotController {
 			break;
 
 		case "act":
-//	          //actService.insertAct(Inserted);
+			Activity act = new Activity();
+			String actId = String.valueOf(dashboardService.selectNextActId());
+			act.setActId(actId);
+			act.setActContent(insertedItem.getTitle());
+			act.setActState(insertedItem.getState());
+
+			dashboardService.insertAct(act);
+			
+			Specific specific2 = new Specific();
+			specific2.setUserId(userId);
+			specific2.setJobId(convSession.getSubJobTopicId());
+			specific2.setSpecId(convSession.getSubSpecTopicId());
+			specific2.setActId(actId);
+			dashboardService.insertSpecLink(specific2);
+
 			break;
 
 		case "ss":
+			SpecSchedule ss = new SpecSchedule();
+			String ssId = String.valueOf(dashboardService.selectNextSsId());
+			ss.setSsId(ssId);
+			ss.setSpecId(insertedItem.getItemId());
+			ss.setSsType(insertedItem.getExplain());
+			ss.setSsDate(insertedItem.getSchedule());
+			
+			dashboardService.insertSs(ss);
 			break;
 
 		default:
