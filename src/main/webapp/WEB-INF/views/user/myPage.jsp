@@ -3,182 +3,189 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="_csrf" content="${_csrf.token}" />
-    <meta name="_csrf_header" content="${_csrf.headerName}" />
-    <title>마이페이지</title>
-    <style>
-        body {
-            background-color: #111;
-            font-family: 'Noto Sans KR', sans-serif;
-            color: white;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="_csrf" content="${_csrf.token}" />
+<meta name="_csrf_header" content="${_csrf.headerName}" />
+<title>마이페이지</title>
+<style>
+body {
+	background-color: #111;
+	font-family: 'Noto Sans KR', sans-serif;
+	color: white;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
 
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 50px;
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #111;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            box-sizing: border-box;
-        }
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 50px;
+	max-width: 1200px;
+	margin: 0 auto;
+	background-color: #111;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+	box-sizing: border-box;
+}
 
-        .container {
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            padding: 40px;
-            width: 400px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            margin: 150px auto 50px;
-            text-align: center;
-        }
+.container {
+	background-color: #1e1e1e;
+	border-radius: 10px;
+	padding: 40px;
+	width: 400px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	margin: 150px auto 50px;
+	text-align: center;
+}
 
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+h2 {
+	text-align: center;
+	margin-bottom: 10px;
+}
 
-        .user-info {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 30px;
-        }
+.user-info {
+	font-size: 14px;
+	color: #ccc;
+	margin-bottom: 30px;
+}
 
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+.input-group {
+	margin-bottom: 20px;
+	text-align: left;
+}
 
-        .input-group label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
+.input-group label {
+	display: block;
+	font-size: 14px;
+	margin-bottom: 5px;
+}
 
-        input[type="password"], input[type="email"], input[type="text"], select {
-            width: 100%;
-            height: 40px;
-            padding: 0 12px;
-            border: 1px solid #444;
-            border-radius: 6px;
-            background-color: #121212;
-            color: white;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+input[type="password"], input[type="email"], input[type="text"], select
+	{
+	width: 100%;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid #444;
+	border-radius: 6px;
+	background-color: #121212;
+	color: white;
+	box-sizing: border-box;
+	font-size: 14px;
+}
 
-        .inline-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+.inline-group {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
 
-        .inline-group input[type="email"] {
-            flex: 1;
-        }
+.inline-group input[type="email"] {
+	flex: 1;
+}
 
-        .inline-group .btn {
-            width: auto;
-            min-width: 100px;
-            height: 40px;
-        }
+.inline-group .btn {
+	width: auto;
+	min-width: 100px;
+	height: 40px;
+}
 
-        .verification-group {
-            position: relative;
-        }
+.verification-group {
+	position: relative;
+}
 
-        .verification-group input[type="text"] {
-            width: 100%;
-            height: 40px;
-            padding-right: 60px;
-        }
+.verification-group input[type="text"] {
+	width: 100%;
+	height: 40px;
+	padding-right: 60px;
+}
 
-        .timer {
-            display: none;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #2ccfcf;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 10;
-        }
+.timer {
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #2ccfcf;
+	font-size: 12px;
+	pointer-events: none;
+	z-index: 10;
+}
 
-        .btn {
-            height: 40px;
-            padding: 0 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            box-sizing: border-box;
-            background-color: #2ccfcf;
-            color: black;
-            position: relative;
-            z-index: 10;
-        }
+.btn {
+	height: 40px;
+	padding: 0 12px;
+	border: none;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 14px;
+	box-sizing: border-box;
+	background-color: #2ccfcf;
+	color: black;
+	position: relative;
+	z-index: 10;
+}
 
-        .btn:disabled {
-            background-color: black;
-            color: white;
-            cursor: not-allowed;
-        }
+.btn:disabled {
+	background-color: black;
+	color: white;
+	cursor: not-allowed;
+}
 
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
+.btn-group {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+}
 
-        .btn.cancel {
-            width: 120px;
-            background-color: #444;
-            color: white;
-        }
+.btn.cancel {
+	width: 120px;
+	background-color: #444;
+	color: white;
+}
 
-        .btn.submit {
-            width: 120px;
-            background-color: #2ccfcf;
-            color: black;
-        }
+.btn.submit {
+	width: 120px;
+	background-color: #2ccfcf;
+	color: black;
+}
 
-        .message {
-            font-size: 12px;
-            margin-top: 5px;
-            text-align: left;
-        }
+.exit {
+	font-size: 12px;
+	color: white;
+	cursor: pointer;
+}
 
-        .message.error {
-            color: #ff5a5a;
-        }
+.message {
+	font-size: 12px;
+	margin-top: 5px;
+	text-align: left;
+}
 
-        .message.success {
-            color: #00ffaa;
-        }
-    </style>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
+.message.error {
+	color: #ff5a5a;
+}
+
+.message.success {
+	color: #00ffaa;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
         if (typeof jQuery === 'undefined') {
             document.write('<script src="/resources/js/jquery-3.7.1.min.js"><\/script>');
         }
     </script>
-    <script>
+<script>
         $(document).ready(function() {
             try {
                 // DOM 요소 캐싱 (존재 여부 확인)
@@ -803,95 +810,134 @@
                 alert('페이지 로드 중 오류가 발생했습니다.');
             }
         });
+        function tryExitSite() {
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                fetch("exit.do", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ authority: 4 })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("탈퇴 처리 완료되었습니다.");
+                    location.href = "main.do"; // 로그아웃 또는 메인 이동
+                })
+                .catch(error => {
+                    alert("오류 발생: " + error);
+                });
+            }
+        }
     </script>
 </head>
 <body>
-    <c:import url="/WEB-INF/views/common/header.jsp" />
-    <div class="container">
-        <h2>마이페이지</h2>
-        <c:if test="${not empty sessionScope.loginUser}">
-            <div class="user-info">${sessionScope.loginUser.userName}님의 마이페이지</div>
-        </c:if>
-        <c:if test="${empty sessionScope.loginUser}">
-            <div class="message error">로그인이 필요합니다.</div>
-            <script>
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+	<div class="container">
+		<h2>마이페이지</h2>
+		<c:if test="${not empty sessionScope.loginUser}">
+			<div class="user-info">${sessionScope.loginUser.userName}님의
+				마이페이지</div>
+		</c:if>
+		<c:if test="${empty sessionScope.loginUser}">
+			<div class="message error">로그인이 필요합니다.</div>
+			<script>
                 setTimeout(() => location.href = 'loginPage.do', 1000);
             </script>
-        </c:if>
-        <form id="myPageForm">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
-            <!-- 비밀번호 변경 -->
-            <c:if test="${not empty sessionScope.loginUser and sessionScope.loginUser.userLoginType != 3 and sessionScope.loginUser.userLoginType != 4 and sessionScope.loginUser.userLoginType != 5}">
-                <div class="input-group">
-                    <label for="new-password">새 비밀번호</label>
-                    <input type="password" id="new-password" name="newPassword" placeholder="새 비밀번호 입력" maxlength="16">
-                    <div id="new-password-message" class="message"></div>
-                </div>
-                <div class="input-group">
-                    <label for="confirm-password">새 비밀번호 확인</label>
-                    <input type="password" id="confirm-password" name="confirmPassword" placeholder="비밀번호 재입력" maxlength="16">
-                    <div id="confirm-password-message" class="message"></div>
-                </div>
-            </c:if>
-            <!-- 이메일 변경 -->
-            <c:if test="${not empty sessionScope.loginUser and sessionScope.loginUser.userLoginType != 3 and sessionScope.loginUser.userLoginType != 4 and sessionScope.loginUser.userLoginType != 5}">
-                <div class="input-group">
-                    <label for="email">이메일</label>
-                    <div class="inline-group">
-                        <input type="email" id="email" name="email" value="${sessionScope.loginUser.userEmail}" readonly>
-                        <button type="button" class="btn" id="change-email">변경하기</button>
-                    </div>
-                    <div id="email-message" class="message"></div>
-                </div>
-                <!-- 인증번호 -->
-                <div class="input-group verification-group" style="display: none;">
-                    <div class="inline-group">
-                        <input type="text" id="verification-code" name="verification-code" placeholder="인증번호" maxlength="6" disabled>
-                        <button type="button" class="btn" id="verify-code" disabled>인증확인</button>
-                    </div>
-                    <div id="timer" class="timer">00:00</div>
-                    <div id="verification-message" class="message"></div>
-                </div>
-            </c:if>
-            <!-- 대학교 -->
-            <div class="input-group">
-                <label for="university">대학교</label>
-                <input type="text" id="university" name="university" placeholder="대학교 입력" value="${sessionScope.loginUser.userUniversity}">
-                <div id="university-message" class="message"></div>
-            </div>
-            <!-- 학위 -->
-            <div class="input-group">
-                <label for="degree">학위</label>
-                <select id="degree" name="degree">
-                    <option value="" ${empty sessionScope.loginUser.userDegree ? 'selected' : ''}>선택하세요</option>
-                    <option value="bachelor" ${sessionScope.loginUser.userDegree == 'bachelor' ? 'selected' : ''}>학사</option>
-                    <option value="master" ${sessionScope.loginUser.userDegree == 'master' ? 'selected' : ''}>석사</option>
-                    <option value="doctor" ${sessionScope.loginUser.userDegree == 'doctor' ? 'selected' : ''}>박사</option>
-                </select>
-                <div id="degree-message" class="message"></div>
-            </div>
-            <!-- 졸업 여부 -->
-            <div class="input-group">
-                <label for="graduated">졸업 여부</label>
-                <select id="graduated" name="graduated">
-                    <option value="" ${empty sessionScope.loginUser.userGradulate ? 'selected' : ''}>선택하세요</option>
-                    <option value="Y" ${sessionScope.loginUser.userGradulate == 'Y' ? 'selected' : ''}>졸업</option>
-                    <option value="N" ${sessionScope.loginUser.userGradulate == 'N' ? 'selected' : ''}>미졸업</option>
-                </select>
-                <div id="graduated-message" class="message"></div>
-            </div>
-            <!-- 학점 -->
-            <div class="input-group">
-                <label for="point">학점</label>
-                <input type="text" id="point" name="point" placeholder="학점 입력 (예: 3.5)" value="${sessionScope.loginUser.userPoint}">
-                <div id="point-message" class="message"></div>
-            </div>
-            <!-- 버튼 -->
-            <div class="btn-group">
-                <button type="button" class="btn cancel" id="cancel">취소</button>
-                <button type="button" class="btn submit" id="submit">변경하기</button>
-            </div>
-        </form>
-    </div>
+		</c:if>
+		<form id="myPageForm">
+			<input type="hidden" name="_csrf" value="${_csrf.token}" />
+			<!-- 비밀번호 변경 -->
+			<c:if
+				test="${not empty sessionScope.loginUser and sessionScope.loginUser.userLoginType != 3 and sessionScope.loginUser.userLoginType != 4 and sessionScope.loginUser.userLoginType != 5}">
+				<div class="input-group">
+					<label for="new-password">새 비밀번호</label> <input type="password"
+						id="new-password" name="newPassword" placeholder="새 비밀번호 입력"
+						maxlength="16">
+					<div id="new-password-message" class="message"></div>
+				</div>
+				<div class="input-group">
+					<label for="confirm-password">새 비밀번호 확인</label> <input
+						type="password" id="confirm-password" name="confirmPassword"
+						placeholder="비밀번호 재입력" maxlength="16">
+					<div id="confirm-password-message" class="message"></div>
+				</div>
+			</c:if>
+			<!-- 이메일 변경 -->
+			<c:if
+				test="${not empty sessionScope.loginUser and sessionScope.loginUser.userLoginType != 3 and sessionScope.loginUser.userLoginType != 4 and sessionScope.loginUser.userLoginType != 5}">
+				<div class="input-group">
+					<label for="email">이메일</label>
+					<div class="inline-group">
+						<input type="email" id="email" name="email"
+							value="${sessionScope.loginUser.userEmail}" readonly>
+						<button type="button" class="btn" id="change-email">변경하기</button>
+					</div>
+					<div id="email-message" class="message"></div>
+				</div>
+				<!-- 인증번호 -->
+				<div class="input-group verification-group" style="display: none;">
+					<div class="inline-group">
+						<input type="text" id="verification-code" name="verification-code"
+							placeholder="인증번호" maxlength="6" disabled>
+						<button type="button" class="btn" id="verify-code" disabled>인증확인</button>
+					</div>
+					<div id="timer" class="timer">00:00</div>
+					<div id="verification-message" class="message"></div>
+				</div>
+			</c:if>
+			<!-- 대학교 -->
+			<div class="input-group">
+				<label for="university">대학교</label> <input type="text"
+					id="university" name="university" placeholder="대학교 입력"
+					value="${sessionScope.loginUser.userUniversity}">
+				<div id="university-message" class="message"></div>
+			</div>
+			<!-- 학위 -->
+			<div class="input-group">
+				<label for="degree">학위</label> <select id="degree" name="degree">
+					<option value=""
+						${empty sessionScope.loginUser.userDegree ? 'selected' : ''}>선택하세요</option>
+					<option value="bachelor"
+						${sessionScope.loginUser.userDegree == 'bachelor' ? 'selected' : ''}>학사</option>
+					<option value="master"
+						${sessionScope.loginUser.userDegree == 'master' ? 'selected' : ''}>석사</option>
+					<option value="doctor"
+						${sessionScope.loginUser.userDegree == 'doctor' ? 'selected' : ''}>박사</option>
+				</select>
+				<div id="degree-message" class="message"></div>
+			</div>
+			<!-- 졸업 여부 -->
+			<div class="input-group">
+				<label for="graduated">졸업 여부</label> <select id="graduated"
+					name="graduated">
+					<option value=""
+						${empty sessionScope.loginUser.userGradulate ? 'selected' : ''}>선택하세요</option>
+					<option value="Y"
+						${sessionScope.loginUser.userGradulate == 'Y' ? 'selected' : ''}>졸업</option>
+					<option value="N"
+						${sessionScope.loginUser.userGradulate == 'N' ? 'selected' : ''}>미졸업</option>
+				</select>
+				<div id="graduated-message" class="message"></div>
+			</div>
+			<!-- 학점 -->
+			<div class="input-group">
+				<label for="point">학점</label> <input type="text" id="point"
+					name="point" placeholder="학점 입력 (예: 3.5)"
+					value="${sessionScope.loginUser.userPoint}">
+				<div id="point-message" class="message"></div>
+			</div>
+			<!-- 버튼 -->
+			<div class="btn-group">
+				<button type="button" class="btn cancel" id="cancel">취소</button>
+				<button type="button" class="btn submit" id="submit">변경하기</button>
+			</div>
+			<div class="exit" onclick="tryExitSite()">
+				<h4>
+					<u>탈퇴하기</u>
+				</h4>
+			</div>
+		</form>
+	</div>
 </body>
 </html>
