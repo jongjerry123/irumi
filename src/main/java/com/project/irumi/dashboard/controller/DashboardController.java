@@ -1,7 +1,9 @@
 package com.project.irumi.dashboard.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.project.irumi.common.Paging;
 import com.project.irumi.common.Search;
+import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Dashboard;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.JobList;
 import com.project.irumi.dashboard.model.dto.Spec;
+import com.project.irumi.dashboard.model.dto.SpecSchedule;
 import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
@@ -256,7 +260,7 @@ public class DashboardController {
 	@RequestMapping(value = "insertJob.do", method = RequestMethod.POST)
 	public ModelAndView insertJobMethod(Job job, ModelAndView mv, HttpSession session) {
 		
-		int jobId = dashboardService.selectMaxJobId() + 1;
+		int jobId = dashboardService.selectNextJobId();
 		job.setJobId(String.valueOf(jobId));
 		
 		int resultOne = dashboardService.insertJob(job);
@@ -280,15 +284,9 @@ public class DashboardController {
 	}
 	
 	@RequestMapping("deleteSpec.do")
-	public String deleteSpecMethod(@RequestParam("specId") String specId, Model model, HttpSession session) {
+	public String deleteSpecMethod(@RequestParam("specId") String specId, Model model) {
 		
-		User loginUser = (User) session.getAttribute("loginUser");
-		Specific specific = new Specific();
-		specific.setUserId(loginUser.getUserId());
-		specific.setSpecId(String.valueOf(specId));
-		
-		if (dashboardService.deleteSpecLink(specific) > 0 && dashboardService.deleteSpec(specId) > 0) {
-			
+		if (dashboardService.deleteSpec(specId) > 0) {
 			return "redirect:dashboard.do";
 		} else {
 			model.addAttribute("message", "스펙 삭제 실패!");
@@ -297,23 +295,56 @@ public class DashboardController {
 	}
 	
 	@RequestMapping(value = "insertSpec.do", method = RequestMethod.POST)
-	public ModelAndView insertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, ModelAndView mv, HttpSession session) {
+	public ModelAndView insertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, @RequestParam("ssType") List<String> ssType, @RequestParam("ssDate") List<String> ssDate, @RequestParam("actContent") List<String> actContent, ModelAndView mv, HttpSession session) {
 		
-		int specId = dashboardService.selectMaxSpecId() + 1;
-		spec.setSpecId(String.valueOf(specId));
-		
-		int resultOne = dashboardService.insertSpec(spec);
+		// 스펙 추가
+		boolean resultOne = true;
+		String specId = String.valueOf(dashboardService.selectNextSpecId());
+		spec.setSpecId(specId);
+		int one = dashboardService.insertSpec(spec);
 		
 		User loginUser = (User) session.getAttribute("loginUser");
 		Specific specific = new Specific();
 		specific.setUserId(loginUser.getUserId());
 		specific.setJobId(jobId);
-		specific.setSpecId(String.valueOf(specId));
+		specific.setSpecId(specId);
+		int two = dashboardService.insertSpecLink(specific);
 		
-		int resultTwo = dashboardService.insertSpecLink(specific);
-		if (resultOne > 0 && resultTwo > 0) {
-			mv.addObject("spec", spec);
-			mv.setViewName("chatbot/act");
+		if (one < 1 || two < 1) {
+			resultOne = false;
+		}
+		
+		// 스펙 스케줄 추가
+		boolean resultTwo = true;
+		if (ssType.size() == ssDate.size()) {
+			for (int i = 0; i < ssType.size(); i++) {
+				if (ssType.get(i) != null && ssDate.get(i) != null) {
+					int ssId = dashboardService.selectNextSsId();
+					if (dashboardService.insertSs(new SpecSchedule(String.valueOf(ssId), String.valueOf(specId), ssType.get(i), Date.valueOf(ssDate.get(i)))) < 1) {
+						resultTwo = false;
+					}
+				}
+				
+			}
+		}
+		
+		// 활동 추가
+		boolean resultThree = true;
+		for (int i = 0; i < actContent.size(); i++) {
+			if (actContent.get(i) != null) {
+				int actId = dashboardService.selectNextActId();
+				Activity act = new Activity(String.valueOf(actId), actContent.get(i));
+				specific.setActId(String.valueOf(actId));
+				if (dashboardService.insertAct(act) < 1 || dashboardService.insertActLink(specific) < 1) {
+					resultThree = false;
+				}
+			}
+			
+		}
+		
+		
+		if (resultOne && resultTwo && resultThree) {
+			mv.setViewName("dashboard/dashboard");
 		} else {
 			mv.addObject("message", "스펙 추가 실패!");
 			mv.setViewName("common/error");
@@ -331,5 +362,91 @@ public class DashboardController {
 		model.addAttribute("message", "스펙 업데이트 실패!");
 		return "common/error";
 	}
+	
+	@RequestMapping("updateSpec.do")
+	public String updateSpecMethod(@RequestParam("jobId") String jobId, @RequestParam("specId") String specId, Model model, HttpSession session) {
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		specific.setSpecId(specId);
+		
+		Job job = dashboardService.selectJob(jobId);
+		Spec spec = dashboardService.selectSpec(specId);
+		ArrayList<SpecSchedule> ss = dashboardService.selectUserSpecSchedule(specId);
+		ArrayList<Activity> acts = dashboardService.selectUserActs(specific);
+		
+		if (spec != null) {
+			model.addAttribute("job", job);
+			model.addAttribute("spec", spec);
+			model.addAttribute("ss", ss);
+			model.addAttribute("acts", acts);
+			return "dashboard/editSpec";
+		}
+		model.addAttribute("message", "스펙 업데이트 실패!");
+		return "common/error";
+	}
+	
+	@RequestMapping(value = "deleteAndInsertSpec.do", method = RequestMethod.POST)
+	public ModelAndView deleteAndInsertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, @RequestParam("ssType") List<String> ssType, @RequestParam("ssDate") List<String> ssDate, @RequestParam("actContent") List<String> actContent, ModelAndView mv, HttpSession session) {
+
+		// 기존 스펙 삭제
+		int resultDelete = dashboardService.deleteSpec(spec.getSpecId());
+		
+		// 스펙 추가
+		boolean resultOne = true;
+		String specId = String.valueOf(dashboardService.selectNextSpecId());
+		spec.setSpecId(specId);
+		int one = dashboardService.insertSpec(spec);
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		specific.setSpecId(specId);
+		int two = dashboardService.insertSpecLink(specific);
+
+		if (one < 1 || two < 1) {
+			resultOne = false;
+		}
+
+		// 스펙 스케줄 추가
+		boolean resultTwo = true;
+		if (ssType.size() == ssDate.size()) {
+			for (int i = 0; i < ssType.size(); i++) {
+				if (ssType.get(i) != null && ssDate.get(i) != null) {
+					int ssId = dashboardService.selectNextSsId();
+					if (dashboardService.insertSs(new SpecSchedule(String.valueOf(ssId), String.valueOf(specId), ssType.get(i), Date.valueOf(ssDate.get(i)))) < 1) {
+						resultTwo = false;
+					}
+				}
+			}
+		}
+
+		// 활동 추가
+		boolean resultThree = true;
+		for (int i = 0; i < actContent.size(); i++) {
+			if (actContent.get(i) != null) {
+				int actId = dashboardService.selectNextActId();
+				Activity act = new Activity(String.valueOf(actId), actContent.get(i));
+				specific.setActId(String.valueOf(actId));
+				if (dashboardService.insertAct(act) < 1 || dashboardService.insertActLink(specific) < 1) {
+					resultThree = false;
+				}
+			}
+
+		}
+
+		if (resultDelete > 0 && resultOne && resultTwo && resultThree) {
+			mv.setViewName("dashboard/dashboard");
+		} else {
+			mv.addObject("message", "스펙 추가 실패!");
+			mv.setViewName("common/error");
+		}
+
+		return mv;
+	}
+	
 	
 }

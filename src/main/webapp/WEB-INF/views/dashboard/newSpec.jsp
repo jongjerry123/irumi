@@ -2,6 +2,9 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp" />
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
@@ -68,9 +71,15 @@ label {
 
 /* 호버 언더라인 */
 label::after {
-  content: ""; position: absolute; left: 0; bottom: 0;
-  width: 100%; height: 2px; background: #009688;
-  transform: scaleX(0); transform-origin: left;
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #009688;
+  transform: scaleX(0);
+  transform-origin: left;
   transition: transform 0.3s;
 }
 label:hover { color: #009688; }
@@ -78,7 +87,9 @@ label:hover::after { transform: scaleX(1); }
 
 /* 클릭 배경 및 물결 */
 input[type="radio"]:checked + label {
-  color: #fff; background: #009688; border-radius: 4px;
+  color: #fff;
+  background: #009688;
+  border-radius: 4px;
 }
 
 input[type="radio"]:checked + label::before {
@@ -98,18 +109,76 @@ input[type="radio"]:checked + label::before {
   to { width: 200%; height: 200%; opacity: 0; }
 }
 </style>
+<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
+<script>
+	function addSchedule() {
+		let allFilled = true;
+		$('.ssType, .ssDate').each(function() {
+			if ($(this).val().trim() === '') {
+				allFilled = false;
+				return false;
+			}
+		});
+
+		if (allFilled) {
+			$('#scheduleRow')
+					.append(
+							'<div class="schedule-set">'
+									+ '일정 유형: <input type=\"text\" name=\"ssType\" class=\"ssType\" required>&nbsp;'
+									+ '날짜: <input type=\"date\" name=\"ssDate\" class=\"ssDate\" required>&nbsp;'
+									+ '<button type=\"button\" onclick=\"removeSchedule(this)\">삭제</button>'
+									+ '</div>');
+		}
+		else {
+			alert('일정 칸이 비어있습니다!');
+		}
+	}
+
+	function removeSchedule(btn) {
+		$(btn).closest('.schedule-set').remove();
+	}
+	
+	function addAct() {
+		let allFilled = true;
+		$('.actContent').each(function() {
+			if ($(this).val().trim() === '') {
+				allFilled = false;
+				return false;
+			}
+		});
+
+		if (allFilled) {
+			$('#actRow').append('<div class="act-set">'
+									+ '<input type=\"text\" name=\"actContent\" class=\"actContent\" required>&nbsp;'
+									+ '<button type=\"button\" onclick=\"removeAct(this)\">삭제</button>'
+									+ '</div>');
+		}
+		else {
+			alert('활동 칸이 비어있습니다!');
+		}
+	}
+	
+	function removeAct(btn) {
+		$(btn).closest('.act-set').remove();
+	}
+	
+	function checkSchedule(event) {
+		if ((!$('.ssType').val() && $('.ssDate').val()) || ($('.ssType').val() && !$('.ssDate').val())) {
+			alert("주요 일정에 입력란 모두 채워져야 합니다.");
+			event.preventDefault();
+		}
+	}
+</script>
 </head>
 <body>
-	<c:if test="${ empty sessionScope.loginUser }">
-		<jsp:forward page="/WEB-INF/views/user/login.jsp" />
-	</c:if>
+	
 	<c:set var="menu" value="dashboard" scope="request" />
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	
 	<h1 align="center">목표: ${ requestScope.job.jobName }</h1>
 	<h3>${ requestScope.job.jobExplain }</h3>
 	<form action="insertSpec.do" method="post">
-		<input type="text" name="jobId" value="${ requestScope.job.jobId }" hidden>
+		<input type="hidden" name="jobId" value="${ requestScope.job.jobId }">
 		<table align="center" width="1000" border="1" cellspacing="0" cellpadding="5">
 			<tr>
 				<th>목표 스펙*</th>
@@ -136,10 +205,22 @@ input[type="radio"]:checked + label::before {
 				<th>스펙 내용</th>
 				<td><textarea name="specExplain" rows="4" cols="50"></textarea></td>
 			</tr>
+			<tr>
+				<th>주요 일정</th>
+				<td id="scheduleRow">
+					<div class="schedule-set">
+						일정: <input type="text" name="ssType" class="ssType">&nbsp;날짜: <input type="date" name="ssDate" class="ssDate">&nbsp;<button type="button" onclick="addSchedule()">일정 더 추가하기</button>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>목표 활동</th>
+				<td id="actRow"><input type="text" name="actContent" class="actContent">&nbsp;<button type="button" onclick="addAct()">활동 더 추가하기</button></td>
+			</tr>
 		</table>
 		
 		<div class="buttons">
-			<button type="submit">목표 스펙으로 설정</button>
+			<button type="submit" onclick="checkSchedule(event)">목표 스펙으로 설정</button>
 		</div>
 	</form>
 	<c:import url="/WEB-INF/views/common/footer.jsp" />

@@ -1,9 +1,11 @@
 package com.project.irumi.chatbot.manager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,8 @@ import org.springframework.stereotype.Component;
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
-
-import com.project.irumi.chatbot.context.StateActChat;
-import com.project.irumi.chatbot.context.StateJobChat;
 import com.project.irumi.chatbot.context.StateSpecChat;
+import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.dashboard.model.service.DashboardService;
 
@@ -67,59 +67,104 @@ public class SpecChatManager {
             	
             	// 현재 타겟 직업은 job service에서 selectOneJob 개발시 설정
             	//String targetJob = session.getSubtopicId();
-            	String targetJob = "소프트웨어 개발자";
+            	String targetJob = dashboardService.selectJob(session.getSubtopicId()).getJobName();
             	String serpQuery = targetJob+ "되기 위해 필요한 " +userMsg + "리스트";
                 String serpResult = serpApiService.searchJobSpec(serpQuery);
             	
-                String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저가 [소프트웨어 개발자]직무에 지원할 때 이력으로 적으면 좋을 만한 스펙들을 3개 추천해 줘."
-                																				+ "유저가 이미 보유한 스펙과 이미 저장한 스펙은 제외해 줘."
-                																				+ "한 줄에 1개씩 출력해줘, "
-                																				+"스펙명: 어떠한 능력을 보는 어떤 특징을 가진 스펙인지 간단히 설명하는 형태로."+
-                																				String.join(" ", session.getContextHistory())+
-                																				"참고용 검색 결과: " + serpResult
-                																				// specific db 구현 후 
-                																				//+"\n 유저가 저장한 스펙 리스트: "+ String.join(" ", dashboardService. )
-                																				);
-            String specType = userMsg.trim(); // 수정 -- 스펙 타입 저장 (gpt 가 스펙 타입 무시해서 제대로 알아듣게 필드생성)
-            	
-            	
-            	String gotSpec = session.getGettedSpec(); /// 수정 -- 이미 갖고 있는 스펙 가져오기
-            	String specText;
+//                String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저가 [소프트웨어 개발자]직무에 지원할 때 이력으로 적으면 좋을 만한 스펙들을 3개 추천해 줘."
+//                																				+ "유저가 이미 보유한 스펙과 이미 저장한 스펙은 제외해 줘."
+//                																				+ "한 줄에 1개씩 출력해줘, "
+//                																				+"스펙명: 어떠한 능력을 보는 어떤 특징을 가진 스펙인지 간단히 설명하는 형태로."+
+//                																				String.join(" ", session.getContextHistory())+
+//                																				"참고용 검색 결과: " + serpResult
+//                																				// specific db 구현 후 
+//                																				//+"\n 유저가 저장한 스펙 리스트: "+ String.join(" ", dashboardService. )
+//                																				);
+                String gptAnswer = gptApiService.callGPT(
+                		"""
+                        다음 정보를 참고하여 유저가 [%s] 직무에 지원할 때 이력으로 적으면 좋을 스펙 3개를 추천해 줘.  
+                        아래와 같은 JSON 배열 형식으로만 응답해.  
+                        다른 문장이나 설명은 절대 포함하지 마.  
+                        각 스펙은 다음 속성을 포함해야 해:  
+                        - title (스펙 이름)  
+                        - explain (간단한 설명)  
 
-            	if (gotSpec == null || gotSpec.isBlank()) {
-            	    specText = "보유한 스펙 정보 없음";
-            	} else {
-            	    specText = gotSpec;
-            	}
-            	
-            	// prompt 수정
-            	String prompt = """
-						다음 정보를 참고해서 유저가 [소프트웨어 개발자] 직무에 지원할 때 이력서에 적으면 좋을 %s 유형의 스펙들을 3개 추천해 주세요.
-						한 줄에 1개씩 출력해주세요.
-						단, 아래에 이미 유저가 보유한 스펙은 언급하지 마세요.
+                        예시:  
+                        [  
+                          { "title": "정보처리기사", "explain": "정보 시스템과 소프트웨어 기초 역량을 평가하는 자격증" },  
+                          { "title": "포트폴리오 제작", "explain": "자기 주도적 프로젝트를 통해 실무 능력을 보여주는 활동" }  
+                        ]  
 
-						유저가 보유한 스펙: %s
+                        참고할 유저 정보: %s  
+                        검색 참고 결과: %s
+                        """.formatted(targetJob, String.join(" ", session.getContextHistory()), serpResult)
+                    );
+                logger.info("받은 응답:"+gptAnswer);
+                
+             // ✅ JSON → CareerItemDto 리스트로 파싱
+                List<CareerItemDto> specCItemList = new ArrayList<>();
+                try {
+                    JSONArray jsonArray = new JSONArray(gptAnswer);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        CareerItemDto dto = new CareerItemDto();
+                        dto.setTitle(obj.getString("title"));
+                        dto.setExplain(obj.getString("explain"));
+                        dto.setType("spec");
+                        specCItemList.add(dto);
+                    }
+                    logger.info("specCIitemList:"+specCItemList);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return new ChatbotResponseDto("스펙 추천 중 오류가 발생했습니다.", null);
+                }
+                
+                
 
-						유저의 상황:
-						%s
-
-						각 스펙은 한 줄에 "스펙명 - 간단한 설명" 형식으로 작성해 주세요.
-						예:
-						정보처리기사 - 컴퓨터 시스템과 정보처리 역량을 평가하는 대표적인 국가 자격증입니다.
-						개인 포트폴리오 - 실제로 개발한 프로젝트로 실무 능력을 보여줄 수 있습니다.
-						공모전 수상 - 문제 해결력과 창의성을 평가받을 수 있는 활동입니다.
-						""".formatted(specType, specText, String.join(" ", session.getContextHistory()));
-              
-            //String gptAnswer = gptApiService.callGPT(prompt);
-
-            	
-            	List<String> specList = Arrays.stream(gptAnswer.split("\n"))
-                        .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
-                        .collect(Collectors.toList());
-            	
             	session.setChatState(StateSpecChat.ASK_WANT_MORE_OPT);
             	return new ChatbotResponseDto("추가로 더 추천받고 싶으신가요?", 
-                        specList, List.of("네", "아니요"));
+            			specCItemList, List.of("네", "아니요"));
+            	
+            	//상호 ver GPT prompt
+                
+//                String specType = userMsg.trim(); // 수정 -- 스펙 타입 저장 (gpt 가 스펙 타입 무시해서 제대로 알아듣게 필드생성)
+//            	
+//            	
+//            	String gotSpec = session.getGettedSpec(); /// 수정 -- 이미 갖고 있는 스펙 가져오기
+//            	String specText;
+//
+//            	if (gotSpec == null || gotSpec.isBlank()) {
+//            	    specText = "보유한 스펙 정보 없음";
+//            	} else {
+//            	    specText = gotSpec;
+//            	}
+//            	
+//            	// prompt 수정
+//            	String prompt = """
+//						다음 정보를 참고해서 유저가 [소프트웨어 개발자] 직무에 지원할 때 이력서에 적으면 좋을 %s 유형의 스펙들을 3개 추천해 주세요.
+//						한 줄에 1개씩 출력해주세요.
+//						단, 아래에 이미 유저가 보유한 스펙은 언급하지 마세요.
+//
+//						유저가 보유한 스펙: %s
+//
+//						유저의 상황:
+//						%s
+//
+//						각 스펙은 한 줄에 "스펙명 - 간단한 설명" 형식으로 작성해 주세요.
+//						예:
+//						정보처리기사 - 컴퓨터 시스템과 정보처리 역량을 평가하는 대표적인 국가 자격증입니다.
+//						개인 포트폴리오 - 실제로 개발한 프로젝트로 실무 능력을 보여줄 수 있습니다.
+//						공모전 수상 - 문제 해결력과 창의성을 평가받을 수 있는 활동입니다.
+//						""".formatted(specType, specText, String.join(" ", session.getContextHistory()));
+//              
+            //String gptAnswer = gptApiService.callGPT(prompt);
+
+//              List<String> specList = Arrays.stream(gptAnswer.split("\n"))
+//              .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // 번호 제거
+//              .collect(Collectors.toList());
+  	
+            	
+            	
 
             case ASK_WANT_MORE_OPT:
                 if ("네".equals(userMsg)) {

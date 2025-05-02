@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp"/>
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
@@ -153,10 +156,7 @@ div {
 </head>
 <body>
 
-<!-- TODO: 로그인 상태가 아닌 경우 로그인 페이지로 이동 -->
-<%-- <c:if test="${ empty sessionScope.loginUser }">
-	<jsp:forward page="/WEB-INF/views/user/login.jsp"/>
-</c:if> --%>
+
 
 <!-- footer에 페이지를 제대로 표시하기 위해 menu를 request scope에서 dashboard로 설정함 -->
 <c:set var="menu" value="dashboard" scope="request" />

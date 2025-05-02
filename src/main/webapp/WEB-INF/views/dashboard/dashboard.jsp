@@ -127,8 +127,8 @@ body {
 }
 </style>
 
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
+
 <script>
 	$(document).ready(function() {
 		$('#certCards').slideToggle(300);
@@ -234,7 +234,7 @@ body {
 							
 	                        cardHtml += '</div>' +
 	                        			'<div class="buttons">' +
-	                        			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
+	                        			'<button onclick=\"movetoUpdateSpec(' + jobId + ', ' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
 	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 150px;\">삭제</button>' +
 	                        			'</div>' +
 	                        			'<div class="buttons">' +
@@ -261,8 +261,8 @@ body {
 		location.href = 'deleteSpec.do?specId=' + specId;
 	}
 	
-	function movetoUpdateSpec(specId) {
-		location.href = 'updateSpec.do?specId=' + specId;
+	function movetoUpdateSpec(jobId, specId) {
+		location.href = 'updateSpec.do?jobId=' + jobId + '&specId=' + specId;
 	}
 	
 	function movetoAccomplishSpec(specId) {

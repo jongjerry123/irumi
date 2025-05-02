@@ -11,12 +11,24 @@ public class Activity implements java.io.Serializable {
 		super();
 	}
 	
+	public Activity(String actContent) {
+		super();
+		this.actContent = actContent;
+	}
+	
 	public Activity(String actId, String actContent, String actState) {
 		super();
 		this.actId = actId;
 		this.actContent = actContent;
 		this.actState = actState;
 	}
+	
+	public Activity(String actId, String actContent) {
+		super();
+		this.actId = actId;
+		this.actContent = actContent;
+	}
+
 
 	public String getActId() {
 		return actId;
