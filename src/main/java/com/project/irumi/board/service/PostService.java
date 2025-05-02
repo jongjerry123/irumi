@@ -95,6 +95,7 @@ public class PostService {
 
 	// 댓글 삭제 (단건)
 	public void deleteComment(Long commentId) {
+		postDAO.deleteCommentReportsByCommentIds(List.of(commentId));
 		postDAO.deleteComment(commentId);
 	}
 
