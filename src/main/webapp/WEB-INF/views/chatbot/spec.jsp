@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp" />
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
@@ -59,9 +62,11 @@ body {
 	padding-left: 40px;
 	display: flex;
 	flex-direction: column;
+	height:100%;
 }
 .content-box {
 	background-color: #1e1e1e;
+	max-width: 700px;
 	padding-right: 20px;
 	padding-left: 20px;
 	border-radius: 12px;
@@ -72,6 +77,9 @@ body {
 	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
 	display: flex;
 	flex-direction: column;
+	
+	/*위아래 패딩 추가*/
+	padding-top: 30px;
 }
 .content-box::-webkit-scrollbar {
 	width: 9px;
@@ -104,9 +112,9 @@ body {
 	margin-left: 4px;
 }
 .right-panel .info-row{
- display: flex;
   align-items: center;
   margin-bottom: 10px;
+  flex-direction: column; /*세로 정렬*/
 }
 .right-panel .label {
  font-size : 14px;
@@ -115,7 +123,7 @@ body {
 }
 .right-panel .value {
  color: #fff;
- font-size : 11px;
+ font-size : 14px;
  margin-left : 4px;
 }
 .chat-input-box .chat-send-btn:hover {
@@ -315,10 +323,11 @@ body {
 	flex-direction: column; /* 세로 정렬 */
 	align-items: flex-start; /* 좌측 정렬 */
 	gap: 8px;
+	
 }
 .select-label {
 	color: #d9d9d9;
-	font-size: 15px;
+	font-size: 18px;
 	font-weight: 600;
 	margin-bottom: 2px; /* 라벨 아래 약간 여백 */
 }
@@ -333,7 +342,7 @@ body {
 	margin-right: 8px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-bottom: 4px; /* 버튼들끼리 간격 */
+	margin-bottom: 7px; /* 버튼들끼리 간격 */
 }
 .select-btn:hover{
 	background: #BAAC80;
@@ -354,6 +363,10 @@ body {
 	flex-direction: row;
 	gap: 8px; /* 버튼 사이 간격 */
 	flex-wrap: nowrap;
+	
+}
+.select-job-btn-list {
+	padding: 10px 10px 0px 10px;
 }
 .select-btn.active {
 	background: #BAAC80;
@@ -361,6 +374,13 @@ body {
 	font-weight: 700;
 }
 /*************************************************************************** */
+/*추가*/
+/* .chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 전체 높이에서 상단/하단 제외하고 채움 */
+}
+/*
 .chat-area {
 	flex: 1;
 	overflow-y: auto;
@@ -369,8 +389,27 @@ body {
 	padding: 20px;
 	display: flex;
 	flex-direction: column;
+	gap: 8px; 
+} */
+.chat-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+}
+
+.chat-area {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	background-color: #1e1e1e;
+	border-radius: 12px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
 	gap: 8px;
 }
+
 #userInput {
 	flex: 1;
 	background-color: #333;
@@ -382,6 +421,17 @@ body {
 	font-size: 15px;
 	outline: none;
 }
+
+/* 추가된 클래스 - 챗봇 응답이 꽉 차게 함 - html 에 적용해야 함*/
+.answer {
+	max-width: 100%;
+	/*padding: 10px 15px;*/
+	border-radius: 12px;
+	line-height: 1.5;
+	font-size: 0.95em;
+	word-wrap: break-word;
+}
+
 .message {
 	max-width: 70%;
 	padding: 10px 15px;
@@ -391,11 +441,12 @@ body {
 	word-wrap: break-word;
 }
 .user-msg {
-	background-color: #BAAC80;
-	color: black;
+/*배경색, 글씨색 변경*/
+	background-color: #383838; 
+	color: white;
 	align-self: flex-end;
 	text-align: right;
-	font-weight: bold;
+	/*font-weight: bold;*/
 }
 .bot-msg {
 	align-self: flex-start;
@@ -410,10 +461,15 @@ body {
 	padding: 8px 16px;
 	margin-top: 10px;
 }
+.confirm-select-box{
+	  display: flex;
+	  justify-content: center; /* 수평 가운데 정렬 */
+	  align-items: center;     /* 수직 가운데 정렬 (선택사항) */
+}
 /* 추가 - 선택 버튼 css */
 .confirm-select-box .confirm-select-btn{
-	border: 1.5px solid #BAAC80;
-	border-radius: 22px;
+	border: 1.5px solid #eeeeee;
+	border-radius: 10px;
 	font-size: 15px;
 	padding: 7px 20px;
 	cursor: pointer;
@@ -421,22 +477,22 @@ body {
 	margin-top : 3px;
 	font-weight : bold;
 	text-align: center;
-	color: #BAAC80;
+	color: #eeeeee;
 	background: none;
+	margin-right: 20px;
 }
 .confirm-select-box .confirm-select-btn:hover{
-	background: #BAAC80;
-	border: 1.5px solid #BAAC80;
-	color: #1e1e1e;
-	border-radius: 22px;
+	border-radius: 10px;
 	font-size: 15px;
-	font-weight: 500;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	opacity: 0.5;
-	color: black;
-	
+	margin-top : 3px;
+	font-weight : bold;
+	text-align: center;
+	color: #383838;
+	background: #eeeeee;
+	opacity: 0.3;
 }
 </style>
 <script>
@@ -452,10 +508,10 @@ let cacheSessionSpecOpts=null; // (스펙챗엔 필요 X)선택한 jobOpt에 따
 let subTopicJobCI= null; // subtopic 지정 위해 서버로 보낼 CI 객체;
 
 $(function() {
-
+	// 대쉬보드 requestScope에서 가져오는 값.
+	var dashJobName = "${job.jobName}";  
 	
-	// document ready시 바로 startChatSession
-	 // topic 선택용 영역에 서버에서 받은리스트 출력
+	// document ready시 바로 startChatSession, 직무 선택 버튼 보이기
 	 // 서버는 jobList와  specList를 보냄.(리스트 내부 객체는 모두 CI .)
 	$.ajax({ 
         type: "POST",
@@ -470,12 +526,23 @@ $(function() {
             	sessionTopicOpts.jobList.forEach((jobCI, index) => {
                     const btn = $("<button>")
                         .addClass("select-btn")
-                        .toggleClass("active", index === 0)
                         .text(jobCI.title);
                     $jobBtnList.append(btn);
                 });
+            	//대쉬보드에서 넘어온 jobTitle이 있을 경우
+	           	 // 직무 버튼 생성 후 기본 선택
+	           	if (dashJobName && dashJobName.trim() !== "") {
+	                $(".select-job-btn-list .select-btn").each(function () {
+	                    if ($(this).text().trim() === dashJobName.trim()) {
+	                        $(this).siblings().removeClass("active");
+	                        $(this).addClass("active");
+	                        const clickedJobName = $(this).text();
+	                        subTopicJobCI = cacheSessionJobOpts.find(jobCI => jobCI.title === clickedJobName);
+	                    }
+	                });
+            	}
             }
-
+			//타겟 직무 클릭시 토글되도록 하기
             const $specBtnList = $(".select-spec-btn-list");
             $specBtnList.empty();
             if (sessionTopicOpts.specList && sessionTopicOpts.specList.length > 0) {
@@ -504,22 +571,13 @@ $(function() {
 	    // 선택된 Job에 해당하는 Career Item 객체를 서버로 보내기 위해 저장.
 	    subTopicJobCI = cacheSessionJobOpts.find(jobCI => jobCI.title === clickedJobName);
 	    
-	    //클릭한 CI와 연결된 Spec을 불러옴.
-	    
-	    
-/* 	    //서버에 CI 형태로 보내기 위해 변환 작업
-	    subTopicCareerItem = {
-	    	    title: job.jobName,
-	    	    explain: job.jobExplain,
-	    	    type: "job"
-	    	}; */
+
 	});
 	
 	// 토픽 선택 후 '선택 완료' 버튼 클릭시 setSubTopic
 	// spec 은 선택한 job을 sub topic으로 하면 됨.
 	// ss, act 는 최종으로 선택된 spec을 sub topic으로 설정해야 함.
 	//subTopicJobCI을 보내면 됨.
-	
 	const $confirmSelectBtn = $(".confirm-select-btn");
 	$confirmSelectBtn.on("click", function(){
 		
@@ -753,9 +811,11 @@ $(function() {
 						<button class="confirm-select-btn"> 선택 완료 </button>
 					</div>
 				</div>
+				<div class="chat-container" id="chat-container">
 				<div class="chat-area" id="chatArea">
-					<div class="message bot-msg">
+					<div class="answer bot-msg">
 						내게 맞는 스펙 추천 세션입니다.<br> 먼저, 현재 보유하고 있는 스펙이나 경험을 말씀해 주세요.
+					</div>
 					</div>
 				</div>
 			</div>
