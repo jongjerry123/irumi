@@ -208,8 +208,12 @@ body {
 	gap: 10px;
 }
 .content-box .custom-checkbox {
+	/* 추가*/
+	flex-direction: column;  /* 세로로 배치 */
+    align-items: flex-start;  /* 왼쪽 정렬 */
+    
 	display: flex;
-	align-items: center;
+	align-items: left;
 	justify-content: space-between;
 	background: #181818;
 	border: 1.5px solid #fff;
@@ -226,11 +230,19 @@ body {
 .content-box .custom-checkbox input[type="checkbox"] {
 	display: none;
 }
-.content-box .custom-checkbox .checkbox-text {
+.content-box .custom-checkbox .checkbox-explain {
 	color: #fff;
-	font-size: 15px;
+	font-size: 12px;
+   margin-top: 5px;  /* 제목과 설명 사이에 여백 */
 	letter-spacing: 0.5px;
 }
+
+.content-box .custom-checkbox .checkbox-text {
+    color: #BAAC80;  /* 설명 색상 */
+    font-size: 15px;
+    font-weight:bold;
+}
+
 .content-box .custom-checkbox .checkmark {
 	display: none;
 	font-size: 18px;
@@ -344,6 +356,8 @@ body {
 	transition: background 0.18s, color 0.18s, border 0.18s;
 	margin-bottom: 7px; /* 버튼들끼리 간격 */
 }
+
+/*select-job-btn-list 와 같이 option-buttons내의 버튼들이 정렬되도록 고쳐줘. 한 버튼은 텍스트 크기 만해야 해*/
 .select-btn:hover{
 	background: #BAAC80;
 	border: 1.5px solid #BAAC80;
@@ -373,6 +387,18 @@ body {
 	color: #232323;
 	font-weight: 700;
 }
+
+.option-buttons {
+	    display: flex; /* 버튼을 가로로 배치 */
+	    flex-direction: row; /* 수평 정렬 */
+	    gap: 8px; /* 버튼 사이의 간격 */
+	    flex-wrap: wrap; /* 버튼들이 화면에 맞게 자동으로 줄바꿈되게 */
+	    justify-content: flex-start; /* 왼쪽 정렬 */
+	    
+	     margin: 0; /* 부모 요소에서 오는 불필요한 여백 제거 */
+  		  padding: 0; /* 불필요한 내부 여백 제거 */
+}
+
 /*************************************************************************** */
 /*추가*/
 /* .chat-container {
@@ -610,15 +636,19 @@ $(function() {
             contentType: "application/json",
             data: JSON.stringify({ userMsg: message, topic: "spec" }),
             success: function(gptReply) {
-                addMessageToChat(gptReply.gptAnswer, "bot-msg");
+            	addBotMessageToChat(gptReply.gptAnswer, "bot-msg");
 
+            	// 복수 선택 옵션이 올 경우
                 if (gptReply.checkboxOptions && Array.isArray(gptReply.checkboxOptions) && gptReply.checkboxOptions.length > 0) {
                     renderCheckboxList(gptReply.checkboxOptions);
+                  
                 } else {
                     removeCheckboxList();
                 }
 
+            	// 택1 선택 옵션이 올 경우
                 if (gptReply.options && Array.isArray(gptReply.options) && gptReply.options.length > 0) {
+                	
                     renderOptionButtons(gptReply.options);
                 } else {
                     removeOptionButtons();
@@ -657,7 +687,7 @@ $(function() {
             const $label = $("<label>").addClass("custom-checkbox");
             const $input = $("<input>").attr({ type: "checkbox", value: specCI.title });
             const $titleSpan = $("<span>").addClass("checkbox-text").text(specCI.title);
-            const $explainSpan = $("<span>").addClass("checkbox-text").text(specCI.explain);
+            const $explainSpan = $("<span>").addClass("checkbox-explain").text(specCI.explain);
             const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
             $label.append($input, $titleSpan, $explainSpan, $checkMark);
             $listWrap.append($label);
@@ -705,7 +735,7 @@ $(function() {
     function renderOptionButtons(options) {
         removeOptionButtons();
         const $chatArea = $("#chatArea");
-        const $btnWrap = $("<div>").attr("id", "option-buttons").css({ marginTop: "15px", display: "flex", gap: "10px" });
+        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "15px", display: "flex", gap: "10px" });
 
         $.each(options, function(_, option) {
             const $btn = $("<button>").addClass("select-btn").text(option).on("click", function() {
@@ -754,6 +784,13 @@ $(function() {
         $chatArea.append($div);
     }
 	
+	//bot Message 를 화면에 추가
+    function addBotMessageToChat(message, cls) {
+        const $chatArea = $("#chatArea");
+        const $div = $("<div>").addClass("answer " + cls).text(message);
+        $chatArea.append($div);
+    }
+	
 	//이전 선택 체크박스 사라지게 함
     function removeCheckboxList() {
         $("#checkbox-list").remove();
@@ -761,7 +798,7 @@ $(function() {
 
 	// 이전 선택 옵션들 사라지게 함
     function removeOptionButtons() {
-        $("#option-buttons").remove();
+        $(".option-buttons").remove();
     }
 
     function scrollToBottom() {
