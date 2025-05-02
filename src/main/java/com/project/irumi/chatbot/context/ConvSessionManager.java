@@ -43,8 +43,13 @@ public class ConvSessionManager {
         sessionMap.remove(userId);
     }
 
-    //세션의 subtopic 아이디 지정.
-	public void setConvSubTopic(ConvSession session, CareerItemDto selectedItem) {
-		session.setSubtopicId(selectedItem.getItemId());
+    //세션의 subJobTopic 아이디 지정.
+	public void setConvSubJobTopic(ConvSession session, CareerItemDto selectedItem) {
+		session.setSubJobTopicId(selectedItem.getItemId());
 	}
+	
+	//세션의 subSpecTopic 아이디 지정.
+		public void setConvSubSpecTopic(ConvSession session, CareerItemDto selectedItem) {
+			session.setSubSpecTopicId(selectedItem.getItemId());
+		}
 }

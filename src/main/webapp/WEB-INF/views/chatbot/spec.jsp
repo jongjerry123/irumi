@@ -504,6 +504,9 @@ $(function() {
 	    // 선택된 Job에 해당하는 Career Item 객체를 서버로 보내기 위해 저장.
 	    subTopicJobCI = cacheSessionJobOpts.find(jobCI => jobCI.title === clickedJobName);
 	    
+	    //클릭한 CI와 연결된 Spec을 불러옴.
+	    
+	    
 /* 	    //서버에 CI 형태로 보내기 위해 변환 작업
 	    subTopicCareerItem = {
 	    	    title: job.jobName,
@@ -525,7 +528,7 @@ $(function() {
 	    if (subTopicJobCI && subTopicJobCI.title) {
 	        $.ajax({
 	            type: "POST",
-	            url: "setConvSubTopic.do",
+	            url: "setConvSubJobTopic.do",
 	            data: JSON.stringify(subTopicJobCI),
 	            contentType: "application/json",
 	            success: function () {
@@ -574,12 +577,12 @@ $(function() {
     //sidebar
     function addToSpecList(specs) {
         const $specList = $(".saved-spec-list");
-        $.each(specs, function(_, spec) {
+        $.each(specs, function(_, specCI) {
             const $card = $("<div>").addClass("citem-card");
             const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
                 $card.remove();
             });
-            const $span = $("<span>").text(spec);
+            const $span = $("<span>").text(specCI.title);
             $card.append($removeBtn).append($span);
             $specList.append($card);
         });
@@ -592,23 +595,48 @@ $(function() {
         const $chatArea = $("#chatArea");
         const $listWrap = $("<div>").addClass("custom-checkbox-list").attr("id", "checkbox-list");
 
-        $.each(options, function(_, opt) {
+        $.each(options, function(_, specCI) {
             const $label = $("<label>").addClass("custom-checkbox");
-            const $input = $("<input>").attr({ type: "checkbox", value: opt.title });
-            const $textSpan = $("<span>").addClass("checkbox-text").text(opt.title);
+            const $input = $("<input>").attr({ type: "checkbox", value: specCI.title });
+            const $titleSpan = $("<span>").addClass("checkbox-text").text(specCI.title);
+            const $explainSpan = $("<span>").addClass("checkbox-text").text(specCI.explain);
             const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
-            $label.append($input, $textSpan, $checkMark);
+            $label.append($input, $titleSpan, $explainSpan, $checkMark);
             $listWrap.append($label);
         });
 
+        //t선택 완료 버튼
         const $submitBtn = $("<button>").text("선택 완료").css("margin-left", "10px").on("click", function() {
-            const checked = $listWrap.find("input:checked").map(function() { return this.value; }).get();
+            const checked = $listWrap.find("input:checked").map(function() {
+            	const selectedTitle = this.value;
+            return options.find(specCI => specCI.title === selectedTitle);
+            }).get();
             if (checked.length === 0) {
                 alert("하나 이상 선택해 주세요!");
                 return;
             }
             addToSpecList(checked);
             removeCheckboxList();
+            
+            // specCI 선택시, insertSpec으로 CI 형태로 보냄
+            // ==> chatbot Controller가 받음
+            checked.forEach(function(specCI) {
+
+  	    	  $.ajax({
+  	    	    type: "POST",
+  	    	    url: "insertCareerItem.do",
+  	    	    contentType: "application/json",
+  	    	    data: JSON.stringify(specCI),
+  	    	    success: function() {
+  	    	      console.log("직무에 스펙 저장 성공:", specCI.title);
+  	    	    },
+  	    	    error: function() {
+  	    	      console.error("직무에 스펙 저장 실패:", specCI.title);
+  	    	    }
+  	    	  });
+  	    	});
+            
+            
         });
 
         $listWrap.append($submitBtn);

@@ -45,15 +45,15 @@ public class JobChatManager {
 				botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 				break;
 		case "spec":
-			userChatMsg.setConvSubTopicJobId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicJobId(session.getSubJobTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "ss":
-			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicSpecId(session.getSubJobTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		case "act":
-			userChatMsg.setConvSubTopicSpecId(session.getSubtopicId());
+			userChatMsg.setConvSubTopicSpecId(session.getSubJobTopicId());
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		default: // topic 없으면 
