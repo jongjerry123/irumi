@@ -26,6 +26,54 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 	const CHAT_TOPIC = "act";
 	
+	// 추가 - 위쪽 직무 버튼 불러오기
+	fetch("userJobView.do", {
+		  method: "POST"
+		})
+		.then(res => res.json())
+		.then(jobs => {
+		  const jobList = document.getElementById("job-btn-list");
+		  jobList.innerHTML = "";
+		  jobs.forEach(job => {
+		    const btn = document.createElement("button");
+		    btn.className = "select-btn";
+		    btn.textContent = job.jobName;
+		    btn.dataset.jobId = job.jobId;
+		    btn.onclick = () => loadSpecOptions(job.jobId);
+		    jobList.appendChild(btn);
+		  });
+		});
+	
+	// 추가
+	function loadSpecOptions(jobId) {
+    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
+
+    fetch("userSpecsView.do", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "jobId=" + encodeURIComponent(jobId) // JS 함수는 브라우저에서만 해석됨
+    })
+    .then(res => res.json())
+    .then(specs => {
+      console.log("[DEBUG] 불러온 스펙 목록:", specs);
+      const specList = document.getElementById("spec-btn-list");
+      specList.innerHTML = "";
+      specs.forEach(spec => {
+        const btn = document.createElement("button");
+        btn.className = "select-btn";
+        btn.textContent = spec.specName;
+        btn.dataset.specId = spec.specId;
+        btn.onclick = () => {
+      	  window.selectedJobId = jobId;
+      	  window.selectedSpecId = spec.specId;
+      	  window.selectedSpecName = spec.specName;
+      	};
+        specList.appendChild(btn);
+      });
+    });
+  }
+	
+	
 	  // 활동 리스트에 추가하는 함수
 	  function addToActivityList(items) {
 	    const actList = document.getElementById("savedActivityList");
@@ -247,14 +295,15 @@ document.addEventListener("DOMContentLoaded", function() {
 		  }
 		});
 	 
-	  document.querySelectorAll(".select-btn-list").forEach(group => {
-		  const buttons = group.querySelectorAll(".select-btn");
-		  buttons.forEach(btn => {
-		    btn.addEventListener("click", function () {
-		      buttons.forEach(b => b.classList.remove("active"));
-		      this.classList.add("active");
-		    });
-		  });
+	  document.addEventListener("click", function (e) {
+		  if (e.target.classList.contains("select-btn")) {
+		    // 같은 부모 아래 다른 버튼들의 active 제거
+		    const parent = e.target.closest(".select-btn-list");
+		    if (parent) {
+		      parent.querySelectorAll(".select-btn").forEach(btn => btn.classList.remove("active"));
+		    }
+		    e.target.classList.add("active");
+		  }
 		});
 	 
 	// 추가--------- 선택 완료 클릭 시 목표 직무 및 스펙 반영
@@ -767,16 +816,12 @@ body {
 				<div class="select-bar">
 					<div class="select-group">
 						<span class="select-label">스펙 대상 직무 선택</span>
-						<div class="select-btn-list">
-							<button class="select-btn active">프론트엔드 개발자</button>
-							<button class="select-btn">백엔드 개발자</button>
+						<div class="select-btn-list" id="job-btn-list">
 						</div>
 					</div>
 					<div class="select-group">
 						<span class="select-label">일정 대상 스펙 선택</span>
-						<div class="select-btn-list">
-							<button class="select-btn active">정보처리기사</button>
-							<button class="select-btn">OPIC IM 이상</button>
+						<div class="select-btn-list" id="spec-btn-list">
 						</div>
 					</div>
 					<div class="confirm-select-box">
