@@ -50,6 +50,11 @@ public class DashboardDao {
 		return (ArrayList<Spec>) list;
 	}
 	
+	public ArrayList<Spec> selectAllUserSpecs(Specific specific) {
+		List<Spec> list = sqlSessionTemplate.selectList("dashboardMapper.selectAllUserSpecs", specific);
+		return (ArrayList<Spec>) list;
+	}
+	
 	public ArrayList<Activity> selectUserActs(Specific specific) {
 		List<Activity> list = sqlSessionTemplate.selectList("dashboardMapper.selectUserActs", specific);
 		return (ArrayList<Activity>) list;
@@ -94,6 +99,10 @@ public class DashboardDao {
 		return sqlSessionTemplate.update("dashboardMapper.updateActStatus", activity);
 	}
 	
+	public String selectJobIdBySpecId(String specId) {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectJobIdBySpecId", specId);
+	}
+	
 	//직무 추가
 	public int selectNextJobId() {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextJobId");
@@ -105,9 +114,19 @@ public class DashboardDao {
 		return sqlSessionTemplate.insert("dashboardMapper.insertJobLink", specific);
 	}
 	
-	//스펙 삭제
+	// 직무 삭제
+	public int deleteJob(String jobId) {
+		return sqlSessionTemplate.delete("dashboardMapper.deleteJob", jobId);
+	}
+	
+	// 스펙 삭제
 	public int deleteSpec(String specId) {
 		return sqlSessionTemplate.delete("dashboardMapper.deleteSpec", specId);
+	}
+	
+	// 활동 삭제
+	public int deleteAct(String actId) {
+		return sqlSessionTemplate.delete("dashboardMapper.deleteAct", actId);
 	}
 	
 	// 스펙 추가

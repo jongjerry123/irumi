@@ -10,146 +10,149 @@
 <meta charset="UTF-8">
 <title>irumi</title>
 <style>
-.clearfix::after {
-	content: "";
-	display: table;
-	clear: both;
+:root {
+  --bg: #1a1a1a;
+  --surface: #2b2b2b;
+  --card-bg: #333;
+  --primary: #00f7d7;
+  --text: #eee;
+  --text-secondary: #ccc;
+  --radius: 12px;
+  --gap: 16px;
 }
-
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-	background-color: #111;
-	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
-	margin: 0;
-	padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.6;
 }
-
-.education-info {
-    padding: 20px;
-    background: #303030;
-    border-radius: 10px;
-    width: 300px;
-    position: fixed;
-    top: 200px; /* Adjust this value to position it vertically */
-    left: 300px; /* Adjust this value to position it horizontally */
-    z-index: 1000; /* Ensures it stays above other content */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
 }
-
-.spec-info {
-    padding: 20px;
-    background: #303030;
-    border-radius: 10px;
-    width: 300px;
-    position: fixed;
-    top: 200px; /* Adjust this value to position it vertically */
-    right: 300px; /* Adjust this value to position it horizontally */
-    z-index: 1000; /* Ensures it stays above other content */
+.dashboard-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: var(--gap);
+  padding: var(--gap);
 }
-
+.education-info,
+.spec-info,
 .main {
-	margin: auto;
-	padding: 30px;
-	width: 800px;
-	background: #303030;
-	border-radius: 10px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  padding: var(--gap);
 }
-
+.education-info, .spec-info {
+  position: relative;
+}
+.main {
+  width: 100%;
+}
+h1, h2, h3 {
+  margin-bottom: calc(var(--gap) / 2);
+}
+h1 { font-size: 1.8rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.2rem; }
+label, p {
+  color: var(--text-secondary);
+  margin-bottom: calc(var(--gap) / 4);
+  display: block;
+}
 .buttons {
-	display: flex;
-	gap: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: var(--gap);
 }
-
 .buttons button {
-	background: transparent;
-	color: white;
-	border: 1px solid #ccc;
-	padding: 6px 12px;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color .2s;
+  background: var(--primary);
+  border: none;
+  color: var(--bg);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
 }
-
 .buttons button:hover {
-	background: #fff;
-	color: #000;
+  transform: scale(1.05);
 }
-
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  cursor: pointer;                                /* 마우스 포인터 변경 */  
-  accent-color: #4CAF50;                          /* 체크박스 브랜드 색상 지정 :contentReference[oaicite:0]{index=0} */
-  transition: transform 0.1s ease-in-out;          /* 클릭·호버 시 스케일 애니메이션 */
+  cursor: pointer;
+  accent-color: var(--primary);
+  transition: transform 0.1s ease-in-out;
 }
-
-/* 2) 호버 시 살짝 커지면서 강조 */
-input[type="checkbox"]:hover {
-  transform: scale(1.2);                          /* 호버 애니메이션 :contentReference[oaicite:1]{index=1} */
-}
-
-/* 3) 체크된 상태 유지 애니메이션 */
+input[type="checkbox"]:hover,
 input[type="checkbox"]:checked {
   transform: scale(1.2);
 }
-
 .progress-bar {
-	background: darkgray;
-	width: 100%;
-	height: 20px;
-	border-radius: 10px;
-	overflow: hidden;
-	margin-top: 10px;
+  background: darkgray;
+  width: 100%;
+  height: 20px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 10px;
 }
-
 .progress {
-	background: #00f7d7;
-	height: 100%;
-	line-height: 20px;
-	text-align: center;
-	color: black;
+  background: var(--primary);
+  height: 100%;
+  line-height: 20px;
+  text-align: center;
+  color: var(--bg);
+  transition: width 0.3s;
 }
-
-#certSection {
-	margin-top: 20px;
-}
-
 #certCards {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 20px;
-	margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin-top: 10px;
 }
-
 .certCard {
-	background: #404040;
-	border-radius: 10px;
-	padding: 20px;
-	width: 300px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  padding: var(--gap);
+  width: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-
+.certCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+}
 .certCard table {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: 12px;
-	margin-bottom: 15px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 15px;
 }
-
 .certCard table td {
-	padding: 5px 0;
-	border-bottom: 1px solid #555;
+  padding: 5px 0;
+  border-bottom: 1px solid #555;
 }
-
 .certCard a {
-	color: #00f7d7;
-	text-decoration: underline;
+  color: var(--primary);
+  text-decoration: underline;
+}
+@media (max-width: 1024px) {
+  .dashboard-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .education-info, .spec-info {
+    position: static;
+    width: auto;
+  }
 }
 </style>
-
 <script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
-
 <script>
 	$(document).ready(function() {
-		$('#certCards').slideToggle(300);
 		$.ajax({
 			url: 'userSpecView.do',
 			method: 'POST',
@@ -169,12 +172,11 @@ input[type="checkbox"]:checked {
 			dataType: 'json',
 			contentType: 'application/json; charset=UTF-8',
 			success: function(data) {
-				$('#currSpecs').html('<table>');
+				$('#currSpecs').html('<ul>');
 				data.forEach(function(item) {
-					console.log(item.specId);
-					$('#currSpecs').append('<tr><td width=\"250px\">' + item.specName + ' </td><td><button style="border-radius: 20px;" onclick=\"deleteSpec(' + item.specId + ')\">×</button></td></tr>');					
+					$('#currSpecs').append('<li><a href=\"#\" onclick=\"movetoUpdateSpec(' + item.specId + ')\">' + item.specName + '</a></li>');					
 				});
-				$('#currSpecs').append('</table>');
+				$('#currSpecs').append('</ul>');
 			}
 		});
 		
@@ -189,12 +191,23 @@ input[type="checkbox"]:checked {
 					$('<button>')
 						.text(item.jobName)
 						.on('click', function() {
+							$('#certCards').slideToggle(300);
 							$('#targetJob').empty();
-							$('#targetJob').html('목표 직무: ' + item.jobName);
+							$('#targetJob').html('목표 직무: ' + item.jobName + ' &nbsp;<div class="buttons"><button onclick=\"movetoDeleteJob(' + item.jobId + ')\">목표 직무 삭제하기</button></div>');
 							viewSpecs(item.jobId);
+							$.ajax({
+								url: 'updateProgressBar.do',
+	                            method: 'POST',
+	                            data: { jobId: item.jobId },
+	                            dataType: 'json',
+	                            success: function(data) {
+	                                $('.progress').css('width',  data.progress + '%').text(data.progress + '%');
+	                            }
+							});
 							$('#jobExplain').html(item.jobExplain);
 							$('#certCards').slideToggle(300);
-							$('#certCards').slideToggle(300);
+							
+							
 						})
 						.appendTo('#jobs');
 				});
@@ -255,7 +268,7 @@ input[type="checkbox"]:checked {
 							
 	                        cardHtml += '</table></div>' +
 	                        			'<div class="buttons">' +
-	                        			'<button onclick=\"movetoUpdateSpec(' + jobId + ', ' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
+	                        			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
 	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 150px;\">삭제</button>' +
 	                        			'</div>' +
 	                        			'<div class="buttons">' +
@@ -286,8 +299,12 @@ input[type="checkbox"]:checked {
 		location.href = 'deleteSpec.do?specId=' + specId;
 	}
 	
-	function movetoUpdateSpec(jobId, specId) {
-		location.href = 'updateSpec.do?jobId=' + jobId + '&specId=' + specId;
+	function movetoDeleteJob(jobId) {
+		location.href = 'deleteJob.do?jobId=' + jobId;
+	}
+	
+	function movetoUpdateSpec(specId) {
+		location.href = 'updateSpec.do?specId=' + specId;
 	}
 	
 	function movetoAccomplishSpec(specId) {
@@ -323,58 +340,40 @@ input[type="checkbox"]:checked {
 	}
 </script>
 </head>
-
 <body>
-	
-	<c:set var="menu" value="dashboard" scope="request" />
-	<c:import url="/WEB-INF/views/common/header.jsp" />
+  <c:set var="menu" value="dashboard" scope="request" />
+  <c:import url="/WEB-INF/views/common/header.jsp" />
 
-	<h1 style="text-align: center; margin-top: 20px;">내 스펙 대시보드</h1>
+  <h1 style="text-align: center; margin-top: 20px;">내 스펙 대시보드</h1>
 
-	<div class="dashboard-wrapper clearfix">
-		<div class="education-info">
-			<h2>학력 정보</h2>
-			<label id="university">대학교: </label>
-			<br>
-			<label id="degree">학위: </label>
-			<br>
-			<label id="graduation">졸업 여부: </label>
-			<br>
-			<label id="gpa">학점: </label>
-			<br>
-			<div class="buttons">
-				<button onclick="movetoUpDash()">수정하기</button>
-			</div>
-		</div>
+  <div class="dashboard-wrapper clearfix">
+    <div class="education-info">
+      <h2>학력 정보</h2>
+      <label id="university">대학교: </label>
+      <label id="degree">학위: </label>
+      <label id="graduation">졸업 여부: </label>
+      <label id="gpa">학점: </label>
+      <div class="buttons"><button onclick="movetoUpDash()">수정하기</button></div>
+    </div>
 
-		<div class="main">
-			<div class="content">
-				<h2 id="targetJob">목표 직무</h2>
-				<div id="jobs" class="buttons"></div>
-				<div id="jobExplain"></div>
+    <div class="main">
+      <h2 id="targetJob">목표 직무</h2>
+      <div id="jobs" class="buttons"></div>
+      <div id="jobExplain"></div>
 
-				<h2>목표 스펙 달성도</h2>
-				<div class="progress-bar">
-					<div class="progress" style="width: 35%">35%</div>
-				</div>
-				<br>
-				
-				<h2>목표 스펙</h2>
-				<div id="certSection">
-					<div id="certCards" style="display: none;">
-						<h1>직업을 선택하세요</h1>
-					</div>
-				</div>
+      <h2>목표 스펙 달성도</h2>
+      <div class="progress-bar"><div class="progress" style="width:0%">0%</div></div>
 
-			</div>
-		</div>
-		
-		<div class="spec-info">
-			<h2>현재 스펙</h2>
-			<label id="currSpecs"></label><br>
-		</div>
-	</div>
+      <h2>목표 스펙</h2>
+      <div id="certSection"><div id="certCards"><h1>직업을 선택하세요</h1></div></div>
+    </div>
 
-	<c:import url="/WEB-INF/views/common/footer.jsp" />
+    <div class="spec-info">
+      <h2>현재 스펙</h2>
+      <label id="currSpecs"></label>
+    </div>
+  </div>
+
+  <c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

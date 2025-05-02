@@ -2,6 +2,7 @@ package com.project.irumi.dashboard.controller;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -283,6 +284,17 @@ public class DashboardController {
 		return mv;
 	}
 	
+	@RequestMapping("deleteJob.do")
+	public String deleteJobMethod(@RequestParam("jobId") String jobId, Model model) {
+		
+		if (dashboardService.deleteJob(jobId) > 0) {
+			return "redirect:dashboard.do";
+		} else {
+			model.addAttribute("message", "직무 삭제 실패!");
+			return "common/error";
+		}
+	}
+	
 	@RequestMapping("deleteSpec.do")
 	public String deleteSpecMethod(@RequestParam("specId") String specId, Model model) {
 		
@@ -364,8 +376,9 @@ public class DashboardController {
 	}
 	
 	@RequestMapping("updateSpec.do")
-	public String updateSpecMethod(@RequestParam("jobId") String jobId, @RequestParam("specId") String specId, Model model, HttpSession session) {
+	public String updateSpecMethod(@RequestParam("specId") String specId, Model model, HttpSession session) {
 		
+		String jobId = dashboardService.selectJobIdBySpecId(specId);
 		User loginUser = (User) session.getAttribute("loginUser");
 		Specific specific = new Specific();
 		specific.setUserId(loginUser.getUserId());
@@ -467,6 +480,37 @@ public class DashboardController {
 		
 		model.addAttribute("message", "활동 업데이트 실패!");
 		return "common/error";
+	}
+	
+	@RequestMapping(value = "updateProgressBar.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Double> updateProgressBarMethod(@RequestParam("jobId") String jobId, HttpSession session) {
+		
+		double result = 0;
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		ArrayList<Spec> jobList = dashboardService.selectAllUserSpecs(specific);
+		
+		for (int i = 0; i < jobList.size(); i++) {
+			if (jobList.get(i).getSpecState().equals("Y")) {
+				result += 1.0 / jobList.size();
+			}
+			else {
+				specific.setSpecId(jobList.get(i).getSpecId());
+				ArrayList<Activity> actList = dashboardService.selectUserActs(specific);
+				for (int j = 0; j < actList.size(); j++) {
+					if (actList.get(j).getActState().equals("Y")) {
+						result += (1.0 / jobList.size()) / actList.size();
+					}
+				}
+			}
+		}
+		Map<String, Double> response = new HashMap<String, Double>();
+		response.put("progress", result * 100);
+		return response;
 	}
 	
 	

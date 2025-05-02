@@ -20,6 +20,7 @@ public interface DashboardService {
 	ArrayList<Job> selectUserJobs(String userId);
 	Job selectJob(String jobId);
 	ArrayList<Spec> selectUserSpecs(Specific specific);
+	ArrayList<Spec> selectAllUserSpecs(Specific specific);
 	ArrayList<Activity> selectUserActs(Specific specific);
 	ArrayList<SpecSchedule> selectUserSpecSchedule(String specId);
 	int selectJobListCount();
@@ -30,7 +31,9 @@ public interface DashboardService {
 	int selectNextJobId();
 	int insertJob(Job job);
 	int insertJobLink(Specific specific);
+	int deleteJob(String jobId);
 	int deleteSpec(String specId);
+	int deleteAct(String actId);
 	int selectNextSpecId();
 	int insertSpec(Spec spec);
 	int insertSpecLink(Specific specific);
@@ -42,4 +45,5 @@ public interface DashboardService {
 	int insertSs(SpecSchedule ss);
 	Spec selectSpec(String specId);
 	int updateActStatus(Activity activity);
+	String selectJobIdBySpecId(String specId);
 }
