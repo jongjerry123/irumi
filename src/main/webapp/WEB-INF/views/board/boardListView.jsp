@@ -307,7 +307,7 @@ table.board-table td:nth-child(2) {
 							<tr>
 								<td>${post.postWriter}</td>
 								<td><a href="postDetail.do?postId=${post.postId}"
-									style="color: inherit; text-decoration: none;">${post.postTitle}</a></td>
+									style="color: #A983A3">${post.postTitle}</a></td>
 								<td>${post.postTime}</td>
 								<td>${post.postViewCount}</td>
 								<td>${post.postRecommend}</td>

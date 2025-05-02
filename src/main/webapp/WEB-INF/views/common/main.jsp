@@ -17,15 +17,19 @@ body {
 }
 
 .main-container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 80px auto 0;
+  padding: 0 16px;
   text-align: center;
 }
 
 .main-container h2 {
+  font-size: 1.6rem;
   font-weight: normal;
-  line-height: 1.8;
+  line-height: 1.6;
   margin-bottom: 50px;
+  margin-left: 100px;
+  text-align: left;
 }
 
 .main-container h2 strong {
@@ -34,43 +38,55 @@ body {
 
 .card-section {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 40px;
 }
 
 .card {
-  width: 240px;
+  width: 280px;
   height: 480px;
   background-color: #1e1e1e;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.card-section:hover .card:not(:hover) {
+  filter: brightness(0.6);
+  transform: scale(0.98);
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 .card:hover {
-  transform: scale(1.05);
+  filter: brightness(1);
+  transform: scale(1.05) translateY(-10px);
+  z-index: 1;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .card-image {
   width: 100%;
-  height: 240px;
+  height: 360px;
   object-fit: cover;
+  transition: transform 0.4s ease;
 }
 
 .card-info {
   flex-grow: 1;
-  padding: 20px 12px;
+  padding: 20px 16px;
   text-align: center;
   transition: background-color 0.3s ease;
+  color: #fff;
 }
 
 .card-info.dashboard {
   background-color: #43B7B7;
 }
-
 .card:hover .card-info.dashboard {
   background-color: #2f9797;
 }
@@ -78,7 +94,6 @@ body {
 .card-info.ai {
   background-color: #BAAC80;
 }
-
 .card:hover .card-info.ai {
   background-color: #9d8f61;
 }
@@ -86,22 +101,21 @@ body {
 .card-info.community {
   background-color: #A983A3;
 }
-
 .card:hover .card-info.community {
   background-color: #8c6c8c;
 }
 
 .card-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  margin-bottom: 10px;
-  color: #fff;
+  margin-bottom: 6px;
 }
 
 .card-desc {
   font-size: 14px;
-  color: #fff;
+  line-height: 1.4;
 }
+
 </style>
 <script>
   function moveToLogin() {
@@ -123,12 +137,13 @@ body {
   <div class="main-container">
     <h2>
       <strong>이루미</strong>와 함께<br>
-      희망하는 <strong>직무와 관련된 스펙</strong>을 찾고<br>
-      진행 상황을 관리하세요
+  원하는 <strong>직무</strong>에 꼭 맞는 <strong>스펙</strong>을 발견하고<br>
+  나만의 성장 스토리를 쌓아보세요.
     </h2>
+
     <div class="card-section">
       <div class="card" onclick="moveToDash()">
-        <img src="/irumi/resources/images/dashboard2.png" class="card-image" alt="대시보드 이미지" />
+        <img src="/irumi/resources/images/dashboard5.png" class="card-image" alt="대시보드 이미지" />
         <div class="card-info dashboard">
           <div class="card-title">내 스펙 대시보드</div>
           <div class="card-desc">내가 설정한 목표에 따른<br>실행 상황을 살펴볼 수 있습니다.</div>
@@ -136,7 +151,7 @@ body {
       </div>
 
       <div class="card" onclick="moveToAi()">
-        <img src="/irumi/resources/images/ai2.png" class="card-image" alt="AI 도우미 이미지" />
+        <img src="/irumi/resources/images/ai7.png" class="card-image" alt="AI 도우미 이미지" />
         <div class="card-info ai">
           <div class="card-title">대화형 도우미</div>
           <div class="card-desc">최신 정보를 AI와의 대화를 통해<br>스펙 대시보드에 저장할 수 있습니다.</div>
@@ -144,7 +159,7 @@ body {
       </div>
 
       <div class="card" onclick="moveToCommu()">
-        <img src="/irumi/resources/images/community2.png" class="card-image" alt="유저 커뮤니티 이미지" />
+        <img src="/irumi/resources/images/community3.png" class="card-image" alt="유저 커뮤니티 이미지" />
         <div class="card-info community">
           <div class="card-title">유저 커뮤니티</div>
           <div class="card-desc">유저들과 취업 팁, 후기를 공유하고<br>스터디 그룹을 구할 수 있습니다.</div>

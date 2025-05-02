@@ -157,6 +157,13 @@ input[type="checkbox"] {
       }
       return selected;
     }
+    
+    function deleteSelectedComments() {
+        const selected = validateSelectionOrAlert();
+        if (!selected) return;
+        document.getElementById("deleteCommentForm").action = "deleteSelectedComments.do";
+        document.getElementById("deleteCommentForm").submit();
+      }
 
     function registerBadUsers() {
         const selected = validateSelectionOrAlert();
