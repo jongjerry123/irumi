@@ -129,7 +129,7 @@ public class UserController {
 		email.setText(bodyText);
 		return email;
 	}
-
+	//소셜 로그인 임시 이메일 생성
 	private Message createMessageWithEmail(MimeMessage emailContent) throws Exception {
 		java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
 		emailContent.writeTo(buffer);
@@ -139,7 +139,7 @@ public class UserController {
 		message.setRaw(encodedEmail);
 		return message;
 	}
-
+	//소셜 로그인 임시 비밀번호 생성
 	private String generateRandomPassword() {
 		SecureRandom random = new SecureRandom();
 		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
@@ -148,7 +148,7 @@ public class UserController {
 		}
 		return password.toString();
 	}
-
+	
 	@RequestMapping("/")
 	public String home() {
 //		logger.info("home: Redirecting to main page");
@@ -182,6 +182,13 @@ public class UserController {
 				model.addAttribute("message", "아이디 또는 비밀번호가 올바르지 않습니다.");
 				return "user/login";
 			}
+			if("3".equals(loginUser.getUserAuthority())) {
+				return "user/cantLoginPage";
+			}
+			if("4".equals(loginUser.getUserAuthority())) {
+				return "user/blockLogin";
+			}
+			
 			if (bcryptPasswordEncoder.matches(user.getUserPwd(), loginUser.getUserPwd())) {
 //				logger.info("login.do: Login successful for userId = {}", user.getUserId());
 				session.setAttribute("loginUser", loginUser);
@@ -222,7 +229,7 @@ public class UserController {
 			return "user/login";
 		}
 	}
-
+	//비밀번호 변경권유 페이지
 	@RequestMapping(value = "6MChangPwd.do", method = RequestMethod.GET)
 	public String changePasswordPage(HttpSession session, Model model) {
 //		logger.info("6MChangPwd.do: Displaying password change page");
@@ -239,19 +246,19 @@ public class UserController {
 		}
 		return "user/6MChangPwd";
 	}
-
+	//약관페이지로 이동
 	@RequestMapping("resister.do")
 	public String moveResisterPage() {
 //		logger.info("moveResisterPage: Displaying registration page");
 		return "user/resister";
 	}
-
+	//약관 페이지-> 회원가입페이지
 	@RequestMapping("resisterId.do")
 	public String goToNext() {
 //		logger.info("goToNext: Displaying resisterId page");
 		return "user/resisterId";
 	}
-
+	//로그아웃
 	@RequestMapping(value = "logout.do", method = RequestMethod.POST)
 	public String logout(HttpSession session) {
 		session.invalidate();
@@ -451,7 +458,7 @@ public class UserController {
 			return "redirect:/findPassword.do";
 		}
 	}
-
+	//
 	@RequestMapping(value = "updatePassword.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updatePassword(@RequestParam(name = "userId") String userId,
@@ -485,7 +492,7 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//6개월 변경안한 유저 비밀번호 변경 메소드
 	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {
@@ -519,7 +526,7 @@ public class UserController {
 		}
 		return response;
 	}
-
+	// 구글 로그인 api 호출
 	@GetMapping("/googleLogin.do")
 	public String googleLogin(HttpServletRequest request) {
 //		logger.info("googleLogin.do: Initiating Google OAuth flow");
@@ -532,7 +539,7 @@ public class UserController {
 //		logger.info("googleLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
-
+	//네이버 로그인 api 호출
 	@GetMapping("/naverLogin.do")
 	public String naverLogin(HttpServletRequest request) {
 //		logger.info("naverLogin.do: Initiating Naver OAuth flow");
@@ -545,7 +552,7 @@ public class UserController {
 //		logger.info("naverLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
-
+	//카카오 로그인 api 호출
 	@GetMapping("/kakaoLogin.do")
 	public String kakaoLogin(HttpServletRequest request) {
 //		logger.info("kakaoLogin.do: Initiating Kakao OAuth flow");
@@ -557,7 +564,7 @@ public class UserController {
 //		logger.info("kakaoLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
-
+	//소셜 통합 콜벡 
 	@GetMapping("/socialCallback.do")
 	public String socialCallback(@RequestParam("code") String code,
 			@RequestParam(value = "provider", defaultValue = "google") String provider, HttpSession session,
@@ -716,6 +723,13 @@ public class UserController {
 			if (existingUser != null) {
 //				logger.info("socialCallback.do: Existing {} user found, userId = {}", provider,
 //						existingUser.getUserId());
+				String authority = userservice.selectUserAuthority(socialId);
+	            if ("3".equals(authority)) {
+	                return "user/cantLoginPage";
+	            }
+	            if("4".equals(authority)) {
+	            	return "user/blockLogin";
+	            }
 				session.setAttribute("loginUser", existingUser);
 				return "redirect:/main.do";
 			}
@@ -734,7 +748,7 @@ public class UserController {
 			return "user/login";
 		}
 	}
-
+	//소셜 회원가입
 	@PostMapping("/registerSocialUser.do")
 	public String registerSocialUser(@RequestParam(name = "userName") String userName, HttpSession session,
 			Model model) {
@@ -789,7 +803,8 @@ public class UserController {
 			return "user/registerSocialUser";
 		}
 	}
-
+	//마이페이지 비밀번호 확인
+	//실시간 비밀번호 확인 method
 	@RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkPassword(@RequestBody Map<String, String> data, HttpSession session) {
@@ -842,7 +857,7 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//마이페이지 내용 수정
 	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
@@ -905,13 +920,13 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//마이페이지 이동
 	@RequestMapping("myPage.do")
 	public String moveMyPage() {
 //		logger.info("moveMyPage: Displaying myPage");
 		return "user/myPage";
 	}
-
+	//매니저 관리 페이지 이동
 	@RequestMapping("changeManage.do")
 	public String changeManage(HttpSession session) {
 //		logger.info("changeManage: Displaying changeManage page");
@@ -923,7 +938,7 @@ public class UserController {
 		}
 		return "user/changeManage";
 	}
-
+	//유저 찾기
 	@RequestMapping(value = "checkMaUser.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data, HttpSession session) {
@@ -968,7 +983,7 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//권한변경 (1, 유저 / 2, 관리자 / 3, 불량유저 / 4, 탈퇴유저)
 	@RequestMapping(value = "updateAuthority.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateAuthority(@RequestBody Map<String, Object> data, HttpSession session) {
@@ -1011,7 +1026,7 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//탈퇴하기
 	@RequestMapping(value = "exit.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> exit(@RequestBody Map<String, Object> data, HttpSession session) {

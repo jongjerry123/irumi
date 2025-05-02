@@ -22,7 +22,7 @@ body {
 	background-color: #1e1e1e;
 	border-radius: 10px;
 	padding: 40px;
-	width: 400px; /* register.jsp와 동일 */
+	width: 400px; 
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -49,7 +49,7 @@ h2 {
 	display: none; /* 초기에는 숨김 */
 }
 
-/* Webkit 기반 브라우저 스크롤바 스타일 */
+
 .terms-box::-webkit-scrollbar {
 	width: 10px;
 }
@@ -71,7 +71,7 @@ h2 {
 	background: #2ccfcf;
 }
 
-/* Firefox 스크롤바 스타일 */
+
 .terms-box {
 	scrollbar-width: thin;
 	scrollbar-color: #33e3da #333;
@@ -98,7 +98,7 @@ h2 {
 	flex: 1;
 	font-weight: bold;
 	font-size: 18px;
-	cursor: pointer; /* 제목 클릭 가능하도록 커서 변경 */
+	cursor: pointer; 
 }
 
 input[type="checkbox"] {
