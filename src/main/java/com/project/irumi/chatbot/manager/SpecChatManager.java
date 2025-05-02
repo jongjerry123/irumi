@@ -41,6 +41,7 @@ public class SpecChatManager {
         StateSpecChat state = (StateSpecChat) session.getChatState();
         if (state == null) state = StateSpecChat.TEXT_CURRENT_SPEC;
         logger.info("spec chat state: " + state);
+        String tempSpecType;
 
         switch (state) {
 
@@ -60,14 +61,16 @@ public class SpecChatManager {
             	
 
             case OPT_SPEC_TYPE:
+            	//userMsg를 specCI에 사용해야 함...
+            	tempSpecType=userMsg;
             	session.addToContextHistory("유저가 관심 있는 스펙 타입: " + userMsg);
-
+            	
             	
             	// 유저 응답에 따라 관련 스펙 리스트 검색
             	
             	// 현재 타겟 직업은 job service에서 selectOneJob 개발시 설정
             	//String targetJob = session.getSubtopicId();
-            	String targetJob = dashboardService.selectJob(session.getSubtopicId()).getJobName();
+            	String targetJob = dashboardService.selectJob(session.getSubJobTopicId()).getJobName();
             	String serpQuery = targetJob+ "되기 위해 필요한 " +userMsg + "리스트";
                 String serpResult = serpApiService.searchJobSpec(serpQuery);
             	
@@ -101,7 +104,8 @@ public class SpecChatManager {
                     );
                 logger.info("받은 응답:"+gptAnswer);
                 
-             // ✅ JSON → CareerItemDto 리스트로 파싱
+                // ✅ JSON → CareerItemDto 리스트로 파싱
+                // 사용자가 선택 가능하게 보내는 것.
                 List<CareerItemDto> specCItemList = new ArrayList<>();
                 try {
                     JSONArray jsonArray = new JSONArray(gptAnswer);
@@ -110,7 +114,7 @@ public class SpecChatManager {
                         CareerItemDto dto = new CareerItemDto();
                         dto.setTitle(obj.getString("title"));
                         dto.setExplain(obj.getString("explain"));
-                        dto.setType("spec");
+                        dto.setType(tempSpecType);
                         specCItemList.add(dto);
                     }
                     logger.info("specCIitemList:"+specCItemList);
@@ -167,6 +171,7 @@ public class SpecChatManager {
             	
 
             case ASK_WANT_MORE_OPT:
+            	//
                 if ("네".equals(userMsg)) {
                     session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC); // 루프 예시
                     return new ChatbotResponseDto("그렇다면 다시 현재 보유한 스펙이나 경험을 말해주세요", null);

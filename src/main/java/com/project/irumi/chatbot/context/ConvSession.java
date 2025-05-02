@@ -9,7 +9,8 @@ import java.util.UUID;
 public class ConvSession {
 	private final String convId = UUID.randomUUID().toString();
 	private final String topic;          // 대화 주제: job / spec / act / ss
-	private String subtopicId = null;    // 서브 주제 ID (직무 ID or 스펙 ID 등)
+	private String subJobTopicId = null; 
+	private String subSpecTopicId = null;
 	private String userId;
 	private String gettedSpec;	 	// 갖고 있던 스펙 (자격증 공모전수상 등)
 	
@@ -86,12 +87,22 @@ public class ConvSession {
 		this.userId = userId;
 	}
 
-	public String getSubtopicId() {
-		return subtopicId;
+
+
+	public String getSubJobTopicId() {
+		return subJobTopicId;
 	}
 
-	public void setSubtopicId(String subtopicId) {
-		this.subtopicId = subtopicId;
+	public void setSubJobTopicId(String subJobTopicId) {
+		this.subJobTopicId = subJobTopicId;
+	}
+
+	public String getSubSpecTopicId() {
+		return subSpecTopicId;
+	}
+
+	public void setSubSpecTopicId(String subSpecTopicId) {
+		this.subSpecTopicId = subSpecTopicId;
 	}
 
 	public ChatState getChatState() {

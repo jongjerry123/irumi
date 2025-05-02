@@ -49,6 +49,7 @@ public class ChatbotController {
 
 	@Autowired
 	private DashboardService dashboardService;
+	
 
 	@Autowired
 	private JobChatManager jobManager;
@@ -160,13 +161,13 @@ public class ChatbotController {
 		return sessionTopicOpts;
 	}
 
-	// 대화 시작하고 서브 토픽 설정 클릭 ===========================
+	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
 	@RequestMapping(
-			value = "setConvSubTopic.do", 
+			value = "setConvSubJobTopic.do", 
 			method = RequestMethod.POST)
 	@ResponseBody
-	public void setConvSubTopic(
+	public void setConvSubJobTopic(
 			@RequestBody CareerItemDto selectedItem, 
 			HttpSession loginSession) {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
@@ -175,49 +176,61 @@ public class ChatbotController {
 		ConvSession session = convManager.getSession(userId);
 
 		// 세션 sub 주제 설정
-		convManager.setConvSubTopic(session, selectedItem);
+		switch(session.getTopic()) {
+		case "job":
+			break;
+		case "spec":
+			convManager.setConvSubJobTopic(session, selectedItem);
+			break;
+		case "ss":
+			convManager.setConvSubJobTopic(session, selectedItem);
+			break;
+		case "act":
+			convManager.setConvSubJobTopic(session, selectedItem);
+			break;
+		}
 		
-		logger.info("지정된 subtopic: "+ selectedItem.getTitle());
+		
+		logger.info("지정된 subtopic[JOB]: "+ selectedItem.getTitle());
 	}
+	
+	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
+		// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
+		@RequestMapping(
+				value = "setConvSubSpecTopic.do", 
+				method = RequestMethod.POST)
+		@ResponseBody
+		public void setConvSubSpecTopic(
+				@RequestBody CareerItemDto selectedItem, 
+				HttpSession loginSession) {
+			User loginUser = (User) loginSession.getAttribute("loginUser");
+			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+
+			ConvSession session = convManager.getSession(userId);
+
+			// 세션 sub 주제 설정
+			switch(session.getTopic()) {
+			case "job":
+				break;
+			case "spec":
+				break;
+			case "ss":
+				convManager.setConvSubSpecTopic(session, selectedItem);
+				break;
+			case "act":
+				convManager.setConvSubSpecTopic(session, selectedItem);
+				break;
+			}
+			
+			logger.info("지정된 sub topic[SPEC]: "+ selectedItem.getTitle());
+		}
+
 
 	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우 // 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에
 	// append
 	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
 
-	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
-
-	@ResponseBody
-	public ChatbotResponseDto submitChatbotOption(
-
-			@RequestParam("userChoice") String userChoice, HttpSession loginSession) {
-		String userId = (String) loginSession.getAttribute("userId");
-		ConvSession session = convManager.getSession(userId);
-		String topic = session.getTopic();
-
-		ChatbotResponseDto responseDto;
-
-		// handleChatbotOption: // 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라 // 다르게 동작하여
-		// 유저 선택에 대해 응답하도록 함.
-		switch (topic) {
-		case "job":
-			responseDto = jobManager.handleChatbotOption(session, userChoice);
-			break;
-		case "spec":
-			responseDto = specManager.handleChatbotOption(session, userChoice);
-			break;
-		case "ss":
-			responseDto = ssManager.handleChatMessage(session, userChoice);
-			break;
-		case "act":
-			responseDto = actManager.handleChatMessage(session, userChoice);
-			break;
-		default:
-			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-		}
-
-		return responseDto;
-	}
-
+	
 	// 메소드 추가 =====================================================
 	// 사용자가 직접 직무/ 스펙/ 일정/ 활동 입력하고 추가 버튼 누르는 경우
 	// 1. Dashboard Service(?) 사용해 사용자 career plan에 저장
@@ -247,17 +260,37 @@ public class ChatbotController {
 			// job table에 추가
 			dashboardService.insertJob(job);
 
+			// career plan 테이블에 추가
 			Specific specific = new Specific();
 			specific.setUserId(userId);
 			specific.setJobId(String.valueOf(jobId));
-
-			// career plan 테이블에 추가
 			dashboardService.insertJobLink(specific);
+			
 			break;
 
-		case "spec":
-//	            String jobIdForSpec = convSession.getSubtopicId(); // 직무 ID
-//	            specService.insertSpec(insertedItem );
+		case "spec": // 스펙 추천 챗봇에서 선택한 스펙을 저장하기.
+			// 프론트에서 받아온 스펙 정보로 스펙 객체 만들기
+			Spec spec = new Spec();
+			String specId = String.valueOf(dashboardService.selectNextSpecId());
+			spec.setSpecId(specId);
+			spec.setSpecName(insertedItem.getTitle());
+			spec.setSpecExplain(insertedItem.getExplain());
+			spec.setSpecType(insertedItem.getType());
+			
+			// 스펙 tb에 저장
+			dashboardService.insertSpec(spec);
+			
+			// career plan 테이블에 추가
+						// 부모 job id에 대한 specific에 넣어야 함.
+						// 이미 부모 job에 spec이 있을 경우 새로운 specific 생성
+			Specific specific1 = new Specific();
+			specific1.setUserId(userId);
+			specific1.setJobId(convSession.getSubJobTopicId());
+			specific1.setSpecId(specId);
+			
+			dashboardService.insertSpecLink(specific1);//);
+					
+//	            
 
 			break;
 
@@ -332,7 +365,7 @@ public class ChatbotController {
 		case "job":
 			// itemToDelete의 id에 해당하는 job 삭제
 			// Job table에서 삭제 (--> DB 상에서 career plan에서 자동 삭제)
-
+			
 			break;
 		case "spec":
 			break;
@@ -343,5 +376,40 @@ public class ChatbotController {
 		}
 
 	}
+	
+	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
+
+	@ResponseBody
+	public ChatbotResponseDto submitChatbotOption(
+
+			@RequestParam("userChoice") String userChoice, HttpSession loginSession) {
+		String userId = (String) loginSession.getAttribute("userId");
+		ConvSession session = convManager.getSession(userId);
+		String topic = session.getTopic();
+
+		ChatbotResponseDto responseDto;
+
+		// handleChatbotOption: // 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라 // 다르게 동작하여
+		// 유저 선택에 대해 응답하도록 함.
+		switch (topic) {
+		case "job":
+			responseDto = jobManager.handleChatbotOption(session, userChoice);
+			break;
+		case "spec":
+			responseDto = specManager.handleChatbotOption(session, userChoice);
+			break;
+		case "ss":
+			responseDto = ssManager.handleChatMessage(session, userChoice);
+			break;
+		case "act":
+			responseDto = actManager.handleChatMessage(session, userChoice);
+			break;
+		default:
+			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
+		}
+
+		return responseDto;
+	}
+
 
 }
