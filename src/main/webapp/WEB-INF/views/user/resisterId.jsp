@@ -179,7 +179,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM fully loaded');
+//      console.log('DOM fully loaded');
 
       const usernameInput = document.getElementById('username');
       const checkIdButton = document.getElementById('check-id');

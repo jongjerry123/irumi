@@ -134,7 +134,7 @@ body {
 				</div>
 				<button type="submit" class="login-btn" id="loginBtn" disabled>로그인</button>
 				<button type="button" class="signup-btn"
-					onclick="location.href='resisterId.do'">회원가입</button>
+					onclick="location.href='resister.do'">회원가입</button>
 			</form>
 			<div class="helper-links">
 				<a href="findPassword.do">비밀번호 찾기</a> <a href="findId.do">아이디 찾기</a>

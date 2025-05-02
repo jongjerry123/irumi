@@ -255,8 +255,8 @@
                                 $authorityUser.prop('checked', authority === '1');
                                 $authorityAdmin.prop('checked', authority === '2');
                                 console.log('Authority updated, selectedUserId retained:', selectedUserId);
-                                // 메시지 3초 후 제거
-                                setTimeout(() => $authorityMessage.text(''), 3000);
+                                // 메시지 2초 후 제거
+                                setTimeout(() => $authorityMessage.text(''), 2000);
                             } else {
                                 console.log('Authority update failed, selectedUserId:', selectedUserId);
                             }
@@ -265,7 +265,7 @@
                             console.error('Update authority error:', textStatus, errorThrown);
                             $authorityMessage.text('권한 변경 중 오류가 발생했습니다.').addClass('error').removeClass('success');
                             console.log('Authority update error, selectedUserId:', selectedUserId);
-                            setTimeout(() => $authorityMessage.text(''), 3000);
+                            setTimeout(() => $authorityMessage.text(''), 2000);
                         }
                     });
                 });
