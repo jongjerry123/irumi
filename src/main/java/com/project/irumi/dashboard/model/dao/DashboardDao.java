@@ -90,6 +90,10 @@ public class DashboardDao {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectSpec", specId);
 	}
 	
+	public int updateActStatus(Activity activity) {
+		return sqlSessionTemplate.update("dashboardMapper.updateActStatus", activity);
+	}
+	
 	//직무 추가
 	public int selectNextJobId() {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextJobId");

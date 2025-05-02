@@ -157,4 +157,9 @@ public class DashboardServiceImpl implements DashboardService {
 		return dashboardDao.selectSpec(specId);
 	}
 
+	@Override
+	public int updateActStatus(Activity activity) {
+		return dashboardDao.updateActStatus(activity);
+	}
+
 }

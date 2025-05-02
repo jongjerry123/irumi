@@ -318,7 +318,7 @@ public class DashboardController {
 		boolean resultTwo = true;
 		if (ssType.size() == ssDate.size()) {
 			for (int i = 0; i < ssType.size(); i++) {
-				if (ssType.get(i) != null && ssDate.get(i) != null) {
+				if (ssType.get(i) != null && ssDate.get(i) != null && !ssType.get(i).isEmpty() && !ssDate.get(i).isEmpty()) {
 					int ssId = dashboardService.selectNextSsId();
 					if (dashboardService.insertSs(new SpecSchedule(String.valueOf(ssId), String.valueOf(specId), ssType.get(i), Date.valueOf(ssDate.get(i)))) < 1) {
 						resultTwo = false;
@@ -331,7 +331,7 @@ public class DashboardController {
 		// 활동 추가
 		boolean resultThree = true;
 		for (int i = 0; i < actContent.size(); i++) {
-			if (actContent.get(i) != null) {
+			if (actContent.get(i) != null && !actContent.get(i).isEmpty()) {
 				int actId = dashboardService.selectNextActId();
 				Activity act = new Activity(String.valueOf(actId), actContent.get(i));
 				specific.setActId(String.valueOf(actId));
@@ -391,7 +391,7 @@ public class DashboardController {
 	@RequestMapping(value = "deleteAndInsertSpec.do", method = RequestMethod.POST)
 	public ModelAndView deleteAndInsertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, @RequestParam("ssType") List<String> ssType, @RequestParam("ssDate") List<String> ssDate, @RequestParam("actContent") List<String> actContent, ModelAndView mv, HttpSession session) {
 
-		// 기존 스펙 삭제
+		// 기존 스펙 삭제 -- 활동은 안지워짐 (TB_CAREER_PLAN에는 없지만 TB_ACTIVITY에는 남아있음)
 		int resultDelete = dashboardService.deleteSpec(spec.getSpecId());
 		
 		// 스펙 추가
@@ -415,7 +415,7 @@ public class DashboardController {
 		boolean resultTwo = true;
 		if (ssType.size() == ssDate.size()) {
 			for (int i = 0; i < ssType.size(); i++) {
-				if (ssType.get(i) != null && ssDate.get(i) != null) {
+				if (ssType.get(i) != null && ssDate.get(i) != null && !ssType.get(i).isEmpty() && !ssDate.get(i).isEmpty()) {
 					int ssId = dashboardService.selectNextSsId();
 					if (dashboardService.insertSs(new SpecSchedule(String.valueOf(ssId), String.valueOf(specId), ssType.get(i), Date.valueOf(ssDate.get(i)))) < 1) {
 						resultTwo = false;
@@ -427,7 +427,7 @@ public class DashboardController {
 		// 활동 추가
 		boolean resultThree = true;
 		for (int i = 0; i < actContent.size(); i++) {
-			if (actContent.get(i) != null) {
+			if (actContent.get(i) != null && !actContent.get(i).isEmpty()) {
 				int actId = dashboardService.selectNextActId();
 				Activity act = new Activity(String.valueOf(actId), actContent.get(i));
 				specific.setActId(String.valueOf(actId));
@@ -446,6 +446,27 @@ public class DashboardController {
 		}
 
 		return mv;
+	}
+	
+	@RequestMapping("updateActStatus.do")
+	public String updateActStatus(@RequestParam("actId") String actId, @RequestParam("actState") String actState, Model model) {
+		
+		Activity act = new Activity();
+		act.setActId(actId);
+
+		if (actState.equals("N")) {
+			act.setActState("Y");
+		}
+		else {
+			act.setActState("N");
+		}
+		
+		if (dashboardService.updateActStatus(act) > 0) {
+			return "redirect:dashboard.do";
+		}
+		
+		model.addAttribute("message", "활동 업데이트 실패!");
+		return "common/error";
 	}
 	
 	
