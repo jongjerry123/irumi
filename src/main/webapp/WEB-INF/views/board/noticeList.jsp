@@ -31,6 +31,7 @@ body {
 
 .category-bar h2 {
 	margin: 0;
+	font-weight: normal;
 }
 
 .tabs {
@@ -39,25 +40,49 @@ body {
 }
 
 .tabs button {
-	background-color: #222;
-	color: #fff;
-	padding: 10px 24px;
-	border: 1px solid transparent;
-	border-radius: 10px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.tabs button:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .tabs .active {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  color: #A983A3;
+  border: 1px solid #A983A3;
+  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 .admin-btn {
-	background-color: #222;
-	border: 1px solid #fff;
-	border-radius: 10px;
-	padding: 8px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .filters {
@@ -68,28 +93,42 @@ body {
 }
 
 .write-btn {
-	background-color: #A983A3;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 8px;
-	color: #fff;
-	cursor: pointer;
+  background-color: #A983A3;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(169, 131, 163, 0.2);
+}
+
+.write-btn:hover {
+  background-color: #8c6c8c;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(169, 131, 163, 0.4);
 }
 
 table.board-table {
 	width: 100%;
-	border-collapse: collapse;
-	margin-bottom: 20px;
+	border-collapse: separate; 
+	border-spacing: 0;         
+	border: 1px solid #333;
+	border-radius: 12px;
+	overflow: hidden;          
 }
 
 table.board-table th, table.board-table td {
-	border: 1px solid #444;
+	border: 1px solid #333;
 	padding: 12px;
 	text-align: center;
 }
 
 table.board-table th {
-	background-color: #222;
+	background-color: #000;
 }
 
 table.board-table td {
@@ -100,6 +139,15 @@ table.board-table td:nth-child(2) {
 	text-align: left;
 	padding-left: 20px;
 	width: 50%;
+}
+
+.board-table td a {
+  text-decoration: none; 
+  color: #A983A3;        
+}
+
+.board-table td a:hover {
+  color: #C69BC6;       
 }
 
 .empty-message {
@@ -124,17 +172,28 @@ table.board-table td:nth-child(2) {
 }
 
 .board-footer .pagination button {
-	background-color: #222;
-	color: #fff;
-	border: none;
-	padding: 8px 14px;
-	border-radius: 6px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.board-footer .pagination button:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .board-footer .pagination button.selected {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  border: 1px solid #A983A3;
+  color: #A983A3;
+  box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
 }
 </style>
 </head>
@@ -179,7 +238,7 @@ table.board-table td:nth-child(2) {
 							<tr>
 								<td>${post.postWriter}</td>
 								<td><a href="postDetail.do?postId=${post.postId}"
-									style="color: #A983A3">${post.postTitle}</a></td>
+									>${post.postTitle}</a></td>
 								<td>${post.postTime}</td>
 							</tr>
 						</c:forEach>

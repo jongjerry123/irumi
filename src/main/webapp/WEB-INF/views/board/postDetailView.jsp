@@ -71,16 +71,34 @@ body {
 	border-radius: 6px;
 	cursor: pointer;
 	background-color: transparent;
+	transition: all 0.3s ease; /* 부드러운 효과 추가 */
 }
 
+/* 일반 버튼 */
 .btn {
 	border: 1px solid #666;
 	color: #fff;
 }
 
+.btn:hover {
+	border-color: #A983A3;
+	color: #A983A3;
+	box-shadow: 0 2px 5px rgba(169, 131, 163, 0.3);
+}
+
+/* 삭제 버튼 */
 .btn-red {
 	border: 1px solid #ff4c4c;
 	color: #ff4c4c;
+	background-color: transparent;
+	transition: all 0.3s ease;
+}
+
+.btn-red:hover {
+	background-color: rgba(255, 76, 76, 0.15); /* 더 강한 대비 */
+	color: #fff; /* 글씨를 흰색으로 반전 */
+	box-shadow: 0 3px 8px rgba(255, 76, 76, 0.4);
+	transform: translateY(-1px);
 }
 
 .comment-box {
@@ -110,9 +128,19 @@ body {
 	background-color: #A983A3;
 	border: none;
 	padding: 8px 18px;
-	border-radius: 6px;
+	border-radius: 8px;
 	color: #fff;
 	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 4px rgba(169, 131, 163, 0.2);
+}
+
+.comment-form .submit-btn:hover {
+	background-color: #8c6c8c;
+	box-shadow: 0 4px 8px rgba(169, 131, 163, 0.4);
+	transform: translateY(-1px);
 }
 
 .comment-list {

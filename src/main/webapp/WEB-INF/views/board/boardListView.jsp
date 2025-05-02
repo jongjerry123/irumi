@@ -31,6 +31,7 @@ body {
 
 .category-bar h2 {
 	margin: 0;
+	font-weight: normal;
 }
 
 .tabs {
@@ -39,25 +40,49 @@ body {
 }
 
 .tabs button {
-	background-color: #222;
-	color: #fff;
-	padding: 10px 24px;
-	border: 1px solid transparent;
-	border-radius: 10px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.tabs button:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .tabs .active {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  color: #A983A3;
+  border: 1px solid #A983A3;
+  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 .admin-btn {
-	background-color: #222;
-	border: 1px solid #fff;
-	border-radius: 10px;
-	padding: 8px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .filters {
@@ -77,82 +102,131 @@ body {
 }
 
 .dropdown-button {
-	background-color: #222;
-	color: #fff;
-	padding: 8px 16px;
-	border: 1px solid #444;
-	border-radius: 8px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  padding: 8px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.dropdown-button:hover {
+  background-color: #111;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .dropdown-button.selected {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  border: 1px solid #A983A3;
+  color: #A983A3;
+  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
+/* 드롭다운 메뉴 영역 */
 .dropdown-content {
-	display: none;
-	position: absolute;
-	background-color: #222;
-	border: 1px solid #444;
-	top: 38px;
-	left: 0;
-	z-index: 1;
-	border-radius: 8px;
+  display: none;
+  position: absolute;
+  background-color: #000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  top: 42px;
+  left: 0;
+  z-index: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
 }
 
 .dropdown-content button {
-	display: block;
-	padding: 8px 16px;
-	width: 100%;
-	border: none;
-	background-color: #222;
-	color: #fff;
-	text-align: left;
-	cursor: pointer;
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .dropdown-content button:hover {
-	background-color: #333;
+  background-color: #111;
+}
+
+/* 부드러운 등장 효과 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .sort-btn {
-	background-color: #222;
-	color: #fff;
-	border: 1px solid #444;
-	padding: 8px 16px;
-	border-radius: 8px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.sort-btn:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .sort-btn.selected {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  border: 1px solid #A983A3;
+  color: #A983A3;
+  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 .write-btn {
-	background-color: #A983A3;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 8px;
-	color: #fff;
-	cursor: pointer;
+  background-color: #A983A3;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(169, 131, 163, 0.2);
+}
+
+.write-btn:hover {
+  background-color: #8c6c8c;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(169, 131, 163, 0.4);
 }
 
 table.board-table {
 	width: 100%;
-	border-collapse: collapse;
-	margin-bottom: 20px;
+	border-collapse: separate; 
+	border-spacing: 0;         
+	border: 1px solid #333;
+	border-radius: 12px;
+	overflow: hidden;          
 }
 
 table.board-table th, table.board-table td {
-	border: 1px solid #444;
+	border: 1px solid #333;
 	padding: 12px;
 	text-align: center;
 }
 
 table.board-table th {
-	background-color: #222;
+	background-color: #000;
 }
 
 table.board-table td {
@@ -162,7 +236,16 @@ table.board-table td {
 table.board-table td:nth-child(2) {
 	text-align: left;
 	padding-left: 20px;
-	width: 60%;
+	width: 50%;
+}
+
+.board-table td a {
+  text-decoration: none; /* 밑줄 제거 */
+  color: #A983A3;         /* 강조색 유지 */
+}
+
+.board-table td a:hover {
+  color: #C69BC6;         /* 선택사항: 호버 시 색 변경 */
 }
 
 .empty-message {
@@ -175,65 +258,84 @@ table.board-table td:nth-child(2) {
 .board-footer {
 	display: flex;
 	flex-direction: column;
-	align-items: stretch;
+	align-items: center;
 	margin-top: 30px;
-	gap: 12px;
+	gap: 20px;
 }
 
 .board-footer-top {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-}
-
-.board-footer .pagination {
-	display: flex;
-	gap: 10px;
-	justify-content: center;
+	width: 100%;
 }
 
 .board-footer .pagination button {
-	background-color: #222;
-	color: #fff;
-	border: none;
-	padding: 8px 14px;
-	border-radius: 6px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.board-footer .pagination button:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .board-footer .pagination button.selected {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  border: 1px solid #A983A3;
+  color: #A983A3;
+  box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
 }
 
 .board-footer .search-box {
-	display: flex;
-	gap: 6px;
-	align-items: center;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
 }
 
 .board-footer input[type="text"] {
-	padding: 8px;
-	border-radius: 4px;
-	border: 2px solid transparent;
-	outline: none;
-	background-color: #1a1a1a;
-	color: #fff;
-	transition: border 0.3s, background-color 0.3s;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  outline: none;
+  background-color: #1a1a1a;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  width: 200px;
 }
 
 .board-footer input[type="text"]:focus {
-	border: 2px solid #A983A3;
-	background-color: #222;
+  border: 1px solid #A983A3;
+  background-color: #222;
+  box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
 }
 
 .board-footer button.search-btn {
-	background-color: #444;
-	color: #fff;
-	border: none;
-	padding: 8px 14px;
-	border-radius: 6px;
-	cursor: pointer;
+  background-color: #A983A3;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.board-footer button.search-btn:hover {
+  background-color: #8c6c8c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(169, 131, 163, 0.4);
 }
 </style>
 </head>
@@ -307,7 +409,7 @@ table.board-table td:nth-child(2) {
 							<tr>
 								<td>${post.postWriter}</td>
 								<td><a href="postDetail.do?postId=${post.postId}"
-									style="color: #A983A3">${post.postTitle}</a></td>
+									>${post.postTitle}</a></td>
 								<td>${post.postTime}</td>
 								<td>${post.postViewCount}</td>
 								<td>${post.postRecommend}</td>
