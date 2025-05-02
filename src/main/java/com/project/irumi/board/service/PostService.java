@@ -1,21 +1,19 @@
 package com.project.irumi.board.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.irumi.board.dao.PostDAO;
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
 
-import jakarta.annotation.Resource;
-
 @Service
 public class PostService {
 
-	@Resource
+	@Autowired
 	private PostDAO postDAO;
 
 	// 게시글 등록

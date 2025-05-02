@@ -19,21 +19,22 @@ header {
 .logo-area {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 24px;
+    gap: 5px;
+    font-size: 32px;
     font-weight: bold;
     cursor: pointer;
     margin-right: auto; /* 왼쪽 정렬 강제 */
 }
 
 .triangle-img {
-    height: 1.2em;
+    height: 50px;
+    width: 50px;
+    transition: transform 0.2s ease;
     vertical-align: middle;
-    transition: transform 0.2s ease; /* 부드럽게 확대 */
 }
 
 .logo-area:hover .triangle-img {
-    transform: scale(1.4); /* 호버 시 삼각형 확대 */
+    transform: scale(1.3);
 }
 
 .login-actions {
@@ -43,19 +44,25 @@ header {
 }
 
 .login-actions button {
-    background-color: transparent;
-    color: white;
-    border: 1px solid #ccc;
-    padding: 6px 12px;
-    border-radius: 5px;
-    font-size: 14px;
+    background-color: #000; /* ✅ 완전한 검은색 */
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    letter-spacing: 0.5px;
 }
 
 .login-actions button:hover {
-    background-color: #fff;
-    color: #000;
+    background-color: #111; /* ✅ 호버 시 살짝 밝은 블랙 */
+    border-color: #fff;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 </style>
 
@@ -116,9 +123,7 @@ function moveToMain() {
 
 <header>
     <div class="logo-area" onclick="moveToMain()">
-        <svg class="triangle-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <polygon points="12,6 6,18 18,18" fill="white" />
-        </svg>
+        <img src="/irumi/resources/images/eye.png" class="triangle-img" alt="irumi 로고" />
         <span>irumi</span>
     </div>
 

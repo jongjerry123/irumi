@@ -3,6 +3,7 @@ package com.project.irumi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -45,8 +46,13 @@ public class HomeController {
 	
 	@RequestMapping("/boardPage.do")  
     public String forwardBoardListView() {
-        return "redirect:/board/freeBoard.do";  // 자유게시판으로 리디렉트
+        return "redirect:/board/freeBoard.do";  
     }
+	
+	@GetMapping("/about.do")
+	public String showAboutPage() {
+	    return "board/about";  
+	}
 
 
 	

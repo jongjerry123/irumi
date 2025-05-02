@@ -32,6 +32,7 @@ body {
 
 .category-bar h2 {
 	margin: 0;
+	font-weight: normal;
 }
 
 .tabs {
@@ -40,25 +41,49 @@ body {
 }
 
 .tabs button {
-	background-color: #222;
-	color: #fff;
-	padding: 10px 24px;
-	border: 1px solid transparent;
-	border-radius: 10px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.tabs button:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .tabs .active {
-	border: 1px solid #A983A3;
-	color: #A983A3;
+  color: #A983A3;
+  border: 1px solid #A983A3;
+  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 .admin-btn {
-	background-color: #222;
-	border: 1px solid #ff4c4c;
-	border-radius: 10px;
-	padding: 8px;
-	cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #ff4c4c;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #111;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .admin-btn.active {
@@ -68,18 +93,22 @@ body {
 
 table {
 	width: 100%;
-	border-collapse: collapse;
-	margin: 40px 0 20px 0;
+	border-collapse: separate; 
+	border-spacing: 0;         
+	border: 1px solid #333;
+	border-radius: 12px;
+	overflow: hidden;  
+	margin-top: 40px;         
 }
 
 th, td {
-	border: 1px solid #444;
+	border: 1px solid #333;
 	padding: 14px;
 	text-align: center;
 }
 
 th {
-	background-color: #222;
+	background-color: #000;
 }
 
 td {
@@ -108,38 +137,79 @@ td a {
 }
 
 .btn-action {
-	background-color: transparent;
+	background-color: #000;
 	border: 1px solid #A983A3;
 	color: #A983A3;
 	padding: 8px 16px;
 	border-radius: 8px;
 	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 0.4px;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(4px);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-action:hover {
+	background-color: #1a1a1a;
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(169, 131, 163, 0.25);
 }
 
 .btn-danger {
+	background-color: #000;
 	border: 1px solid #ff4c4c;
 	color: #ff4c4c;
+	transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+	background-color: #ff4c4c;
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(255, 76, 76, 0.25);
+}
+
+.board-footer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 30px;
+	gap: 20px;
 }
 
 .pagination {
 	display: flex;
-	gap: 10px;
 	justify-content: center;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
 	margin-top: 20px;
 }
 
 .pagination button {
-	background-color: #222;
+	background-color: #111;    
 	color: #fff;
-	border: none;
+	border: 1px solid #444;       
 	padding: 8px 14px;
 	border-radius: 6px;
 	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.pagination button:hover {
+	border-color: #A983A3;
+	color: #A983A3;
+	background-color: #1c1c1c;
 }
 
 .pagination button.selected {
 	border: 1px solid #A983A3;
 	color: #A983A3;
+	background-color: transparent;
+	font-weight: bold;
 }
 
 input[type="checkbox"] {

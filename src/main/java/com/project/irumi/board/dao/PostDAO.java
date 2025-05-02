@@ -4,19 +4,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
 
-import jakarta.annotation.Resource;
-
 @Repository
 public class PostDAO {
 
-	@Resource(name = "sqlSessionTemplate")
+	@Autowired
 	private SqlSession sqlSession;
 
 	// 게시글 등록

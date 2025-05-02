@@ -59,16 +59,38 @@ textarea {
 }
 
 .btn-submit, .btn-cancel {
-	background-color: #A983A3;
-	border: none;
 	padding: 10px 24px;
 	border-radius: 8px;
 	color: #fff;
 	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
+/* 제출 버튼: 강조색 기반 */
+.btn-submit {
+	background-color: #A983A3;
+	border: none;
+}
+
+.btn-submit:hover {
+	background-color: #8c6c8c;
+	box-shadow: 0 4px 8px rgba(169, 131, 163, 0.4);
+	transform: translateY(-1px);
+}
+
+/* 취소 버튼: 중간 회색 기반 */
 .btn-cancel {
-	background-color: #555;
+	background-color: #444;
+	border: none;
+}
+
+.btn-cancel:hover {
+	background-color: #666;
+	box-shadow: 0 3px 6px rgba(255, 255, 255, 0.1);
+	transform: translateY(-1px);
 }
 </style>
 <script>
