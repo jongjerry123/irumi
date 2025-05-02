@@ -169,6 +169,9 @@ keyframes ripple {to { width:200%;
 			event.preventDefault();
 		}
 	}
+	function movetoAccomplishSpec(specId) {
+		location.href = 'updateSpecStatus.do?specId=' + specId;
+	}
 </script>
 </head>
 <body>
@@ -179,6 +182,7 @@ keyframes ripple {to { width:200%;
 	<form action="deleteAndInsertSpec.do" method="post">
 		<input type="hidden" name="jobId" value="${ requestScope.job.jobId }" />
 		<input type="hidden" name="specId" value="${ requestScope.spec.specId }" />
+		<input type="hidden" name="specState" value="${ requestScope.spec.specState }" />
 		<table align="center" width="1000" border="1" cellspacing="0" cellpadding="5">
 			<tr>
 				<th>목표 스펙*</th>
@@ -220,6 +224,9 @@ keyframes ripple {to { width:200%;
 		</table>
 		<div class="buttons">
 			<button type="submit" onclick="checkSchedule(event)">수정하기</button>
+			<c:if test="${ requestScope.spec.specState eq 'Y' }">
+				<button type="button" onclick="movetoAccomplishSpec('${ requestScope.spec.specId }')">다시 목표로</button>
+			</c:if>
 		</div>
 	</form>
 	<c:import url="/WEB-INF/views/common/footer.jsp" />

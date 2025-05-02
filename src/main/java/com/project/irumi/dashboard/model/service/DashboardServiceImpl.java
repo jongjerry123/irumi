@@ -51,6 +51,11 @@ public class DashboardServiceImpl implements DashboardService {
 	public ArrayList<Spec> selectUserSpecs(Specific specific) {
 		return dashboardDao.selectUserSpecs(specific);
 	}
+	
+	@Override
+	public ArrayList<Spec> selectAllUserSpecs(Specific specific) {
+		return dashboardDao.selectAllUserSpecs(specific);
+	}
 
 	@Override
 	public ArrayList<Activity> selectUserActs(Specific specific) {
@@ -160,6 +165,21 @@ public class DashboardServiceImpl implements DashboardService {
 	@Override
 	public int updateActStatus(Activity activity) {
 		return dashboardDao.updateActStatus(activity);
+	}
+
+	@Override
+	public String selectJobIdBySpecId(String specId) {
+		return dashboardDao.selectJobIdBySpecId(specId);
+	}
+
+	@Override
+	public int deleteAct(String actId) {
+		return dashboardDao.deleteAct(actId);
+	}
+
+	@Override
+	public int deleteJob(String jobId) {
+		return dashboardDao.deleteJob(jobId);
 	}
 
 }
