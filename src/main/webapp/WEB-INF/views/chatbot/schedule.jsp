@@ -119,12 +119,23 @@ document.addEventListener("DOMContentLoaded", function() {
 	      addMessageToChat("서버 오류 또는 JSON 파싱 실패!", "bot-msg");
 	    });
 	  }
+	  
+	// 추가 ------ 관심 직무, 관심 스펙 빈칸 체크 메소드
+	  function isSelectionComplete() {
+		  const jobText = document.querySelector(".info-row .value").textContent.trim();
+		  const specText = document.querySelector(".spec-value").textContent.trim();
+		  return jobText !== "" && specText !== "";
+		}
 	 
 	 
 	  // 사용자가 직접 입력할 때
 	  document.getElementById("userInput").addEventListener("keyup", function(event) {
 	    if (event.key === "Enter") {
 	      const val = this.value.trim();
+	      if(!isSelectionComplete()){
+	    	  alert("먼저 목표 직무와 스펙을 선택하세요.");
+	    	  return;
+	     }
 	      if (val) {
 	        sendMessage(val);
 	        this.value = "";
@@ -135,6 +146,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	  document.querySelector(".chat-send-btn").addEventListener("click", function() {
 	    const input = document.getElementById("userInput");
 	    const val = input.value.trim();
+	    if(!isSelectionComplete()){
+	    	  alert("먼저 목표 직무와 스펙을 선택하세요.");
+	    	  return;
+	     }
 	    if (val) {
 	      sendMessage(val);
 	      input.value = "";
@@ -324,7 +339,7 @@ a {
 }
 .right-panel .spec-value {
   color: #fff;
-  font-size : 9px;
+  font-size : 11px;
   margin-left : 4px;
 }
 .right-panel .schedule-value {

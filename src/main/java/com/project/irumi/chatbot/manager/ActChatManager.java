@@ -196,10 +196,10 @@ public class ActChatManager {
 	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session) {
 	    // 🔹 GPT 프롬프트 생성
 	    String prompt = switch (activityType) {
-	        case "도서" -> spec + " 학습에 도움 되는 추천 도서 3권만 한글로 알려줘. 도서명, 저자, 간단 설명만.";
-	        case "영상" -> spec + " 공부에 추천할 만한 유튜브 채널이나 무료 강의 3개 추천해줘. 제목과 링크 포함해서.";
-	        case "기타 활동" -> spec + " 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 3가지 추천해줘. 활동명과 URL 포함해서.";
-	        default -> spec + "에 도움이 될 활동을 3개 추천해줘. 형식은 자유.";
+	        case "도서" -> spec + " 을(를) 준비하거나 학습하는 데 실질적으로 도움이 되는 한국 도서 3권을 추천해줘. 단순한 자기계발서나 시간관리 도서는 제외하고, 시험 준비 또는 해당 분야 지식 향상에 도움이 되는 책 중심으로 추천해. 각 책은 아래와 같은 형식으로 출력해줘: 도서명 (저자명, 출판사) 보기";
+	        case "영상" -> spec + " 공부에 추천할 만한 유튜브 채널이나 무료 강의 3개 추천해줘. 그리고 출력방식은 제목 - 링크 \" 보기 \" 이런 식으로 출력해줘.";
+	        case "기타 활동" -> spec + " 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 3가지 추천해줘. 그리고 출력방식은 활동명 - 관련 URL \" 참여하기 \" 이런 식으로 출력해줘.";
+	        default -> spec + "에 도움이 될 활동을 3개 추천해줘. 형식은 자유. 그리고 출력방식은 제목이랑 제목에 맞게 \" 하기 \" 나 \" 보기 \" 같이 알맞는 동사 넣어서 출력해줘";
 	    };
 
 	    // 🔹 GPT 호출
@@ -242,9 +242,8 @@ public class ActChatManager {
 	            String content = line.replaceAll("^\\d+\\.\\s*", ""); // 번호 제거
 	            
 	            CareerItemDto dto = new CareerItemDto();
-	            dto.setTitle(content);          // 줄 전체를 title로 설정
-	            dto.setExplain("");             // 필요 시 파싱해서 설명 넣을 수 있음
-	            dto.setType("spec");            // 고정 타입 지정
+	            dto.setTitle(content);         
+	            dto.setType("act");            
 	            return dto;
 	        })
 	        .collect(Collectors.toList());
@@ -253,7 +252,7 @@ public class ActChatManager {
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isSpecRelatedInput(String input) {
         String prompt = """
-            다음 문장이 자격증, 직무, 공부, 기술 분야와 관련된 내용이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
+            다음 문장이 자격증, 직무, 시험 등 스펙을 쌓기 위한 요소에 관련된 내용이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
             입력: "%s"
             """.formatted(input);
 
