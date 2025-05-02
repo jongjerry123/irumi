@@ -41,4 +41,5 @@ public interface DashboardService {
 	int selectNextSsId();
 	int insertSs(SpecSchedule ss);
 	Spec selectSpec(String specId);
+	int updateActStatus(Activity activity);
 }

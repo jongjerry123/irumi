@@ -74,6 +74,24 @@ body {
 	color: #000;
 }
 
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;                                /* 마우스 포인터 변경 */  
+  accent-color: #4CAF50;                          /* 체크박스 브랜드 색상 지정 :contentReference[oaicite:0]{index=0} */
+  transition: transform 0.1s ease-in-out;          /* 클릭·호버 시 스케일 애니메이션 */
+}
+
+/* 2) 호버 시 살짝 커지면서 강조 */
+input[type="checkbox"]:hover {
+  transform: scale(1.2);                          /* 호버 애니메이션 :contentReference[oaicite:1]{index=1} */
+}
+
+/* 3) 체크된 상태 유지 애니메이션 */
+input[type="checkbox"]:checked {
+  transform: scale(1.2);
+}
+
 .progress-bar {
 	background: darkgray;
 	width: 100%;
@@ -222,17 +240,20 @@ body {
 	                        $.each(json.specSchedules, function(i, sch) {
 	                            cardHtml += '<tr><td>' + formatDate(sch.ssDate) + '</td><td>' + sch.ssType + '</td></tr>';
 	                        });
-	                        cardHtml += '</table><div style=\"font-size:12px;\">';
-
-	                        $.each(json.acts, function(i, act) {
-	                            cardHtml +=
-	                              '<div style=\"margin-top:12px;\">' +
-	                                '<input type="checkbox" checked>' +
-	                                '<a href=\"#\">' + act.actContent + '</a>' +
-	                              '</div>';
-	                        });
+	                        cardHtml += '</table><div style=\"font-size: 18px;\">';
+	                        cardHtml += '<table><tr><td width="80px">활동 달성</td><td>활동 내용</td></tr>'
+							$.each(json.acts, function(i, act) {
+								if (act.actState === 'N') {
+									cardHtml += '<tr><td><input type=\"checkbox\" id=\"' + act.actId + '\" onclick=\"updateActStatus(' + act.actId + ', \'' + act.actState + '\')\"></td>' +
+												'<td><label for=\"' + act.actId + '\">' + act.actContent + '</label></td></tr>';
+								}
+								else {
+									cardHtml += '<tr><td><input type=\"checkbox\" id=\"' + act.actId + '\" onclick=\"updateActStatus(' + act.actId + ', \'' + act.actState + '\')\"  checked></td>' +
+												'<td><label for=\"' + act.actId + '\">' + act.actContent + '</label></td></tr>';
+								}
+							});
 							
-	                        cardHtml += '</div>' +
+	                        cardHtml += '</table></div>' +
 	                        			'<div class="buttons">' +
 	                        			'<button onclick=\"movetoUpdateSpec(' + jobId + ', ' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
 	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 150px;\">삭제</button>' +
@@ -255,6 +276,10 @@ body {
 				
 			}
 	    });
+	}
+	
+	function updateActStatus(actId, actState) {
+		location.href = 'updateActStatus.do?actId=' + actId + '&actState=' + actState;
 	}
 
 	function deleteSpec(specId) {
