@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:if test="${ empty sessionScope.loginUser }">
+	<jsp:forward page="/WEB-INF/views/user/login.jsp" />
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
@@ -66,7 +69,6 @@ $(function() {
 	      // ✕ 삭제 버튼
 	      const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
 	        $card.remove(); // 클릭 시 카드 삭제
-	        
 	        // 삭제 클릭시 DB에서도 삭제되게 함
 	        // Dashboard Service 구현 후
 	        $.ajax({
@@ -81,11 +83,10 @@ $(function() {
 	              console.error("DB에서 항목 삭제 실패:", jobCI.title);
 	            }
 	          });
-	        
 	      });
 
-
 	      // 직무명 텍스트만 표시
+	      console.log(jobCI.title);
 	      const $span = $("<span>").text(jobCI.title);
 
 
@@ -197,7 +198,8 @@ $(function() {
 	    const $input = $(".manual-input");
 	    const val = $input.val().trim();
 	    if (val) {
-	      addToJobList([val]);
+	    	const jobCI={title:val};
+		      addToJobList([jobCI]);
 	     
 	      // DB에 저장    ----------- 변경사항
 	      $.ajax({
@@ -211,7 +213,6 @@ $(function() {
 	          alert("직무 추가 실패!");
 	        }
 	      });
-	     
 	     
 	      $input.val("");
 	    } else {
