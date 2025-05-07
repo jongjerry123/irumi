@@ -129,6 +129,11 @@ public class DashboardDao {
 		return sqlSessionTemplate.delete("dashboardMapper.deleteAct", actId);
 	}
 	
+	// 일정 삭제
+	public int deleteSpecSchedule(String ssId) {
+		return sqlSessionTemplate.delete("dashboardMapper.deleteSpecSchedule", ssId);
+	}
+	
 	// 스펙 추가
 	public int selectNextSpecId() {
 		return sqlSessionTemplate.selectOne("dashboardMapper.selectNextSpecId");
@@ -157,6 +162,11 @@ public class DashboardDao {
 	}
 	public int insertSs(SpecSchedule ss) {
 		return sqlSessionTemplate.insert("dashboardMapper.insertSs", ss);
+	}
+	
+	// 스펙 아이디 가져오기 용
+	public int selectMaxSsId() {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxSsId");
 	}
 	
 }

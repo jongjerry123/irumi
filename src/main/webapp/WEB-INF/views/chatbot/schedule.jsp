@@ -70,6 +70,9 @@ document.addEventListener("DOMContentLoaded", function() {
         	  window.selectedJobId = jobId;
         	  window.selectedSpecId = spec.specId;
         	  window.selectedSpecName = spec.specName;
+        	  window.selectedSpecType = spec.specType;
+        	  window.selectedSpecExplain = spec.specExplain;
+        	  window.selectedSpecState = spec.specState;
         	};
         specList.appendChild(btn);
       });
@@ -78,8 +81,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 	// 오른쪽 저장한 일정 부분 함수들
 	function addToActivityList(items) {
-	    const actList = document.getElementById("savedActivityList");
-	    items.forEach(activity => {
+	    const actList = document.getElementById("savedScheduleList");
+	    items.forEach(item => {
 	      const card = document.createElement("div");
 	      card.className = "schedule-card";
 	      // 삭제 버튼
@@ -88,10 +91,28 @@ document.addEventListener("DOMContentLoaded", function() {
 	      removeBtn.textContent = "✕";
 	      removeBtn.onclick = function() {
 	        card.remove();
+	        
+	        
+	        fetch("CdeleteSpecSchedule.do", {
+		    	  method: "POST",
+		    	  headers: {
+		    	    "Content-Type": "application/x-www-form-urlencoded"
+		    	  },
+		    	  body: new URLSearchParams({ ssId: item.ssId }).toString()
+		    	})
+		    	.then(response => {
+		    	  if (response.ok) {
+		    		window.location.href = "viewScheduleRecChat.do";
+		    	    console.log("일정 삭제 성공");
+		    	  } else {
+		    	    alert("일정 삭제 실패!");
+		    	  }
+		    	});
+
 	      };
 	      // 텍스트
 	      const span = document.createElement("span");
-	      span.textContent = activity;
+	      span.textContent = item.text;
 	      card.appendChild(removeBtn);
 	      card.appendChild(span);
 	      actList.appendChild(card);
@@ -103,31 +124,43 @@ document.addEventListener("DOMContentLoaded", function() {
 		  const commentInput = document.getElementById("manualComment").value.trim();
 		 
 		    if (dateInput && commentInput) {
-		    	  /* const scheduleData = {
-		    	    ssDate: dateInput,      
-		    	    ssType: commentInput   
-		    	  };
-		    	  $.ajax({
-		    	    type: "POST",
-		    	    url: "insertSchedule.do",  //// 완성시 이름 바꾸기
-		    	    data: scheduleData, 
-		    	    success: function() {
-		    	      console.log("일정 저장 성공");
-		    	    },
-		    	    error: function() {
-		    	      alert("일정 저장 실패!");
-		    	    }
-		    	  }); */
-		    	 
-		    const combinedText = dateInput + " / " + commentInput;	 
-		    addToActivityList([combinedText]);
-		   
-		    // 입력창 초기화
-		    document.getElementById("manualDate").value = "";
-		    document.getElementById("manualComment").value = "";
-		  } else {
-		    alert("날짜와 코멘트를 모두 입력해 주세요!");
-		  }
+		    	const formData = new URLSearchParams();
+		    	formData.append("jobId", window.selectedJobId);
+		    	formData.append("ssType", commentInput);  
+		    	formData.append("ssDate", dateInput);
+		    	formData.append("actContent", ""); 
+		    	formData.append("specName", window.selectedSpecName);
+		    	formData.append("specType", window.selectedSpecType);
+		    	formData.append("specExplain", window.selectedSpecExplain);
+		    	formData.append("specState", window.selectedSpecState);
+
+		    	
+
+		    	fetch("insertSpec.do", {
+		    	  method: "POST",
+		    	  headers: {
+		    	    "Content-Type": "application/x-www-form-urlencoded"
+		    	  },
+		    	  body: formData.toString()
+		    	})
+		    	.then(res => {
+		            if (!res.ok) throw new Error("일정 저장 실패!");
+		            // ✔️ 저장 완료되면 getLatestSsId.do로 ssId 추정
+		            return fetch("getLatestSsId.do");
+		        })
+		        .then(res => res.text())
+		        .then(ssId => {
+		            const combinedText = dateInput + " / " + commentInput;
+		            addToActivityList([{ text: combinedText, ssId }]);
+
+		            // 입력창 초기화
+		            document.getElementById("manualDate").value = "";
+		            document.getElementById("manualComment").value = "";
+		        })
+		        .catch(err => alert(err.message));
+		    } else {
+		        alert("날짜와 코멘트를 모두 입력해 주세요!");
+		    }
 		});
 	
 	// 저장한 일정쪽 함수 끝
@@ -177,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 	 
 	 
-	  // 사용자가 직접 입력할 때
+	  // 일정 데이터 사용자가 직접 입력
 	  document.getElementById("userInput").addEventListener("keyup", function(event) {
 	    if (event.key === "Enter") {
 	      const val = this.value.trim();
@@ -730,7 +763,7 @@ a {
   </div>
   <div class="saved-schedule-section">
        <div class="section-title">➤ 저장한 일정</div>
-       <div class="saved-schedule-list" id="savedActivityList"></div>
+       <div class="saved-schedule-list" id="savedScheduleList"></div>
       
       
   <div class="manual-input-box">

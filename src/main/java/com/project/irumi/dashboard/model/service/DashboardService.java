@@ -34,6 +34,7 @@ public interface DashboardService {
 	int deleteJob(String jobId);
 	int deleteSpec(String specId);
 	int deleteAct(String actId);
+	int deleteSpecSchedule(String ssId);
 	int selectNextSpecId();
 	int insertSpec(Spec spec);
 	int insertSpecLink(Specific specific);
@@ -46,4 +47,5 @@ public interface DashboardService {
 	Spec selectSpec(String specId);
 	int updateActStatus(Activity activity);
 	String selectJobIdBySpecId(String specId);
+	int selectMaxSsId();
 }
