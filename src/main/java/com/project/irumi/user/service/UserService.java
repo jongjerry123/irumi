@@ -20,10 +20,16 @@ public interface UserService {
     boolean checkUserMatch(String userId, String email);
     //비밀번호 업데이트
     void updatePassword(String userId, String encodedPassword);
+    //소셜아이디 찾기용
     User findUserBySocialId(String socialId, int loginType);
+    //마이페이지 업데이트용
     void updateUserProfile(Map<String, Object> userData);
+    //아이디로 유저 찾기
     User selectUserById(String userId);
+    //유저 권한 업데이트
     void updateUserAuthority(String userId, String userAuthority);
+    //유저 비밀번호 최종 변경일 수정
     void updateChPwd(String userId, Date chPwd);
+    //소셜 유저 권한 조회용
     String selectUserAuthority(String socialId);
 }

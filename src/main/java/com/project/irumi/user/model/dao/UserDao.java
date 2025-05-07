@@ -41,50 +41,56 @@ public class UserDao {
 		return sqlSessionTemplate.selectOne("userMapper.findIdByEmail", email);
 	}
 
-	// 아이디와 이메일 일치 확인 (의존성 추가)
+	// 아이디와 이메일 일치 확인
 	public int countByUserIdAndEmail(String userId, String email) {
 		Map<String, String> params = new HashMap<>();
 		params.put("userId", userId);
 		params.put("email", email);
 		return sqlSessionTemplate.selectOne("userMapper.countByUserIdAndEmail", params);
 	}
+	//비밀번호 변경
 	public void updatePassword(String userId, String encodedPassword) {
-	    Map<String, String> params = new HashMap<>();
-	    params.put("userId", userId);
-	    params.put("userPwd", encodedPassword);
-	    sqlSessionTemplate.update("userMapper.updatePassword", params);
+		Map<String, String> params = new HashMap<>();
+		params.put("userId", userId);
+		params.put("userPwd", encodedPassword);
+		sqlSessionTemplate.update("userMapper.updatePassword", params);
 	}
-	//소셜로그인
-	public User findUserBySocialId(String socialId, int loginType) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("socialId", socialId);
-        params.put("loginType", loginType);
-        return sqlSessionTemplate.selectOne("userMapper.findUserBySocialId", params);
-    }
-	//마이페이지 수정
-	public void updateUserProfile(Map<String, Object> params) {
-        sqlSessionTemplate.update("userMapper.updateUserProfile", params);
-    }
-	
-	public User selectUserById(String userId) {
-        return sqlSessionTemplate.selectOne("userMapper.findByUserId", userId);
-    }
 
-    public void updateUserAuthority(String userId, String userAuthority) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("userAuthority", userAuthority);
-        sqlSessionTemplate.update("userMapper.updateAuthority", params);
-    }
- // CH_PWD 업데이트
-    public void updateChPwd(String userId, Date chPwd) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("chPwd", chPwd);
-        sqlSessionTemplate.update("userMapper.updateChPwd", params);
-    }
-    public String selectUserAuthority(String socialId) {
-    	return sqlSessionTemplate.selectOne("userMapper.selectUserAuthority", socialId);
-    }
+	// 소셜로그인
+	public User findUserBySocialId(String socialId, int loginType) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("socialId", socialId);
+		params.put("loginType", loginType);
+		return sqlSessionTemplate.selectOne("userMapper.findUserBySocialId", params);
+	}
+
+	// 마이페이지 수정
+	public void updateUserProfile(Map<String, Object> params) {
+		sqlSessionTemplate.update("userMapper.updateUserProfile", params);
+	}
+	//유저 아이디 찾기
+	public User selectUserById(String userId) {
+		return sqlSessionTemplate.selectOne("userMapper.findByUserId", userId);
+	}
+	//유저 권한 업데이트
+	public void updateUserAuthority(String userId, String userAuthority) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", userId);
+		params.put("userAuthority", userAuthority);
+		sqlSessionTemplate.update("userMapper.updateAuthority", params);
+	}
+
+	// 비밀번호 최종 수정일 업데이트
+	public void updateChPwd(String userId, Date chPwd) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", userId);
+		params.put("chPwd", chPwd);
+		sqlSessionTemplate.update("userMapper.updateChPwd", params);
+	}
+
+	// 소셜유저 권환 확인용
+	public String selectUserAuthority(String socialId) {
+		return sqlSessionTemplate.selectOne("userMapper.selectUserAuthority", socialId);
+	}
 
 }
