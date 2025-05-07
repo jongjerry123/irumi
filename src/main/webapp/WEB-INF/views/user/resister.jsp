@@ -18,11 +18,26 @@ body {
 	margin: 0;
 }
 
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 50px;
+	background-color: #111;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+	box-sizing: border-box;
+}
+
 .container {
 	background-color: #1e1e1e;
 	border-radius: 10px;
 	padding: 40px;
-	width: 400px; 
+	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -49,7 +64,6 @@ h2 {
 	display: none; /* 초기에는 숨김 */
 }
 
-
 .terms-box::-webkit-scrollbar {
 	width: 10px;
 }
@@ -71,7 +85,6 @@ h2 {
 	background: #2ccfcf;
 }
 
-
 .terms-box {
 	scrollbar-width: thin;
 	scrollbar-color: #33e3da #333;
@@ -89,16 +102,17 @@ h2 {
 	gap: 10px;
 }
 
-.all{
+.all {
 	flex: 1;
 	font-weight: bold;
 	font-size: 18px;
 }
+
 .label-title {
 	flex: 1;
 	font-weight: bold;
 	font-size: 18px;
-	cursor: pointer; 
+	cursor: pointer;
 }
 
 input[type="checkbox"] {
@@ -171,24 +185,23 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </head>
 <body>
+	<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
 		<h2>다음 내용에 동의해주세요</h2>
 
 		<div class="all-agree-section">
 			<div class="checkbox-group">
-				<label class="checkbox-label">
-					<input type="checkbox" id="allAgree" onclick="toggleCheckboxes(this)">
-				</label>
-				<span class="all">모두 동의</span>
+				<label class="checkbox-label"> <input type="checkbox"
+					id="allAgree" onclick="toggleCheckboxes(this)">
+				</label> <span class="all">모두 동의</span>
 			</div>
 		</div>
 
 		<div class="terms-section">
 			<div class="checkbox-group">
-				<label class="checkbox-label">
-					<input type="checkbox" class="agree-check" onclick="updateButtonState();">
-				</label>
-				<span class="label-title"><u>1. 서비스 이용약관 동의 (필수)</u></span>
+				<label class="checkbox-label"> <input type="checkbox"
+					class="agree-check" onclick="updateButtonState();">
+				</label> <span class="label-title"><u>1. 서비스 이용약관 동의 (필수)</u></span>
 			</div>
 			<div class="terms-box">
 				<strong>제1조 (목적)</strong><br> 이 약관은 [회사명] (이하 "회사")가 제공하는
@@ -215,22 +228,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		<div class="terms-section">
 			<div class="checkbox-group">
-				<label class="checkbox-label">
-					<input type="checkbox" class="agree-check" onclick="updateButtonState();">
-				</label>
-				<span class="label-title"><u>2. 개인정보 수집 및 이용 동의(필수)</u></span>
+				<label class="checkbox-label"> <input type="checkbox"
+					class="agree-check" onclick="updateButtonState();">
+				</label> <span class="label-title"><u>2. 개인정보 수집 및 이용 동의(필수)</u></span>
 			</div>
 			<div class="terms-box">
 				<strong>1. 수집하는 개인정보 항목</strong><br> 회사는 회원가입, 상담, 서비스 제공을 위해
 				아래와 같은 개인정보를 수집할 수 있습니다.<br> - 필수 항목: 이름, 이메일, 비밀번호, 생년월일,
-				휴대폰번호<br> - 자동 수집 항목: IP주소, 쿠키, 방문일시, 서비스 이용기록 등<br>
-				<br> <strong>2. 개인정보 수집 및 이용 목적</strong><br> 회사는 수집한 개인정보를
-				다음의 목적을 위해 이용합니다.<br> - 회원관리: 회원제 서비스 이용에 따른 본인확인, 가입의사 확인<br>
-				- 서비스 제공: 콘텐츠 제공, 맞춤형 서비스 제공<br> - 민원 처리 및 고객지원<br>
-				<br> <strong>3. 개인정보 보유 및 이용기간</strong><br> - 원칙적으로 개인정보
-				수집 및 이용 목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다.<br> - 단, 관련 법령에 따라 보존이
-				필요한 경우에는 일정 기간 보관합니다.<br> 예) 전자상거래 등에서의 소비자 보호에 관한 법률: 계약/청약철회
-				정보 5년 등<br>
+				휴대폰번호<br> - 자동 수집 항목: IP주소, 쿠키, 방문일시, 서비스 이용기록 등<br> <br>
+				<strong>2. 개인정보 수집 및 이용 목적</strong><br> 회사는 수집한 개인정보를 다음의 목적을
+				위해 이용합니다.<br> - 회원관리: 회원제 서비스 이용에 따른 본인확인, 가입의사 확인<br> -
+				서비스 제공: 콘텐츠 제공, 맞춤형 서비스 제공<br> - 민원 처리 및 고객지원<br> <br>
+				<strong>3. 개인정보 보유 및 이용기간</strong><br> - 원칙적으로 개인정보 수집 및 이용 목적이
+				달성된 후에는 해당 정보를 지체 없이 파기합니다.<br> - 단, 관련 법령에 따라 보존이 필요한 경우에는 일정
+				기간 보관합니다.<br> 예) 전자상거래 등에서의 소비자 보호에 관한 법률: 계약/청약철회 정보 5년 등<br>
 				<br> <strong>4. 동의를 거부할 권리</strong><br> - 이용자는 개인정보 수집 및
 				이용 동의를 거부할 수 있습니다.<br> - 단, 동의하지 않을 경우 서비스 가입 및 이용이 제한될 수 있습니다.<br>
 				<br>

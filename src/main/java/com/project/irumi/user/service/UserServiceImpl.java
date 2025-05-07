@@ -106,6 +106,7 @@ public class UserServiceImpl implements UserService {
     public void updateChPwd(String userId, Date chPwd) {
         userDao.updateChPwd(userId, chPwd);
     }
+    //소셜유저 권환 확인용
 	@Override
 	public String selectUserAuthority(String socialId) {
 		return userDao.selectUserAuthority(socialId);

@@ -30,8 +30,26 @@ body {
 	text-align: center;
 }
 
-.login-box h2 {
-	margin-bottom: 20px;
+.logo-area {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 32px;
+	font-weight: bold;
+	cursor: pointer;
+	justify-content: center;
+	margin-bottom : 30px
+}
+
+.triangle-img {
+	height: 50px;
+	width: 50px;
+	transition: transform 0.2s ease;
+	vertical-align: middle;
+}
+
+.logo-area:hover .triangle-img {
+	transform: scale(1.3);
 }
 
 .login-box input {
@@ -120,7 +138,10 @@ body {
 <body>
 	<div class="login-container">
 		<div class="login-box">
-			<h2>로그인</h2>
+			<div class="logo-area" onclick="moveToMain()">
+				<img src="/irumi/resources/images/eye.png" class="triangle-img"
+					alt="irumi 로고" /> <span>irumi</span>
+			</div>
 			<form action="login.do" method="post">
 				<input type="hidden" name="_csrf" value="${_csrf.token}" /> <input
 					type="text" name="userId" placeholder="아이디 입력" id="userId"
@@ -143,14 +164,10 @@ body {
 				<img
 					src="${pageContext.request.contextPath}/resources/images/naver.png"
 					alt="네이버 로그인" class="social-icon"
-					onclick="location.href='naverLogin.do'">
-					
-				 <img
+					onclick="location.href='naverLogin.do'"> <img
 					src="${pageContext.request.contextPath}/resources/images/google.png"
 					alt="구글 로그인" class="social-icon"
-					onclick="location.href='googleLogin.do'"> 
-					
-				<img
+					onclick="location.href='googleLogin.do'"> <img
 					src="${pageContext.request.contextPath}/resources/images/kakao.png"
 					alt="카카오 로그인" class="social-icon"
 					onclick="location.href='kakaoLogin.do'">
@@ -168,7 +185,10 @@ body {
     if (errorMessage.textContent.trim()) {
         errorMessage.style.display = 'block';
     }
-
+ // 삼각형 + irumi 클릭 시 메인페이지 이동
+    function moveToMain() {
+        location.href = 'main.do';
+    }
     function validateInputs() {
         const idValid = userId.value.trim().length >= 3;
         const pwdValid = userPwd.value.trim().length >= 8 &&

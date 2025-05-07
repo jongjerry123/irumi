@@ -1,4 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+	<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,177 +9,199 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 body {
-  background-color: #121212;
-  font-family: Arial, sans-serif;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
+	background-color: #121212;
+	font-family: Arial, sans-serif;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+}
+
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 50px;
+	background-color: #111;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+	box-sizing: border-box;
 }
 
 .container {
-  background-color: #1e1e1e;
-  border-radius: 10px;
-  padding: 40px;
-  width: 400px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	background-color: #1e1e1e;
+	border-radius: 10px;
+	padding: 40px;
+	width: 400px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 h2 {
-  text-align: center;
-  margin-bottom: 30px;
+	text-align: center;
+	margin-bottom: 30px;
 }
 
 .input-group {
-  margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 input[type="text"], input[type="password"], input[type="email"] {
-  width: 100%;
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid #444;
-  border-radius: 6px;
-  background-color: #121212;
-  color: white;
-  box-sizing: border-box;
-  font-size: 14px;
+	width: 100%;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid #444;
+	border-radius: 6px;
+	background-color: #121212;
+	color: white;
+	box-sizing: border-box;
+	font-size: 14px;
 }
 
 .btn, #send-verification, #check-id, #verify-code {
-  width: 100%;
-  height: 40px;
-  padding: 0 12px;
-  border: none;
-  border-radius: 6px;
-  background-color: #2ccfcf;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-  box-sizing: border-box;
+	width: 100%;
+	height: 40px;
+	padding: 0 12px;
+	border: none;
+	border-radius: 6px;
+	background-color: #2ccfcf;
+	color: black;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 14px;
+	box-sizing: border-box;
 }
 
-.btn:disabled, #send-verification:disabled, #check-id:disabled, #verify-code:disabled {
-  background-color: black;
-  color: white;
-  cursor: not-allowed;
+.btn:disabled, #send-verification:disabled, #check-id:disabled,
+	#verify-code:disabled {
+	background-color: black;
+	color: white;
+	cursor: not-allowed;
 }
 
 .inline-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+	display: flex;
+	gap: 10px;
+	align-items: center;
 }
 
-.inline-group input[type="text"],
-.inline-group input[type="email"] {
-  flex: 1;
-  height: 40px;
+.inline-group input[type="text"], .inline-group input[type="email"] {
+	flex: 1;
+	height: 40px;
 }
 
-.inline-group #send-verification,
-.inline-group #check-id,
-.inline-group #verify-code {
-  width: auto;
-  min-width: 100px;
-  height: 40px;
+.inline-group #send-verification, .inline-group #check-id, .inline-group #verify-code
+	{
+	width: auto;
+	min-width: 100px;
+	height: 40px;
 }
 
 .verification-group {
-  position: relative;
+	position: relative;
 }
 
 #verification-code {
-  width: 100%;
-  height: 40px;
-  padding-right: 60px;
+	width: 100%;
+	height: 40px;
+	padding-right: 60px;
 }
 
 #timer {
-  display: none;
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #2ccfcf;
-  font-size: 12px;
-  pointer-events: none;
-  z-index: 10;
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #2ccfcf;
+	font-size: 12px;
+	pointer-events: none;
+	z-index: 10;
 }
 
 .message {
-  font-size: 12px;
-  margin-top: 5px;
+	font-size: 12px;
+	margin-top: 5px;
 }
 
 .message.success {
-  color: #00ffaa;
+	color: #00ffaa;
 }
 
 .message.error {
-  color: #ff5a5a;
+	color: #ff5a5a;
 }
 </style>
 </head>
 <body>
-  <div class="container">
-    <h2>회원가입</h2>
-    <form id="register-form">
-      <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-      <!-- 아이디 입력 -->
-      <div class="input-group">
-        <div class="inline-group">
-          <input type="text" id="username" name="username" placeholder="아이디 입력" maxlength="12">
-          <button type="button" id="check-id">중복확인</button>
-        </div>
-        <div id="id-message" class="message"></div>
-      </div>
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+	<div class="container">
+		<h2>회원가입</h2>
+		<form id="register-form">
+			<input type="hidden" name="_csrf" value="${_csrf.token}" />
+			<!-- 아이디 입력 -->
+			<div class="input-group">
+				<div class="inline-group">
+					<input type="text" id="username" name="username"
+						placeholder="아이디 입력" maxlength="12">
+					<button type="button" id="check-id">중복확인</button>
+				</div>
+				<div id="id-message" class="message"></div>
+			</div>
 
-      <!-- 이름 입력 -->
-      <div class="input-group">
-        <input type="text" id="userName" name="userName" placeholder="이름 입력" maxlength="20">
-        <div id="name-message" class="message"></div>
-      </div>
+			<!-- 이름 입력 -->
+			<div class="input-group">
+				<input type="text" id="userName" name="userName" placeholder="이름 입력"
+					maxlength="20">
+				<div id="name-message" class="message"></div>
+			</div>
 
-      <!-- 비밀번호 -->
-      <div class="input-group">
-        <input type="password" id="password" name="password" placeholder="비밀번호" maxlength="16">
-        <div id="password-message" class="message error"></div>
-      </div>
+			<!-- 비밀번호 -->
+			<div class="input-group">
+				<input type="password" id="password" name="password"
+					placeholder="비밀번호" maxlength="16">
+				<div id="password-message" class="message error"></div>
+			</div>
 
-      <!-- 비밀번호 확인 -->
-      <div class="input-group">
-        <input type="password" id="confirm-password" placeholder="비밀번호 확인" maxlength="16">
-        <div id="confirm-message" class="message error"></div>
-      </div>
+			<!-- 비밀번호 확인 -->
+			<div class="input-group">
+				<input type="password" id="confirm-password" placeholder="비밀번호 확인"
+					maxlength="16">
+				<div id="confirm-message" class="message error"></div>
+			</div>
 
-      <!-- 이메일 -->
-      <div class="input-group">
-        <div class="inline-group">
-          <input type="email" id="email" name="userEmail" placeholder="이메일 주소" maxlength="30">
-          <button type="button" id="send-verification" disabled>인증전송</button>
-        </div>
-        <div id="email-message" class="message"></div>
-      </div>
+			<!-- 이메일 -->
+			<div class="input-group">
+				<div class="inline-group">
+					<input type="email" id="email" name="userEmail"
+						placeholder="이메일 주소" maxlength="30">
+					<button type="button" id="send-verification" disabled>인증전송</button>
+				</div>
+				<div id="email-message" class="message"></div>
+			</div>
 
-      <!-- 인증번호 -->
-      <div class="input-group verification-group">
-        <div class="inline-group">
-          <input type="text" id="verification-code" name="verification-code" placeholder="인증번호" maxlength="6" disabled>
-          <button type="button" id="verify-code" disabled>인증확인</button>
-        </div>
-        <div id="timer">00:00</div>
-        <div id="verification-message" class="message"></div>
-      </div>
+			<!-- 인증번호 -->
+			<div class="input-group verification-group">
+				<div class="inline-group">
+					<input type="text" id="verification-code" name="verification-code"
+						placeholder="인증번호" maxlength="6" disabled>
+					<button type="button" id="verify-code" disabled>인증확인</button>
+				</div>
+				<div id="timer">00:00</div>
+				<div id="verification-message" class="message"></div>
+			</div>
 
-      <button type="button" class="btn" id="complete-registration" disabled>회원가입 완료</button>
-    </form>
-  </div>
+			<button type="button" class="btn" id="complete-registration" disabled>회원가입
+				완료</button>
+		</form>
+	</div>
 
-  <script>
+	<script>
     document.addEventListener('DOMContentLoaded', () => {
 //      console.log('DOM fully loaded');
 
@@ -208,7 +232,7 @@ input[type="text"], input[type="password"], input[type="email"] {
       // 아이디 중복 확인
       function dupIdCheck() {
         const username = usernameInput.value.trim();
-        console.log('Checking username:', username);
+        //console.log('Checking username:', username); 
         if (username.length < 3) {
           idMessage.textContent = '아이디는 3자 이상이어야 합니다.';
           idMessage.classList.remove('success');
@@ -226,7 +250,7 @@ input[type="text"], input[type="password"], input[type="email"] {
           },
           dataType: 'json',
           success: function(data) {
-            console.log('ID check success:', data);
+            //console.log('ID check success:', data);
             idMessage.textContent = data.message;
             idMessage.classList.toggle('success', data.available);
             idMessage.classList.toggle('error', !data.available);
@@ -239,7 +263,7 @@ input[type="text"], input[type="password"], input[type="email"] {
             validateForm();
           },
           error: function(jqXHR, textStatus, errorThrown) {
-            console.error('ID check error:', jqXHR, textStatus, errorThrown);
+            //console.error('ID check error:', jqXHR, textStatus, errorThrown);
             idMessage.textContent = '중복 확인 중 오류가 발생했습니다.';
             idMessage.classList.remove('success');
             idMessage.classList.add('error');
@@ -318,7 +342,7 @@ input[type="text"], input[type="password"], input[type="email"] {
           },
           dataType: 'json',
           success: function(data) {
-            console.log('Email check success:', data);
+            //console.log('Email check success:', data);
             if (data.available) {
               emailMessage.textContent = '사용 가능한 이메일입니다.';
               emailMessage.classList.add('success');
@@ -341,7 +365,7 @@ input[type="text"], input[type="password"], input[type="email"] {
             validateForm();
           },
           error: function(jqXHR, textStatus, errorThrown) {
-            console.error('Email check error:', jqXHR, textStatus, errorThrown);
+            //console.error('Email check error:', jqXHR, textStatus, errorThrown);
             emailMessage.textContent = '이메일 확인 중 오류가 발생했습니다.';
             emailMessage.classList.add('error');
             emailMessage.classList.remove('success');
@@ -358,7 +382,7 @@ input[type="text"], input[type="password"], input[type="email"] {
       // 인증번호 전송
       async function sendVerification() {
         const email = emailInput.value.trim();
-        console.log('Sending verification to:', email);
+        //console.log('Sending verification to:', email);
         if (!isEmailValid || !isEmailAvailable) {
           emailMessage.textContent = '유효한 이메일을 먼저 확인해주세요.';
           emailMessage.classList.add('error');

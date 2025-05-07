@@ -88,78 +88,88 @@ public class UserController {
 	private RestTemplate restTemplate;
 
 	private Gmail gmailService;
-
-	public UserController() {
-		try {
-			final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			gmailService = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-					.setApplicationName(APPLICATION_NAME).build();
-//			logger.info("GmailService initialized successfully");
-		} catch (Exception e) {
-//			logger.error("Failed to initialize GmailService", e);
-		}
-	}
-	//Credentials 가져오기용 (구글 이메일 api 사용용으로 클라이언트 ID 가져오는 것)
-	private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws Exception {
-		InputStream in = UserController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-		if (in == null) {
-			throw new IllegalStateException("Credentials file not found at: " + CREDENTIALS_FILE_PATH);
-		}
-		try (InputStreamReader reader = new InputStreamReader(in)) {
-			GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, reader);
-			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-					clientSecrets, Collections.singletonList("https://www.googleapis.com/auth/gmail.send"))
-					.setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens"))).setAccessType("offline")
-					.build();
-			LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-			return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-		}
-	}
-	//DB 소셜로그인 임시 이메일 생성용 
-	private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
-		if (!to.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-			throw new IllegalArgumentException("Invalid recipient email: " + to);
-		}
-		Properties props = new Properties();
-		Session session = Session.getDefaultInstance(props, null);
-		MimeMessage email = new MimeMessage(session);
-		email.setFrom(new InternetAddress(from));
-		email.addRecipient(RecipientType.TO, new InternetAddress(to));
-		email.setSubject(subject);
-		email.setText(bodyText);
-		return email;
-	}
-	//소셜 로그인 임시 이메일 생성
-	private Message createMessageWithEmail(MimeMessage emailContent) throws Exception {
-		java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
-		emailContent.writeTo(buffer);
-		byte[] bytes = buffer.toByteArray();
-		String encodedEmail = java.util.Base64.getUrlEncoder().encodeToString(bytes);
-		Message message = new Message();
-		message.setRaw(encodedEmail);
-		return message;
-	}
-	//소셜 로그인 임시 비밀번호 생성
-	private String generateRandomPassword() {
-		SecureRandom random = new SecureRandom();
-		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
-		for (int i = 0; i < PASSWORD_LENGTH; i++) {
-			password.append(RANDOM_PASSWORD_CHARS.charAt(random.nextInt(RANDOM_PASSWORD_CHARS.length())));
-		}
-		return password.toString();
-	}
-	//main 으로 가는 메소드
-	@RequestMapping("/")
-	public String home() {
-//		logger.info("home: Redirecting to main page");
-		return "common/main";
-	}
+	
+	/*---------------------------페이지 이동--------------------------*/
+	
 	//로그인 페이지로 이동하는 메소드
 	@RequestMapping(value = "loginPage.do", method = RequestMethod.GET)
 	public String moveToLoginPage() {
 //		logger.info("moveToLoginPage: Displaying login page");
 		return "user/login";
 	}
+	//비밀번호 변경권유 페이지
+	@RequestMapping(value = "6MChangPwd.do", method = RequestMethod.GET)
+	public String changePasswordPage(HttpSession session, Model model) {
+//		logger.info("6MChangPwd.do: Displaying password change page");
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+//			logger.warn("6MChangPwd.do: No user in session, redirecting to login");
+			model.addAttribute("message", "로그인이 필요합니다.");
+			return "redirect:/loginPage.do";
+		}
+		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+//			logger.warn("6MChangPwd.do: Social login user (type={}), redirecting to main",
+//					loginUser.getUserLoginType());
+			return "user/main";
+		}
+		return "user/6MChangPwd";
+	}
+	//로그아웃 
+	@RequestMapping(value = "logout.do", method = RequestMethod.POST)
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect:/main.do";
+	}
+	//약관페이지로 이동
+	@RequestMapping("resister.do")
+	public String moveResisterPage() {
+//		logger.info("moveResisterPage: Displaying registration page");
+		return "user/resister";
+	}
+	//약관 페이지-> 회원가입페이지
+	@RequestMapping("resisterId.do")
+	public String goToNext() {
+//		logger.info("goToNext: Displaying resisterId page");
+		return "user/resisterId";
+	}
+	//아이디 찾기 페이지 이동 
+	@RequestMapping("findId.do")
+	public String goToFindId() {
+//		logger.info("goToFindId: Displaying findId page");
+		return "user/findId";
+	}
+	//아이디 알려주는 페이지에 전송
+	@RequestMapping("showId.do")
+	public String goToShowId() {
+//		logger.info("goToShowId: Displaying showId page");
+		return "user/showId";
+	}
+	//비밀번호 찾기 페이지 이동
+	@RequestMapping("findPassword.do")
+	public String goTofindPassword() {
+//		logger.info("goTofindPassword: Displaying findPassword page");
+		return "user/findPassword";
+	}
+	//마이페이지 이동
+	@RequestMapping("myPage.do")
+	public String moveMyPage() {
+//		logger.info("moveMyPage: Displaying myPage");
+		return "user/myPage";
+	}
+	//관리자 기능 페이지 이동
+	@RequestMapping("changeManage.do")
+	public String changeManage(HttpSession session) {
+//		logger.info("changeManage: Displaying changeManage page");
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
+//			logger.warn("changeManage: Unauthorized access attempt by userId={}",
+//					loginUser != null ? loginUser.getUserId() : "null");
+			return "redirect:/loginPage.do";
+		}
+		return "user/changeManage";
+	}
+	
+	/*---------------------------기능---------------------------*/
 	//로그인용 메소드
 	@RequestMapping(value = "login.do", method = RequestMethod.POST)
 	public String loginMethod(User user, HttpSession session, Model model) {
@@ -229,40 +239,249 @@ public class UserController {
 			return "user/login";
 		}
 	}
-	//비밀번호 변경권유 페이지
-	@RequestMapping(value = "6MChangPwd.do", method = RequestMethod.GET)
-	public String changePasswordPage(HttpSession session, Model model) {
-//		logger.info("6MChangPwd.do: Displaying password change page");
+	//비밀번호 수정
+	@RequestMapping(value = "updatePassword.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updatePassword(@RequestParam(name = "userId") String userId,
+			@RequestParam(name = "newPassword") String newPassword, HttpSession session) {
+//		logger.info("updatePassword.do: Updating password for userId = {}", userId);
+		Map<String, Object> response = new HashMap<>();
 		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null) {
-//			logger.warn("6MChangPwd.do: No user in session, redirecting to login");
-			model.addAttribute("message", "로그인이 필요합니다.");
-			return "redirect:/loginPage.do";
+		if (loginUser == null || !loginUser.getUserId().equals(userId)) {
+//			logger.warn("updatePassword.do: Invalid session or userId mismatch for userId = {}", userId);
+			response.put("success", false);
+			response.put("message", "로그인 정보가 유효하지 않습니다.");
+			return response;
 		}
 		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-//			logger.warn("6MChangPwd.do: Social login user (type={}), redirecting to main",
+//			logger.info("updatePassword.do: Social login user (type={}) cannot change password",
 //					loginUser.getUserLoginType());
-			return "user/main";
+			response.put("success", false);
+			response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+			return response;
 		}
-		return "user/6MChangPwd";
+		try {
+			String encodedPassword = bcryptPasswordEncoder.encode(newPassword);
+			userservice.updatePassword(userId, encodedPassword); // CH_PWD는 매퍼에서 sysdate로 자동 업데이트
+//			logger.info("updatePassword.do: Password and CH_PWD updated for userId = {}", userId);
+			response.put("success", true);
+			response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+		} catch (Exception e) {
+//			logger.error("updatePassword.do: Error updating password for userId = {}", userId, e);
+			response.put("success", false);
+			response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
+		}
+		return response;
 	}
-	//약관페이지로 이동
-	@RequestMapping("resister.do")
-	public String moveResisterPage() {
-//		logger.info("moveResisterPage: Displaying registration page");
-		return "user/resister";
+	//2개월간 메시지 보지 않기
+	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {
+//		logger.info("deferPasswordChange.do: Deferring password change for userId = {}", userId);
+		Map<String, Object> response = new HashMap<>();
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !loginUser.getUserId().equals(userId)) {
+//			logger.warn("deferPasswordChange.do: Invalid session or userId mismatch for userId = {}", userId);
+			response.put("success", false);
+			response.put("message", "로그인 정보가 유효하지 않습니다.");
+			return response;
+		}
+		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+//			logger.info("deferPasswordChange.do: Social login user (type={}) cannot defer password change",
+//					loginUser.getUserLoginType());
+			response.put("success", false);
+			response.put("message", "소셜 로그인 사용자는 비밀번호 변경 연기를 할 수 없습니다.");
+			return response;
+		}
+		try {
+			// CH_PWD를 현재 날짜에서 120일 전으로 설정
+			long pastChPwdMillis = System.currentTimeMillis() - (120L * 24 * 60 * 60 * 1000);
+			userservice.updateChPwd(userId, new Date(pastChPwdMillis));
+//			logger.info("deferPasswordChange.do: CH_PWD set to 120 days ago for userId = {}", userId);
+			response.put("success", true);
+			response.put("message", "비밀번호 변경 주기가 120일 전으로 설정되었습니다.");
+		} catch (Exception e) {
+//			logger.error("deferPasswordChange.do: Error deferring password change for userId = {}", userId, e);
+			response.put("success", false);
+			response.put("message", "연기 처리 중 오류가 발생했습니다.");
+		}
+		return response;
 	}
-	//약관 페이지-> 회원가입페이지
-	@RequestMapping("resisterId.do")
-	public String goToNext() {
-//		logger.info("goToNext: Displaying resisterId page");
-		return "user/resisterId";
+	//실시간 비밀번호 확인
+	@RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> checkPassword(@RequestBody Map<String, String> data, HttpSession session) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			User loginUser = (User) session.getAttribute("loginUser");
+			if (loginUser == null) {
+//				logger.warn("checkPassword.do: No user in session");
+				response.put("success", false);
+				response.put("message", "로그인이 필요합니다.");
+				return response;
+			}
+
+			if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+//				logger.info("checkPassword.do: Social login user (type={}) cannot change password",
+//						loginUser.getUserLoginType());
+				response.put("success", false);
+				response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+				return response;
+			}
+
+			String currentPassword = loginUser.getUserPwd();
+			if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
+//				logger.error("checkPassword.do: Invalid or missing password hash for userId={}", loginUser.getUserId());
+				response.put("success", false);
+				response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
+				return response;
+			}
+
+			String newPassword = data.get("password");
+//			logger.debug("checkPassword.do: Checking password for userId={}, input length={}", loginUser.getUserId(),
+//					newPassword != null ? newPassword.length() : 0);
+
+			if (newPassword == null || newPassword.isEmpty()) {
+				response.put("success", true);
+				response.put("isSame", false);
+				response.put("message", "");
+				return response;
+			}
+
+			boolean isSame = bcryptPasswordEncoder.matches(newPassword, currentPassword);
+			response.put("success", true);
+			response.put("isSame", isSame);
+			response.put("message", isSame ? "새 비밀번호는 현재 비밀번호와 달라야 합니다." : "");
+//			logger.debug("checkPassword.do: Password comparison result: isSame={}", isSame);
+		} catch (Exception e) {
+//			logger.error("checkPassword.do: Error checking password", e);
+			response.put("success", false);
+			response.put("message", "비밀번호 확인 중 오류: " + e.getMessage());
+		}
+		return response;
 	}
-	//로그아웃
-	@RequestMapping(value = "logout.do", method = RequestMethod.POST)
-	public String logout(HttpSession session) {
-		session.invalidate();
-		return "redirect:/";
+	//마이페이지 내용 수정
+	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			User loginUser = (User) session.getAttribute("loginUser");
+			if (loginUser == null) {
+//				logger.warn("updateUserProfile.do: No user in session");
+				response.put("success", false);
+				response.put("message", "로그인이 필요합니다.");
+				return response;
+			}
+
+			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()
+					&& Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+//				logger.info("updateUserProfile.do: Social login user (type={}) cannot change password",
+//						loginUser.getUserLoginType());
+				response.put("success", false);
+				response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+				return response;
+			}
+
+			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()) {
+				String currentPassword = loginUser.getUserPwd();
+				if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
+//					logger.error("updateUserProfile.do: Invalid or missing password hash for userId={}",
+//							loginUser.getUserId());
+					response.put("success", false);
+					response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
+					return response;
+				}
+
+				if (bcryptPasswordEncoder.matches(userData.get("password").toString(), currentPassword)) {
+//					logger.debug("updateUserProfile.do: New password matches current password for userId={}",
+//							loginUser.getUserId());
+					response.put("success", false);
+					response.put("message", "새 비밀번호는 현재 비밀번호와 달라야 합니다.");
+					return response;
+				}
+				userData.put("password", bcryptPasswordEncoder.encode(userData.get("password").toString()));
+//				logger.debug("updateUserProfile.do: Password encrypted for userId={}", loginUser.getUserId());
+			}
+
+			userData.put("userId", loginUser.getUserId());
+//			logger.debug("updateUserProfile.do: Updating profile for userId={}, data={}", loginUser.getUserId(),
+//					userData);
+
+			userservice.updateUserProfile(userData);
+
+			User updatedUser = userservice.selectUser(loginUser);
+			session.setAttribute("loginUser", updatedUser);
+//			logger.info("updateUserProfile.do: Profile updated successfully for userId={}", loginUser.getUserId());
+
+			response.put("success", true);
+			response.put("message", "업데이트 성공");
+		} catch (Exception e) {
+//			logger.error("updateUserProfile.do: Error updating profile", e);
+			response.put("success", false);
+			response.put("message", "업데이트 실패: " + e.getMessage());
+		}
+		return response;
+	}
+	//구글 로그인 api 사용을 위한 생성자
+	public UserController() {
+		try {
+			final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+			gmailService = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+					.setApplicationName(APPLICATION_NAME).build();
+//			logger.info("GmailService initialized successfully");
+		} catch (Exception e) {
+//			logger.error("Failed to initialize GmailService", e);
+		}
+	}
+	//Credentials 가져오기용 (구글 이메일 api 사용용으로 클라이언트 ID 가져오는 것)
+	private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws Exception {
+		InputStream in = UserController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+		if (in == null) {
+			throw new IllegalStateException("Credentials file not found at: " + CREDENTIALS_FILE_PATH);
+		}
+		try (InputStreamReader reader = new InputStreamReader(in)) {
+			GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, reader);
+			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+					clientSecrets, Collections.singletonList("https://www.googleapis.com/auth/gmail.send"))
+					.setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens"))).setAccessType("offline")
+					.build();
+			LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(0).build();
+			return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+		}
+	}
+	//이메일 메시지 전송용
+	private Message createMessageWithEmail(MimeMessage emailContent) throws Exception {
+		java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+		emailContent.writeTo(buffer);
+		byte[] bytes = buffer.toByteArray();
+		String encodedEmail = java.util.Base64.getUrlEncoder().encodeToString(bytes);
+		Message message = new Message();
+		message.setRaw(encodedEmail);
+		return message;
+	}
+	//DB 소셜로그인 임시 이메일 생성용 
+	private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
+		if (!to.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+			throw new IllegalArgumentException("Invalid recipient email: " + to);
+		}
+		Properties props = new Properties();
+		Session session = Session.getDefaultInstance(props, null);
+		MimeMessage email = new MimeMessage(session);
+		email.setFrom(new InternetAddress(from));
+		email.addRecipient(RecipientType.TO, new InternetAddress(to));
+		email.setSubject(subject);
+		email.setText(bodyText);
+		return email;
+	}
+	//소셜 로그인 임시 비밀번호 생성
+	private String generateRandomPassword() {
+		SecureRandom random = new SecureRandom();
+		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
+		for (int i = 0; i < PASSWORD_LENGTH; i++) {
+			password.append(RANDOM_PASSWORD_CHARS.charAt(random.nextInt(RANDOM_PASSWORD_CHARS.length())));
+		}
+		return password.toString();
 	}
 	//회원가입시 아이디 중복 확인용 
 	@PostMapping("idchk.do")
@@ -296,6 +515,12 @@ public class UserController {
 			if (gmailService == null) {
 				throw new IllegalStateException("Gmail service is not initialized");
 			}
+			 // MODIFIED: Gmail API 상태 확인
+            try {
+                gmailService.users().getProfile("me").execute();
+            } catch (Exception e) {
+                throw new IllegalStateException("Gmail API token invalid or service unavailable: " + e.getMessage(), e);
+            }
 			String code = String.valueOf((int) (Math.random() * 900000) + 100000);
 			long currentTime = System.currentTimeMillis();
 			Date expiry = new Date(currentTime + 5 * 60 * 1000);
@@ -319,6 +544,9 @@ public class UserController {
 //			logger.error("sendVerification.do: Error sending verification email = {}", email, e);
 			response.put("success", false);
 			response.put("message", "인증번호 전송 실패: " + e.getMessage());
+			if (e.getMessage().contains("invalid_grant")) { // MODIFIED: invalid_grant 오류 디버깅
+                response.put("details", "Google API token may be expired or revoked. Please re-authenticate.");
+            }
 		}
 		return response;
 	}
@@ -406,18 +634,6 @@ public class UserController {
 		}
 		return response;
 	}
-	//아이디 찾기 페이지 이동 
-	@RequestMapping("findId.do")
-	public String goToFindId() {
-//		logger.info("goToFindId: Displaying findId page");
-		return "user/findId";
-	}
-	//아이디 찾기 페이지에 전송
-	@RequestMapping("showId.do")
-	public String goToShowId() {
-//		logger.info("goToShowId: Displaying showId page");
-		return "user/showId";
-	}
 	//이메일 인증 후 아이디 알려주는 페이지 이동
 	@GetMapping("showId.do")
 	public String showId(@RequestParam(name = "email") String email, Model model) {
@@ -425,12 +641,6 @@ public class UserController {
 		String userId = userservice.findIdByEmail(email);
 		model.addAttribute("userId", userId);
 		return "user/showId";
-	}
-	//비밀번호 찾기 페이지 이동
-	@RequestMapping("findPassword.do")
-	public String goTofindPassword() {
-//		logger.info("goTofindPassword: Displaying findPassword page");
-		return "user/findPassword";
 	}
 	//아이디 이메일로 있는 유저인지 확인
 	@PostMapping("checkUser.do")
@@ -457,75 +667,6 @@ public class UserController {
 //			logger.warn("resetPassword.do: Email not verified for userId = {}", userId);
 			return "redirect:/findPassword.do";
 		}
-	}
-	//비밀번호 수정
-	@RequestMapping(value = "updatePassword.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> updatePassword(@RequestParam(name = "userId") String userId,
-			@RequestParam(name = "newPassword") String newPassword, HttpSession session) {
-//		logger.info("updatePassword.do: Updating password for userId = {}", userId);
-		Map<String, Object> response = new HashMap<>();
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null || !loginUser.getUserId().equals(userId)) {
-//			logger.warn("updatePassword.do: Invalid session or userId mismatch for userId = {}", userId);
-			response.put("success", false);
-			response.put("message", "로그인 정보가 유효하지 않습니다.");
-			return response;
-		}
-		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-//			logger.info("updatePassword.do: Social login user (type={}) cannot change password",
-//					loginUser.getUserLoginType());
-			response.put("success", false);
-			response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
-			return response;
-		}
-		try {
-			String encodedPassword = bcryptPasswordEncoder.encode(newPassword);
-			userservice.updatePassword(userId, encodedPassword); // CH_PWD는 매퍼에서 sysdate로 자동 업데이트
-//			logger.info("updatePassword.do: Password and CH_PWD updated for userId = {}", userId);
-			response.put("success", true);
-			response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
-		} catch (Exception e) {
-//			logger.error("updatePassword.do: Error updating password for userId = {}", userId, e);
-			response.put("success", false);
-			response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
-		}
-		return response;
-	}
-	//2개월간 메시지 보지 않기
-	//6개월 변경안한 유저 비밀번호 변경 메소드
-	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {
-//		logger.info("deferPasswordChange.do: Deferring password change for userId = {}", userId);
-		Map<String, Object> response = new HashMap<>();
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null || !loginUser.getUserId().equals(userId)) {
-//			logger.warn("deferPasswordChange.do: Invalid session or userId mismatch for userId = {}", userId);
-			response.put("success", false);
-			response.put("message", "로그인 정보가 유효하지 않습니다.");
-			return response;
-		}
-		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-//			logger.info("deferPasswordChange.do: Social login user (type={}) cannot defer password change",
-//					loginUser.getUserLoginType());
-			response.put("success", false);
-			response.put("message", "소셜 로그인 사용자는 비밀번호 변경 연기를 할 수 없습니다.");
-			return response;
-		}
-		try {
-			// CH_PWD를 현재 날짜에서 120일 전으로 설정
-			long pastChPwdMillis = System.currentTimeMillis() - (120L * 24 * 60 * 60 * 1000);
-			userservice.updateChPwd(userId, new Date(pastChPwdMillis));
-//			logger.info("deferPasswordChange.do: CH_PWD set to 120 days ago for userId = {}", userId);
-			response.put("success", true);
-			response.put("message", "비밀번호 변경 주기가 120일 전으로 설정되었습니다.");
-		} catch (Exception e) {
-//			logger.error("deferPasswordChange.do: Error deferring password change for userId = {}", userId, e);
-			response.put("success", false);
-			response.put("message", "연기 처리 중 오류가 발생했습니다.");
-		}
-		return response;
 	}
 	//구글 로그인
 	// 구글 로그인 api 호출
@@ -808,146 +949,7 @@ public class UserController {
 			return "user/registerSocialUser";
 		}
 	}
-	//현재 비밀번호와 동일한지 체크용
-	//마이페이지 비밀번호 확인
-	//실시간 비밀번호 확인 method
-	@RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> checkPassword(@RequestBody Map<String, String> data, HttpSession session) {
-		Map<String, Object> response = new HashMap<>();
-		try {
-			User loginUser = (User) session.getAttribute("loginUser");
-			if (loginUser == null) {
-//				logger.warn("checkPassword.do: No user in session");
-				response.put("success", false);
-				response.put("message", "로그인이 필요합니다.");
-				return response;
-			}
-
-			if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-//				logger.info("checkPassword.do: Social login user (type={}) cannot change password",
-//						loginUser.getUserLoginType());
-				response.put("success", false);
-				response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
-				return response;
-			}
-
-			String currentPassword = loginUser.getUserPwd();
-			if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
-//				logger.error("checkPassword.do: Invalid or missing password hash for userId={}", loginUser.getUserId());
-				response.put("success", false);
-				response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
-				return response;
-			}
-
-			String newPassword = data.get("password");
-//			logger.debug("checkPassword.do: Checking password for userId={}, input length={}", loginUser.getUserId(),
-//					newPassword != null ? newPassword.length() : 0);
-
-			if (newPassword == null || newPassword.isEmpty()) {
-				response.put("success", true);
-				response.put("isSame", false);
-				response.put("message", "");
-				return response;
-			}
-
-			boolean isSame = bcryptPasswordEncoder.matches(newPassword, currentPassword);
-			response.put("success", true);
-			response.put("isSame", isSame);
-			response.put("message", isSame ? "새 비밀번호는 현재 비밀번호와 달라야 합니다." : "");
-//			logger.debug("checkPassword.do: Password comparison result: isSame={}", isSame);
-		} catch (Exception e) {
-//			logger.error("checkPassword.do: Error checking password", e);
-			response.put("success", false);
-			response.put("message", "비밀번호 확인 중 오류: " + e.getMessage());
-		}
-		return response;
-	}
-	//마이페이지 생성용
-	//마이페이지 내용 수정
-	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
-		Map<String, Object> response = new HashMap<>();
-		try {
-			User loginUser = (User) session.getAttribute("loginUser");
-			if (loginUser == null) {
-//				logger.warn("updateUserProfile.do: No user in session");
-				response.put("success", false);
-				response.put("message", "로그인이 필요합니다.");
-				return response;
-			}
-
-			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()
-					&& Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-//				logger.info("updateUserProfile.do: Social login user (type={}) cannot change password",
-//						loginUser.getUserLoginType());
-				response.put("success", false);
-				response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
-				return response;
-			}
-
-			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()) {
-				String currentPassword = loginUser.getUserPwd();
-				if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
-//					logger.error("updateUserProfile.do: Invalid or missing password hash for userId={}",
-//							loginUser.getUserId());
-					response.put("success", false);
-					response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
-					return response;
-				}
-
-				if (bcryptPasswordEncoder.matches(userData.get("password").toString(), currentPassword)) {
-//					logger.debug("updateUserProfile.do: New password matches current password for userId={}",
-//							loginUser.getUserId());
-					response.put("success", false);
-					response.put("message", "새 비밀번호는 현재 비밀번호와 달라야 합니다.");
-					return response;
-				}
-				userData.put("password", bcryptPasswordEncoder.encode(userData.get("password").toString()));
-//				logger.debug("updateUserProfile.do: Password encrypted for userId={}", loginUser.getUserId());
-			}
-
-			userData.put("userId", loginUser.getUserId());
-//			logger.debug("updateUserProfile.do: Updating profile for userId={}, data={}", loginUser.getUserId(),
-//					userData);
-
-			userservice.updateUserProfile(userData);
-
-			User updatedUser = userservice.selectUser(loginUser);
-			session.setAttribute("loginUser", updatedUser);
-//			logger.info("updateUserProfile.do: Profile updated successfully for userId={}", loginUser.getUserId());
-
-			response.put("success", true);
-			response.put("message", "업데이트 성공");
-		} catch (Exception e) {
-//			logger.error("updateUserProfile.do: Error updating profile", e);
-			response.put("success", false);
-			response.put("message", "업데이트 실패: " + e.getMessage());
-		}
-		return response;
-	}
-	//마이페이지 이동
-	//마이페이지 이동
-	@RequestMapping("myPage.do")
-	public String moveMyPage() {
-//		logger.info("moveMyPage: Displaying myPage");
-		return "user/myPage";
-	}
-	//관리자 기능 페이지 이동
-	//매니저 관리 페이지 이동
-	@RequestMapping("changeManage.do")
-	public String changeManage(HttpSession session) {
-//		logger.info("changeManage: Displaying changeManage page");
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null || !"2".equals(loginUser.getUserAuthority())) {
-//			logger.warn("changeManage: Unauthorized access attempt by userId={}",
-//					loginUser != null ? loginUser.getUserId() : "null");
-			return "redirect:/loginPage.do";
-		}
-		return "user/changeManage";
-	}
-	//유저 아이디 확인용 
+	//관리자 기능에서 유저 아이디 확인용 
 	//유저 찾기
 	@RequestMapping(value = "checkMaUser.do", method = RequestMethod.POST)
 	@ResponseBody
