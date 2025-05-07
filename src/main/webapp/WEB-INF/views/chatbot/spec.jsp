@@ -188,8 +188,15 @@ body {
 	background: #BAAC80;
 }
 
+/* .manual-input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* input과 버튼 사이 간격 */
+
+
 .manual-input-box {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	background: #232323;
 	border-radius: 8px;
@@ -206,12 +213,57 @@ body {
 	font-size: 14px;
 	padding: 8px 4px;
 	outline: none;
+	border-radius: 5px;
+	border: 1px solid white;
+}
+
+.manual-input-box .manual-input-explain {
+	flex: 1;
+	background: transparent;
+	border: none;
+	color: #facc15;
+	font-size: 14px;
+	padding: 8px 4px;
+	border-radius: 5px;
+	border: 1px solid white;
+	outline: none;
+}
+
+.specTypeChoice {
+    display: flex;
+    flex-wrap: wrap;  /* 버튼들이 화면 크기에 맞게 줄바꿈될 수 있도록 설정 */
+    gap: 10px; /* 버튼들 사이의 간격 */
+    justify-content: flex-start; /* 버튼들을 왼쪽 정렬 */
+}
+
+.specType {
+    background: #232323;
+    border: 1px solid #BAAC80;
+    color: #BAAC80;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+}
+
+.specType:hover {
+    background: #BAAC80;
+    color: #232323;
+}
+
+/* active 상태에서 버튼 스타일 */
+.specType.active {
+    background-color: #BAAC80; /* 활성화된 버튼 배경 색 */
+    color: #232323;  /* 활성화된 버튼 글씨 색 */
+    border: 1.5px solid #232323; /* 활성화된 버튼 테두리 색 */
 }
 
 .manual-input-box .add-btn {
-	background: #232323;
+	background: skyblue;
 	border: 1px solid #BAAC80;
-	color: #BAAC80;
+	color: black;
 	border-radius: 6px;
 	width: 28px;
 	height: 28px;
@@ -580,6 +632,7 @@ let cacheSessionJobOpts=null; // 서버에서 받아온 유저가 저장한 모�
 let cacheSessionSpecOpts=null; // (스펙챗엔 필요 X)선택한 jobOpt에 따라 서버에서 가져올 내용 
 
 let subTopicJobCI= null; // subtopic 지정 위해 서버로 보낼 CI 객체;
+let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변수
 
 $(function() {
 	// 대쉬보드 requestScope에서 가져오는 값.
@@ -814,7 +867,7 @@ $(function() {
             $input.val("");
         }
     });
-	// + 버튼 클릭시 직접 입력한 스펙 보내게 설정
+	/* // + 버튼 클릭시 직접 입력한 스펙 보내게 설정
     $(".add-btn").on("click", function() {
         const $input = $(".manual-input");
         const val = $input.val().trim();
@@ -844,6 +897,61 @@ $(function() {
             alert("스펙을 입력해 주세요!");
         }
     });
+	 */
+	 // 대체 내용
+	 // 버튼 클릭 시 active 상태 토글
+    $(".specType").on("click", function() {
+        // 모든 버튼에서 active 클래스 제거
+        $(".specType").removeClass("active");
+        
+        // 클릭된 버튼에만 active 클래스 추가
+        $(this).addClass("active");
+        
+        // 선택된 버튼의 value 저장
+        selectedType = $(this).text();//data("value");
+    });
+
+    // + 버튼 클릭 시 처리
+    $(".add-btn").on("click", function() {
+        const $input = $(".manual-input");
+        const $explainInput = $(".manual-input-explain"); // 설명 입력 필드
+        const val = $input.val().trim();
+        const explainVal = $explainInput.val().trim(); // 설명 값
+
+        // 선택된 타입과 입력 값이 모두 있을 때만 실행
+        if (selectedType && val) {
+            const specCI = {
+                title: val,       // 입력한 스펙 제목
+                explain: explainVal,  // 입력한 설명 (비워두어도 상관없음)
+                type: selectedType // 선택된 타입
+            };
+
+            // 데이터를 서버로 보내는 AJAX 요청
+            $.ajax({
+                type: "POST",
+                url: "insertCareerItem.do",
+                contentType: "application/json",
+                data: JSON.stringify(specCI),
+                success: function() {
+                    console.log("직무에 스펙 추가 성공");
+                    addToSpecList([specCI]); 
+                },
+                error: function() {
+                    alert("직무에 스펙 추가 실패!");
+                }
+            });
+
+            // 입력 필드 초기화
+            $input.val("");
+            $explainInput.val(""); // 설명 입력 초기화
+            // 선택된 버튼 초기화
+            $(".specType").removeClass("active");
+            selectedType = null;  // reset
+        } else {
+            alert("스펙과 스펙 유형을 모두 입력해주세요.");
+        }
+    });
+	 
 	// 입력한 메세지를 채팅창 말풍선으로 추가
     function addMessageToChat(message, cls) {
         const $chatArea = $("#chatArea");
@@ -939,7 +1047,17 @@ $(function() {
 				<div class="saved-spec-list"></div>
 				<div class="manual-input-box">
 					<input type="text" placeholder="직접 스펙 입력" class="manual-input" />
-					<button class="add-btn">+</button>
+					 <input type="text" placeholder="스펙 설명 (선택)" class="manual-input-explain" />
+					<div class="specTypeChoice">
+					<!--  List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타")); -->
+						<button class="specType">자격증 </button>
+						<button class="specType">어학</button>
+						<button class="specType">인턴십</button>
+						<button class="specType">대회/ 공모전</button>
+						<button class="specType">자기계발</button>
+						<button class="specType">기타</button>
+						<button class="add-btn">+</button>
+					</div>
 				</div>
 			</div>
 		</div>
