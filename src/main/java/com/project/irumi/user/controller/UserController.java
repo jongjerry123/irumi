@@ -1,10 +1,13 @@
 package com.project.irumi.user.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +38,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.auth.oauth2.AuthorizationCodeTokenRequest;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -50,7 +55,7 @@ import com.google.api.services.gmail.model.Message;
 import com.project.irumi.user.model.dto.User;
 import com.project.irumi.user.service.UserService;
 
-import jakarta.mail.Message.RecipientType;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -59,13 +64,14 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class UserController {
-//	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	private static final String APPLICATION_NAME = "irumi";
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 	private static final String FROM_EMAIL = "irumi@gmail.com";
 	private static final String RANDOM_PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
 	private static final int PASSWORD_LENGTH = 16;
+	private static final String REDIRECT_URI = "http://localhost:8080/irumi/oauth2callback";
 
 	@Value("${google.client.id}")
 	private String GOOGLE_CLIENT_ID;
@@ -88,16 +94,17 @@ public class UserController {
 	private RestTemplate restTemplate;
 
 	private Gmail gmailService;
-	
+
 	/*---------------------------페이지 이동--------------------------*/
-	
-	//로그인 페이지로 이동하는 메소드
+
+	// 로그인 페이지로 이동하는 메소드
 	@RequestMapping(value = "loginPage.do", method = RequestMethod.GET)
 	public String moveToLoginPage() {
 //		logger.info("moveToLoginPage: Displaying login page");
 		return "user/login";
 	}
-	//비밀번호 변경권유 페이지
+
+	// 비밀번호 변경권유 페이지
 	@RequestMapping(value = "6MChangPwd.do", method = RequestMethod.GET)
 	public String changePasswordPage(HttpSession session, Model model) {
 //		logger.info("6MChangPwd.do: Displaying password change page");
@@ -114,49 +121,57 @@ public class UserController {
 		}
 		return "user/6MChangPwd";
 	}
-	//로그아웃 
+
+	// 로그아웃
 	@RequestMapping(value = "logout.do", method = RequestMethod.POST)
 	public String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:/main.do";
 	}
-	//약관페이지로 이동
+
+	// 약관페이지로 이동
 	@RequestMapping("resister.do")
 	public String moveResisterPage() {
 //		logger.info("moveResisterPage: Displaying registration page");
 		return "user/resister";
 	}
-	//약관 페이지-> 회원가입페이지
+
+	// 약관 페이지-> 회원가입페이지
 	@RequestMapping("resisterId.do")
 	public String goToNext() {
 //		logger.info("goToNext: Displaying resisterId page");
 		return "user/resisterId";
 	}
-	//아이디 찾기 페이지 이동 
+
+	// 아이디 찾기 페이지 이동
 	@RequestMapping("findId.do")
 	public String goToFindId() {
 //		logger.info("goToFindId: Displaying findId page");
 		return "user/findId";
 	}
-	//아이디 알려주는 페이지에 전송
+
+	// 아이디 알려주는 페이지에 전송
 	@RequestMapping("showId.do")
 	public String goToShowId() {
 //		logger.info("goToShowId: Displaying showId page");
 		return "user/showId";
 	}
-	//비밀번호 찾기 페이지 이동
+
+	// 비밀번호 찾기 페이지 이동
 	@RequestMapping("findPassword.do")
 	public String goTofindPassword() {
 //		logger.info("goTofindPassword: Displaying findPassword page");
 		return "user/findPassword";
 	}
-	//마이페이지 이동
+
+	// 마이페이지 이동
 	@RequestMapping("myPage.do")
 	public String moveMyPage() {
 //		logger.info("moveMyPage: Displaying myPage");
 		return "user/myPage";
 	}
-	//관리자 기능 페이지 이동
+
+	// 관리자 기능 페이지 이동
 	@RequestMapping("changeManage.do")
 	public String changeManage(HttpSession session) {
 //		logger.info("changeManage: Displaying changeManage page");
@@ -168,9 +183,40 @@ public class UserController {
 		}
 		return "user/changeManage";
 	}
-	
+
+	@GetMapping("/oauth2callback")
+	public String handleOAuth2Callback(@RequestParam("code") String code, HttpSession session) {
+		try {
+			// GoogleAuthorizationCodeFlow 초기화
+			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(new NetHttpTransport(),
+					JacksonFactory.getDefaultInstance(), GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+					Collections.singletonList("https://www.googleapis.com/auth/gmail.send")) // 필요한 스코프 설정
+					.setAccessType("offline") // 리프레시 토큰 발급을 위해 offline 설정
+					.build();
+
+			// 인증 코드를 사용해 토큰 요청
+			TokenResponse tokenResponse = flow.newTokenRequest(code).setRedirectUri(REDIRECT_URI).execute();
+
+			// 발급받은 토큰을 세션에 저장
+			session.setAttribute("accessToken", tokenResponse.getAccessToken());
+			session.setAttribute("refreshToken", tokenResponse.getRefreshToken());
+
+			// (선택 사항) 사용자 정보 가져오기
+			// 예: Google API를 호출해 사용자 정보를 가져오는 로직을 추가 가능
+			// String accessToken = tokenResponse.getAccessToken();
+			// 사용자 정보 요청 로직 추가 가능 (예: https://www.googleapis.com/oauth2/v2/userinfo)
+
+			// 인증 완료 후 메인 페이지로 리다이렉트
+			return "redirect:/main.do";
+		} catch (IOException e) {
+			// 오류 처리
+			e.printStackTrace();
+			return "redirect:/loginPage.do?error=authentication_failed";
+		}
+	}
+
 	/*---------------------------기능---------------------------*/
-	//로그인용 메소드
+	// 로그인용 메소드
 	@RequestMapping(value = "login.do", method = RequestMethod.POST)
 	public String loginMethod(User user, HttpSession session, Model model) {
 //		logger.info("login.do: Received user = {}", user);
@@ -192,13 +238,13 @@ public class UserController {
 				model.addAttribute("message", "아이디 또는 비밀번호가 올바르지 않습니다.");
 				return "user/login";
 			}
-			if("3".equals(loginUser.getUserAuthority())) {
+			if ("3".equals(loginUser.getUserAuthority())) {
 				return "user/cantLoginPage";
 			}
-			if("4".equals(loginUser.getUserAuthority())) {
+			if ("4".equals(loginUser.getUserAuthority())) {
 				return "user/blockLogin";
 			}
-			
+
 			if (bcryptPasswordEncoder.matches(user.getUserPwd(), loginUser.getUserPwd())) {
 //				logger.info("login.do: Login successful for userId = {}", user.getUserId());
 				session.setAttribute("loginUser", loginUser);
@@ -239,7 +285,8 @@ public class UserController {
 			return "user/login";
 		}
 	}
-	//비밀번호 수정
+
+	// 비밀번호 수정
 	@RequestMapping(value = "updatePassword.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updatePassword(@RequestParam(name = "userId") String userId,
@@ -273,7 +320,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//2개월간 메시지 보지 않기
+
+	// 2개월간 메시지 보지 않기
 	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {
@@ -307,7 +355,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//실시간 비밀번호 확인
+
+	// 실시간 비밀번호 확인
 	@RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkPassword(@RequestBody Map<String, String> data, HttpSession session) {
@@ -360,7 +409,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//마이페이지 내용 수정
+
+	// 마이페이지 내용 수정
 	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
@@ -423,7 +473,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//구글 로그인 api 사용을 위한 생성자
+
+	// 구글 로그인 api 사용을 위한 생성자
 	public UserController() {
 		try {
 			final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -434,7 +485,8 @@ public class UserController {
 //			logger.error("Failed to initialize GmailService", e);
 		}
 	}
-	//Credentials 가져오기용 (구글 이메일 api 사용용으로 클라이언트 ID 가져오는 것)
+
+	// Credentials 가져오기용 (구글 이메일 api 사용용으로 클라이언트 ID 가져오는 것)
 	private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws Exception {
 		InputStream in = UserController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 		if (in == null) {
@@ -450,31 +502,8 @@ public class UserController {
 			return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 		}
 	}
-	//이메일 메시지 전송용
-	private Message createMessageWithEmail(MimeMessage emailContent) throws Exception {
-		java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
-		emailContent.writeTo(buffer);
-		byte[] bytes = buffer.toByteArray();
-		String encodedEmail = java.util.Base64.getUrlEncoder().encodeToString(bytes);
-		Message message = new Message();
-		message.setRaw(encodedEmail);
-		return message;
-	}
-	//DB 소셜로그인 임시 이메일 생성용 
-	private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
-		if (!to.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-			throw new IllegalArgumentException("Invalid recipient email: " + to);
-		}
-		Properties props = new Properties();
-		Session session = Session.getDefaultInstance(props, null);
-		MimeMessage email = new MimeMessage(session);
-		email.setFrom(new InternetAddress(from));
-		email.addRecipient(RecipientType.TO, new InternetAddress(to));
-		email.setSubject(subject);
-		email.setText(bodyText);
-		return email;
-	}
-	//소셜 로그인 임시 비밀번호 생성
+
+	// 소셜 로그인 임시 비밀번호 생성
 	private String generateRandomPassword() {
 		SecureRandom random = new SecureRandom();
 		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
@@ -483,7 +512,8 @@ public class UserController {
 		}
 		return password.toString();
 	}
-	//회원가입시 아이디 중복 확인용 
+
+	// 회원가입시 아이디 중복 확인용
 	@PostMapping("idchk.do")
 	@ResponseBody
 	public Map<String, Object> checkId(@RequestParam(name = "userId") String userId) {
@@ -494,7 +524,8 @@ public class UserController {
 		response.put("message", available ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.");
 		return response;
 	}
-	//이메일 중복 체크 확인용 
+
+	// 이메일 중복 체크 확인용
 	@PostMapping("checkEmail.do")
 	@ResponseBody
 	public Map<String, Object> checkEmail(@RequestParam(name = "email") String email) {
@@ -505,58 +536,115 @@ public class UserController {
 		response.put("message", available ? "사용 가능한 이메일입니다." : "이미 가입되어 있는 유저입니다.");
 		return response;
 	}
-	//구글 메일을 활용한 랜덤인증번호 전송용 
+
+	// 이메일 메시지 전송용
+	private Message createMessageWithEmail(MimeMessage emailContent) {
+		try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+			emailContent.writeTo(buffer);
+			byte[] bytes = buffer.toByteArray();
+			String encodedEmail = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+			Message message = new Message();
+			message.setRaw(encodedEmail);
+			return message;
+		} catch (MessagingException | IOException e) {
+			throw new RuntimeException("이메일 메시지를 인코딩하는 중 오류가 발생했습니다.", e);
+		}
+	}
+
+	// 이메일 생성
+	private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
+		if (to == null || !to.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+			throw new IllegalArgumentException("잘못된 이메일 주소입니다: " + to);
+		}
+
+		Properties props = new Properties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		Session session = Session.getDefaultInstance(props);
+
+		MimeMessage email = new MimeMessage(session);
+		email.setFrom(new InternetAddress(from));
+		email.addRecipient(jakarta.mail.Message.RecipientType.TO, new InternetAddress(to));
+		email.setSubject(subject, "UTF-8");
+		email.setText(bodyText, "UTF-8");
+
+		return email;
+	}
+
+	// 구글 메일을 활용한 랜덤 인증번호 전송
 	@PostMapping("sendVerification.do")
 	@ResponseBody
 	public Map<String, Object> sendVerification(@RequestParam("email") String email, HttpSession session) {
-//		logger.info("sendVerification.do: Received email = {}", email);
 		Map<String, Object> response = new HashMap<>();
-		try {
-			if (gmailService == null) {
-				throw new IllegalStateException("Gmail service is not initialized");
-			}
-			 // MODIFIED: Gmail API 상태 확인
-            try {
-                gmailService.users().getProfile("me").execute();
-            } catch (Exception e) {
-                throw new IllegalStateException("Gmail API token invalid or service unavailable: " + e.getMessage(), e);
-            }
-			String code = String.valueOf((int) (Math.random() * 900000) + 100000);
-			long currentTime = System.currentTimeMillis();
-			Date expiry = new Date(currentTime + 5 * 60 * 1000);
 
+		try {
+			// 1. 이메일 형식 유효성 검사
+			if (email == null || !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+				response.put("success", false);
+				response.put("message", "올바른 이메일 형식이 아닙니다.");
+				return response;
+			}
+
+			// 2. Gmail 서비스 상태 확인
+			if (gmailService == null) {
+				throw new IllegalStateException("Gmail 서비스가 초기화되지 않았습니다.");
+			}
+			try {
+				gmailService.users().getProfile("me").execute();
+			} catch (Exception e) {
+				throw new IllegalStateException("Gmail API 토큰이 유효하지 않거나 서비스에 접근할 수 없습니다.", e);
+			}
+
+			// 3. 보안 강화된 인증번호 생성
+			SecureRandom random = new SecureRandom();
+			String code = String.format("%06d", random.nextInt(1000000)); // 6자리 숫자
+			LocalDateTime expiry = LocalDateTime.now().plusMinutes(5); // 5분 유효
+
+			// 4. 이메일 전송
 			String subject = "이메일 인증번호";
 			String body = "인증번호: " + code + "\n이 코드는 5분 동안 유효합니다.";
-//			logger.info("sendVerification.do: Sending email to = {}, subject = {}", email, subject);
 
 			MimeMessage emailMessage = createEmail(email, FROM_EMAIL, subject, body);
 			Message message = createMessageWithEmail(emailMessage);
 			gmailService.users().messages().send("me", message).execute();
 
+			// 5. 인증 정보 세션에 저장
 			session.setAttribute("verificationCode", code);
 			session.setAttribute("verificationEmail", email);
 			session.setAttribute("emailTokenExpiry", expiry);
-//			logger.info("sendVerification.do: Verification code sent to email = {}", email);
 
 			response.put("success", true);
 			response.put("message", "인증번호가 전송되었습니다.");
-		} catch (Exception e) {
-//			logger.error("sendVerification.do: Error sending verification email = {}", email, e);
+
+		} catch (IllegalArgumentException e) {
 			response.put("success", false);
-			response.put("message", "인증번호 전송 실패: " + e.getMessage());
-			if (e.getMessage().contains("invalid_grant")) { // MODIFIED: invalid_grant 오류 디버깅
-                response.put("details", "Google API token may be expired or revoked. Please re-authenticate.");
-            }
+			response.put("message", e.getMessage());
+		} catch (IllegalStateException e) {
+			response.put("success", false);
+			response.put("message", "서비스에 접근할 수 없습니다. 관리자에게 문의하세요.");
+			logger.error("Gmail 서비스 오류: ", e);
+		} catch (MessagingException | IOException e) {
+			response.put("success", false);
+			response.put("message", "이메일 전송 중 오류가 발생했습니다.");
+			logger.error("이메일 전송 실패: ", e);
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "인증번호 전송에 실패했습니다. 다시 시도해 주세요.");
+			logger.error("알 수 없는 오류: ", e);
 		}
+
 		return response;
 	}
-	//resister으로 인증번호 redirect 용 
+
+	// resister으로 인증번호 redirect 용
 	@GetMapping("verifyCode.do")
 	public String handleGetVerifyCode() {
 //		logger.warn("verifyCode.do: GET method not supported, redirecting to registration page");
 		return "redirect:/resister.do";
 	}
-	//인증번호 인증용 
+
+	// 인증번호 인증용
 	@PostMapping("verifyCode.do")
 	@ResponseBody
 	public Map<String, Object> verifyCode(@RequestParam(name = "code") String code, HttpSession session) {
@@ -592,7 +680,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//회원가입 정보 전송용 || 회원가입용 
+
+	// 회원가입 정보 전송용 || 회원가입용
 	@PostMapping("registerUser.do")
 	@ResponseBody
 	public Map<String, Object> register(@RequestBody User user, HttpSession session) {
@@ -634,7 +723,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//이메일 인증 후 아이디 알려주는 페이지 이동
+
+	// 이메일 인증 후 아이디 알려주는 페이지 이동
 	@GetMapping("showId.do")
 	public String showId(@RequestParam(name = "email") String email, Model model) {
 //		logger.info("showId.do: Finding userId for email = {}", email);
@@ -642,7 +732,8 @@ public class UserController {
 		model.addAttribute("userId", userId);
 		return "user/showId";
 	}
-	//아이디 이메일로 있는 유저인지 확인
+
+	// 아이디 이메일로 있는 유저인지 확인
 	@PostMapping("checkUser.do")
 	@ResponseBody
 	public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data) {
@@ -655,7 +746,8 @@ public class UserController {
 		response.put("message", matched ? "아이디와 이메일이 일치합니다." : "아이디와 이메일이 일치하지 않습니다.");
 		return response;
 	}
-	//인증 완료 후 비밀번호 변경
+
+	// 인증 완료 후 비밀번호 변경
 	@GetMapping("resetPassword.do")
 	public String resetPassword(@RequestParam(name = "userId") String userId, HttpSession session, Model model) {
 //		logger.info("resetPassword.do: Processing for userId = {}", userId);
@@ -668,7 +760,7 @@ public class UserController {
 			return "redirect:/findPassword.do";
 		}
 	}
-	//구글 로그인
+
 	// 구글 로그인 api 호출
 	@GetMapping("/googleLogin.do")
 	public String googleLogin(HttpServletRequest request) {
@@ -682,8 +774,8 @@ public class UserController {
 //		logger.info("googleLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
-	//네이버 로그인
-	//네이버 로그인 api 호출
+
+	// 네이버 로그인 api 호출
 	@GetMapping("/naverLogin.do")
 	public String naverLogin(HttpServletRequest request) {
 //		logger.info("naverLogin.do: Initiating Naver OAuth flow");
@@ -696,8 +788,8 @@ public class UserController {
 //		logger.info("naverLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
-	//카카오 로그인
-	//카카오 로그인 api 호출
+
+	// 카카오 로그인 api 호출
 	@GetMapping("/kakaoLogin.do")
 	public String kakaoLogin(HttpServletRequest request) {
 //		logger.info("kakaoLogin.do: Initiating Kakao OAuth flow");
@@ -709,7 +801,8 @@ public class UserController {
 //		logger.info("kakaoLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
-	//소셜 통합 콜벡 
+
+	// 소셜 통합 콜벡
 	@GetMapping("/socialCallback.do")
 	public String socialCallback(@RequestParam("code") String code,
 			@RequestParam(value = "provider", defaultValue = "google") String provider, HttpSession session,
@@ -869,12 +962,12 @@ public class UserController {
 //				logger.info("socialCallback.do: Existing {} user found, userId = {}", provider,
 //						existingUser.getUserId());
 				String authority = userservice.selectUserAuthority(socialId);
-	            if ("3".equals(authority)) {
-	                return "user/cantLoginPage";
-	            }
-	            if("4".equals(authority)) {
-	            	return "user/blockLogin";
-	            }
+				if ("3".equals(authority)) {
+					return "user/cantLoginPage";
+				}
+				if ("4".equals(authority)) {
+					return "user/blockLogin";
+				}
 				session.setAttribute("loginUser", existingUser);
 				return "redirect:/main.do";
 			}
@@ -893,8 +986,8 @@ public class UserController {
 			return "user/login";
 		}
 	}
-	//첫 소셜 로그인 가입시 닉네임 생성 페이지 이동용
-	//소셜 회원가입
+
+	// 소셜 회원가입
 	@PostMapping("/registerSocialUser.do")
 	public String registerSocialUser(@RequestParam(name = "userName") String userName, HttpSession session,
 			Model model) {
@@ -949,8 +1042,8 @@ public class UserController {
 			return "user/registerSocialUser";
 		}
 	}
-	//관리자 기능에서 유저 아이디 확인용 
-	//유저 찾기
+
+	// 관리자 기능에서 유저 아이디 확인용
 	@RequestMapping(value = "checkMaUser.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data, HttpSession session) {
@@ -995,8 +1088,8 @@ public class UserController {
 		}
 		return response;
 	}
-	//권한 변경용 
-	//권한변경 (1, 유저 / 2, 관리자 / 3, 불량유저 / 4, 탈퇴유저)
+
+	// 권한 변경용
 	@RequestMapping(value = "updateAuthority.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateAuthority(@RequestBody Map<String, Object> data, HttpSession session) {
@@ -1039,28 +1132,28 @@ public class UserController {
 		}
 		return response;
 	}
-	//탈퇴용 
-	//탈퇴하기
+
+	// 탈퇴용
 	@RequestMapping(value = "exit.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> exit(@RequestBody Map<String, Object> data, HttpSession session) {
-	    Map<String, Object> response = new HashMap<>();
-	    User loginUser = (User) session.getAttribute("loginUser");
+		Map<String, Object> response = new HashMap<>();
+		User loginUser = (User) session.getAttribute("loginUser");
 
-	    if (loginUser != null) {
-	        String userId = loginUser.getUserId();
-	        String authority = data.get("authority").toString();
+		if (loginUser != null) {
+			String userId = loginUser.getUserId();
+			String authority = data.get("authority").toString();
 
-	        userservice.updateUserAuthority(userId, authority);
+			userservice.updateUserAuthority(userId, authority);
 
-	        session.invalidate(); // 세션 종료
-	        response.put("status", "success");
-	        response.put("message", "탈퇴 처리 완료");
-	    } else {
-	        response.put("status", "error");
-	        response.put("message", "로그인 정보 없음");
-	    }
+			session.invalidate(); // 세션 종료
+			response.put("status", "success");
+			response.put("message", "탈퇴 처리 완료");
+		} else {
+			response.put("status", "error");
+			response.put("message", "로그인 정보 없음");
+		}
 
-	    return response;
+		return response;
 	}
 }
