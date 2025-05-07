@@ -99,7 +99,7 @@ public class UserController {
 //			logger.error("Failed to initialize GmailService", e);
 		}
 	}
-
+	//Credentials 가져오기용 (구글 이메일 api 사용용으로 클라이언트 ID 가져오는 것)
 	private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws Exception {
 		InputStream in = UserController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 		if (in == null) {
@@ -115,7 +115,7 @@ public class UserController {
 			return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 		}
 	}
-
+	//DB 소셜로그인 임시 이메일 생성용 
 	private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
 		if (!to.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
 			throw new IllegalArgumentException("Invalid recipient email: " + to);
@@ -148,19 +148,19 @@ public class UserController {
 		}
 		return password.toString();
 	}
-	
+	//main 으로 가는 메소드
 	@RequestMapping("/")
 	public String home() {
 //		logger.info("home: Redirecting to main page");
 		return "common/main";
 	}
-
+	//로그인 페이지로 이동하는 메소드
 	@RequestMapping(value = "loginPage.do", method = RequestMethod.GET)
 	public String moveToLoginPage() {
 //		logger.info("moveToLoginPage: Displaying login page");
 		return "user/login";
 	}
-
+	//로그인용 메소드
 	@RequestMapping(value = "login.do", method = RequestMethod.POST)
 	public String loginMethod(User user, HttpSession session, Model model) {
 //		logger.info("login.do: Received user = {}", user);
@@ -264,7 +264,7 @@ public class UserController {
 		session.invalidate();
 		return "redirect:/";
 	}
-
+	//회원가입시 아이디 중복 확인용 
 	@PostMapping("idchk.do")
 	@ResponseBody
 	public Map<String, Object> checkId(@RequestParam(name = "userId") String userId) {
@@ -275,7 +275,7 @@ public class UserController {
 		response.put("message", available ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.");
 		return response;
 	}
-
+	//이메일 중복 체크 확인용 
 	@PostMapping("checkEmail.do")
 	@ResponseBody
 	public Map<String, Object> checkEmail(@RequestParam(name = "email") String email) {
@@ -286,7 +286,7 @@ public class UserController {
 		response.put("message", available ? "사용 가능한 이메일입니다." : "이미 가입되어 있는 유저입니다.");
 		return response;
 	}
-
+	//구글 메일을 활용한 랜덤인증번호 전송용 
 	@PostMapping("sendVerification.do")
 	@ResponseBody
 	public Map<String, Object> sendVerification(@RequestParam("email") String email, HttpSession session) {
@@ -322,13 +322,13 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//resister으로 인증번호 redirect 용 
 	@GetMapping("verifyCode.do")
 	public String handleGetVerifyCode() {
 //		logger.warn("verifyCode.do: GET method not supported, redirecting to registration page");
 		return "redirect:/resister.do";
 	}
-
+	//인증번호 인증용 
 	@PostMapping("verifyCode.do")
 	@ResponseBody
 	public Map<String, Object> verifyCode(@RequestParam(name = "code") String code, HttpSession session) {
@@ -364,7 +364,7 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//회원가입 정보 전송용 || 회원가입용 
 	@PostMapping("registerUser.do")
 	@ResponseBody
 	public Map<String, Object> register(@RequestBody User user, HttpSession session) {
@@ -406,19 +406,19 @@ public class UserController {
 		}
 		return response;
 	}
-
+	//아이디 찾기 페이지 이동 
 	@RequestMapping("findId.do")
 	public String goToFindId() {
 //		logger.info("goToFindId: Displaying findId page");
 		return "user/findId";
 	}
-
+	//아이디 찾기 페이지에 전송
 	@RequestMapping("showId.do")
 	public String goToShowId() {
 //		logger.info("goToShowId: Displaying showId page");
 		return "user/showId";
 	}
-
+	//이메일 인증 후 아이디 알려주는 페이지 이동
 	@GetMapping("showId.do")
 	public String showId(@RequestParam(name = "email") String email, Model model) {
 //		logger.info("showId.do: Finding userId for email = {}", email);
@@ -426,13 +426,13 @@ public class UserController {
 		model.addAttribute("userId", userId);
 		return "user/showId";
 	}
-
+	//비밀번호 찾기 페이지 이동
 	@RequestMapping("findPassword.do")
 	public String goTofindPassword() {
 //		logger.info("goTofindPassword: Displaying findPassword page");
 		return "user/findPassword";
 	}
-
+	//아이디 이메일로 있는 유저인지 확인
 	@PostMapping("checkUser.do")
 	@ResponseBody
 	public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data) {
@@ -445,7 +445,7 @@ public class UserController {
 		response.put("message", matched ? "아이디와 이메일이 일치합니다." : "아이디와 이메일이 일치하지 않습니다.");
 		return response;
 	}
-
+	//인증 완료 후 비밀번호 변경
 	@GetMapping("resetPassword.do")
 	public String resetPassword(@RequestParam(name = "userId") String userId, HttpSession session, Model model) {
 //		logger.info("resetPassword.do: Processing for userId = {}", userId);
@@ -458,7 +458,7 @@ public class UserController {
 			return "redirect:/findPassword.do";
 		}
 	}
-	//
+	//비밀번호 수정
 	@RequestMapping(value = "updatePassword.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updatePassword(@RequestParam(name = "userId") String userId,
@@ -492,6 +492,7 @@ public class UserController {
 		}
 		return response;
 	}
+	//2개월간 메시지 보지 않기
 	//6개월 변경안한 유저 비밀번호 변경 메소드
 	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
 	@ResponseBody
@@ -526,6 +527,7 @@ public class UserController {
 		}
 		return response;
 	}
+	//구글 로그인
 	// 구글 로그인 api 호출
 	@GetMapping("/googleLogin.do")
 	public String googleLogin(HttpServletRequest request) {
@@ -539,6 +541,7 @@ public class UserController {
 //		logger.info("googleLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
+	//네이버 로그인
 	//네이버 로그인 api 호출
 	@GetMapping("/naverLogin.do")
 	public String naverLogin(HttpServletRequest request) {
@@ -552,6 +555,7 @@ public class UserController {
 //		logger.info("naverLogin.do: Redirecting to auth URL: {}", authUrl);
 		return "redirect:" + authUrl;
 	}
+	//카카오 로그인
 	//카카오 로그인 api 호출
 	@GetMapping("/kakaoLogin.do")
 	public String kakaoLogin(HttpServletRequest request) {
@@ -748,6 +752,7 @@ public class UserController {
 			return "user/login";
 		}
 	}
+	//첫 소셜 로그인 가입시 닉네임 생성 페이지 이동용
 	//소셜 회원가입
 	@PostMapping("/registerSocialUser.do")
 	public String registerSocialUser(@RequestParam(name = "userName") String userName, HttpSession session,
@@ -803,6 +808,7 @@ public class UserController {
 			return "user/registerSocialUser";
 		}
 	}
+	//현재 비밀번호와 동일한지 체크용
 	//마이페이지 비밀번호 확인
 	//실시간 비밀번호 확인 method
 	@RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
@@ -857,6 +863,7 @@ public class UserController {
 		}
 		return response;
 	}
+	//마이페이지 생성용
 	//마이페이지 내용 수정
 	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
 	@ResponseBody
@@ -921,11 +928,13 @@ public class UserController {
 		return response;
 	}
 	//마이페이지 이동
+	//마이페이지 이동
 	@RequestMapping("myPage.do")
 	public String moveMyPage() {
 //		logger.info("moveMyPage: Displaying myPage");
 		return "user/myPage";
 	}
+	//관리자 기능 페이지 이동
 	//매니저 관리 페이지 이동
 	@RequestMapping("changeManage.do")
 	public String changeManage(HttpSession session) {
@@ -938,6 +947,7 @@ public class UserController {
 		}
 		return "user/changeManage";
 	}
+	//유저 아이디 확인용 
 	//유저 찾기
 	@RequestMapping(value = "checkMaUser.do", method = RequestMethod.POST)
 	@ResponseBody
@@ -983,6 +993,7 @@ public class UserController {
 		}
 		return response;
 	}
+	//권한 변경용 
 	//권한변경 (1, 유저 / 2, 관리자 / 3, 불량유저 / 4, 탈퇴유저)
 	@RequestMapping(value = "updateAuthority.do", method = RequestMethod.POST)
 	@ResponseBody
@@ -1026,6 +1037,7 @@ public class UserController {
 		}
 		return response;
 	}
+	//탈퇴용 
 	//탈퇴하기
 	@RequestMapping(value = "exit.do", method = RequestMethod.POST)
 	@ResponseBody
