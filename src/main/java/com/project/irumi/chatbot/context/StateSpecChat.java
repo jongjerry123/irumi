@@ -2,6 +2,8 @@ package com.project.irumi.chatbot.context;
 
 
 public enum StateSpecChat implements ChatState {
+	
+	START("내게 맞는 직무 찾기 세션입니다.\\r\\n\" + \"먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요."),
 
     TEXT_CURRENT_SPEC("현재 가지고 있는 스펙이나 경험을 알려주세요."),
 
