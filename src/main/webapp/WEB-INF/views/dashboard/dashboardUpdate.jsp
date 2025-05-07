@@ -167,7 +167,7 @@ div {
 <!-- 학력 정보 수정을 위한 칸 -->
 <form action="dashUpdate.do" method="post">
 	<input type="hidden" name="userId" value="${ requestScope.dashboard.userId }">
-	<div class="education-info" style="padding: 20px; background: #303030; border-radius: 10px; max-width: 400px; margin-left: 50px;">
+	<div class="education-info" style="padding: 20px; background: #303030; border-radius: 10px; max-width: 400px; margin: auto;">
 		<h2>학력 정보</h2>
 		<div style="margin-bottom: 10px;">
 			대학교: 

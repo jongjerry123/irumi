@@ -124,7 +124,7 @@ input[type="radio"]:checked + label::before {
 			$('#scheduleRow')
 					.append(
 							'<div class="schedule-set">'
-									+ '일정 유형: <input type=\"text\" name=\"ssType\" class=\"ssType\" required>&nbsp;'
+									+ '일정: <input type=\"text\" name=\"ssType\" class=\"ssType\" required>&nbsp;'
 									+ '날짜: <input type=\"date\" name=\"ssDate\" class=\"ssDate\" required>&nbsp;'
 									+ '<button type=\"button\" onclick=\"removeSchedule(this)\">삭제</button>'
 									+ '</div>');
@@ -176,7 +176,9 @@ input[type="radio"]:checked + label::before {
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	
 	<h1 align="center">목표: ${ requestScope.job.jobName }</h1>
-	<h3>${ requestScope.job.jobExplain }</h3>
+	<pre>
+		<h3>${ requestScope.job.jobExplain }</h3>
+	</pre>
 	<form action="insertSpec.do" method="post">
 		<input type="hidden" name="jobId" value="${ requestScope.job.jobId }">
 		<table align="center" width="1000" border="1" cellspacing="0" cellpadding="5">

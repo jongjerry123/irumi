@@ -204,7 +204,7 @@ input[type="checkbox"]:checked {
 	                                $('.progress').css('width',  data.progress + '%').text(data.progress + '%');
 	                            }
 							});
-							$('#jobExplain').html(item.jobExplain);
+							$('#jobExplain').html('<br><h2>직업 상세설명</h2><pre>' + item.jobExplain + '</pre><br>');
 							$('#certCards').slideToggle(300);
 							
 							

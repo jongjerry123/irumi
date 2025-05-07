@@ -29,6 +29,80 @@ header {
 	align-items: center;
 	padding: 20px 50px;
 }
+
+form.sform {
+	text-align: center;
+	margin-top: 30px;
+}
+
+fieldset {
+	border: 2px solid #009688;
+	border-radius: 10px;
+	display: inline-block;
+	padding: 20px 30px;
+	background-color: #222;
+}
+
+legend {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: #00bfa5;
+}
+
+input[type="search"] {
+	padding: 8px;
+	border: 1px solid #555;
+	border-radius: 5px;
+	width: 400px;
+	background: #333;
+	color: white;
+}
+
+input[type="submit"] {
+	padding: 8px 16px;
+	border: none;
+	border-radius: 5px;
+	background-color: #00bfa5;
+	color: white;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+	background-color: #00796b;
+}
+
+table {
+	width: 1000px;
+	margin: 40px auto;
+	border-collapse: collapse;
+	background-color: #1e1e1e;
+	box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+th, td {
+	padding: 12px;
+	border: 1px solid #444;
+}
+
+th {
+	background-color: #009688;
+	color: white;
+}
+
+td {
+	color: #ccc;
+}
+
+td a {
+	color: #80cbc4;
+	text-decoration: none;
+}
+
+td a:hover {
+	text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -43,14 +117,11 @@ header {
 	</fieldset>
 	</form>
 	
-	<br>
-	<br>
-	
-	<table align="center" width="1000" border="1" cellspacing="0" cellpadding="0">
+	<table>
 		<tr>
-			<th>직업</th>
+			<th width="100px">직업</th>
 			<th>내용</th>
-			<th>분류</th>
+			<th width="100px">분류</th>
 		</tr>
 		<c:forEach items="${ requestScope.list }" var="jobList">
 			<tr align="center">
@@ -64,9 +135,7 @@ header {
 				<td>${ jobList.jobType }</td>
 			</tr>
 		</c:forEach>
-	
 	</table>
-	<br>
 	
 	<c:import url="/WEB-INF/views/common/pagingView.jsp" />
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
