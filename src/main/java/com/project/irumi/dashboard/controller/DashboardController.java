@@ -306,6 +306,67 @@ public class DashboardController {
 		}
 	}
 	
+	// 추가 -- 일정 삭제 용도
+	@RequestMapping("CdeleteSpecSchedule.do")
+	public String deleteSpecScheduleMethod(@RequestParam("ssId") String ssId, Model model) {
+		
+		if (dashboardService.deleteSpecSchedule(ssId) > 0) {
+			return "redirect:viewScheduleRecChat.do";
+		} else {
+			model.addAttribute("message", "일정 삭제 실패!");
+			return "common/error";
+		}
+	}
+	
+	// 추가 -- ssid 가져오기 용도 
+	@ResponseBody
+	@RequestMapping("getLatestSsId.do")
+	public String getLatestSsId() {
+	    int maxSsId = dashboardService.selectMaxSsId(); 
+	    return String.valueOf(maxSsId); 
+	}
+	
+	@RequestMapping("deleteAct.do")
+	public String deleteActMethod(@RequestParam("actId") String actId, Model model) {
+		
+		if (dashboardService.deleteSpec(actId) > 0) {
+			return "redirect:dashboard.do";
+		} else {
+			model.addAttribute("message", "스펙 삭제 실패!");
+			return "common/error";
+		}
+	}
+	
+	// 추가 -- 활동 추가 용도
+	@ResponseBody
+	@RequestMapping(value = "insertAct.do", method = RequestMethod.POST)
+	public Map<String, Object> insertActMethod(@RequestParam("jobId") String jobId,
+	                                           @RequestParam("specId") String specId,
+	                                           @RequestParam("actContent") String actContent,
+	                                           HttpSession session) {
+	    Map<String, Object> result = new HashMap<>();
+	    
+	    User loginUser = (User) session.getAttribute("loginUser");
+
+	    String actId = String.valueOf(dashboardService.selectNextActId());
+	    Activity act = new Activity(actId, actContent);
+
+	    Specific specific = new Specific();
+	    specific.setUserId(loginUser.getUserId());
+	    specific.setJobId(jobId);
+	    specific.setSpecId(specId);
+	    specific.setActId(actId);
+
+	    boolean success = dashboardService.insertAct(act) > 0 &&
+	                      dashboardService.insertActLink(specific) > 0;
+
+	    result.put("success", success); // insert 확인 용도, 프런트에서 확인
+	    result.put("actId", actId);
+	    return result;
+	}
+
+	
+	
 	@RequestMapping(value = "insertSpec.do", method = RequestMethod.POST)
 	public ModelAndView insertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, @RequestParam("ssType") List<String> ssType, @RequestParam("ssDate") List<String> ssDate, @RequestParam("actContent") List<String> actContent, ModelAndView mv, HttpSession session) {
 		

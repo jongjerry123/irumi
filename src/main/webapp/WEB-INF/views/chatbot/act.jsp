@@ -70,6 +70,10 @@ document.addEventListener("DOMContentLoaded", function() {
       	  window.selectedJobId = jobId;
       	  window.selectedSpecId = spec.specId;
       	  window.selectedSpecName = spec.specName;
+      	  window.selectedSpecType = spec.specType;
+  	  	  window.selectedSpecExplain = spec.specExplain;
+  	 	  window.selectedSpecState = spec.specState;
+      	  
       	};
         specList.appendChild(btn);
       });
@@ -83,12 +87,29 @@ document.addEventListener("DOMContentLoaded", function() {
 	    items.forEach(activity => {
 	      const card = document.createElement("div");
 	      card.className = "schedule-card";
+	    	
 	      // 삭제 버튼
 	      const removeBtn = document.createElement("button");
 	      removeBtn.className = "remove-btn";
 	      removeBtn.textContent = "✕";
 	      removeBtn.onclick = function() {
 	        card.remove();
+	        
+	        fetch("deleteAct.do", {
+		    	  method: "POST",
+		    	  headers: {
+		    	    "Content-Type": "application/x-www-form-urlencoded"
+		    	  },
+		    	  body: new URLSearchParams({ actId: item.actId }).toString()
+		    	})
+		    	.then(response => {
+		    	  if (response.ok) {
+		    		window.location.href = "viewActRecChat.do";
+		    	    console.log("일정 삭제 성공");
+		    	  } else {
+		    	    alert("일정 삭제 실패!");
+		    	  }
+		    	});
 	      };
 	      // 텍스트
 	      const span = document.createElement("span");
@@ -138,25 +159,30 @@ document.addEventListener("DOMContentLoaded", function() {
 	      }
 	     
 	      // 오른쪽 리스트에 추가
-	      addToActivityList(checked);
+	      Promise.all(checked.map(content =>
+	      fetch("insertAct.do", {
+	        method: "POST",
+	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	        body: new URLSearchParams({
+	          jobId: window.selectedJobId,
+	          specId: window.selectedSpecId,
+	          actContent: content
+	        }).toString()
+	      })
+	      .then(res => res.json())
+	      .then(data => {
+	        if (data.success) {
+	          addToActivityList([{ text: content, actId: data.actId }]);
+	        } else {
+	          alert(`'${content}' 저장 실패`);
+	        }
+	      })
+	    ))
+	    .then(() => {
 	      removeCheckboxList();
-	     
-	   /* // DB에 저장    ----------- 변경사항
-	      checked.forEach(function(actContent) {
-	    	  $.ajax({
-	    	    type: "POST",
-	    	    url: "insertAct.do",   ///   완성시 이름 바꾸기
-	    	    data: { actContent: actContent },
-	    	    success: function() {
-	    	      console.log("활동 저장 성공:", actContent);
-	    	    },
-	    	    error: function() {
-	    	      console.error("활동 저장 실패:", actContent);
-	    	    }
-	    	  });
-	    	}); */
-	     
-	    };
+	    })
+	    .catch(() => alert("서버 통신 오류"));
+	  };
 	    listWrap.appendChild(submitBtn);
 	    chatArea.appendChild(listWrap);
 	  }
@@ -276,23 +302,25 @@ document.addEventListener("DOMContentLoaded", function() {
 		  const input = document.querySelector(".manual-input");
 		  const val = input.value.trim();
 		  if (val) {
-		    addToActivityList([val]);
-		   
-		 /* // DB에 저장    ----------- 변경사항
-		      $.ajax({
-		        type: "POST",
-		        url: "insertAct.do",  /// 완성 시 이름 바꾸기
-		        data: { actContent: val },
-		        success: function() {
-		          console.log("활동 추가 성공");
-		        },
-		        error: function() {
-		          alert("활동 추가 실패!");
-		        }
-		      }); */
-		   
-		   
-		    input.value = "";
+			// 예: 직접 입력 후 빈값이 아니라면 db에 추가
+			  fetch("insertAct.do", {
+			    method: "POST",
+			    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			    body: new URLSearchParams({
+			      jobId: window.selectedJobId,
+			      specId: window.selectedSpecId,
+			      actContent: val
+			    }).toString()
+			  })
+			  .then(res => res.json())
+			  .then(data => {
+			    if (data.success) {
+			      addToActivityList([{ text: val, actId: data.actId }]);
+			      input.value = "";
+			    } else {
+			      alert("활동 저장 실패!");
+			    }
+			  });
 		  } else {
 		    alert("활동을 입력해 주세요!");
 		  }
