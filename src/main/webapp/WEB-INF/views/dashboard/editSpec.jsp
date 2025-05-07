@@ -17,8 +17,8 @@
   margin: 40px auto;
   background: #1a1a1a;
   padding: 20px;
-  border-radius: 12px;            /* 둥근 모서리 */ :contentReference[oaicite:3]{index=3}
-  box-shadow: 0 4px 20px rgba(0,0,0,0.7); /* 그림자 */ :contentReference[oaicite:4]{index=4}
+  border-radius: 12px;            /* 둥근 모서리 */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7); /* 그림자 */
 }
 
 /* 제목 */
@@ -45,13 +45,11 @@ th, td {
 }
 th {
   background: #009688;
-  position: sticky; top: 0;       /* 헤더 고정 */ :contentReference[oaicite:5]{index=5}
+  position: sticky; top: 0;       /* 헤더 고정 */
   color: #fff;
   font-weight: 600;
 }
-tbody tr:nth-of-type(even) {
-  background: #1f1f1f;            /* 지브라 스트라이프 */ :contentReference[oaicite:6]{index=6}
-}
+
 tbody tr:hover { background: #2a2a2a; }
 
 /* 버튼 공통 */
@@ -77,7 +75,7 @@ tbody tr:hover { background: #2a2a2a; }
 
 /* 입력 필드 */
 input[type="text"], input[type="date"], textarea {
-  width: calc(100% - 20px);
+  width: calc(100% - 200px);
   padding: 8px 10px;
   margin: 4px 0;
   background: #333;
@@ -169,9 +167,10 @@ input[type="radio"]:checked+label::before {
 		});
 		if (allFilled) {
 			$('#scheduleRow').append(
-				'<div class="schedule-set">일정: <input type="text" name="ssType" class="ssType" required>' +
-				' 날짜: <input type="date" name="ssDate" class="ssDate" required>' +
-				' <button type="button" class="btn btn-danger" onclick="removeSchedule(this)">삭제</button></div>');
+				'<div class="schedule-set">' +
+				'일정: <input type="text" name="ssType" class="ssType" style="width: 300px;" required>' +
+				'날짜: <input type="date" name="ssDate" class="ssDate" style="width: 100px;" required>' +
+				'<button type="button" class="btn btn-danger" onclick="removeSchedule(this)">삭제</button></div>');
 		} else alert('일정 칸이 비어있습니다!');
 	}
 	function removeSchedule(btn){ $(btn).closest('.schedule-set').remove(); }
@@ -237,15 +236,15 @@ input[type="radio"]:checked+label::before {
 	        <td id="scheduleRow">
 	          <c:forEach var="ss" items="${ requestScope.ss }">
 	            <div class="schedule-set">
-	              일정: <input type="text" name="ssType" class="ssType" value="${ ss.ssType }">
+	              일정: <input type="text" name="ssType" class="ssType" value="${ ss.ssType }" style="width: 300px;">
 	              날짜: <input type="date" name="ssDate" class="ssDate"
-	                        value="<fmt:formatDate value='${ss.ssDate}' pattern='yyyy-MM-dd'/>">
+	                        value="<fmt:formatDate value='${ss.ssDate}' pattern='yyyy-MM-dd'/>" style="width: 100px;">
 	              <button type="button" class="btn btn-danger" onclick="removeSchedule(this)">삭제</button>
 	            </div>
 	          </c:forEach>
 	          <div class="schedule-set">
-	            일정: <input type="text" name="ssType" class="ssType">
-	            날짜: <input type="date" name="ssDate" class="ssDate">
+	            일정: <input type="text" name="ssType" class="ssType"  style="width: 300px;">
+	            날짜: <input type="date" name="ssDate" class="ssDate" style="width: 100px;">
 	            <button type="button" class="btn" onclick="addSchedule()">일정 더 추가하기</button>
 	          </div>
 	        </td>
@@ -268,10 +267,10 @@ input[type="radio"]:checked+label::before {
 	    </table>
 	    </div>
 
-	    <div class="buttons">
-	      <button type="submit" class="btn" onclick="checkSchedule(event)">수정하기</button>
+	    <div class="buttons" style="padding-top: 25px; text-align: center;">
+	      <button type="submit" class="btn" style="display: inline-block; margin: 0 5px;" onclick="checkSchedule(event)">수정하기</button>
 	      <c:if test="${ requestScope.spec.specState eq 'Y' }">
-	        <button type="button" class="btn btn-danger"
+	        <button type="button" class="btn btn-danger" style="display: inline-block; margin: 0 5px;"
 	                onclick="movetoAccomplishSpec('${ requestScope.spec.specId }')">다시 목표로</button>
 	      </c:if>
 	    </div>

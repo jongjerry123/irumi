@@ -7,7 +7,11 @@ import java.net.URL;
 import java.sql.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
+@Component
+@PropertySource("classpath:application.properties")
 public class JobListInserter {
 
     // Oracle DB 연결 정보
@@ -15,14 +19,16 @@ public class JobListInserter {
     private static final String DB_USER = "c##irumi"; // 실제 사용자명으로 변경
     private static final String DB_PASSWORD = "irumi"; // 실제 비밀번호로 변경
 
-    // 커리어넷 오픈 API URL
-    private static final String API_URL = "https://www.career.go.kr/cnet/openapi/getOpenApi?apiKey=1335ded918216a532600e25314a6e428&svcType=api&svcCode=JOB&contentType=json&gubun=job_dic_list&perPage=500"; // 실제 API 키로 변경
+    private static String jobApi = "1335ded918216a532600e25314a6e428";
+
+	// 커리어넷 오픈 API URL
+    private static final String API_URL = "https://www.career.go.kr/cnet/openapi/getOpenApi?apiKey=" + jobApi + "&svcType=api&svcCode=JOB&contentType=json&gubun=job_dic_list&perPage=500"; // 실제 API 키로 변경
 
     public static void main(String[] args) {
         try {
             // API 호출
             String jsonResponse = fetchApiData(API_URL);
-
+                        
             // JSON 파싱
             JSONObject jsonObject = new JSONObject(jsonResponse);
             JSONArray jobList = jsonObject.getJSONObject("dataSearch").getJSONArray("content");

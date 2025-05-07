@@ -11,102 +11,150 @@
 <meta charset="UTF-8">
 <title>irumi</title>
 <style>
-body {
-	background-color: #111;
-	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
-	margin: 0;
-	padding: 0;
+/* 컨테이너 카드 스타일 */
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;            /* 둥근 모서리 */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7); /* 그림자 */
 }
 
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
+/* 제목 */
+.container h1 {
+  color: #00bfae;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
-.buttons {
-	display: flex;
-	gap: 10px;
-}
-
-.buttons button {
-	background: transparent;
-	color: white;
-	border: 1px solid #ccc;
-	padding: 6px 12px;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color .2s;
-}
-
-.buttons button:hover {
-	background: #fff;
-	color: #000;
-}
-
-/* 기본 라디오 숨김 */
-input[type="radio"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* 레이블 기본 */
-label {
-  display: inline-block;
-  position: relative;
-  padding: 0.5em 1em;
-  margin-right: 0.5em;
-  cursor: pointer;
-  color: #fff;
-  transition:
-  color 0.3s;
-}
-
-/* 호버 언더라인 */
-label::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
+/* 테이블 래퍼 & 스트라이프 */
+.table-wrapper { overflow-x: auto; margin-bottom: 20px; }
+table {
   width: 100%;
-  height: 2px;
-  background: #009688;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s;
+  border-collapse: collapse;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
 }
-label:hover { color: #009688; }
-label:hover::after { transform: scaleX(1); }
-
-/* 클릭 배경 및 물결 */
-input[type="radio"]:checked + label {
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+}
+th {
+  background: #009688;
+  position: sticky; top: 0;       /* 헤더 고정 */
   color: #fff;
+  font-weight: 600;
+}
+
+tbody tr:hover { background: #2a2a2a; }
+
+/* 버튼 공통 */
+.btn {
   background: #009688;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn:hover {
+  background: #00bfae;
+  transform: translateY(-2px);
+}
+.btn-danger {
+  background: #e64a19;
+}
+.btn-danger:hover { background: #ff5722; }
+
+/* 입력 필드 */
+input[type="text"], input[type="date"], textarea {
+  width: calc(100% - 200px);
+  padding: 8px 10px;
+  margin: 4px 0;
+  background: #333;
+  color: #eee;
+  border: 1px solid #444;
   border-radius: 4px;
+  font-size: 0.9rem;
 }
 
-input[type="radio"]:checked + label::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(0,150,136,0.4);
-  border-radius: 50%;
-  transform: translate(-50%,-50%);
-  animation: ripple 0.6s ease-out;
+input[type="radio"] {
+	appearance: none;
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
 }
 
-@keyframes ripple {
-  to { width: 200%; height: 200%; opacity: 0; }
+label {
+	display: inline-block;
+	position: relative;
+	padding: 0.5em 1em;
+	margin-right: 0.5em;
+	cursor: pointer;
+	color: #fff;
+	transition: color 0.3s;
+}
+
+label::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 2px;
+	background: #009688;
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.3s;
+}
+
+label:hover {
+	color: #009688;
+}
+
+label:hover::after {
+	transform: scaleX(1);
+}
+
+input[type="radio"]:checked+label {
+	color: #fff;
+	background: #009688;
+	border-radius: 4px;
+}
+
+input[type="radio"]:checked+label::before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 0;
+	height: 0;
+	background: rgba(0, 150, 136, 0.4);
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {to { width:200%;
+	height: 200%;
+	opacity: 0;
+	}
+}
+
+/* 일정·활동 블록 */
+.schedule-set, .act-set {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 </style>
 <script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
@@ -124,9 +172,9 @@ input[type="radio"]:checked + label::before {
 			$('#scheduleRow')
 					.append(
 							'<div class="schedule-set">'
-									+ '일정: <input type=\"text\" name=\"ssType\" class=\"ssType\" required>&nbsp;'
-									+ '날짜: <input type=\"date\" name=\"ssDate\" class=\"ssDate\" required>&nbsp;'
-									+ '<button type=\"button\" onclick=\"removeSchedule(this)\">삭제</button>'
+									+ '일정: <input type=\"text\" name=\"ssType\" class=\"ssType\" style=\"width: 300px;\" required>'
+									+ '날짜: <input type=\"date\" name=\"ssDate\" class=\"ssDate\" style=\"width: 100px;\" required>'
+									+ '<button type=\"button\" class=\"btn btn-danger\" onclick=\"removeSchedule(this)\">삭제</button>'
 									+ '</div>');
 		}
 		else {
@@ -150,7 +198,7 @@ input[type="radio"]:checked + label::before {
 		if (allFilled) {
 			$('#actRow').append('<div class="act-set">'
 									+ '<input type=\"text\" name=\"actContent\" class=\"actContent\" required>&nbsp;'
-									+ '<button type=\"button\" onclick=\"removeAct(this)\">삭제</button>'
+									+ '<button type=\"button\" class="btn btn-danger" onclick=\"removeAct(this)\">삭제</button>'
 									+ '</div>');
 		}
 		else {
@@ -174,9 +222,9 @@ input[type="radio"]:checked + label::before {
 	
 	<c:set var="menu" value="dashboard" scope="request" />
 	<c:import url="/WEB-INF/views/common/header.jsp" />
-	
+	<div class="container">
 	<h1 align="center">목표: ${ requestScope.job.jobName }</h1>
-	<pre>
+	<pre style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto; color: #18d7c6;">
 		<h3>${ requestScope.job.jobExplain }</h3>
 	</pre>
 	<form action="insertSpec.do" method="post">
@@ -211,21 +259,29 @@ input[type="radio"]:checked + label::before {
 				<th>주요 일정</th>
 				<td id="scheduleRow">
 					<div class="schedule-set">
-						일정: <input type="text" name="ssType" class="ssType">&nbsp;날짜: <input type="date" name="ssDate" class="ssDate">&nbsp;<button type="button" onclick="addSchedule()">일정 더 추가하기</button>
+						일정: <input type="text" name="ssType" class="ssType" style="width: 300px;">
+						날짜: <input type="date" name="ssDate" class="ssDate" style="width: 100px;">
+						<button type="button" class="btn" onclick="addSchedule()">일정 더 추가하기</button>
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<th>목표 활동</th>
-				<td id="actRow"><input type="text" name="actContent" class="actContent">&nbsp;<button type="button" onclick="addAct()">활동 더 추가하기</button></td>
+				<td id="actRow">
+					<div class="act-set">
+						<input type="text" name="actContent" class="actContent">&nbsp;<button type="button" class="btn" onclick="addAct()">활동 더 추가하기</button>
+					</div>
+				</td>
 			</tr>
 		</table>
 		
-		<div class="buttons">
-			<button type="submit" onclick="checkSchedule(event)">목표 스펙으로 설정</button>
+		<div class="buttons" style="padding-top: 25px; text-align:center;">
+			<button type="submit" class="btn" style="display: inline-block; margin: 0 auto;" onclick="checkSchedule(event)">목표 스펙으로 설정</button>
 		</div>
 	</form>
+	</div>
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
 
 </body>
 </html>
+
