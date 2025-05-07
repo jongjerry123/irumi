@@ -7,8 +7,21 @@ public class ChatMsg implements java.io.Serializable {
 
 	private static final long serialVersionUID = -8536063013979132015L;
 	private String msgId;
+	
+
 	public String getMsgId() {
 		return msgId;
+	}
+	
+	public ChatMsg() {}
+	
+	public ChatMsg(String userId, String convId, String convTopic, String convSubTopicJobId, String role) {
+		super();
+		this.userId = userId;
+		this.convId = convId;
+		this.convTopic = convTopic;
+		this.convSubTopicJobId = convSubTopicJobId;
+		this.role = role;
 	}
 	public void setMsgId(String msgId) {
 		this.msgId = msgId;

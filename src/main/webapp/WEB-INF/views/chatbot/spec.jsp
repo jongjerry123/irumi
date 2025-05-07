@@ -825,31 +825,36 @@ $(function() {
         const $submitBtn = $("<button>").text("선택 완료").css("margin-left", "10px").on("click", function() {
             const checked = $listWrap.find("input:checked").map(function() {
             	const selectedTitle = this.value;
-            return options.find(specCI => specCI.title === selectedTitle);
+         		   return options.find(specCI => specCI.title === selectedTitle);
             }).get();
             if (checked.length === 0) {
                 alert("하나 이상 선택해 주세요!");
                 return;
             }
-            addToSpecList(checked);
+           
             removeCheckboxList();
             
             // specCI 선택시, insertSpec으로 CI 형태로 보냄
             // ==> chatbot Controller가 받음
+            const savedSpecCIs = [];
+			let completed = 0;
             checked.forEach(function(specCI) {
 
-  	    	  $.ajax({
-  	    	    type: "POST",
-  	    	    url: "insertCareerItem.do",
-  	    	    contentType: "application/json",
-  	    	    data: JSON.stringify(specCI),
-  	    	    success: function() {
-  	    	      console.log("직무에 스펙 저장 성공:", specCI.title);
-  	    	    },
-  	    	    error: function() {
-  	    	      console.error("직무에 스펙 저장 실패:", specCI.title);
-  	    	    }
-  	    	  });
+            	$.ajax({
+            	    type: "POST",
+            	    url: "insertCareerItem.do",
+            	    contentType: "application/json",
+            	    data: JSON.stringify(specCI),
+            	    success: function(returnedSpecCI) {
+            	      savedSpecCIs.push(returnedSpecCI);
+            	    },
+            	    complete: function() {
+            	      completed++;
+            	      if (completed === checked.length) {
+            	        addToSpecList(savedSpecCIs);  // 모든 요청 성공 후 한 번만 호출
+            	      }
+            	    }
+            	  });
   	    	});
             
             

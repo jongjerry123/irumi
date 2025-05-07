@@ -40,7 +40,7 @@ public class ConvSession {
 	private ChatState resolveInitialState(String topic) {
 		switch (topic) {
 			case "job":
-				return StateJobChat.ASK_PERSONALITY;
+				return StateJobChat.START;
 			case "spec":
 				return StateSpecChat.TEXT_CURRENT_SPEC;
 			case "ss":
