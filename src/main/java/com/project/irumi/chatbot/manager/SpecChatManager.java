@@ -16,7 +16,9 @@ import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateSpecChat;
 import com.project.irumi.chatbot.model.dto.CareerItemDto;
+import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.service.DashboardService;
 
 @Component
@@ -30,10 +32,25 @@ public class SpecChatManager {
 
 	@Autowired
 	private DashboardService dashboardService;
+	
+	@Autowired
+	private ChatbotService chatbotService;
 
 	private static final Logger logger = LoggerFactory.getLogger(SpecChatManager.class);
 	public ChatbotResponseDto getGptResponse(ConvSession session, String userMsg) {
 		StateSpecChat state = (StateSpecChat) session.getChatState();
+		
+		ChatMsg botChatMsg = new ChatMsg();
+		ChatMsg userChatMsg = new ChatMsg();
+		//MSG 저장시에 필요한 대화 세션 정보 세팅
+		userChatMsg.setConvId(session.getConvId());
+		botChatMsg.setConvId(session.getConvId());
+		userChatMsg.setConvTopic(session.getTopic());
+		botChatMsg.setConvTopic(session.getTopic());
+		userChatMsg.setConvSubTopicJobId(session.getSubJobTopicId());
+		botChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+		
+		
 		if (state == null) {
 			state = StateSpecChat.TEXT_CURRENT_SPEC;
 		}
@@ -41,19 +58,21 @@ public class SpecChatManager {
 		String tempSpecType;
 
 		switch (state) {
-		
-		//case START:
-			
+		case START:
+			botChatMsg.setMsgContent(StateSpecChat.START.getPrompt());
+			chatbotService.insertChatMsg(botChatMsg);
 			
 		case TEXT_CURRENT_SPEC:
-			boolean isMeaningful = isSpecRelatedInput(userMsg);
-			if (isMeaningful) {
+			
+			if ( isSpecRelatedInput(userMsg)) {
 				session.addToContextHistory("유저가 현재 보유한 스펙: " + userMsg);
-				session.setGettedSpec(userMsg); /// 수정 - 이미 갖고 있는 스펙 저장 (gpt 가 자꾸 보유 스펙 저걸 무시해서 걍 필드생성)
 				session.setChatState(StateSpecChat.OPT_SPEC_TYPE);
+				
+				
 				return new ChatbotResponseDto("어떤 종류의 스펙 추천을 받고 싶으신가요?",
 						List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타"));
-			} else {
+			} 
+			else {
 				session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
 				return new ChatbotResponseDto(
 						"잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 스펙 추천 세션입니다.\r\n" + "현재 보유하고 있는 스펙이나 경험을 말씀해 주세요.");
