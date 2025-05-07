@@ -363,53 +363,9 @@ NOCACHE;
 CREATE TABLE TB_JOB_LIST (
     JOB_LIST_ID  VARCHAR2(50) PRIMARY KEY,
     JOB_NAME    VARCHAR2(100) NOT NULL,
-    JOB_TYPE      VARCHAR2(50) NOT NULL,
-    JOB_EXPLAIN VARCHAR2(1000) NOT NULL
+    JOB_TYPE      VARCHAR2(50),
+    JOB_EXPLAIN VARCHAR2(2000)
 );
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('1', '경영 및 기획', '총괄 운영 관리자', '조직의 전반적인 운영을 계획하고 조율합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('2', '경영 및 기획', '영업 관리자', '영업 전략을 수립하고 영업팀의 성과를 관리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('3', '재무 및 회계', '회계사', '재무제표를 작성하고 세무 신고 및 내부 감사를 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('4', '재무 및 회계', '재무 분석가', '재무 데이터를 분석하여 투자 타당성을 평가하고 의사결정을 지원합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('5', '정보기술', '응용 소프트웨어 개발자', '애플리케이션 및 시스템 소프트웨어를 설계하고 개발합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('6', '정보기술', '데이터 과학자', '대규모 데이터를 분석하여 인사이트를 도출하고 모델을 개발합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('7', '엔지니어링', '토목 기사', '도로, 교량 등 인프라를 설계하고 시공을 관리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('8', '엔지니어링', '기계 기사', '기계 시스템을 설계하고 성능을 최적화합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('9', '과학 및 연구', '환경 과학자', '환경 데이터를 분석하고 보전 정책을 연구합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('10', '과학 및 연구', '미생물학자', '미생물을 연구하여 건강, 식품, 환경 관련 솔루션을 개발합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('11', '사회복지 및 상담', '사회복지사', '개인, 가족, 지역사회의 복지 서비스를 계획하고 지원합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('12', '사회복지 및 상담', '상담사', '심리 및 행동 문제 해결을 위해 상담 서비스를 제공합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('13', '법률 및 행정', '변호사', '법률 자문을 제공하고 소송을 대리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('14', '법률 및 행정', '법무 보조원', '법률 문서를 작성하고 변호사의 업무를 지원합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('15', '교육 및 도서관', '고등학교 교사', '고등학생을 대상으로 교과목을 가르치고 평가합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('16', '교육 및 도서관', '사서', '도서관 자료를 관리하고 정보 서비스를 제공합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('17', '예술 및 디자인', '그래픽 디자이너', '시각적 커뮤니케이션을 위해 디자인을 개발하고 제작합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('18', '예술 및 디자인', '음악가 및 가수', '음악을 연주하고 공연을 기획합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('19', '의료 및 보건', '등록 간호사', '환자의 치료 계획을 수립하고 간호 서비스를 제공합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('20', '의료 및 보건', '의사 및 외과의', '질병을 진단하고 치료 계획을 수립하며 수술을 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('21', '의료 지원', '간호 조무사', '환자의 기본 간호 및 일상 생활 지원을 제공합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('22', '의료 지원', '의료 보조원', '의사의 진료를 보조하고 행정 업무를 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('23', '보안 및 응급 서비스', '경찰관', '지역 치안을 유지하고 범죄를 예방합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('24', '보안 및 응급 서비스', '소방관', '화재를 진압하고 구조 및 구급 활동을 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('25', '요식업 및 서비스', '셰프 및 수석 요리사', '조리 팀을 관리하고 메뉴를 개발합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('26', '요식업 및 서비스', '웨이터 및 웨이트리스', '고객의 주문을 받고 음식을 제공합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('27', '시설 관리 및 청소', '청소원', '건물을 청소하고 시설을 유지 관리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('28', '시설 관리 및 청소', '조경사', '조경을 설계하고 정원을 관리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('29', '개인 서비스', '보육 교사', '아동을 보육하고 교육 지원 서비스를 제공합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('30', '개인 서비스', '미용사', '미용 서비스를 제공하고 스타일링을 합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('31', '영업 및 마케팅', '소매 판매원', '상품을 판매하고 고객을 응대합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('32', '영업 및 마케팅', '기업 영업 담당자', '기업을 대상으로 제품을 판매하고 계약을 관리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('33', '사무 및 행정 지원', '고객 서비스 담당자', '고객의 문의에 응대하고 문제를 해결합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('34', '사무 및 행정 지원', '비서 및 행정 보조', '문서를 작성하고 일정을 관리하며 전화를 응대합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('35', '농업 및 자연 자원 관리', '농장 관리자', '농장을 운영하고 작물 및 가축을 관리합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('36', '농업 및 자연 자원 관리', '산림 보전원', '산림을 보전하고 재조림 작업을 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('37', '건설 및 채굴', '건설 노동자', '건설 현장에서 자재를 운반하고 기초 작업을 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('38', '건설 및 채굴', '전기 기사', '전기 설비를 설치하고 수리하며 유지보수를 합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('39', '설치 및 정비', '일반 정비공', '장비를 점검하고 수리하며 예방 정비를 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('40', '설치 및 정비', '자동차 정비사', '자동차를 정비하고 진단 업무를 수행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('41', '제조 및 생산', '조립공', '부품을 조립하고 제품을 포장합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('42', '제조 및 생산', '기계공', '기계 공작물을 가공하고 장비를 운영합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('43', '운송 및 물류', '대형 트럭 운전사', '화물을 운송하고 차량을 안전하게 운행합니다.');
-INSERT INTO TB_JOB_LIST (JOB_LIST_ID, JOB_TYPE, JOB_NAME, JOB_EXPLAIN) VALUES ('44', '운송 및 물류', '물류 작업자', '창고에서 물품을 운반하고 분류 작업을 수행합니다.');
 
 -- TB_USER
 -- 관리자 유저, 일반 로그인

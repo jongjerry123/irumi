@@ -9,41 +9,82 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>스펙 수정</title>
+<title>irumi</title>
 <style>
-body {
-	background-color: #111;
-	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
-	margin: 0;
-	padding: 0;
+/* 컨테이너 카드 스타일 */
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;            /* 둥근 모서리 */ :contentReference[oaicite:3]{index=3}
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7); /* 그림자 */ :contentReference[oaicite:4]{index=4}
 }
 
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
+/* 제목 */
+.container h1 {
+  color: #00bfae;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
-.buttons {
-	display: flex;
-	gap: 10px;
+/* 테이블 래퍼 & 스트라이프 */
+.table-wrapper { overflow-x: auto; margin-bottom: 20px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
 }
-
-.buttons button {
-	background: transparent;
-	color: white;
-	border: 1px solid #ccc;
-	padding: 6px 12px;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color .2s;
+th, td {
+  padding: 12px 15px;
+  text-align: left;
 }
+th {
+  background: #009688;
+  position: sticky; top: 0;       /* 헤더 고정 */ :contentReference[oaicite:5]{index=5}
+  color: #fff;
+  font-weight: 600;
+}
+tbody tr:nth-of-type(even) {
+  background: #1f1f1f;            /* 지브라 스트라이프 */ :contentReference[oaicite:6]{index=6}
+}
+tbody tr:hover { background: #2a2a2a; }
 
-.buttons button:hover {
-	background: #fff;
-	color: #000;
+/* 버튼 공통 */
+.btn {
+  background: #009688;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn:hover {
+  background: #00bfae;
+  transform: translateY(-2px);
+}
+.btn-danger {
+  background: #e64a19;
+}
+.btn-danger:hover { background: #ff5722; }
+
+/* 입력 필드 */
+input[type="text"], input[type="date"], textarea {
+  width: calc(100% - 20px);
+  padding: 8px 10px;
+  margin: 4px 0;
+  background: #333;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 input[type="radio"] {
@@ -104,73 +145,59 @@ input[type="radio"]:checked+label::before {
 	animation: ripple 0.6s ease-out;
 }
 
-@
-keyframes ripple {to { width:200%;
+@keyframes ripple {to { width:200%;
 	height: 200%;
 	opacity: 0;
+	}
 }
+
+/* 일정·활동 블록 */
+.schedule-set, .act-set {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 </style>
-<script
-	src="${pageContext.servletContext.contextPath}/resources/js/jquery-3.7.1.min.js"></script>
+<script src="${pageContext.servletContext.contextPath}/resources/js/jquery-3.7.1.min.js"></script>
 <script>
+	// 일정 추가/삭제
 	function addSchedule() {
-
 		let allFilled = true;
 		$('.ssType, .ssDate').each(function() {
-			if ($(this).val().trim() === '') {
-				allFilled = false;
-				return false;
-			}
+			if ($(this).val().trim() === '') { allFilled = false; return false; }
 		});
-
 		if (allFilled) {
-			$('#scheduleRow')
-					.append(
-							'<div class=\"schedule-set\">'
-									+ '일정 유형: <input type=\"text\" name=\"ssType\" class=\"ssType\" required>&nbsp;'
-									+ '날짜: <input type=\"date\" name=\"ssDate\" class=\"ssDate\" required>&nbsp;'
-									+ '<button type=\"button\" onclick=\"removeSchedule(this)\">삭제</button>'
-									+ '</div>');
-		}
-		else {
-			alert('일정 칸이 비어있습니다!');
-		}
-			
+			$('#scheduleRow').append(
+				'<div class="schedule-set">일정: <input type="text" name="ssType" class="ssType" required>' +
+				' 날짜: <input type="date" name="ssDate" class="ssDate" required>' +
+				' <button type="button" class="btn btn-danger" onclick="removeSchedule(this)">삭제</button></div>');
+		} else alert('일정 칸이 비어있습니다!');
 	}
-	function removeSchedule(btn) {
-		$(btn).closest('.schedule-set').remove();
-	}
+	function removeSchedule(btn){ $(btn).closest('.schedule-set').remove(); }
+
+	// 활동 추가/삭제
 	function addAct() {
 		let allFilled = true;
 		$('.actContent').each(function() {
-			if ($(this).val().trim() === '') {
-				allFilled = false;
-				return false;
-			}
+			if ($(this).val().trim() === '') { allFilled = false; return false; }
 		});
 		if (allFilled) {
-			$('#actRow').append('<div class=\"act-set\">'
-									+ '<input type=\"text\" name=\"actContent\" class=\"actContent\" required>&nbsp;'
-									+ '<button type=\"button\" onclick=\"removeAct(this)">삭제</button>'
-									+ '</div>');
-		}
-		else {
-			alert('활동 칸이 비어있습니다!');
-		}
-			
+			$('#actRow').append(
+				'<div class="act-set"><input type="text" name="actContent" class="actContent" required>' +
+				' <button type="button" class="btn btn-danger" onclick="removeAct(this)">삭제</button></div>');
+		} else alert('활동 칸이 비어있습니다!');
 	}
-	function removeAct(btn) {
-		$(btn).closest('.act-set').remove();
-	}
+	function removeAct(btn){ $(btn).closest('.act-set').remove(); }
+
+	// 제출 전 일정 체크
 	function checkSchedule(event) {
-		if ((!$('.ssType').val() && $('.ssDate').val()) || ($('.ssType').val() && !$('.ssDate').val())) {
-			alert("주요 일정에 입력란 모두 채워져야 합니다.");
-			event.preventDefault();
+		if((!$('.ssType').val() && $('.ssDate').val())||($('.ssType').val()&&!$('.ssDate').val())){
+			alert("주요 일정에 입력란 모두 채워져야 합니다."); event.preventDefault();
 		}
 	}
-	function movetoAccomplishSpec(specId) {
-		location.href = 'updateSpecStatus.do?specId=' + specId;
+	function movetoAccomplishSpec(specId){
+		location.href='updateSpecStatus.do?specId='+specId;
 	}
 </script>
 </head>
@@ -178,58 +205,79 @@ keyframes ripple {to { width:200%;
 	<c:set var="menu" value="dashboard" scope="request" />
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
-	<h1 align="center">${ requestScope.job.jobName }의 스펙 수정</h1>
-	<form action="deleteAndInsertSpec.do" method="post">
-		<input type="hidden" name="jobId" value="${ requestScope.job.jobId }" />
-		<input type="hidden" name="specId" value="${ requestScope.spec.specId }" />
-		<input type="hidden" name="specState" value="${ requestScope.spec.specState }" />
-		<table align="center" width="1000" border="1" cellspacing="0" cellpadding="5">
-			<tr>
-				<th>목표 스펙*</th>
-				<td><input type="text" name="specName" value="${ requestScope.spec.specName }" required></td>
-			</tr>
-			<tr>
-				<th>스펙 종류*</th>
-				<td><c:forEach var="type" items="${ ['어학 능력','자격증','인턴십 및 현장실습','대외 활동','연구 활동','기타'] }">
-						<input type="radio" name="specType" id="${ type }" value="${ type }" <c:if test="${ requestScope.spec.specType == type }">checked</c:if> required>
-							<label for="${ type }">${ type }</label>
-					</c:forEach></td>
-			</tr>
-			<tr>
-				<th>스펙 내용</th>
-				<td><textarea name="specExplain" rows="4" cols="50">${ requestScope.spec.specExplain }</textarea></td>
-			</tr>
-			<tr>
-				<th>주요 일정</th>
-				<td id="scheduleRow">
-					<c:forEach var="ss" items="${ requestScope.ss }">
-						<div class="schedule-set">
-							일정 유형: <input type="text" name="ssType" class="ssType" value="${ ss.ssType }">&nbsp; 날짜: <input type="date" name="ssDate" class="ssDate" value="<fmt:formatDate value='${ss.ssDate}' pattern='yyyy-MM-dd'/>">&nbsp;<button type="button" onclick="removeSchedule(this)">삭제</button>
-						</div>
-					</c:forEach>
-					일정: <input type="text" name="ssType" class="ssType">&nbsp;날짜: <input type="date" name="ssDate" class="ssDate">&nbsp;<button type="button" onclick="addSchedule()">일정 더 추가하기</button>
-			</tr>
-			<tr>
-				<th>목표 활동</th>
-				<td id="actRow">
-					<c:forEach var="act" items="${ requestScope.acts }">
-						<div class="act-set">
-							<input type="text" name="actContent" class="actContent" value="${ act.actContent }" required>&nbsp;
-							<button type="button" onclick="removeAct(this)">삭제</button>
-						</div>
-					</c:forEach>
-					<input type="text" name="actContent" class="actContent">&nbsp;<button type="button" onclick="addAct()">활동 더 추가하기</button>
-				</td>
-			</tr>
-		</table>
-		<div class="buttons">
-			<button type="submit" onclick="checkSchedule(event)">수정하기</button>
-			<c:if test="${ requestScope.spec.specState eq 'Y' }">
-				<button type="button" onclick="movetoAccomplishSpec('${ requestScope.spec.specId }')">다시 목표로</button>
-			</c:if>
-		</div>
-	</form>
-	<c:import url="/WEB-INF/views/common/footer.jsp" />
+	<div class="container">
+	  <h1>${ requestScope.job.jobName }의 스펙 수정</h1>
+	  <form action="deleteAndInsertSpec.do" method="post">
+	    <input type="hidden" name="jobId" value="${ requestScope.job.jobId }" />
+	    <input type="hidden" name="specId" value="${ requestScope.spec.specId }" />
+	    <input type="hidden" name="specState" value="${ requestScope.spec.specState }" />
 
+	    <div class="table-wrapper">
+	    <table border="1" cellspacing="0" cellpadding="5">
+	      <tr>
+	        <th>목표 스펙*</th>
+	        <td><input type="text" name="specName" value="${ requestScope.spec.specName }" required></td>
+	      </tr>
+	      <tr>
+	        <th>스펙 종류*</th>
+	        <td>
+	          <c:forEach var="type" items="${ ['어학 능력','자격증','인턴십 및 현장실습','대외 활동','연구 활동','기타'] }">
+	            <input type="radio" name="specType" id="${ type }" value="${ type }"
+	              <c:if test="${ requestScope.spec.specType eq type }">checked</c:if> required>
+	            <label for="${ type }">${ type }</label>
+	          </c:forEach>
+	        </td>
+	      </tr>
+	      <tr>
+	        <th>스펙 내용</th>
+	        <td><textarea name="specExplain" rows="4" cols="50">${ requestScope.spec.specExplain }</textarea></td>
+	      </tr>
+	      <tr>
+	        <th>주요 일정</th>
+	        <td id="scheduleRow">
+	          <c:forEach var="ss" items="${ requestScope.ss }">
+	            <div class="schedule-set">
+	              일정: <input type="text" name="ssType" class="ssType" value="${ ss.ssType }">
+	              날짜: <input type="date" name="ssDate" class="ssDate"
+	                        value="<fmt:formatDate value='${ss.ssDate}' pattern='yyyy-MM-dd'/>">
+	              <button type="button" class="btn btn-danger" onclick="removeSchedule(this)">삭제</button>
+	            </div>
+	          </c:forEach>
+	          <div class="schedule-set">
+	            일정: <input type="text" name="ssType" class="ssType">
+	            날짜: <input type="date" name="ssDate" class="ssDate">
+	            <button type="button" class="btn" onclick="addSchedule()">일정 더 추가하기</button>
+	          </div>
+	        </td>
+	      </tr>
+	      <tr>
+	        <th>목표 활동</th>
+	        <td id="actRow">
+	          <c:forEach var="act" items="${ requestScope.acts }">
+	            <div class="act-set">
+	              <input type="text" name="actContent" class="actContent" value="${ act.actContent }" required>
+	              <button type="button" class="btn btn-danger" onclick="removeAct(this)">삭제</button>
+	            </div>
+	          </c:forEach>
+	          <div class="act-set">
+	            <input type="text" name="actContent" class="actContent">
+	            <button type="button" class="btn" onclick="addAct()">활동 더 추가하기</button>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+	    </div>
+
+	    <div class="buttons">
+	      <button type="submit" class="btn" onclick="checkSchedule(event)">수정하기</button>
+	      <c:if test="${ requestScope.spec.specState eq 'Y' }">
+	        <button type="button" class="btn btn-danger"
+	                onclick="movetoAccomplishSpec('${ requestScope.spec.specId }')">다시 목표로</button>
+	      </c:if>
+	    </div>
+	  </form>
+	</div>
+
+	<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
