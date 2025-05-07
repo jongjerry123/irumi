@@ -47,5 +47,4 @@ public interface DashboardService {
 	Spec selectSpec(String specId);
 	int updateActStatus(Activity activity);
 	String selectJobIdBySpecId(String specId);
-	int selectMaxSsId();
 }

@@ -164,9 +164,4 @@ public class DashboardDao {
 		return sqlSessionTemplate.insert("dashboardMapper.insertSs", ss);
 	}
 	
-	// 스펙 아이디 가져오기 용
-	public int selectMaxSsId() {
-		return sqlSessionTemplate.selectOne("dashboardMapper.selectMaxSsId");
-	}
-	
 }

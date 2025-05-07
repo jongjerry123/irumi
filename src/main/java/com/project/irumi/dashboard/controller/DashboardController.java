@@ -318,18 +318,10 @@ public class DashboardController {
 		}
 	}
 	
-	// 추가 -- ssid 가져오기 용도 
-	@ResponseBody
-	@RequestMapping("getLatestSsId.do")
-	public String getLatestSsId() {
-	    int maxSsId = dashboardService.selectMaxSsId(); 
-	    return String.valueOf(maxSsId); 
-	}
-	
 	@RequestMapping("deleteAct.do")
 	public String deleteActMethod(@RequestParam("actId") String actId, Model model) {
 		
-		if (dashboardService.deleteSpec(actId) > 0) {
+		if (dashboardService.deleteAct(actId) > 0) {
 			return "redirect:dashboard.do";
 		} else {
 			model.addAttribute("message", "스펙 삭제 실패!");
@@ -337,7 +329,33 @@ public class DashboardController {
 		}
 	}
 	
-	// 추가 -- 활동 추가 용도
+	// 추가 -- 일정 추가 메소드
+	@RequestMapping(value = "insertSpecSchedule.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> insertSpecSchedule(
+	        @RequestParam("specId") String specId,
+	        @RequestParam("ssType") String ssType,
+	        @RequestParam("ssDate") String ssDate) {
+
+	    Map<String, Object> result = new HashMap<>();
+
+	    int ssId = dashboardService.selectNextSsId();
+	    SpecSchedule ss = new SpecSchedule(
+	        String.valueOf(ssId),
+	        specId,
+	        ssType,
+	        Date.valueOf(ssDate)
+	    );
+
+	    boolean success = dashboardService.insertSs(ss) > 0;
+
+	    result.put("success", success);
+	    result.put("ssId", ssId);
+
+	    return result;
+	}
+	
+	// 추가 -- 활동 추가 메소드
 	@ResponseBody
 	@RequestMapping(value = "insertAct.do", method = RequestMethod.POST)
 	public Map<String, Object> insertActMethod(@RequestParam("jobId") String jobId,

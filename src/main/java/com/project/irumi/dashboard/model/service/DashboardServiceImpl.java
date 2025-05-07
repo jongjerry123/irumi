@@ -187,9 +187,4 @@ public class DashboardServiceImpl implements DashboardService {
 		return dashboardDao.deleteSpecSchedule(ssId);
 	}
 
-	@Override
-	public int selectMaxSsId() {
-		return dashboardDao.selectMaxSsId();
-	}
-
 }

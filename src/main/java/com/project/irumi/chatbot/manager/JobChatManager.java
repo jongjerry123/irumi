@@ -119,13 +119,36 @@ public class JobChatManager {
 			if (isMeaningful) {
 				session.addToContextHistory("유저는 다음과 같은 업계를 선호함: " + userMsg);
 
-				String gptAnswer = gptApiService.callGPT("다음 정보를 참고하여 유저에게 추천할 만한 직무를 3개 추천해줘.  \r\n"
-						+ "아래 형식의 JSON **배열**로만 응답해. 숫자, 설명, 다른 텍스트는 절대 포함하지 마.  \r\n" + "각 직무는 다음과 같은 속성을 가져야 해:\r\n"
-						+ "- jobName (직무 이름)\r\n" + "- jobExplain (간단한 설명)\r\n" + "\r\n" + "다음은 예시 형식이다:\r\n" + "\r\n"
-						+ "[\r\n" + "  {\r\n" + "    \"jobName\": \"데이터 분석가\",\r\n"
-						+ "    \"jobExplain\": \"데이터 기반 의사결정을 지원하는 직무\"\r\n" + "  },\r\n" + "  {\r\n"
-						+ "    \"jobName\": \"프론트엔드 개발자\",\r\n" + "    \"jobExplain\": \"사용자 인터페이스를 개발하는 직무\"\r\n"
-						+ "  }\r\n" + "]" + "    응답에 참고할 정보: " + String.join(" ", session.getContextHistory()));
+				String gptAnswer = gptApiService.callGPT(
+					    "다음 정보는 사용자가 원하는 직무 특성, 성격, 가치관, 선호하는 업무 환경 등을 담고 있는 매우 중요한 기준입니다.\r\n" +
+					    "이 정보를 최우선으로 고려하여, 가장 잘 맞는 직무를 3개 추천해 주세요.\r\n" +
+					    "\r\n" +
+					    "단, 반드시 아래 형식의 JSON 배열로만 응답하세요. 숫자, 설명, 다른 텍스트는 절대 포함하지 마세요.\r\n" +
+					    "각 직무는 다음과 같은 속성을 가져야 합니다:\r\n" +
+					    "- jobName (직무 이름)\r\n" +
+					    "- jobExplain (간단한 설명)\r\n" +
+					    "\r\n" +
+					    "예시 형식:\r\n" +
+					    "[\r\n" +
+					    "  {\r\n" +
+					    "    \"jobName\": \"데이터 분석가\",\r\n" +
+					    "    \"jobExplain\": \"데이터 기반 의사결정을 지원하는 직무\"\r\n" +
+					    "  },\r\n" +
+					    "  {\r\n" +
+					    "    \"jobName\": \"프론트엔드 개발자\",\r\n" +
+					    "    \"jobExplain\": \"사용자 인터페이스를 개발하는 직무\"\r\n" +
+					    "  },\r\n" +
+					    "  {\r\n" +
+					    "    \"jobName\": \"AI 엔지니어\",\r\n" +
+					    "    \"jobExplain\": \"머신러닝 기반 시스템을 개발하는 직무\"\r\n" +
+					    "  }\r\n" +
+					    "]\r\n" +
+					    "\r\n" +
+					    "절대 다른 설명을 덧붙이지 말고, JSON 배열만 반환하세요.\r\n" +
+					    "🔽 다음 정보는 반드시 참고해야 할 사용자 특성입니다:\r\n" +
+					    String.join(" ", session.getContextHistory())
+					);
+
 
 				logger.info("gpt JSON 응답?:" + gptAnswer);
 				// GPT 응답을 CareerItem DTO 리스트로 변환
@@ -207,7 +230,7 @@ public class JobChatManager {
 	// 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
 	private boolean isPersonaliltyRelatedInput(String input) {
 		String prompt = """
-				입력 문장이 사용자의 특성(예: 성격, 강점, 가치관 등)과 관련된 설명이면 '예', 아니면 '아니오'라고만 답하세요.
+				입력 문장이 사람의 특성(예: 성격, 강점, 가치관 등)과 관련된 설명이면 '예', 아니면 '아니오'라고만 답하세요.
 				설명 없이 반드시 '예' 또는 '아니오'로만 대답하세요.
 
 				입력: "%s"

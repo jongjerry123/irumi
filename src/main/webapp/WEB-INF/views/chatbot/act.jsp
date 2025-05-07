@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch("userSpecsView.do", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "jobId=" + encodeURIComponent(jobId) // JS 함수는 브라우저에서만 해석됨
+      body: "jobId=" + encodeURIComponent(jobId) 
     })
     .then(res => res.json())
     .then(specs => {
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		    	  headers: {
 		    	    "Content-Type": "application/x-www-form-urlencoded"
 		    	  },
-		    	  body: new URLSearchParams({ actId: item.actId }).toString()
+		    	  body: new URLSearchParams({ actId: activity.actId }).toString()
 		    	})
 		    	.then(response => {
 		    	  if (response.ok) {
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	      };
 	      // 텍스트
 	      const span = document.createElement("span");
-	      span.textContent = activity;
+	      span.textContent = activity.text;
 	      card.appendChild(removeBtn);
 	      card.appendChild(span);
 	      actList.appendChild(card);
@@ -802,8 +802,8 @@ body {
 }
 /* 추가 - 선택 버튼 css */
 .confirm-select-box .confirm-select-btn {
-	border: 1.5px solid #BAAC80;
-	border-radius: 22px;
+	border: 1.5px solid #eeeeee;
+	border-radius: 10px;
 	font-size: 15px;
 	padding: 7px 20px;
 	cursor: pointer;
@@ -811,21 +811,23 @@ body {
 	margin-top: 3px;
 	font-weight: bold;
 	text-align: center;
-	color: #BAAC80;
+	color: #eeeeee;
 	background: none;
+	margin-right: 20px;
 }
+
 .confirm-select-box .confirm-select-btn:hover {
-	background: #BAAC80;
-	border: 1.5px solid #BAAC80;
-	color: #1e1e1e;
-	border-radius: 22px;
+	border-radius: 10px;
 	font-size: 15px;
-	font-weight: 500;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	opacity: 0.5;
-	color: black;
+	margin-top: 3px;
+	font-weight: bold;
+	text-align: center;
+	color: #383838;
+	background: #eeeeee;
+	opacity: 0.3;
 }
 </style>
 </head>

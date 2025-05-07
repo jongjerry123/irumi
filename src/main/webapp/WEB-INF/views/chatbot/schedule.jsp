@@ -70,17 +70,16 @@ document.addEventListener("DOMContentLoaded", function() {
         	  window.selectedJobId = jobId;
         	  window.selectedSpecId = spec.specId;
         	  window.selectedSpecName = spec.specName;
-        	  window.selectedSpecType = spec.specType;
-        	  window.selectedSpecExplain = spec.specExplain;
-        	  window.selectedSpecState = spec.specState;
+
         	};
         specList.appendChild(btn);
       });
     });
   }
 	
+	
 	// 오른쪽 저장한 일정 부분 함수들
-	function addToActivityList(items) {
+	function addToScheduleList(items) {
 	    const actList = document.getElementById("savedScheduleList");
 	    items.forEach(item => {
 	      const card = document.createElement("div");
@@ -120,38 +119,30 @@ document.addEventListener("DOMContentLoaded", function() {
 	  }
 	
 	document.querySelector(".add-btn").addEventListener("click", function() {
+		if(!isSelectionComplete()){
+	    	  alert("먼저 목표 직무와 스펙을 선택하세요.");
+	    	  return;
+	     }
 		  const dateInput = document.getElementById("manualDate").value.trim();
 		  const commentInput = document.getElementById("manualComment").value.trim();
 		 
 		    if (dateInput && commentInput) {
-		    	const formData = new URLSearchParams();
-		    	formData.append("jobId", window.selectedJobId);
-		    	formData.append("ssType", commentInput);  
-		    	formData.append("ssDate", dateInput);
-		    	formData.append("actContent", ""); 
-		    	formData.append("specName", window.selectedSpecName);
-		    	formData.append("specType", window.selectedSpecType);
-		    	formData.append("specExplain", window.selectedSpecExplain);
-		    	formData.append("specState", window.selectedSpecState);
 
-		    	
-
-		    	fetch("insertSpec.do", {
+		    	fetch("insertSpecSchedule.do", {
 		    	  method: "POST",
 		    	  headers: {
 		    	    "Content-Type": "application/x-www-form-urlencoded"
 		    	  },
-		    	  body: formData.toString()
+		    	  body: new URLSearchParams({
+		    		  specId : window.selectedSpecId,
+		    		  ssType : commentInput,
+		    		  ssDate : dateInput
+		    	  }).toString()
 		    	})
-		    	.then(res => {
-		            if (!res.ok) throw new Error("일정 저장 실패!");
-		            // ✔️ 저장 완료되면 getLatestSsId.do로 ssId 추정
-		            return fetch("getLatestSsId.do");
-		        })
-		        .then(res => res.text())
-		        .then(ssId => {
-		            const combinedText = dateInput + " / " + commentInput;
-		            addToActivityList([{ text: combinedText, ssId }]);
+		        .then(res => res.json())
+		        .then(data => {
+		        	const combined = dateInput + " / " + commentInput;
+		            addToScheduleList([{ text: combined, ssId: data.ssId }]);
 
 		            // 입력창 초기화
 		            document.getElementById("manualDate").value = "";
@@ -162,6 +153,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		        alert("날짜와 코멘트를 모두 입력해 주세요!");
 		    }
 		});
+	
+
 	
 	// 저장한 일정쪽 함수 끝
 	
@@ -682,32 +675,33 @@ a {
  margin-top: 10px;
 }
 /* 추가 - 선택 버튼 css */
-.confirm-select-box .confirm-select-btn{
-	border: 1.5px solid #BAAC80;
-	border-radius: 22px;
+.confirm-select-box .confirm-select-btn {
+	border: 1.5px solid #eeeeee;
+	border-radius: 10px;
 	font-size: 15px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-top : 3px;
-	font-weight : bold;
+	margin-top: 3px;
+	font-weight: bold;
 	text-align: center;
-	color: #BAAC80;
+	color: #eeeeee;
 	background: none;
+	margin-right: 20px;
 }
-.confirm-select-box .confirm-select-btn:hover{
-	background: #BAAC80;
-	border: 1.5px solid #BAAC80;
-	color: #1e1e1e;
-	border-radius: 22px;
+
+.confirm-select-box .confirm-select-btn:hover {
+	border-radius: 10px;
 	font-size: 15px;
-	font-weight: 500;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	opacity: 0.5;
-	color: black;
-	
+	margin-top: 3px;
+	font-weight: bold;
+	text-align: center;
+	color: #383838;
+	background: #eeeeee;
+	opacity: 0.3;
 }
 </style>
 </head>
