@@ -24,9 +24,9 @@ import com.project.irumi.chatbot.manager.SsChatManager;
 import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.dto.SessionTopicOpts;
+import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.Spec;
-import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.SpecSchedule;
 import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
@@ -51,7 +51,6 @@ public class ChatbotController {
 
 	@Autowired
 	private DashboardService dashboardService;
-	
 
 	@Autowired
 	private JobChatManager jobManager;
@@ -87,102 +86,108 @@ public class ChatbotController {
 	// 세션매니저 관리 시작 (tab 유형에 따라 현재 로그인한 유저가 진행중인 session 정보)
 	@RequestMapping(value = "startChatSession.do", method = RequestMethod.POST)
 	@ResponseBody
-	public SessionTopicOpts startChatSession(
-			@RequestParam("topic") String topic, 
-			HttpSession loginSession) {
-		
+	public SessionTopicOpts startChatSession(@RequestParam("topic") String topic, HttpSession loginSession) {
+
 		// 로그인 세션에서 현 유저 받아옴.
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
-		//챗봇 세션 생성
+		// 챗봇 세션 생성
 		ConvSession session = convManager.createNewSession(userId, topic);
-		
+
 		SessionTopicOpts sessionTopicOpts = new SessionTopicOpts();
-		
+
 		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
 		ArrayList<Spec> userSpecs;
 		ArrayList<SpecSchedule> userSchedules;
 		ArrayList<Activity> userActs;
-		
-		// CareerItemDto 리스트로 변환하여 저장
-	    List<CareerItemDto> jobCItemList = new ArrayList<>();
-	    List<CareerItemDto> specCItemList = new ArrayList<>();
-	    List<CareerItemDto> scheduleCItemList = new ArrayList<>();
-	    List<CareerItemDto> activityCItemList = new ArrayList<>();
-	    
-		switch (topic) {
-			case "job":
-				break;
-			case "spec":
-				 userJobs= dashboardService.selectUserJobs(userId);
-				 for (Job job : userJobs) {
-		                CareerItemDto dto = new CareerItemDto();
-		                dto.setItemId(job.getJobId());
-		                dto.setTitle(job.getJobName());
-		                dto.setExplain(job.getJobExplain());
-		                dto.setType("job");
-		                jobCItemList.add(dto);
-		            }
-		            sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
-				break;
-				
-			case "ss":
-				//job setting
-				userJobs = dashboardService.selectUserJobs(userId);
-				userSpecs = dashboardService.selectCurrUserSpec(userId);
-				 for (Job job : userJobs) {
-		                CareerItemDto dto = new CareerItemDto();
-		                dto.setItemId(job.getJobId());
-		                dto.setTitle(job.getJobName());
-		                dto.setExplain(job.getJobExplain());
-		                dto.setType("job");
-		                jobCItemList.add(dto);
-				 }
-		        // spec setting
-		        for (Spec spec : userSpecs) {
-		        	CareerItemDto dto = new CareerItemDto();
-		        	dto.setItemId(spec.getSpecId());
-		        	dto.setTitle(spec.getSpecName());
-		        	dto.setExplain(spec.getSpecExplain());
-		        	dto.setType("spec");
-		        	specCItemList.add(dto);
-		        }
-		        sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
-		        
-		        
-		           
-				// 유저 직무 선택에 따라 sub 주제 세팅
-				//userSpecs = dashboardService.selectUserSpecs(...);
-				break;
 
-			case "act":
-				//job setting
-				userJobs = dashboardService.selectUserJobs(userId);
-				userSpecs = dashboardService.selectCurrUserSpec(userId);
-				for (Job job : userJobs) {
-					CareerItemDto dto = new CareerItemDto();
-					dto.setItemId(job.getJobId());
-					dto.setTitle(job.getJobName());
-					dto.setExplain(job.getJobExplain());
-					dto.setType("job");
-					jobCItemList.add(dto);
-				}
-				// spec setting
-				for (Spec spec : userSpecs) {
-					CareerItemDto dto = new CareerItemDto();
-					dto.setItemId(spec.getSpecId());
-					dto.setTitle(spec.getSpecName());
-					dto.setExplain(spec.getSpecExplain());
-					dto.setType("spec");
-					specCItemList.add(dto);
-				}
-				sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
-				// 유저 직무 선택에 따라 sub 주제 세팅
-				//userSpecs = dashboardService.selectUserSpecs(...);
-				break;
-			default:
-					break;
+		// CareerItemDto 리스트로 변환하여 저장
+		List<CareerItemDto> jobCItemList = new ArrayList<>();
+		List<CareerItemDto> specCItemList = new ArrayList<>();
+		List<CareerItemDto> scheduleCItemList = new ArrayList<>();
+		List<CareerItemDto> activityCItemList = new ArrayList<>();
+
+		switch (topic) {
+		case "job":
+			userJobs = dashboardService.selectUserJobs(userId);
+			for (Job job : userJobs) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(job.getJobId());
+				dto.setTitle(job.getJobName());
+				dto.setExplain(job.getJobExplain());
+				dto.setType("job");
+				jobCItemList.add(dto);
+			}
+			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+			break;
+		case "spec":
+			userJobs = dashboardService.selectUserJobs(userId);
+			for (Job job : userJobs) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(job.getJobId());
+				dto.setTitle(job.getJobName());
+				dto.setExplain(job.getJobExplain());
+				dto.setType("job");
+				jobCItemList.add(dto);
+			}
+			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+			break;
+
+		case "ss":
+			// job setting
+			userJobs = dashboardService.selectUserJobs(userId);
+			userSpecs = dashboardService.selectCurrUserSpec(userId);
+			for (Job job : userJobs) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(job.getJobId());
+				dto.setTitle(job.getJobName());
+				dto.setExplain(job.getJobExplain());
+				dto.setType("job");
+				jobCItemList.add(dto);
+			}
+			// spec setting
+			for (Spec spec : userSpecs) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(spec.getSpecId());
+				dto.setTitle(spec.getSpecName());
+				dto.setExplain(spec.getSpecExplain());
+				dto.setType("spec");
+				specCItemList.add(dto);
+			}
+			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+
+			// 유저 직무 선택에 따라 sub 주제 세팅
+			// userSpecs = dashboardService.selectUserSpecs(...);
+			break;
+
+		case "act":
+			// job setting
+			userJobs = dashboardService.selectUserJobs(userId);
+			userSpecs = dashboardService.selectCurrUserSpec(userId);
+			for (Job job : userJobs) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(job.getJobId());
+				dto.setTitle(job.getJobName());
+				dto.setExplain(job.getJobExplain());
+				dto.setType("job");
+				jobCItemList.add(dto);
+			}
+			// spec setting
+			for (Spec spec : userSpecs) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(spec.getSpecId());
+				dto.setTitle(spec.getSpecName());
+				dto.setExplain(spec.getSpecExplain());
+				dto.setType("spec");
+				specCItemList.add(dto);
+			}
+			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
+			// 유저 직무 선택에 따라 sub 주제 세팅
+			// userSpecs = dashboardService.selectUserSpecs(...);
+			break;
+		default:
+			break;
 		}
 		//
 		return sessionTopicOpts;
@@ -190,20 +195,16 @@ public class ChatbotController {
 
 	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
-	@RequestMapping(
-			value = "setConvSubJobTopic.do", 
-			method = RequestMethod.POST)
+	@RequestMapping(value = "setConvSubJobTopic.do", method = RequestMethod.POST)
 	@ResponseBody
-	public void setConvSubJobTopic(
-			@RequestBody CareerItemDto selectedItem, 
-			HttpSession loginSession) {
+	public void setConvSubJobTopic(@RequestBody CareerItemDto selectedItem, HttpSession loginSession) {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
 		ConvSession session = convManager.getSession(userId);
 
 		// 세션 sub 주제 설정
-		switch(session.getTopic()) {
+		switch (session.getTopic()) {
 		case "job":
 			break;
 		case "spec":
@@ -216,48 +217,41 @@ public class ChatbotController {
 			convManager.setConvSubJobTopic(session, selectedItem);
 			break;
 		}
-		
-		
-		logger.info("지정된 subtopic[JOB]: "+ selectedItem.getTitle());
+
+		logger.info("지정된 subtopic[JOB]: " + selectedItem.getTitle());
 	}
-	
+
 	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
-		// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
-		@RequestMapping(
-				value = "setConvSubSpecTopic.do", 
-				method = RequestMethod.POST)
-		@ResponseBody
-		public void setConvSubSpecTopic(
-				@RequestBody CareerItemDto selectedItem, 
-				HttpSession loginSession) {
-			User loginUser = (User) loginSession.getAttribute("loginUser");
-			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
+	@RequestMapping(value = "setConvSubSpecTopic.do", method = RequestMethod.POST)
+	@ResponseBody
+	public void setConvSubSpecTopic(@RequestBody CareerItemDto selectedItem, HttpSession loginSession) {
+		User loginUser = (User) loginSession.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
-			ConvSession session = convManager.getSession(userId);
+		ConvSession session = convManager.getSession(userId);
 
-			// 세션 sub 주제 설정
-			switch(session.getTopic()) {
-			case "job":
-				break;
-			case "spec":
-				break;
-			case "ss":
-				convManager.setConvSubSpecTopic(session, selectedItem);
-				break;
-			case "act":
-				convManager.setConvSubSpecTopic(session, selectedItem);
-				break;
-			}
-			
-			logger.info("지정된 sub topic[SPEC]: "+ selectedItem.getTitle());
+		// 세션 sub 주제 설정
+		switch (session.getTopic()) {
+		case "job":
+			break;
+		case "spec":
+			break;
+		case "ss":
+			convManager.setConvSubSpecTopic(session, selectedItem);
+			break;
+		case "act":
+			convManager.setConvSubSpecTopic(session, selectedItem);
+			break;
 		}
 
+		logger.info("지정된 sub topic[SPEC]: " + selectedItem.getTitle());
+	}
 
 	// 유저가 대화 중 챗봇이 준 옵션 중 선택 후 제출한 경우 // 세션 정보에 따라 매니저 서비스 호출 -> 서비스에서 응답을 화면에
 	// append
 	// 유저가 챗봇이 준 옵션 중 선택 후 제출한 경우 ===========================
 
-	
 	// 메소드 추가 =====================================================
 	// 사용자가 직접 직무/ 스펙/ 일정/ 활동 입력하고 추가 버튼 누르는 경우
 	// 1. Dashboard Service(?) 사용해 사용자 career plan에 저장
@@ -266,13 +260,13 @@ public class ChatbotController {
 	@RequestMapping(value = "insertCareerItem.do", method = RequestMethod.POST)
 	@ResponseBody
 	public CareerItemDto insertCareerItem(
-			// @RequestParam("itemId") String itemId,
 			@RequestBody CareerItemDto insertedItem, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
 		ConvSession convSession = convManager.getSession(userId);
 		String topic = convSession.getTopic();
+		
 
 		switch (topic) {
 		case "job":
@@ -283,6 +277,7 @@ public class ChatbotController {
 			job.setJobId(String.valueOf(jobId));
 			job.setJobName(insertedItem.getTitle());
 			job.setJobExplain(insertedItem.getExplain());
+			insertedItem.setItemId(String.valueOf(jobId)); // ← 이게 빠졌어요
 
 			// job table에 추가
 			dashboardService.insertJob(job);
@@ -292,7 +287,7 @@ public class ChatbotController {
 			specific.setUserId(userId);
 			specific.setJobId(String.valueOf(jobId));
 			dashboardService.insertJobLink(specific);
-			
+
 			break;
 
 		case "spec": // 스펙 추천 챗봇에서 선택한 스펙을 저장하기.
@@ -300,23 +295,24 @@ public class ChatbotController {
 			Spec spec = new Spec();
 			String specId = String.valueOf(dashboardService.selectNextSpecId());
 			spec.setSpecId(specId);
+			insertedItem.setItemId(String.valueOf(specId)); // ← 이게 빠졌어요
 			spec.setSpecName(insertedItem.getTitle());
 			spec.setSpecExplain(insertedItem.getExplain());
 			spec.setSpecType(insertedItem.getType());
-			
+
 			// 스펙 tb에 저장
 			dashboardService.insertSpec(spec);
-			
+
 			// career plan 테이블에 추가
-						// 부모 job id에 대한 specific에 넣어야 함.
-						// 이미 부모 job에 spec이 있을 경우 새로운 specific 생성
+			// 부모 job id에 대한 specific에 넣어야 함.
+			// 이미 부모 job에 spec이 있을 경우 새로운 specific 생성
 			Specific specific1 = new Specific();
 			specific1.setUserId(userId);
 			specific1.setJobId(convSession.getSubJobTopicId());
 			specific1.setSpecId(specId);
-			
-			dashboardService.insertSpecLink(specific1);//);
-					
+
+			dashboardService.insertSpecLink(specific1);// );
+
 //	            
 
 			break;
@@ -329,7 +325,7 @@ public class ChatbotController {
 			act.setActState(insertedItem.getState());
 
 			dashboardService.insertAct(act);
-			
+
 			Specific specific2 = new Specific();
 			specific2.setUserId(userId);
 			specific2.setJobId(convSession.getSubJobTopicId());
@@ -346,7 +342,7 @@ public class ChatbotController {
 			ss.setSpecId(insertedItem.getItemId());
 			ss.setSsType(insertedItem.getExplain());
 			ss.setSsDate(insertedItem.getSchedule());
-			
+
 			dashboardService.insertSs(ss);
 			break;
 
@@ -402,6 +398,9 @@ public class ChatbotController {
 
 	// 메소드 추가
 	// Dashboard Service에서 delete job 등 생긴 후 마저 구현
+
+	@RequestMapping(value = "deleteSavedOption.do", method = RequestMethod.POST)
+	@ResponseBody
 	public void deleteSavedOption(@RequestBody CareerItemDto itemToDelete, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -414,9 +413,10 @@ public class ChatbotController {
 		case "job":
 			// itemToDelete의 id에 해당하는 job 삭제
 			// Job table에서 삭제 (--> DB 상에서 career plan에서 자동 삭제)
-			
+			dashboardService.deleteJob(itemToDelete.getItemId());
 			break;
 		case "spec":
+			dashboardService.deleteSpec(itemToDelete.getItemId());
 			break;
 		case "ss":
 			break;
@@ -425,9 +425,8 @@ public class ChatbotController {
 		}
 
 	}
-	
-	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
 
+	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
 	@ResponseBody
 	public ChatbotResponseDto submitChatbotOption(
 
@@ -460,5 +459,30 @@ public class ChatbotController {
 		return responseDto;
 	}
 
+	// SPEC CHAT에서 SUBTOPIC JOB 에 따른 저장해둔 스펙 불러와 사이드바에 넣기 위함
+	@RequestMapping(value = "getSpecsByJob.do", method = RequestMethod.POST)
+	@ResponseBody
+	public List<CareerItemDto> getSpecsByJob(@RequestBody CareerItemDto targetJobCI, HttpSession loginSession) {
 
+		// 로그인 세션에서 현 유저 받아옴.
+		User loginUser = (User) loginSession.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+
+		Specific specific = new Specific();
+		specific.setUserId(userId);
+		specific.setJobId(targetJobCI.getItemId());
+
+		List<Spec> specList = dashboardService.selectUserSpecs(specific);
+		List<CareerItemDto> specCIList = new ArrayList<>();
+		for (Spec spec : specList) {
+			CareerItemDto dto = new CareerItemDto();
+			dto.setItemId(spec.getSpecId()); // 또는 적절한 ID 매핑
+			dto.setTitle(spec.getSpecName());
+			dto.setExplain(spec.getSpecExplain());
+			dto.setType("spec"); // 타입도 지정
+
+			specCIList.add(dto);
+		}
+		return specCIList;
+	}
 }

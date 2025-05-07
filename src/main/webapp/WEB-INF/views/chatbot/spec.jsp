@@ -707,8 +707,6 @@ $(function() {
 	//subTopicJobCI을 보내면 됨.
 	const $confirmSelectBtn = $(".confirm-select-btn");
 	$confirmSelectBtn.on("click", function(){
-		
-
 	    // 선택된 항목이 있으면 서버에 전송
 	    if (subTopicJobCI && subTopicJobCI.title) {
 	        $.ajax({
@@ -718,6 +716,20 @@ $(function() {
 	            contentType: "application/json",
 	            success: function () {
 	                console.log("sub topic 설정 완료:", subTopicJobCI.title);
+	                // 해당 subtopic에 해당하는 spec들 불러오기
+	                $.ajax({
+	                    type: "POST",
+	                    url: "getSpecsByJob.do",
+	                    data: JSON.stringify(subTopicJobCI),
+	                    contentType: "application/json",  // 꼭 필요함!
+	                    success: function (specList) {
+	                        addToSpecList(specList);      // 사이드바에 렌더링
+	                    },
+	                    error: function () {
+	                        alert("스펙 목록 불러오기 실패");
+	                    }
+	                });
+	                
 	            },
 	            error: function () {
 	                alert("서브 토픽 설정에 실패했습니다.");
@@ -765,11 +777,26 @@ $(function() {
 
     //sidebar
     function addToSpecList(specs) {
+    	console.log;
         const $specList = $(".saved-spec-list");
         $.each(specs, function(_, specCI) {
             const $card = $("<div>").addClass("citem-card");
             const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
-                $card.remove();
+                // 카드 모양 삭제
+            	$card.remove(); 
+                // db에서 삭제
+                $.ajax({
+    	            type: "POST",
+    	            url: "deleteSavedOption.do",
+    	            contentType: "application/json",
+    	            data: JSON.stringify(specCI),  // jobCI는 현재 카드에 해당하는 CareerItemDto 객체
+    	            success: function () {
+    	              console.log("DB에서 항목 삭제 성공:", specCI.title);
+    	            },
+    	            error: function () {
+    	              console.error("DB에서 항목 삭제 실패:", specCI.title);
+    	            }
+    	          });
             });
             const $span = $("<span>").text(specCI.title);
             $card.append($removeBtn).append($span);
@@ -1050,11 +1077,11 @@ $(function() {
 					 <input type="text" placeholder="스펙 설명 (선택)" class="manual-input-explain" />
 					<div class="specTypeChoice">
 					<!--  List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타")); -->
-						<button class="specType">자격증 </button>
-						<button class="specType">어학</button>
-						<button class="specType">인턴십</button>
-						<button class="specType">대회/ 공모전</button>
-						<button class="specType">자기계발</button>
+						<button class="specType">어학 능력</button>
+						<button class="specType">자격증</button>
+						<button class="specType">인턴십 및 현장실습</button>
+						<button class="specType">대외 활동</button>
+						<button class="specType">연구 활동</button>
 						<button class="specType">기타</button>
 						<button class="add-btn">+</button>
 					</div>

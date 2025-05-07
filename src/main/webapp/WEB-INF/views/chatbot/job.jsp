@@ -7,7 +7,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>chatbot 직무 찾기</title>
@@ -28,7 +29,22 @@ function moveJobPage() {
 </script>
 <!--  메세지 전송 이벤트용 스크립트 -->
 <script>
+let savedJobs=null;
 $(function() {
+	// 유저가 이미 저장해둔 직무 가져오기
+	$.ajax({ 
+        type: "POST",
+        url: "startChatSession.do",
+        data: { topic: "job" }, // 필요 시 동적으로 변경
+        success: function (sessionTopicOpts) {
+        	// 유저가 저장한 직무들 전체 프론트에 가지고 있기 위함
+        	console.log(sessionTopicOpts);
+        	savedJobs = sessionTopicOpts.jobList; 
+        	addToJobList(savedJobs);
+        }
+    });
+	
+	
 		// ➤ 사용자 입력 메시지 서버로 전송 함수
 	  function sendMessage(message) {
 	    addMessageToChat(message, "user-msg"); // 사용자 메시지 표시
@@ -73,7 +89,7 @@ $(function() {
 	        // Dashboard Service 구현 후
 	        $.ajax({
 	            type: "POST",
-	            url: "/irumi/deleteSavedOption.do",
+	            url: "deleteSavedOption.do",
 	            contentType: "application/json",
 	            data: JSON.stringify(jobCI),  // jobCI는 현재 카드에 해당하는 CareerItemDto 객체
 	            success: function () {
@@ -195,28 +211,38 @@ $(function() {
 	  });
 	  // ➤ 사이드바에서 수동 입력으로 직무 추가
 	  $(".add-btn").on("click", function() {
-	    const $input = $(".manual-input");
-	    const val = $input.val().trim();
-	    if (val) {
-	    	const jobCI={title:val};
-		      addToJobList([jobCI]);
+		  	// 입력된 직무명
+			const $input = $(".manual-input");
+			const val = $input.val().trim();
+			
+			//입력된 직무 설명
+	        const $explainInput = $(".manual-input-explain"); // 설명 입력 필드
+	        const explainVal = $explainInput.val().trim(); // 설명 값
+	        
+	        // 직무명만 있어도 추가 가능
+		    if (val) {
+		    		const jobCI={title:val, explain:explainVal};
 	     
-	      // DB에 저장    ----------- 변경사항
-	      $.ajax({
-	        type: "POST",
-	        url: "insertJob.do",
-	        data: { jobName: val },
-	        success: function() {
-	          console.log("직무 추가 성공");
-	        },
-	        error: function() {
-	          alert("직무 추가 실패!");
-	        }
-	      });
-	     
-	      $input.val("");
-	    } else {
-	      alert("직무를 입력해 주세요!");
+			      // DB에 저장    ----------- 변경사항
+			      $.ajax({
+			        type: "POST",
+			        url: "insertCareerItem.do",
+			        data: JSON.stringify(jobCI),
+			        contentType: "application/json",
+			        success: function(returnedJobCI) {
+			          console.log("직무 추가 성공");
+			          addToJobList([returnedJobCI]); // 이 시점에만 호출하면 OK
+			        },
+			        error: function() {
+			          alert("직무 추가 실패!");
+			        }
+			      });
+			      $input.val("");
+			      $explainInput.val(""); // 설명 입력 초기화
+	      
+	    } 
+		    else {
+	      alert("직무명은 필수 입력입니다.");
 	    }
 	  });
 	 
@@ -254,14 +280,17 @@ body {
 	padding: 0;
 	min-height: 70vh;
 }
+
 .container {
 	display: flex;
 	min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
 	margin-top: 20px; /* header 높이만큼 아래로 */
 }
+
 .sidebar, .right-panel {
 	height: auto; /* 높이 자동 (100vh 등 절대값 X) */
 }
+
 .sidebar {
 	width: 200px;
 	background-color: #141414;
@@ -270,6 +299,7 @@ body {
 	flex-direction: column;
 	gap: 20px;
 }
+
 .sidebar button {
 	background-color: #222;
 	border: none;
@@ -282,14 +312,17 @@ body {
 	text-align: center;
 	font-weight: bold;
 }
+
 .sidebar button:hover {
 	background-color: #BAAC80;
 	color: black;
 }
+
 .sidebar button.active {
- background-color: #BAAC80;
- color: black;
+	background-color: #BAAC80;
+	color: black;
 }
+
 .main {
 	flex: 1;
 	padding-right: 40px;
@@ -297,6 +330,7 @@ body {
 	display: flex;
 	flex-direction: column;
 }
+
 .content-box {
 	background-color: #1e1e1e;
 	padding-right: 20px;
@@ -310,18 +344,22 @@ body {
 	display: flex;
 	flex-direction: column;
 }
+
 .content-box::-webkit-scrollbar {
 	width: 9px;
 	background: #222;
 }
+
 .content-box::-webkit-scrollbar-thumb {
 	background: #BAAC80;
 	border-radius: 6px;
 }
+
 .content-box {
 	scrollbar-color: #BAAC80 #222;
 	scrollbar-width: thin;
 }
+
 .right-panel {
 	width: 230px;
 	padding-right: 20px;
@@ -330,19 +368,23 @@ body {
 	flex-direction: column;
 	gap: 30px;
 }
+
 .right-panel .spec-value {
 	color: #fff;
 	font-size: 9px;
 	margin-left: 4px;
 }
+
 .right-panel .citem-value {
 	color: #fff;
 	font-size: 9px;
 	margin-left: 4px;
 }
+
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
+
 .chat-input-box {
 	display: flex;
 	align-items: center;
@@ -352,6 +394,7 @@ body {
 	margin-top: 40px;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
+
 .chat-input-box .chat-input {
 	flex: 1;
 	background: transparent;
@@ -361,6 +404,7 @@ body {
 	padding: 8px;
 	outline: none;
 }
+
 .chat-input-box .chat-send-btn {
 	width: 36px;
 	height: 36px;
@@ -376,9 +420,11 @@ body {
 	cursor: pointer;
 	transition: background 0.2s;
 }
+
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
+
 .manual-input-box {
 	display: flex;
 	align-items: center;
@@ -387,8 +433,20 @@ body {
 	padding: 6px 10px;
 	margin-top: 12px;
 	gap: 6px;
+	flex-direction: column;
 }
+
 .manual-input-box .manual-input {
+	flex: 1;
+	background: transparent;
+	border: solid white 1px;
+	color: #facc15;
+	font-size: 14px;
+	padding: 8px 4px;
+	outline: none;
+}
+
+.manual-input-box .manual-input-explain {
 	flex: 1;
 	background: transparent;
 	border: none;
@@ -397,6 +455,7 @@ body {
 	padding: 8px 4px;
 	outline: none;
 }
+
 .manual-input-box .add-btn {
 	background: #232323;
 	border: 1px solid #BAAC80;
@@ -411,16 +470,19 @@ body {
 	font-size: 18px;
 	margin-left: 4px;
 }
+
 .manual-input-box .add-btn:hover {
 	background: #BAAC80;
 	color: #232323;
 }
+
 .content-box .custom-checkbox-list {
 	margin: 24px 0 0 0;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 }
+
 .content-box .custom-checkbox {
 	display: flex;
 	align-items: center;
@@ -437,17 +499,17 @@ body {
 	min-width: 210px;
 	max-width: 340px;
 }
+
 .content-box .custom-checkbox input[type="checkbox"] {
 	display: none;
 }
 
-
 .content-box .custom-checkbox .checkbox-title {
-
 	color: #fff;
 	font-size: 15px;
 	letter-spacing: 0.5px;
 }
+
 .content-box .custom-checkbox .checkmark {
 	display: none;
 	font-size: 18px;
@@ -459,33 +521,40 @@ body {
 	.checkmark {
 	display: block;
 }
+
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkbox-title {
 	color: #BAAC80;
 	font-weight: 600;
 }
+
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkmark {
 	color: #BAAC80;
 }
+
 .content-box .custom-checkbox:hover {
 	background: #222;
 }
+
 .saved-citem-section {
 	margin-bottom: 20px;
 }
+
 .section-title {
 	color: #BAAC80;
 	font-weight: bold;
 	font-size: 15px;
 	margin: 24px 0 10px 0;
 }
+
 .saved-citem-list {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	margin-bottom: 14px;
 }
+
 .citem-card {
 	background: #232323;
 	border: 1.5px solid #444;
@@ -498,6 +567,7 @@ body {
 	color: #fff;
 	position: relative;
 }
+
 .remove-btn {
 	background: none;
 	border: none;
@@ -507,9 +577,11 @@ body {
 	cursor: pointer;
 	transition: color 0.2s;
 }
+
 .remove-btn:hover {
 	color: #f87171;
 }
+
 .add-citem-btn {
 	margin-top: 10px;
 	width: 100%;
@@ -527,26 +599,31 @@ body {
 	gap: 8px;
 	transition: background 0.2s, color 0.2s;
 }
+
 .add-citem-btn span {
 	font-size: 18px;
 	font-weight: bold;
 }
+
 .add-citem-btn:hover {
 	background: #BAAC80;
 	color: #232323;
 }
+
 .select-group {
 	display: flex;
 	flex-direction: column; /* 세로 정렬 */
 	align-items: flex-start; /* 좌측 정렬 */
 	gap: 8px;
 }
+
 .select-label {
 	color: #d9d9d9;
 	font-size: 15px;
 	font-weight: 600;
 	margin-bottom: 2px; /* 라벨 아래 약간 여백 */
 }
+
 .select-btn {
 	background: none;
 	border: 1.5px solid #BAAC80;
@@ -560,6 +637,7 @@ body {
 	transition: background 0.18s, color 0.18s, border 0.18s;
 	margin-bottom: 4px; /* 버튼들끼리 간격 */
 }
+
 .select-btn-list {
 	display: flex;
 	flex-direction: row;
@@ -577,6 +655,7 @@ body {
 	flex-direction: column;
 	gap: 8px;
 }
+
 #userInput {
 	flex: 1;
 	background-color: #333;
@@ -588,6 +667,7 @@ body {
 	font-size: 15px;
 	outline: none;
 }
+
 .message {
 	max-width: 70%;
 	padding: 10px 15px;
@@ -596,6 +676,7 @@ body {
 	font-size: 0.95em;
 	word-wrap: break-word;
 }
+
 .user-msg {
 	background-color: #BAAC80;
 	color: black;
@@ -603,6 +684,7 @@ body {
 	text-align: right;
 	font-weight: bold;
 }
+
 .bot-msg {
 	align-self: flex-start;
 	text-align: left;
@@ -651,8 +733,8 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 		<div class="main">
 			<!-- 콘텐츠 영역 -->
 			<div class="content-box">
-				
- 
+
+
 				<div class="chat-area" id="chatArea">
 					<div class="message bot-msg">
 						내게 맞는 직무 찾기 세션입니다.<br> 먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점,
@@ -687,6 +769,9 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 				</div>
 				<div class="manual-input-box">
 					<input type="text" placeholder="직접 직무 입력" class="manual-input" />
+
+					<input type="text" placeholder="직무 설명 (선택)"
+						class="manual-input-explain" />
 					<button class="add-btn">+</button>
 				</div>
 			</div>
