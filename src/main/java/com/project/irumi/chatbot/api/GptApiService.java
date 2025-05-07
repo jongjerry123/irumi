@@ -26,7 +26,7 @@ public class GptApiService {
         headers.setBearerAuth(openaiApiKey);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("model", "gpt-3.5-turbo"); 
+        body.put("model", "gpt-4o"); 
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(Map.of("role", "user", "content", prompt));
         body.put("messages", messages);
