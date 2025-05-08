@@ -227,7 +227,7 @@ public class JobChatManager {
 				입력 문장이 사람의 특성(예: 성격, 강점, 가치관 등)과 관련된 설명이면 '예', 아니면 '아니오'라고만 답하세요.
 				설명 없이 반드시 '예' 또는 '아니오'로만 대답하세요.
 
-				입력: "%s"
+				입력: 나의 특성 -  "%s"
 				""".formatted(input);
 
 		String reply = gptApiService.callGPT(prompt);
@@ -236,8 +236,9 @@ public class JobChatManager {
 
 	private boolean isHopeJobRelatedInput(String input) {
 		String prompt = """
-				입력 문장이 희망 직무의 특성(예: 연봉, 문화, 업무 방식 등)에 대한 설명인지 확인하고,
+				입력 문장이 직무의 특성(예: 연봉, 문화, 업무 방식 등)에 대한 것인지 판단하여,
 				오직 '예' 또는 '아니오'로만 대답하세요.
+				사용자가 없다고 대답하거나 모른다고 대답하면 '예'라고 대답하세요.
 
 				입력: "%s"
 				""".formatted(input);
@@ -248,7 +249,10 @@ public class JobChatManager {
 
 	private boolean isHopeIndustryRelatedInput(String input) {
 		String prompt = """
-				입력 문장이 희망 업계(예: IT, 부동산, 연예계 등)에 관한 내용이면 '예', 관련이 없으면 '아니오'라고만 대답하세요.
+				입력 문장이 업계의 유형(예: IT, 부동산, 연예계 등)에 관한 내용인지 판단하여,
+				오직 '예'또는 '아니오'로만 대답하세요.
+				관련이 있으면 '예', 관련이 없으면 '아니오'라고만 대답하세요.
+				사용자가 없다고 대답하거나 모른다고 대답하면 '예'라고 대답하세요.
 
 				입력: "%s"
 				""".formatted(input);
