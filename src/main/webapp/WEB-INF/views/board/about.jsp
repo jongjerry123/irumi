@@ -50,7 +50,7 @@
       color: #BAAC80;
       overflow: hidden;
       white-space: nowrap;
-      animation: typing 4s steps(40, end) forwards;
+      animation: typing 1s steps(40, end) forwards;
     }
 
     @keyframes typing {

@@ -19,6 +19,14 @@ public class PostDTO {
 
     // ✨ 추가된 가상 필드 (DB와 무관) 
     private boolean hasAnswer;
+    
+    private String firstImageUrl; // Quill 본문 중 첫 이미지 src
+    public String getFirstImageUrl() {
+        return firstImageUrl;
+    }
+    public void setFirstImageUrl(String firstImageUrl) {
+        this.firstImageUrl = firstImageUrl;
+    }
 
     public PostDTO() {}
 

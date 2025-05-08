@@ -227,13 +227,20 @@ public class PostService {
 	public void registerBadUsersFromPosts(List<Long> postIds, String reason, String reportedBy) {
 		for (Long postId : postIds) {
 			String userId = postDAO.findWriterByPostId(postId);
+			
+			int authority = postDAO.getUserAuthority(userId);
+	        if (authority == 2) {
+	            throw new IllegalStateException("관리자 계정은 불량 등록할 수 없습니다: " + userId);
+	        }
 			if (postDAO.isUserAlreadyBad(userId)) {
 				throw new IllegalStateException("이미 등록되어 있는 사용자입니다.");
 			}
 
 			boolean alreadyReported = postDAO.countPostReport(reportedBy, postId) > 0;
 			if (!alreadyReported) {
-				postDAO.insertPostReport(postId, reason, reportedBy);
+			    postDAO.insertPostReport(postId, reason, reportedBy);
+			} else {
+			    postDAO.updatePostReportReason(postId, reportedBy, reason);
 			}
 
 			postDAO.updateUserAuthorityByPostId(postId);
@@ -256,16 +263,25 @@ public class PostService {
 
 			// 1. 댓글 작성자 ID 조회
 			String userId = postDAO.findCommentWriterByCommentId(commentId);
+			
+			 // 2. 관리자 계정은 등록 불가
+	        int authority = postDAO.getUserAuthority(userId);
+	        if (authority == 2) {
+	            throw new IllegalStateException("관리자 계정은 불량 등록할 수 없습니다: " + userId);
+	        }
 
-			// 2. 이미 불량 등록된 사용자면 예외 발생
+			// 3. 이미 불량 등록된 사용자면 예외 발생
 			if (postDAO.isUserAlreadyBad(userId)) {
 				throw new IllegalStateException("이미 등록되어 있는 사용자입니다.");
 			}
 
-			// 3. 중복 신고 insert 방지
+			// 4. 중복 신고 insert 방지
 			boolean alreadyReported = postDAO.countCommentReport(reportedBy, commentId) > 0;
+
 			if (!alreadyReported) {
-				postDAO.insertCommentReport(commentId, reason, reportedBy);
+			    postDAO.insertCommentReport(commentId, reason, reportedBy);
+			} else {
+			    postDAO.updateCommentReportReason(commentId, reportedBy, reason);
 			}
 
 			// 4. 사용자 불량 권한 설정
@@ -286,5 +302,10 @@ public class PostService {
 	// 불량 이용자 카운트
 	public int countBadUsers() {
 		return postDAO.countBadUsers();
+	}
+	
+	// 사용자 권한 조회
+	public int getUserAuthority(String userId) {
+	    return postDAO.getUserAuthority(userId);
 	}
 }

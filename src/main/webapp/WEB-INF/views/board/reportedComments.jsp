@@ -12,7 +12,7 @@
 body {
 	margin: 0;
 	font-family: 'Noto Sans KR', sans-serif;
-	background-color: #111;
+	background-color: #000 !important;
 	color: #fff;
 }
 
@@ -107,11 +107,11 @@ th, td {
 }
 
 th {
-	background-color: #000;
+	background-color: #A983A3;
 }
 
 td {
-	background-color: #1a1a1a;
+	background-color: #000;
 }
 
 .bottom-bar {
@@ -227,34 +227,39 @@ input[type="checkbox"] {
         document.getElementById("deleteCommentForm").submit();
       }
 
-    function registerBadUsers() {
-        const selected = validateSelectionOrAlert();
-        if (!selected) return;
+    function registerBadUsersFromComments() {
+    	  const selected = validateCommentSelectionOrAlert();
+    	  if (!selected) return;
 
-        const reason = prompt("신고 사유를 입력해주세요.");
-        if (!reason || reason.trim() === "") {
-            alert("신고 사유는 필수입니다.");
-            return;
-        }
+    	  const reason = prompt("등록 사유를 입력해주세요.");
+    	  if (!reason || reason.trim() === "") {
+    	    alert("등록 사유는 필수입니다.");
+    	    return;
+    	  }
 
-        const formData = new URLSearchParams();
-        selected.forEach(id => formData.append("selectedComments", id));
-        formData.append("reason", reason);  
+    	  const formData = new URLSearchParams();
+    	  selected.forEach(id => formData.append("selectedComments", id));
+    	  formData.append("reason", reason);
 
-        fetch("registerBadUsersFromComments.do", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: formData.toString()
-        })
-        .then(res => {
-            if (res.redirected) {
-                alert("등록되었습니다.");
-                window.location.href = res.url;
-            } else {
-                alert("등록 실패");
-            }
-        });
-    }
+    	  fetch("registerBadUsersFromComments.do", {
+    	    method: "POST",
+    	    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    	    body: formData.toString()
+    	  })
+    	  .then(async res => {
+    	    if (res.redirected) {
+    	      alert("등록되었습니다.");
+    	      window.location.href = res.url;
+    	    } else {
+    	      const msg = await res.text();
+    	      alert(msg || "등록 실패");
+    	    }
+    	  })
+    	  .catch(err => {
+    	    console.error("서버 오류:", err);
+    	    alert("서버 오류가 발생했습니다.");
+    	  });
+    	}
   </script>
 </head>
 <body>
