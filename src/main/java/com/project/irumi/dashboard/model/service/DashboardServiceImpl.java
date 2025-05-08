@@ -78,8 +78,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public int selectSearchJobCount(String keyword) {
-		return dashboardDao.selectSearchJobCount(keyword);
+	public int selectSearchJobCount(Search search) {
+		return dashboardDao.selectSearchJobCount(search);
 	}
 
 	@Override

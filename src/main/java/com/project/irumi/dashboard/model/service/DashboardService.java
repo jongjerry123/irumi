@@ -25,7 +25,7 @@ public interface DashboardService {
 	ArrayList<SpecSchedule> selectUserSpecSchedule(String specId);
 	int selectJobListCount();
 	ArrayList<JobList> selectJobList(Paging paging);
-	int selectSearchJobCount(String keyword);
+	int selectSearchJobCount(Search search);
 	ArrayList<JobList> selectSearchJob(Search search);
 	JobList selectOneJobList(String jobListId);
 	int selectNextJobId();

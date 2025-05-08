@@ -2,7 +2,6 @@ package com.project.irumi.dashboard.controller;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,7 +196,7 @@ public class DashboardController {
 	
 	@RequestMapping("jobSearch.do")
 	public ModelAndView jobSearchMethod(
-			ModelAndView mv, @RequestParam("keyword") String keyword, @RequestParam(name = "page", required = false) String page, @RequestParam(name = "limit", required = false) String slimit) {
+			ModelAndView mv, Search search, @RequestParam(name = "page", required = false) String page, @RequestParam(name = "limit", required = false) String slimit) {
 		// 페이징 처리
 		int currentPage = 1;
 		if (page != null) {
@@ -211,32 +210,29 @@ public class DashboardController {
 		}
 
 		// 검색결과가 적용된 총 목록 갯수 조회해서, 총 페이지 수 계산함
-		int listCount = dashboardService.selectSearchJobCount(keyword);
+		int listCount = dashboardService.selectSearchJobCount(search);
 		// 페이지 관련 항목들 계산 처리
 		Paging paging = new Paging(listCount, limit, currentPage, "jobSearch.do");
 		paging.calculate();
 
 		// 마이바티스 매퍼에서 사용되는 메소드는 Object 1개만 전달할 수 있음
 		// paging.startRow, paging.endRow, keyword 같이 전달해야 하므로 => 객체 하나를 만들어서 저장해서 보냄
-		Search search = new Search();
-		search.setKeyword(keyword);
-		search.setStartRow(paging.getStartRow());
-		search.setEndRow(paging.getEndRow());
+		Search ss = new Search();
+		ss.setKeyword(search.getKeyword());
+		ss.setType(search.getType());
+		ss.setStartRow(paging.getStartRow());
+		ss.setEndRow(paging.getEndRow());
 
 		// 서비스 모델로 페이징 적용된 목록 조회 요청하고 결과받기
 		ArrayList<JobList> list = dashboardService.selectSearchJob(search);
 
-		if (list != null && list.size() > 0) { // 조회 성공시
-			// ModelAndView : Model + View
-			mv.addObject("list", list); // request.setAttribute("list", list) 와 같음
-			mv.addObject("paging", paging);
-			mv.addObject("keyword", keyword);
 
-			mv.setViewName("dashboard/newJob");
-		} else { // 조회 실패시
-			mv.addObject("message", keyword + " 검색 결과가 존재하지 않습니다.");
-			mv.setViewName("common/error");
-		}
+		// ModelAndView : Model + View
+		mv.addObject("list", list); // request.setAttribute("list", list) 와 같음
+		mv.addObject("paging", paging);
+		mv.addObject("keyword", search.getKeyword());
+
+		mv.setViewName("dashboard/newJob");
 
 		return mv;
 	}
@@ -435,7 +431,7 @@ public class DashboardController {
 		
 		
 		if (resultOne && resultTwo && resultThree) {
-			mv.setViewName("dashboard/dashboard");
+			mv.setViewName("redirect:dashboard.do");
 		} else {
 			mv.addObject("message", "스펙 추가 실패!");
 			mv.setViewName("common/error");
@@ -531,7 +527,7 @@ public class DashboardController {
 		}
 
 		if (resultDelete > 0 && resultOne && resultTwo && resultThree) {
-			mv.setViewName("dashboard/dashboard");
+			mv.setViewName("redirect:dashboard.do");
 		} else {
 			mv.addObject("message", "스펙 추가 실패!");
 			mv.setViewName("common/error");
