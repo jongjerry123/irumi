@@ -285,7 +285,18 @@ public class ChatbotController {
 		switch (topic) {
 		case "job":
 			// 최대 5개까지 추가할 수 있도록 제한
-			if (dashboardService.selectUserJobs(userId).size() < 5) {
+			List<Job> userJobs = dashboardService.selectUserJobs(userId);
+			boolean isDuplicate=false;
+			
+			for (Job job :userJobs) {
+				logger.info("추가된 jobname:"+ insertedItem.getTitle()+", 비교:"+job.getJobName());
+				if (job.getJobName().equals(insertedItem.getTitle())) {
+					isDuplicate=true;
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("같은 이름의 직무가 이미 존재합니다.");
+				}
+			}
+			
+			if (userJobs.size() < 5  && isDuplicate==false) {
 
 				Job job = new Job();
 
