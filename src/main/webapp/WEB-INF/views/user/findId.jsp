@@ -41,6 +41,10 @@ header {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 	margin: 200px auto 50px; /* 헤더와의 간격 조정 */
 	text-align: center;
+	border-left: 3px solid #2ccfcf;
+	border-top: 1px solid #2ccfcf;
+	border-bottom: 1px solid #2ccfcf;
+	border-right: 3px solid #2ccfcf;
 }
 
 h2 {

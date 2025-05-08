@@ -3,158 +3,182 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>비밀번호 찾기</title>
-    <style>
-        body {
-            background-color: #111;
-            font-family: 'Noto Sans KR', sans-serif;
-            color: white;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 50px;
-            background-color: #111;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            padding: 40px;
-            width: 400px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            margin: 150px auto 50px;
-            text-align: center;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            height: 40px;
-            padding: 0 12px;
-            border: 1px solid #444;
-            border-radius: 6px;
-            background-color: #121212;
-            color: white;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        .btn, #send-verification, #verify-code {
-            width: 100%;
-            height: 40px;
-            padding: 0 12px;
-            border: none;
-            border-radius: 6px;
-            background-color: #2ccfcf;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        .btn:disabled, #send-verification:disabled, #verify-code:disabled {
-            background-color: black;
-            color: white;
-            cursor: not-allowed;
-        }
-        .inline-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .inline-group input[type="email"], .inline-group input[type="text"] {
-            flex: 1;
-            height: 40px;
-        }
-        .inline-group #send-verification, .inline-group #verify-code {
-            width: auto;
-            min-width: 100px;
-            height: 40px;
-        }
-        .verification-group {
-            position: relative;
-        }
-        #verification-code {
-            width: 100%;
-            height: 40px;
-            padding-right: 60px;
-        }
-        #timer {
-            display: none;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #2ccfcf;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .message {
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        .message.success {
-            color: #00ffaa;
-        }
-        .message.error {
-            color: #ff5a5a;
-        }
-    </style>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비밀번호 찾기</title>
+<style>
+body {
+	background-color: #111;
+	font-family: 'Noto Sans KR', sans-serif;
+	color: white;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 50px;
+	background-color: #111;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+	box-sizing: border-box;
+}
+
+.container {
+	background-color: #1e1e1e;
+	border-radius: 10px;
+	padding: 40px;
+	width: 400px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	margin: 150px auto 50px;
+	text-align: center;
+	border-left: 3px solid #2ccfcf;
+	border-top: 1px solid #2ccfcf;
+	border-bottom: 1px solid #2ccfcf;
+	border-right: 3px solid #2ccfcf;
+}
+
+h2 {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.input-group {
+	margin-bottom: 20px;
+}
+
+input[type="text"], input[type="email"] {
+	width: 100%;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid #444;
+	border-radius: 6px;
+	background-color: #121212;
+	color: white;
+	box-sizing: border-box;
+	font-size: 14px;
+}
+
+.btn, #send-verification, #verify-code {
+	width: 100%;
+	height: 40px;
+	padding: 0 12px;
+	border: none;
+	border-radius: 6px;
+	background-color: #2ccfcf;
+	color: black;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+.btn:disabled, #send-verification:disabled, #verify-code:disabled {
+	background-color: black;
+	color: white;
+	cursor: not-allowed;
+}
+
+.inline-group {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.inline-group input[type="email"], .inline-group input[type="text"] {
+	flex: 1;
+	height: 40px;
+}
+
+.inline-group #send-verification, .inline-group #verify-code {
+	width: auto;
+	min-width: 100px;
+	height: 40px;
+}
+
+.verification-group {
+	position: relative;
+}
+
+#verification-code {
+	width: 100%;
+	height: 40px;
+	padding-right: 60px;
+}
+
+#timer {
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #2ccfcf;
+	font-size: 12px;
+	pointer-events: none;
+	z-index: 10;
+}
+
+.message {
+	font-size: 12px;
+	margin-top: 5px;
+}
+
+.message.success {
+	color: #00ffaa;
+}
+
+.message.error {
+	color: #ff5a5a;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-    <c:import url="/WEB-INF/views/common/header.jsp" />
-    <div class="container">
-        <h2>비밀번호 찾기</h2>
-        <form id="findPasswordForm">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
-            <!-- 아이디 입력 -->
-            <div class="input-group">
-                <input type="text" id="userId" name="userId" placeholder="아이디" maxlength="20">
-                <div id="userId-message" class="message"></div>
-            </div>
-            <!-- 이메일 입력 -->
-            <div class="input-group">
-                <div class="inline-group">
-                    <input type="email" id="email" name="email" placeholder="이메일 주소" maxlength="30">
-                    <button type="button" id="send-verification" disabled>인증전송</button>
-                </div>
-                <div id="email-message" class="message"></div>
-            </div>
-            <!-- 인증번호 -->
-            <div class="input-group verification-group" style="display: none;">
-                <div class="inline-group">
-                    <input type="text" id="verification-code" name="verification-code" placeholder="인증번호" maxlength="6" disabled>
-                    <button type="button" id="verify-code" disabled>인증확인</button>
-                </div>
-                <div id="timer">00:00</div>
-                <div id="verification-message" class="message"></div>
-            </div>
-            <button type="button" class="btn" id="reset-password" disabled>비밀번호 재설정</button>
-        </form>
-    </div>
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+	<div class="container">
+		<h2>비밀번호 찾기</h2>
+		<form id="findPasswordForm">
+			<input type="hidden" name="_csrf" value="${_csrf.token}" />
+			<!-- 아이디 입력 -->
+			<div class="input-group">
+				<input type="text" id="userId" name="userId" placeholder="아이디"
+					maxlength="20">
+				<div id="userId-message" class="message"></div>
+			</div>
+			<!-- 이메일 입력 -->
+			<div class="input-group">
+				<div class="inline-group">
+					<input type="email" id="email" name="email" placeholder="이메일 주소"
+						maxlength="30">
+					<button type="button" id="send-verification" disabled>인증전송</button>
+				</div>
+				<div id="email-message" class="message"></div>
+			</div>
+			<!-- 인증번호 -->
+			<div class="input-group verification-group" style="display: none;">
+				<div class="inline-group">
+					<input type="text" id="verification-code" name="verification-code"
+						placeholder="인증번호" maxlength="6" disabled>
+					<button type="button" id="verify-code" disabled>인증확인</button>
+				</div>
+				<div id="timer">00:00</div>
+				<div id="verification-message" class="message"></div>
+			</div>
+			<button type="button" class="btn" id="reset-password" disabled>비밀번호
+				재설정</button>
+		</form>
+	</div>
 
-    <script>
+	<script>
     $(document).ready(function() {
         const $userIdInput = $('#userId');
         const $emailInput = $('#email');
