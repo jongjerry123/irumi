@@ -2,6 +2,8 @@ package com.project.irumi.chatbot.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,12 +127,25 @@ public class SpecChatManager {
 					검색 참고 결과: %s
 					""".formatted(targetJobName, String.join(" ", session.getContextHistory()), serpResult));
 			logger.info("받은 응답:" + gptAnswer);
+			
+			//gpt 응답에서 json만 분리하기
+			Pattern pattern = Pattern.compile("\\[.*?\\]", Pattern.DOTALL);
+	        Matcher matcher = pattern.matcher(gptAnswer);
+	        String gptJSON=null;
+	        if (matcher.find()) {
+	            gptJSON = matcher.group();
+	         
+	        } else {
+	            System.out.println("JSON 형식의 배열이 없습니다.");
+	            return new ChatbotResponseDto("스펙 정보 추출하지 못함", null);
+	        }
+			
 
 			// ✅ JSON → CareerItemDto 리스트로 파싱
 			// 사용자가 선택 가능하게 보내는 것.
 			List<CareerItemDto> specCItemList = new ArrayList<>();
 			try {
-				JSONArray jsonArray = new JSONArray(gptAnswer);
+				JSONArray jsonArray = new JSONArray(gptJSON);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject obj = jsonArray.getJSONObject(i);
 					CareerItemDto dto = new CareerItemDto();

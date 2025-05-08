@@ -2,6 +2,8 @@ package com.project.irumi.chatbot.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,26 +41,9 @@ public class JobChatManager {
 		botChatMsg.setConvId(session.getConvId());
 		userChatMsg.setConvTopic(session.getTopic());
 		botChatMsg.setConvTopic(session.getTopic());
-		switch (session.getTopic()) {
-		case "job":
-			userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "spec":
-			userChatMsg.setConvSubTopicJobId(session.getSubJobTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "ss":
-			userChatMsg.setConvSubTopicSpecId(session.getSubJobTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "act":
-			userChatMsg.setConvSubTopicSpecId(session.getSubJobTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		default: // topic 없으면
-			return new ChatbotResponseDto("현재 세션 토픽 정보가 없습니다.", null);
-		}
+		userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+		botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+	
 		userChatMsg.setMsgContent(userMsg);
 		userChatMsg.setRole("USER");
 		userChatMsg.setUserId(session.getUserId());
@@ -148,15 +133,24 @@ public class JobChatManager {
 					    "🔽 다음 정보는 반드시 참고해야 할 사용자 특성입니다:\r\n" +
 					    String.join(" ", session.getContextHistory())
 					);
+				logger.info("gpt 응답?:" + gptAnswer);
 
-
-				logger.info("gpt JSON 응답?:" + gptAnswer);
+				//gpt 응답에서 json만 분리하기
+				Pattern pattern = Pattern.compile("\\[.*?\\]", Pattern.DOTALL);
+		        Matcher matcher = pattern.matcher(gptAnswer);
+		        String gptJSON=null;
+		        if (matcher.find()) {
+		            gptJSON = matcher.group();
+		        } else {
+		            System.out.println("JSON 형식의 배열이 없습니다.");
+		            return new ChatbotResponseDto("스펙 정보 추출하지 못함", null);
+		        }
+				
 				// GPT 응답을 CareerItem DTO 리스트로 변환
 				List<CareerItemDto> jobCIList = new ArrayList<>();
-
 				try {
 					// GPT 응답을 JSON 배열로 파싱
-					JSONArray jsonArray = new JSONArray(gptAnswer);
+					JSONArray jsonArray = new JSONArray(gptJSON);
 
 					// JSON 배열에서 각 객체를 Job 객체로 변환
 					for (int i = 0; i < jsonArray.length(); i++) {

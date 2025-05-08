@@ -171,7 +171,10 @@ $(function() {
 	    });
 	    $listWrap.append($submitBtn);
 	    $chatArea.append($listWrap);
-	  }	//체크박스 리스트 렌더링 함수
+	  }	
+	  
+	  
+	  //체크박스 리스트 렌더링 함수
 	// 택1 옵션 버튼 제공 관련 ===============================
 	  function renderOptionButtons(options) {
 	    removeOptionButtons(); // 기존 옵션 버튼 제거
