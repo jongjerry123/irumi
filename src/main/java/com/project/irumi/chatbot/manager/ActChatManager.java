@@ -91,6 +91,10 @@ public class ActChatManager {
         String lastSpec = session.getLastTopic();
         String lastActivityType = (String) session.getLastActivityType();
         
+        String specId = session.getSubSpecTopicId();
+	    String specName = dashboardService.selectSpec(specId).getSpecName();
+	    System.out.println("subSpecName: " + specName);
+        
 
         switch (state) {
             case INPUT_HAVEBEEN:
@@ -123,11 +127,12 @@ public class ActChatManager {
     	            	Umsg.setMsgContent(userMsg);
 
     	            	chatbotService.insertChatMsg(Umsg);
+    	            	session.setHavebeenact(Umsg);
     	            	
                     	session.setLastTopic(userMsg.trim());
                         session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                         
-                        String answer = "'" + session.getSubSpecTopicId() + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
+                        String answer = "'" + specName + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
                       botChatMsg.setMsgContent(answer);
     					chatbotService.insertChatMsg(botChatMsg);
                         return new ChatbotResponseDto(
@@ -151,7 +156,7 @@ public class ActChatManager {
             	ChatMsg Umsg = new ChatMsg();
             	Umsg.setConvId(session.getConvId());
             	Umsg.setConvTopic(session.getTopic());
-            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); // 필요 시 맞춰 수정
+            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
             	Umsg.setUserId(session.getUserId());
             	Umsg.setRole("USER");
             	Umsg.setMsgContent(userMsg);
@@ -208,16 +213,36 @@ public class ActChatManager {
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
 	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session) {
 	    // 🔹 검색 키워드 생성
-	    String keyword = switch (activityType) {
-	        case "도서" -> spec + " 관련 자격증 공부 도서 추천";
-	        case "영상" -> spec + " 무료 강의 또는 유튜브 채널";
-	        case "기타 활동" -> spec + " 관련 공모전 대외활동 봉사활동";
-	        default -> spec + " 활동 추천";
-	    };
+		String userHistory = session.getHavebeenact() != null ? session.getHavebeenact().getMsgContent() : "";
+
+		String prompt = switch (activityType) {
+		    case "도서" -> """
+		        %s를 공부하는 데 도움이 되는 도서를 3권만 추천해줘.
+		        단, 사용자가 이전에 언급한 활동: "%s" 과 중복되지 않도록 해줘.
+		        도서명, 저자, 간단한 이유만 포함해서 알려줘.
+		        """.formatted(spec, userHistory);
+		        
+		    case "영상" -> """
+		        %s에 대해 공부할 수 있는 유튜브 채널 또는 무료 강의 3개 추천해줘.
+		        단, "%s"와 유사한 내용은 제외하고 새로운 추천만 해줘.
+		        제목과 링크 포함해서 알려줘.
+		        """.formatted(spec, userHistory);
+		        
+		    case "기타 활동" -> """
+		        %s와 관련된 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 중에서
+		        "%s"와 겹치지 않는 새로운 활동 3가지를 추천해줘.
+		        활동명과 URL 함께 제공해줘.
+		        """.formatted(spec, userHistory);
+		        
+		    default -> """
+		        %s에 도움이 될 활동을 추천해줘. 단 "%s"와 비슷한 것은 제외해줘.
+		        """.formatted(spec, userHistory);
+		};
+
 
 	    // 🔹 SerpAPI 호출 → 아래는 예시로 고정된 항목 사용
 	    // 실제 구현 시 serpApiService.searchActivities(keyword) 로 치환
-	    List<CareerItemDto> checkboxList = serpApiService.searchSerpActivity(keyword, activityType);
+	    List<CareerItemDto> checkboxList = serpApiService.searchSerpActivity(prompt, activityType);
 	    // 🔹 응답 메시지 문자열 생성
 	    StringBuilder msgBuilder = new StringBuilder();
 	    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
@@ -264,7 +289,7 @@ public class ActChatManager {
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isSpecRelatedInput(String input) {
         String prompt = """
-            다음 문장이 자격증, 직무, 시험 등 스펙을 쌓기 위한 요소에 관련된 내용이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
+            다음 문장이 사용자가 원하는 스펙을 이루기 위한 활동에 관한 내용이거나 빈칸이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
             입력: "%s"
             """.formatted(input);
 
