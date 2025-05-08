@@ -31,73 +31,58 @@ public class SerpApiService {
     private static final String BASE_URL = "https://serpapi.com/search";
 
     public String searchJobSpec(String query) {
-    	String gptInput="";
-    	try {
+        String gptInput = "";
+        try {
             RestTemplate restTemplate = new RestTemplate();
             
             String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
 
-
             URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
-            	    .queryParam("q", encodedQuery) // 인코딩된 검색어
-            	    .queryParam("hl", "ko")
-            	    .queryParam("gl", "kr")
-            	    .queryParam("engine", "google")
-            	    .queryParam("api_key", serpApiKey)
-            	    .build(true)
-            	    .toUri();
+                .queryParam("q", encodedQuery) // 인코딩된 검색어
+                .queryParam("hl", "ko")
+                .queryParam("gl", "kr")
+                .queryParam("engine", "google")
+                .queryParam("api_key", serpApiKey)
+                .build(true)
+                .toUri();
 
             // API 호출
             String response = restTemplate.getForObject(uri, String.class);
             JSONObject serpJson = new JSONObject(response);
             
-       
-
-            if (serpJson.has("answer_box")) {
-                JSONObject answerBox = serpJson.getJSONObject("answer_box");
-                // 필요한 필드 사용
-                // 1. answer_box에서 자격증 목록 가져오기
-                List<Map<String, String>> certs = serpJson
-                    .getJSONObject("answer_box")
-                    .getJSONObject("contents")
-                    .getJSONArray("formatted")
-                    .toList()
-                    .stream()
-                    .map(o -> (Map<String, String>) o)
-                    .collect(Collectors.toList());
-                
-                // 2. organic_results에서 설명 추출
-                List<String> descriptions = serpJson
-                    .getJSONArray("organic_results")
-                    .toList()
-                    .stream()
-                    .map(obj -> ((Map<String, Object>) obj).get("snippet").toString())
-                    .collect(Collectors.toList());
-
-                // 3. GPT에 넘길 문장 조합 (최대 3~5개 정도 추려서 사용)
-                List<String> gptInputLines = new ArrayList<>();
-                for (int i = 0; i < Math.min(certs.size(), descriptions.size()); i++) {
-                    String cert = certs.get(i).get("자격증_종류");
-                    String desc = descriptions.get(i);
-                    gptInputLines.add(cert + ": " + desc);
-                }
-                gptInput = String.join("\n", gptInputLines);
-                logger.info("serpapi 검색결과: " +gptInput);
-                return gptInput;//parseSearchResult(response);
-                
-            } else {
-                logger.warn("answer_box가 SerpAPI 응답에 존재하지 않음. 대체 정보 사용.");
-                // fallback 처리: organic_results 등 다른 필드를 활용하거나 빈 문자열 반환
-            }
-
-          
+            logger.info(response);
             
+            // 'organic_results' 확인
+            if (serpJson.has("organic_results") && serpJson.getJSONArray("organic_results").length() > 0) {
+                JSONArray organicResults = serpJson.getJSONArray("organic_results");
+                
+                // organic_results에서 정보 추출
+                List<String> descriptions = new ArrayList<>();
+                for (int i = 0; i < organicResults.length(); i++) {
+                    JSONObject result = organicResults.getJSONObject(i);
+                    String title = result.getString("title");
+                    String snippet = result.getString("snippet");
+                    
+                    // 필요 시 제목과 설명을 조합하여 결과에 추가
+                    descriptions.add(title + ": " + snippet);
+                }
+
+                // 최대 3개까지만 추출하여 GPT 입력 준비
+                gptInput = String.join("\n", descriptions.subList(0, Math.min(descriptions.size(), 7)));
+                logger.info("serpapi 검색결과: " + gptInput);
+            } else {
+                // 'organic_results'가 없을 때 대체 처리
+                logger.warn("organic_results가 SerpAPI 응답에 존재하지 않음. 대체 정보 사용.");
+                
+                // 대체 정보 사용
+                gptInput = "검색 결과가 없습니다. 관련 자격증이나 경력에 대해 다시 시도해 주세요.";
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return "검색 중 오류가 발생했습니다.";
+            gptInput = "검색 중 오류가 발생했습니다.";
         }
-    	return gptInput;
-	}
+        return gptInput;
+    }
 
 
     public String searchExamSchedule(String query) {

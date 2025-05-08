@@ -45,6 +45,10 @@ header {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 	margin: 150px auto 50px;
 	text-align: center;
+	border-left: 3px solid #2ccfcf;
+	border-top: 1px solid #2ccfcf;
+	border-bottom: 1px solid #2ccfcf;
+	border-right: 3px solid #2ccfcf;
 }
 
 h2 {
@@ -320,14 +324,17 @@ input[type="password"], input[type="email"], input[type="text"], select
 
                 // 학점 유효성 검사
                 function validatePoint(point) {
-                    if (!point) return true;
-                    const pointPattern = /^\d(\.\d)?$/;
+                    if (!point) {
+                        $pointMessage.text('').removeClass('error');
+                        return true; // 빈 입력은 유효
+                    }
+                    const pointPattern = /^\d(\.\d{1,2})?$/; // 0.0, 0.00, 4.5, 4.50 형식 허용
                     if (!pointPattern.test(point)) {
-                        $pointMessage.text('학점은 0.0~4.5 형식으로 입력해주세요.').addClass('error');
+                        $pointMessage.text('학점은 0.0~4.5 형식으로 입력해주세요 (예: 3.5, 3.45).').addClass('error');
                         return false;
                     }
                     const pointValue = parseFloat(point);
-                    if (pointValue < 0 || pointValue > 4.5) {
+                    if (isNaN(pointValue) || pointValue < 0 || pointValue > 4.5) {
                         $pointMessage.text('학점은 0.0~4.5 사이여야 합니다.').addClass('error');
                         return false;
                     }
@@ -667,7 +674,8 @@ input[type="password"], input[type="email"], input[type="text"], select
 
                 // 학점 입력 실시간 검사
                 $pointInput.on('input', function() {
-                    validatePoint($pointInput.val().trim());
+                    const point = $pointInput.val().trim();
+                    validatePoint(point);
                 });
 
                 // 이메일 변경 버튼 클릭
@@ -729,7 +737,7 @@ input[type="password"], input[type="email"], input[type="text"], select
                     const isUniversityChanged = university !== sessionUniversity;
                     const isDegreeChanged = degree !== sessionDegree;
                     const isGraduatedChanged = graduated !== sessionGraduated;
-                    const isPointChanged = point !== sessionPoint && (point === '' || validatePoint(point));
+                    const isPointChanged = point !== sessionPoint;
 
                     // 변경된 사항이 없으면 main.do로 이동
                     if (!isPasswordChanged && !isEmailChangedLocal && !isUniversityChanged && 
@@ -762,8 +770,9 @@ input[type="password"], input[type="email"], input[type="text"], select
                         return;
                     }
 
-                    // 학점 유효성 체크
+                    // 학점 유효성 체크 (입력값이 있으면 반드시 유효해야 함)
                     if (point && !validatePoint(point)) {
+                        $pointMessage.text('학점은 0.0~4.5 사이여야 합니다.').addClass('error');
                         return;
                     }
 
@@ -898,12 +907,14 @@ input[type="password"], input[type="email"], input[type="text"], select
 				<label for="degree">학위</label> <select id="degree" name="degree">
 					<option value=""
 						${empty sessionScope.loginUser.userDegree ? 'selected' : ''}>선택하세요</option>
-					<option value="bachelor"
-						${sessionScope.loginUser.userDegree == 'bachelor' ? 'selected' : ''}>학사</option>
-					<option value="master"
-						${sessionScope.loginUser.userDegree == 'master' ? 'selected' : ''}>석사</option>
-					<option value="doctor"
-						${sessionScope.loginUser.userDegree == 'doctor' ? 'selected' : ''}>박사</option>
+					<option value="학사"
+						${sessionScope.loginUser.userDegree == '학사' ? 'selected' : ''}>학사</option>
+					<option value="석사"
+						${sessionScope.loginUser.userDegree == '석사' ? 'selected' : ''}>석사</option>
+					<option value="박사"
+						${sessionScope.loginUser.userDegree == '박사' ? 'selected' : ''}>박사</option>
+					<option value="기타"
+						${sessionScope.loginUser.userDegree == '기타' ? 'selected' : ''}>기타</option>
 				</select>
 				<div id="degree-message" class="message"></div>
 			</div>
@@ -913,10 +924,14 @@ input[type="password"], input[type="email"], input[type="text"], select
 					name="graduated">
 					<option value=""
 						${empty sessionScope.loginUser.userGradulate ? 'selected' : ''}>선택하세요</option>
-					<option value="Y"
-						${sessionScope.loginUser.userGradulate == 'Y' ? 'selected' : ''}>졸업</option>
-					<option value="N"
-						${sessionScope.loginUser.userGradulate == 'N' ? 'selected' : ''}>미졸업</option>
+					<option value="졸업"
+						${sessionScope.loginUser.userGradulate == '졸업' ? 'selected' : ''}>졸업</option>
+					<option value="재학"
+						${sessionScope.loginUser.userGradulate == '재학' ? 'selected' : ''}>재학</option>
+					<option value="휴학"
+						${sessionScope.loginUser.userGradulate == '휴학' ? 'selected' : ''}>휴학</option>
+					<option value="기타"
+						${sessionScope.loginUser.userGradulate == '기타' ? 'selected' : ''}>기타</option>
 				</select>
 				<div id="graduated-message" class="message"></div>
 			</div>

@@ -206,6 +206,9 @@ input[type="radio"]:checked+label::before {
 
 	<div class="container">
 	  <h1>${ requestScope.job.jobName }의 스펙 수정</h1>
+	  <pre style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto; color: #18d7c6;">
+		<h3>${ requestScope.job.jobExplain }</h3>
+	</pre>
 	  <form action="deleteAndInsertSpec.do" method="post">
 	    <input type="hidden" name="jobId" value="${ requestScope.job.jobId }" />
 	    <input type="hidden" name="specId" value="${ requestScope.spec.specId }" />

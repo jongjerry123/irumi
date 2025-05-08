@@ -13,7 +13,7 @@
 body {
 	margin: 0;
 	font-family: 'Noto Sans KR', sans-serif;
-	background-color: #111;
+	background-color: #000 !important;
 	color: #fff;
 }
 
@@ -108,16 +108,16 @@ th, td {
 }
 
 th {
-	background-color: #000;
+	background-color: #A983A3;
 }
 
 td {
-	background-color: #1a1a1a;
+	background-color: #000;
 }
 
 td a {
 	color: #A983A3;
-	text-decoration: underline;
+	
 }
 
 .bottom-bar {

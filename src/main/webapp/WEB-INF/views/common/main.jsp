@@ -27,11 +27,17 @@
 	width: 200px;
 	height: 200px;
 	cursor: pointer;
-	transition: transform 0.4s ease;
+	transition: transform 0.4s ease, filter 0.4s ease, box-shadow 0.4s ease;
 }
 
 #introOverlay img:hover {
 	transform: scale(1.2);
+	filter: 
+		brightness(2.5) /* 이미지 자체 밝기 증가 */
+		contrast(110%)  /* 대비 증가 */
+		drop-shadow(0 0 20px #fff)
+		drop-shadow(0 0 40px #fff)
+		drop-shadow(0 0 80px #BAAC80); /* 외곽 빛 퍼짐 효과 */
 }
 
 .intro-content {
@@ -52,7 +58,7 @@
 }
 
 body {
-	background-color: #111;
+	background-color: #000;
 	color: white;
 	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
@@ -213,31 +219,43 @@ function moveToCommu() {
 	location.href = 'freeBoard.do';
 }
 
-// ✅ [인트로 클릭 시 전체 콘텐츠 활성화]
+// [인트로 클릭 시 전체 콘텐츠 활성화]
 window.addEventListener("DOMContentLoaded", function () {
-	const intro = document.getElementById("introOverlay");
 	const main = document.querySelector(".main-container");
 	const header = document.querySelector("header");
 
-	intro.querySelector("img").addEventListener("click", () => {
-		intro.style.opacity = "0";
-		setTimeout(() => {
-			intro.style.display = "none";
+	<c:choose>
+		<c:when test="${empty loginUser}">
+			// 비로그인: 클릭 시 보여지도록 설정
+			const intro = document.getElementById("introOverlay");
+			intro.querySelector("img").addEventListener("click", () => {
+				intro.style.opacity = "0";
+				setTimeout(() => {
+					intro.style.display = "none";
+					main.classList.add("active");
+					header.classList.add("active");
+				}, 500);
+			});
+		</c:when>
+		<c:otherwise>
+			// 로그인: 처음부터 바로 보이도록 설정
 			main.classList.add("active");
 			header.classList.add("active");
-		}, 500);
-	});
+		</c:otherwise>
+	</c:choose>
 });
 </script>
 </head>
 <body>
-	<!-- ✅ 인트로 오버레이 (최상단 삽입) -->
+	<c:if test="${empty loginUser}">
+	<!-- ✅ 인트로 오버레이 (비로그인 유저만) -->
 	<div id="introOverlay">
 		<div class="intro-content">
 			<img src="/irumi/resources/images/eye.png" alt="irumi 로고 클릭" />
 			<p class="intro-subtitle">Project Irumi</p>
 		</div>
 	</div>
+</c:if>
 
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="main-container">

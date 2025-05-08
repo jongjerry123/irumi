@@ -131,6 +131,7 @@ public class PostDAO {
 	public void updatePost(PostDTO post) {
 		sqlSession.update("boardMapper.updatePost", post);
 	}
+	
 
 	// 게시글 삭제
 	public void deletePost(Long postId) {
@@ -331,6 +332,28 @@ public class PostDAO {
 	// 불량 이용자 수 카운트
 	public int countBadUsers() {
 		return sqlSession.selectOne("boardMapper.countBadUsers");
+	}
+	
+	// 불량 이용자 등록 사유 업데이트하기
+	public void updatePostReportReason(Long postId, String reportedBy, String reason) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("postId", postId);
+	    map.put("reportedBy", reportedBy);
+	    map.put("reason", reason);
+	    sqlSession.update("boardMapper.updatePostReportReason", map);
+	}
+	
+	public void updateCommentReportReason(Long commentId, String reportedBy, String reason) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("commentId", commentId);
+	    map.put("reportedBy", reportedBy);
+	    map.put("reason", reason);
+	    sqlSession.update("boardMapper.updateCommentReportReason", map);
+	}
+	
+	// 사용자 권한 조회
+	public int getUserAuthority(String userId) {
+	    return sqlSession.selectOne("boardMapper.selectUserAuthority", userId);
 	}
 
 }

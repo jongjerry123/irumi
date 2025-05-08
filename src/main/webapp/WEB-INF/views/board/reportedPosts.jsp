@@ -12,7 +12,7 @@
 body {
 	margin: 0;
 	font-family: 'Noto Sans KR', sans-serif;
-	background-color: #111;
+	background-color: #000 !important;
 	color: #fff;
 }
 
@@ -107,11 +107,11 @@ th, td {
 }
 
 th {
-	background-color: #000;
+	background-color: #A983A3;
 }
 
 td {
-	background-color: #1a1a1a;
+	background-color: #000;
 }
 
 .bottom-bar {
@@ -321,18 +321,23 @@ input[type="checkbox"] {
 	  formData.append("reason", reason);
 
 	  fetch("registerBadUsers.do", {
-	    method: "POST",
-	    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-	    body: formData.toString()
-	  })
-	  .then(res => {
-	    if (res.redirected) {
-	      alert("등록되었습니다.");
-	      window.location.href = res.url;
-	    } else {
-	      alert("등록 실패");
-	    }
-	  });
+		  method: "POST",
+		  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		  body: formData.toString()
+		})
+		.then(async res => {
+		  if (res.redirected) {
+		    alert("등록되었습니다.");
+		    window.location.href = res.url;
+		  } else {
+		    const msg = await res.text(); // 실패 시 서버에서 보낸 텍스트 받기
+		    alert(msg || "등록 실패");
+		  }
+		})
+		.catch(err => {
+		  console.error("서버 오류:", err);
+		  alert("서버 오류가 발생했습니다.");
+		});
 	}
 </script>
 
