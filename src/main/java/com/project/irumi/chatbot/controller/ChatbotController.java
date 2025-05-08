@@ -337,7 +337,7 @@ public class ChatbotController {
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("직무에 같은 스펙이 이미 존재합니다.");
 				}
 			}
-			if (isSpecDuplicate == false) {
+			if (isSpecDuplicate == false && specList.size()<7) {
 				// 스펙 추천 챗봇에서 선택한 스펙을 저장하기.
 				// 프론트에서 받아온 스펙 정보로 스펙 객체 만들기
 				Spec spec = new Spec();
@@ -360,6 +360,10 @@ public class ChatbotController {
 				specific1.setSpecId(specId);
 
 				dashboardService.insertSpecLink(specific1);
+			}
+			else {
+				// 7개 초과해 추가하려고 할 경우
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("스펙은 직무당 최대 7개까지만 추가할 수 있습니다.");
 			}
 			break;
 
