@@ -22,6 +22,7 @@ import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.service.DashboardService;
+import com.project.irumi.user.model.dto.User;
 
 @Component
 public class SpecChatManager {
@@ -53,7 +54,8 @@ public class SpecChatManager {
 		}
 		logger.info("spec chat state: " + state);
 		String tempSpecType;
-
+		
+				
 		switch (state) {
 		case START:
 			// 유저가 현재 자신의 성격/ 가치관 입력하게 하는 첫 prompt 저장
@@ -105,6 +107,7 @@ public class SpecChatManager {
 			String targetJobName = dashboardService.selectJob(session.getSubJobTopicId()).getJobName();
 			String serpQuery = targetJobName + "되기 위해 필요한 추천" + userMsg + " 리스트";
 			String serpResult = serpApiService.searchJobSpec(serpQuery);
+			String userSpecInfo = dashboardService.selectUserSpec(session.getUserId()).toString();
 			String gptAnswer = gptApiService.callGPT("""
 					다음 정보를 참고하여 유저가 [%s] 직무에 지원할 때 이력으로 적으면 좋을 스펙 3개를 추천해 줘.
 					아래와 같은 JSON 배열 형식으로만 응답해.
@@ -123,9 +126,12 @@ public class SpecChatManager {
 					  { "title": "정보처리기사", "explain": "정보 시스템과 소프트웨어 기초 역량을 평가하는 자격증" },
 					  { "title": "포트폴리오 제작", "explain": "자기 주도적 프로젝트를 통해 실무 능력을 보여주는 활동" }
 					]
-					참고할 유저 정보: %s
-					검색 참고 결과: %s
-					""".formatted(targetJobName, String.join(" ", session.getContextHistory()), serpResult));
+					다음과 같은 특성을 가진 유저에게 적합한 스펙으로 3개 추천해야 해.
+					%s
+					이외 유저의 학력 상태는 다음과 같음: %s
+					추천에 다음 결과를 참고할 수 있음: %s
+					""".formatted(targetJobName, String.join(" ", session.getContextHistory())
+											,userSpecInfo, serpResult));
 			logger.info("받은 응답:" + gptAnswer);
 			
 			//gpt 응답에서 json만 분리하기
@@ -139,7 +145,6 @@ public class SpecChatManager {
 	            System.out.println("JSON 형식의 배열이 없습니다.");
 	            return new ChatbotResponseDto("스펙 정보 추출하지 못함", null);
 	        }
-			
 
 			// ✅ JSON → CareerItemDto 리스트로 파싱
 			// 사용자가 선택 가능하게 보내는 것.

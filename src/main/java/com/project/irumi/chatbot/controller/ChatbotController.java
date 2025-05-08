@@ -318,7 +318,6 @@ public class ChatbotController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("직무는 최대 5개까지만 추가할 수 있습니다.");
 
 			}
-
 			break;
 
 		case "spec":
