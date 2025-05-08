@@ -1,5 +1,7 @@
 package com.project.irumi.chatbot.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class ChatbotController {
 
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	
 	@Autowired
 	private ConvSessionManager convManager;
 	private static final Logger logger = LoggerFactory.getLogger(ChatbotController.class);
@@ -104,14 +109,12 @@ public class ChatbotController {
 		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
 		ArrayList<Spec> userSpecs;
-		ArrayList<SpecSchedule> userSchedules;
-		ArrayList<Activity> userActs;
+
 
 		// CareerItemDto 리스트로 변환하여 저장
 		List<CareerItemDto> jobCItemList = new ArrayList<>();
 		List<CareerItemDto> specCItemList = new ArrayList<>();
-		List<CareerItemDto> scheduleCItemList = new ArrayList<>();
-		List<CareerItemDto> activityCItemList = new ArrayList<>();
+
 
 		switch (topic) {
 		case "job":
@@ -142,7 +145,7 @@ public class ChatbotController {
 		case "ss":
 			// job setting
 			userJobs = dashboardService.selectUserJobs(userId);
-			userSpecs = dashboardService.selectCurrUserSpec(userId);
+			
 			for (Job job : userJobs) {
 				CareerItemDto dto = new CareerItemDto();
 				dto.setItemId(job.getJobId());
@@ -151,25 +154,16 @@ public class ChatbotController {
 				dto.setType("job");
 				jobCItemList.add(dto);
 			}
-			// spec setting
-			for (Spec spec : userSpecs) {
-				CareerItemDto dto = new CareerItemDto();
-				dto.setItemId(spec.getSpecId());
-				dto.setTitle(spec.getSpecName());
-				dto.setExplain(spec.getSpecExplain());
-				dto.setType("spec");
-				specCItemList.add(dto);
-			}
+			
 			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 
-			// 유저 직무 선택에 따라 sub 주제 세팅
-			// userSpecs = dashboardService.selectUserSpecs(...);
+
 			break;
 
 		case "act":
 			// job setting
 			userJobs = dashboardService.selectUserJobs(userId);
-			userSpecs = dashboardService.selectCurrUserSpec(userId);
+			
 			for (Job job : userJobs) {
 				CareerItemDto dto = new CareerItemDto();
 				dto.setItemId(job.getJobId());
@@ -178,18 +172,9 @@ public class ChatbotController {
 				dto.setType("job");
 				jobCItemList.add(dto);
 			}
-			// spec setting
-			for (Spec spec : userSpecs) {
-				CareerItemDto dto = new CareerItemDto();
-				dto.setItemId(spec.getSpecId());
-				dto.setTitle(spec.getSpecName());
-				dto.setExplain(spec.getSpecExplain());
-				dto.setType("spec");
-				specCItemList.add(dto);
-			}
+			
 			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 			// 유저 직무 선택에 따라 sub 주제 세팅
-			// userSpecs = dashboardService.selectUserSpecs(...);
 			break;
 		default:
 			break;
@@ -197,6 +182,33 @@ public class ChatbotController {
 		//
 		return sessionTopicOpts;
 	}
+	
+	@RequestMapping(value = "selectSpecByJobId.do", method = RequestMethod.POST)
+	@ResponseBody
+	public List<CareerItemDto> selectSpecByJobId(@RequestBody Map<String, String> data, HttpSession session) {
+	    String jobId = data.get("jobId");
+
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+
+	    Specific specific = new Specific();
+	    specific.setUserId(userId);
+	    specific.setJobId(jobId);
+
+	    List<Spec> specList = dashboardService.selectUserSpecs(specific);
+	    List<CareerItemDto> result = new ArrayList<>();
+
+	    for (Spec spec : specList) {
+	        CareerItemDto dto = new CareerItemDto();
+	        dto.setItemId(spec.getSpecId());
+	        dto.setTitle(spec.getSpecName());
+	        dto.setExplain(spec.getSpecExplain());
+	        dto.setType("spec");
+	        result.add(dto);
+	    }
+	    return result;
+	}
+
 
 	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
@@ -226,7 +238,7 @@ public class ChatbotController {
 		logger.info("지정된 subtopic[JOB]: " + selectedItem.getTitle());
 	}
 
-	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
+	// 대화 시작하고 서브 토픽 [스펙] 설정 클릭 ===========================
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
 	@RequestMapping(value = "setConvSubSpecTopic.do", method = RequestMethod.POST)
 	@ResponseBody
@@ -388,7 +400,7 @@ public class ChatbotController {
 			SpecSchedule ss = new SpecSchedule();
 			String ssId = String.valueOf(dashboardService.selectNextSsId());
 			ss.setSsId(ssId);
-			ss.setSpecId(insertedItem.getItemId());
+			ss.setSpecId(convSession.getSubSpecTopicId());
 			ss.setSsType(insertedItem.getExplain());
 			ss.setSsDate(insertedItem.getSchedule());
 
@@ -535,4 +547,65 @@ public class ChatbotController {
 		}
 		return specCIList;
 	}
+	
+		@RequestMapping(value = "getActByCI.do", method = RequestMethod.POST)
+		@ResponseBody
+		public List<CareerItemDto> getActByCI(@RequestBody CareerItemDto targetCI, HttpSession loginSession) {
+
+			// 로그인 세션에서 현 유저 받아옴.
+			User loginUser = (User) loginSession.getAttribute("loginUser");
+			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+
+			Specific specific = new Specific();
+			specific.setUserId(userId);
+			specific.setJobId(targetCI.getpId());
+			specific.setSpecId(targetCI.getItemId());
+
+			List<Activity> activityList = dashboardService.selectUserActs(specific);
+			List<CareerItemDto> actCIList = new ArrayList<>();
+			for (Activity act : activityList) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(act.getActId()); 
+				dto.setTitle(act.getActContent());
+				dto.setState(act.getActState());
+				dto.setType("act"); 
+
+				actCIList.add(dto);
+			}
+			return actCIList;
+		}
+		
+		@RequestMapping(value = "getSs.do", method = RequestMethod.POST)
+		@ResponseBody
+		public List<CareerItemDto> getSs(@RequestBody Map<String, String> data, HttpSession loginSession) {
+			String specId = data.get("specId");
+			
+			// 로그인 세션에서 현 유저 받아옴.
+			User loginUser = (User) loginSession.getAttribute("loginUser");
+			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+
+			List<SpecSchedule> scheduleList = dashboardService.selectUserSpecSchedule(specId);
+			List<CareerItemDto> ssList = new ArrayList<>();
+			for (SpecSchedule ss : scheduleList) {
+				CareerItemDto dto = new CareerItemDto();
+				dto.setItemId(ss.getSsId()); 
+				dto.setpId(ss.getSpecId());
+				dto.setExplain(ss.getSsType());
+				
+				LocalDate localDate = ss.getSsDate().toLocalDate();
+				String formatted = localDate.format(formatter);
+				
+			    dto.setStrschedule(localDate.format(formatter));
+			    
+			    
+				dto.setType("ss"); 
+
+				ssList.add(dto);
+			}
+			return ssList;
+		}
+		
+		
+		
+		
 }

@@ -293,6 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	      const specGroup = document.querySelectorAll(".select-group")[1];
 	      const selectedSpecBtn = specGroup.querySelector(".select-btn.active");
 	      const selectedSpec = selectedSpecBtn ? selectedSpecBtn.textContent.trim() : null;
+	      const selectedSpecId = selectedSpecBtn ? selectedSpecBtn.dataset.specId : null;
 	      // 우측에 반영
 	      if (selectedJob) {
 	          document.querySelector(".info-row .value").textContent = selectedJob;
@@ -300,6 +301,31 @@ document.addEventListener("DOMContentLoaded", function() {
 	      if (selectedSpec) {
 	          document.querySelector(".spec-value").textContent = selectedSpec;
 	      }
+	      
+	      if (selectedSpecId) {
+	    	  const actList = document.getElementById("savedScheduleList");
+	    	  actList.innerHTML = "";
+	    	  
+	    	    fetch("getSs.do", {
+	    	      method: "POST",
+	    	      headers: {
+	    	        "Content-Type": "application/json"
+	    	      },
+	    	      body: JSON.stringify({ specId: selectedSpecId })
+	    	    })
+	    	    .then(res => res.json())
+	    	    .then(list => {
+	    	      // 🔄 CareerItemDto 형식 기반으로 변환
+	    	      const formatted = list.map(item => ({
+	    	        ssId: item.itemId,
+	    	        text: item.strschedule + " / " + item.explain
+	    	      }));
+	    	      addToScheduleList(formatted);
+	    	    })
+	    	    .catch(err => {
+	    	      console.error("일정 조회 실패:", err);
+	    	    });
+	    	  }
 	  });
 	 
 	});
@@ -389,6 +415,8 @@ a {
  scrollbar-color: #BAAC80 #222;
  scrollbar-width: thin;
 }
+
+
 /* 오른쪽 페널 */
 .right-panel {
   width: 230px;
@@ -435,6 +463,7 @@ a {
   padding: 8px 16px;
   margin-top: 40px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  border-left: 4px solid #BAAC80;
 }
 .chat-input-box .chat-input {
   flex: 1;
@@ -462,7 +491,20 @@ a {
 }
 .chat-input-box .chat-send-btn:hover {
   background: #BAAC80;
+} 
+.warning-box {
+  margin-top: 12px;
+  padding: 8px 12px;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
 }
+.warning-text {
+  font-size: 13px;
+}
+
+
+
 /* 오른쪽 입력 박스 부분  */
 .manual-input-box {
   display: flex;
@@ -703,6 +745,8 @@ a {
 	background: #eeeeee;
 	opacity: 0.3;
 }
+
+
 </style>
 </head>
 <body>
@@ -717,19 +761,17 @@ a {
         <button onclick="moveActPage();">활동 찾기</button>
      </div>
      <!-- Main content -->
-<div class="main">
+		<div class="main">
 			<!-- 콘텐츠 영역 -->
 			<div class="content-box">
 				<div class="select-bar">
 					<div class="select-group">
 						<span class="select-label">스펙 대상 직무 선택</span>
-						<div class="select-btn-list" id="job-btn-list">
-						</div>
+						<div class="select-btn-list" id="job-btn-list"></div>
 					</div>
 					<div class="select-group">
 						<span class="select-label">일정 대상 스펙 선택</span>
-						<div class="select-btn-list" id="spec-btn-list">
-						</div>
+						<div class="select-btn-list" id="spec-btn-list"></div>
 					</div>
 					<div class="confirm-select-box">
 						<!--  클릭시 setSubTopic 해야함 -->
@@ -737,17 +779,25 @@ a {
 					</div>
 				</div>
 				<div class="chat-area" id="chatArea">
-					<div class="message bot-msg">이곳은 일정 찾기 세션입니다.<br>
-						어떤 시험 일정이 궁금하신가요? 알고 싶으신 시험의 명칭을 입력해주세요! <br>
-						(예: 정보처리기사 정보처리기능사)</div>
+					<div class="message bot-msg">
+						이곳은 일정 찾기 세션입니다.<br> 어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! <br>
+						(예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)
+					</div>
 				</div>
 			</div>
 			<div class="chat-input-box">
-   <input type="text" placeholder="무엇이든 물어보세요" class="chat-input" id="userInput"/>
-   <button class="chat-send-btn" onclick="sendMessage()"><i class="fa fa-paper-plane"></i></button>
-</div>
-     </div>
-<!-- Right panel -->
+				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
+					id="userInput" />
+				<button class="chat-send-btn" onclick="sendMessage()">
+					<i class="fa fa-paper-plane"></i>
+				</button>
+			</div>
+			<div class="warning-box">
+				<span class="warning-text">Irumi 챗봇은 실수를 할 수 있습니다. 중요한 정보는
+					재차 확인하세요.</span>
+			</div>
+		</div>
+		<!-- Right panel -->
 <div class="right-panel">
   <div class="info-row">
        <span class="label">➤ 목표 직무:</span> <span class="value"></span>
@@ -761,7 +811,7 @@ a {
       
       
   <div class="manual-input-box">
-  <input type="date" class="manual-date" id="manualDate" placeholder="날짜 선택"/>
+  <input type="date" class="manual-date" id="manualDate"/>
    <input type="text" placeholder="일정 입력" class="manual-input" id="manualComment"/>
    <button class="add-btn">+</button>
 </div>

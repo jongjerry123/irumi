@@ -16,6 +16,7 @@ import com.project.irumi.chatbot.model.dto.CareerItemDto;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
 import com.project.irumi.chatbot.model.service.ChatbotService;
+import com.project.irumi.dashboard.model.service.DashboardService;
 
 @Component
 public class ActChatManager {
@@ -32,12 +33,16 @@ public class ActChatManager {
 	@Autowired
 	private ChatbotService chatbotService;
 	
+	@Autowired
+	private DashboardService dashboardService;
+	
 	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {	    
+
 		ChatMsg botChatMsg = new ChatMsg();
 
 		// 보내온 유저의 메세지 tb에 저장
@@ -67,6 +72,8 @@ public class ActChatManager {
 			return new ChatbotResponseDto("현재 세션 토픽 정보가 없습니다.", null);
 			
 		}		
+		
+		
 		userChatMsg.setMsgContent(userMsg);
 		
 		userChatMsg.setRole("USER");
@@ -79,19 +86,21 @@ public class ActChatManager {
 		
         StateActChat state = (StateActChat) session.getChatState();
         if (state == null) {
-        	state = StateActChat.INPUT_SPEC;
+        	state = StateActChat.INPUT_HAVEBEEN;
         }
         String lastSpec = session.getLastTopic();
         String lastActivityType = (String) session.getLastActivityType();
         
 
         switch (state) {
-            case INPUT_SPEC:
+            case INPUT_HAVEBEEN:
                 if (userMsg != null && !userMsg.isBlank()) {
                     boolean isMeaningful = isSpecRelatedInput(userMsg);
                     String initMsg = """
     	    	            이곳은 활동 찾기 세션입니다.
-    	    	            어떤 스펙(자격증/공모전 등) 에 대한 활동을 추천받고 싶으신가요?
+						선택하신 활동 대상 스펙에 관련된 활동을 하신 적이 있으신가요?
+						활동 경험이 있으시다면 적어주시고, 없으시다면 빈칸을 입력해주세요!
+						(예시 : ooo 문제집 풀어본 경험이 있다, xx 스펙 관련 박람회를 가본 적이 있다 등등)
     	    	            """;
 
     	    	        ChatMsg botMsg = new ChatMsg();
@@ -118,7 +127,7 @@ public class ActChatManager {
                     	session.setLastTopic(userMsg.trim());
                         session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                         
-                        String answer = "'" + userMsg + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
+                        String answer = "'" + session.getSubSpecTopicId() + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
                       botChatMsg.setMsgContent(answer);
     					chatbotService.insertChatMsg(botChatMsg);
                         return new ChatbotResponseDto(
@@ -126,13 +135,13 @@ public class ActChatManager {
                             List.of("도서 추천", "영상 추천", "기타 활동 추천")
                         );
                     } else {
-                    	session.setChatState(StateActChat.INPUT_SPEC);
+                    	session.setChatState(StateActChat.INPUT_HAVEBEEN);
                         return new ChatbotResponseDto(
                             "스펙 관련 입력이 아닌 것 같아요. 자격증, 분야, 기술 등과 관련된 주제로 다시 입력해 주세요."
                         );
                     }
                   } else {
-                	  session.setChatState(StateActChat.INPUT_SPEC);
+                	  session.setChatState(StateActChat.INPUT_HAVEBEEN);
                       return new ChatbotResponseDto("빈 응답이 기록되었습니다. 다시 입력해 주세요.");
                   }
                 	
@@ -191,7 +200,7 @@ public class ActChatManager {
                 }
                 
             default:
-                session.setChatState(StateActChat.INPUT_SPEC);
+                session.setChatState(StateActChat.INPUT_HAVEBEEN);
                 return new ChatbotResponseDto("오류가 발생했습니다. 처음부터 다시 시도해 주세요.");
         }
     }
