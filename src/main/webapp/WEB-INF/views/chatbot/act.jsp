@@ -74,8 +74,22 @@ document.addEventListener("DOMContentLoaded", function() {
   	  	  window.selectedSpecExplain = spec.specExplain;
   	 	  window.selectedSpecState = spec.specState;
       	  
+  	 	fetch("setConvSubSpecTopic.do", {
+        	  method: "POST",
+        	  headers: { "Content-Type": "application/json" },
+        	  body: JSON.stringify({
+        	    itemId: spec.specId,
+        	    title: spec.specName,
+        	    explain: spec.specExplain,
+        	    type: spec.specType
+        	  })
+        	});
       	};
+      	
         specList.appendChild(btn);
+        
+        
+
       });
     });
   }
@@ -343,10 +357,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	      const jobGroup = document.querySelectorAll(".select-group")[0];
 	      const selectedJobBtn = jobGroup.querySelector(".select-btn.active");
 	      const selectedJob = selectedJobBtn ? selectedJobBtn.textContent.trim() : null;
+	      const selectedJobId = selectedJobBtn ? selectedJobBtn.dataset.jobId : null;
+
 	      // 두 번째 select-group은 스펙 선택
 	      const specGroup = document.querySelectorAll(".select-group")[1];
 	      const selectedSpecBtn = specGroup.querySelector(".select-btn.active");
 	      const selectedSpec = selectedSpecBtn ? selectedSpecBtn.textContent.trim() : null;
+	      const selectedSpecId = selectedSpecBtn ? selectedSpecBtn.dataset.specId : null;
+
 	      // 우측에 반영
 	      if (selectedJob) {
 	          document.querySelector(".info-row .value").textContent = selectedJob;
@@ -354,6 +372,36 @@ document.addEventListener("DOMContentLoaded", function() {
 	      if (selectedSpec) {
 	          document.querySelector(".spec-value").textContent = selectedSpec;
 	      }
+	      
+	      if (selectedSpecId) {
+	    	  const actList = document.getElementById("savedActivityList");
+	    	  actList.innerHTML = "";
+	    	  
+	    	  const reqBody = {
+	    			  pId : selectedJobId,
+	    			  itemId : selectedSpecId
+	    	  };
+	    	  
+	    	    fetch("getActByCI.do", {
+	    	      method: "POST",
+	    	      headers: {
+	    	        "Content-Type": "application/json"
+	    	      },
+	    	      body: JSON.stringify(reqBody)
+	    	    })
+	    	    .then(res => res.json())
+	    	    .then(list => {
+	    	      // 🔄 CareerItemDto 형식 기반으로 변환
+	    	      const formatted = list.map(item => ({
+	    	        ssId: item.itemId,
+	    	        text: item.title
+	    	      }));
+	    	      addToActivityList(formatted);
+	    	    })
+	    	    .catch(err => {
+	    	      console.error("일정 조회 실패:", err);
+	    	    });
+	    	  }
 	  });
 	
 	});
@@ -426,6 +474,9 @@ body {
 	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
 	display: flex;
 	flex-direction: column;
+	 border-left: 4px solid #BAAC80;
+
+	
 }
 .content-box::-webkit-scrollbar {
 	width: 9px;
@@ -513,6 +564,19 @@ body {
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
+
+.warning-box {
+  margin-top: 12px;
+  padding: 8px 12px;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.warning-text {
+  font-size: 13px;
+}
+
+
 /* manual 부분 */
 .manual-input-box {
 	display: flex;
@@ -714,6 +778,8 @@ body {
 	border-radius: 12px;
 	padding: 8px 16px;
 	margin-top: 10px;
+	border-left: 4px solid #BAAC80;
+	
 }
 /* 옵션 버튼 css 추가  */
 #option-buttons button.select-btn {
@@ -853,7 +919,7 @@ body {
 						</div>
 					</div>
 					<div class="select-group">
-						<span class="select-label">일정 대상 스펙 선택</span>
+						<span class="select-label">활동 대상 스펙 선택</span>
 						<div class="select-btn-list" id="spec-btn-list">
 						</div>
 					</div>
@@ -865,7 +931,9 @@ body {
 				<div class="chat-area" id="chatArea">
 					<div class="message bot-msg">
 						이곳은 활동 찾기 세션입니다. <br>
-						어떤 스펙(자격증/공모전 등) 에 대한 활동을 추천받고 싶으신가요?
+						선택하신 활동 대상 스펙에 관련된 활동을 하신 적이 있으신가요? <br>
+						활동 경험이 있으시다면 적어주시고, 없으시다면 빈칸을 입력해주세요! <br>
+						(예시 : ooo 문제집 풀어본 경험이 있다, xx 스펙 관련 박람회를 가본 적이 있다 등등)
 					</div>
 				</div>
 			</div>
@@ -875,6 +943,10 @@ body {
 				<button class="chat-send-btn">
 					<i class="fa fa-paper-plane"></i>
 				</button>
+			</div>
+			<div class="warning-box">
+				<span class="warning-text">Irumi 챗봇은 실수를 할 수 있습니다. 중요한 정보는
+					재차 확인하세요.</span>
 			</div>
 		</div>
 		<!-- Right panel -->

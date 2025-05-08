@@ -97,8 +97,8 @@ public class SsChatManager {
 	            
 	            String initMsg = """
 	    	            이곳은 일정 찾기 세션입니다.
-	    	            어떤 시험 일정이 궁금하신가요? 알고 싶으신 시험의 명칭을 입력해주세요!
-	    	            (예: 정보처리기사 정보처리기능사)
+	    	            어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요!
+	    	            (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)
 	    	            """;
 
 	    	        ChatMsg botMsg = new ChatMsg();
@@ -139,25 +139,25 @@ public class SsChatManager {
 	                session.setChatState(StateSsChat.ASK_WANT_MORE);
 	                return new ChatbotResponseDto(
 	                    serpResult,
-	                    List.of("다른 시험 검색", "종료")
+	                    List.of("다른 일정 검색", "종료")
 	                );
 	            } else {
 	            	session.setChatState(StateSsChat.SERP_SEARCH);
-	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 알고 싶으신 시험의 명칭을 입력해주세요! (예 : 정보처리기사 청보처리기능사)");
+	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 알고 싶으신 일정의 명칭을 입력해주세요! (예 :  oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 	            }
 	            	
 	            } else {
-	                return new ChatbotResponseDto("시험명을 다시 입력해주세요.");
+	                return new ChatbotResponseDto("일정명을 다시 입력해주세요.");
 	            }
 
 	        case ASK_WANT_MORE:
 	            if ("다른 시험 검색".equals(userMsg)) {
-	            	botChatMsg.setMsgContent("다른 시험 검색");
+	            	botChatMsg.setMsgContent("다른 일정 검색");
 					chatbotService.insertChatMsg(botChatMsg);
 	                session.setChatState(StateSsChat.SERP_SEARCH);
-	                botChatMsg.setMsgContent("어떤 시험 일정이 궁금하신가요? (예: 정보처리기사 정보처리기능사)");
+	                botChatMsg.setMsgContent("어떤 일정이 궁금하신가요? (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 					chatbotService.insertChatMsg(botChatMsg);
-	                return new ChatbotResponseDto("어떤 시험 일정이 궁금하신가요? 알고 싶으신 시험의 명칭을 입력해주세요! (예: 정보처리기사 정보처리기능사)");
+	                return new ChatbotResponseDto("어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 	            } else {
 	            	botChatMsg.setMsgContent("종료");
 					chatbotService.insertChatMsg(botChatMsg);
@@ -176,7 +176,7 @@ public class SsChatManager {
 	// 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
 	private boolean isSpecRelatedInput(String input) {
         String prompt = """
-        		입력 문장이 자격증, 직무, 공부, 기술 분야 등 '스펙'과 관련된 내용인지 판별하세요.
+        		입력 문장이 자격증, 시험, 공모전, 인턴십 등의 '스펙'에 대한 일정에 관련된 내용인지 판별하세요.
         		반드시 '예' 또는 '아니오' 중 하나만 출력하세요. 다른 설명은 하지 마세요.
 
         		입력: "%s"

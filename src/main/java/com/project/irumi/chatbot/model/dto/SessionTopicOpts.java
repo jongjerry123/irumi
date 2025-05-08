@@ -7,7 +7,7 @@ import com.project.irumi.dashboard.model.dto.Spec;
 
 public class SessionTopicOpts {
 	private List<CareerItemDto> jobList;
-    private List<CareerItemDto> specList;  // 예시로 스펙 클래스
+    private List<CareerItemDto> specList;  
     
 	public List<CareerItemDto> getJobList() {
 		return jobList;

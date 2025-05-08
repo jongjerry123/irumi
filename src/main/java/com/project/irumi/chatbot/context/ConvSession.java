@@ -12,7 +12,7 @@ public class ConvSession {
 	private String subJobTopicId = null; 
 	private String subSpecTopicId = null;
 	private String userId;
-	private String gettedSpec;	 	// 갖고 있던 스펙 (자격증 공모전수상 등)
+	private String havebeenact;	 	// 해왔던 활동 
 	
 
 	
@@ -46,7 +46,7 @@ public class ConvSession {
 			case "ss":
 				return StateSsChat.SERP_SEARCH;
 			case "act":
-				return StateActChat.INPUT_SPEC;
+				return StateActChat.INPUT_HAVEBEEN;
 			default:
 				throw new IllegalArgumentException("Invalid topic: " + topic);
 		}
@@ -126,16 +126,16 @@ public class ConvSession {
     public void setLastActivityType(String lastActivityType) {
         this.lastActivityType = lastActivityType;
     }
-    
-    
-    //  추가
-	public String getGettedSpec() {
-		return gettedSpec;
+
+	public String getHavebeenact() {
+		return havebeenact;
 	}
 
-	public void setGettedSpec(String gettedSpec) {
-		this.gettedSpec = gettedSpec;
+	public void setHavebeenact(String havebeenact) {
+		this.havebeenact = havebeenact;
 	}
+    
+   
 
     
     

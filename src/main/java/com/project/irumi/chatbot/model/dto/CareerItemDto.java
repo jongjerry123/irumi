@@ -16,6 +16,7 @@ public class CareerItemDto {
 	private String explain; // 상세 내용, 설명 등
 	private String type; // "job", "spec", "act", "ss"
 	private Date schedule;
+	private String strschedule;
 	private String state;
 
 	public CareerItemDto() {
@@ -99,6 +100,15 @@ public class CareerItemDto {
 	public void setState(String state) {
 		this.state = state;
 	}
+
+	public String getStrschedule() {
+		return strschedule;
+	}
+
+	public void setStrschedule(String strschedule) {
+		this.strschedule = strschedule;
+	}
+	
 	
 
 }
