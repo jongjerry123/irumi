@@ -264,18 +264,16 @@ public class ChatbotController {
 	// -- > 입력된 정보 다시 우측 사이드바에 받아오는 메소드 필요
 	@RequestMapping(value = "insertCareerItem.do", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> insertCareerItem(
-			@RequestBody CareerItemDto insertedItem, 
-			HttpSession session,
-			 HttpServletResponse response){
+	public ResponseEntity<?> insertCareerItem(@RequestBody CareerItemDto insertedItem, HttpSession session,
+			HttpServletResponse response) {
 		/*
 		 * try { request.setCharacterEncoding("UTF-8");
 		 * response.setContentType("application/json; charset=UTF-8"); } catch
 		 * (UnsupportedEncodingException e) { // TODO Auto-generated catch block
 		 * e.printStackTrace(); }
 		 */
-		 response.setContentType("application/json; charset=UTF-8");
-		
+		response.setContentType("application/json; charset=UTF-8");
+
 		User loginUser = (User) session.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
@@ -286,17 +284,17 @@ public class ChatbotController {
 		case "job":
 			// 최대 5개까지 추가할 수 있도록 제한
 			List<Job> userJobs = dashboardService.selectUserJobs(userId);
-			boolean isDuplicate=false;
-			
-			for (Job job :userJobs) {
-				logger.info("추가된 jobname:"+ insertedItem.getTitle()+", 비교:"+job.getJobName());
+			boolean isDuplicate = false;
+
+			for (Job job : userJobs) {
+				logger.info("추가된 jobname:" + insertedItem.getTitle() + ", 비교:" + job.getJobName());
 				if (job.getJobName().equals(insertedItem.getTitle())) {
-					isDuplicate=true;
+					isDuplicate = true;
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("같은 이름의 직무가 이미 존재합니다.");
 				}
 			}
-			
-			if (userJobs.size() < 5  && isDuplicate==false) {
+
+			if (userJobs.size() < 5 && isDuplicate == false) {
 
 				Job job = new Job();
 
@@ -315,40 +313,54 @@ public class ChatbotController {
 				specific.setUserId(userId);
 				specific.setJobId(String.valueOf(jobId));
 				dashboardService.insertJobLink(specific);
-			}
-			else {
+			} else {
 				// 5개 초과해 추가하려고 할 경우
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("직무는 최대 5개까지만 추가할 수 있습니다.");
-				
+
 			}
 
 			break;
 
-		case "spec": // 스펙 추천 챗봇에서 선택한 스펙을 저장하기.
-			// 프론트에서 받아온 스펙 정보로 스펙 객체 만들기
-			Spec spec = new Spec();
-			String specId = String.valueOf(dashboardService.selectNextSpecId());
-			spec.setSpecId(specId);
-			insertedItem.setItemId(String.valueOf(specId)); // ← 이게 빠졌어요
-			spec.setSpecName(insertedItem.getTitle());
-			spec.setSpecExplain(insertedItem.getExplain());
-			spec.setSpecType(insertedItem.getType());
+		case "spec":
+			// 같은 직무에 대해 이미 같은 이름의 스펙이 존재하지 않도록 처리
+			// 현재 타겟 직무에 대해 저장된 스펙들 불러오기
+			Specific specific = new Specific();
+			specific.setUserId(userId);
+			specific.setJobId(convSession.getSubJobTopicId());
+			logger.info("target 직무 아이디"+ specific.getJobId());
+			
+			List<Spec> specList = dashboardService.selectUserSpecs(specific);
+			boolean isSpecDuplicate = false;
+			for (Spec spec : specList) {
+				if (spec.getSpecName().equals(insertedItem.getTitle())) {
+					isSpecDuplicate = true;
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("직무에 같은 스펙이 이미 존재합니다.");
+				}
+			}
+			if (isSpecDuplicate == false) {
+				// 스펙 추천 챗봇에서 선택한 스펙을 저장하기.
+				// 프론트에서 받아온 스펙 정보로 스펙 객체 만들기
+				Spec spec = new Spec();
+				String specId = String.valueOf(dashboardService.selectNextSpecId());
+				spec.setSpecId(specId);
+				insertedItem.setItemId(String.valueOf(specId)); // ← 이게 빠졌어요
+				spec.setSpecName(insertedItem.getTitle());
+				spec.setSpecExplain(insertedItem.getExplain());
+				spec.setSpecType(insertedItem.getType());
 
-			// 스펙 tb에 저장
-			dashboardService.insertSpec(spec);
+				// 스펙 tb에 저장
+				dashboardService.insertSpec(spec);
 
-			// career plan 테이블에 추가
-			// 부모 job id에 대한 specific에 넣어야 함.
-			// 이미 부모 job에 spec이 있을 경우 새로운 specific 생성
-			Specific specific1 = new Specific();
-			specific1.setUserId(userId);
-			specific1.setJobId(convSession.getSubJobTopicId());
-			specific1.setSpecId(specId);
+				// career plan 테이블에 추가
+				// 부모 job id에 대한 specific에 넣어야 함.
+				// 이미 부모 job에 spec이 있을 경우 새로운 specific 생성
+				Specific specific1 = new Specific();
+				specific1.setUserId(userId);
+				specific1.setJobId(convSession.getSubJobTopicId());
+				specific1.setSpecId(specId);
 
-			dashboardService.insertSpecLink(specific1);// );
-
-//	            
-
+				dashboardService.insertSpecLink(specific1);
+			}
 			break;
 
 		case "act":

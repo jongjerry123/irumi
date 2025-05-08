@@ -727,7 +727,7 @@ $(function() {
 	                    	addToSpecList(specList);      // 사이드바에 해당 직업에 저장된 스펙들 렌더링
 	                    },
 	                    error: function () {
-	                        alert("스펙 목록 불러오기 실패");
+	       		              alert("직무 추가 중 오류가 발생했습니다.");
 	                    }
 	                });
 	                
@@ -838,9 +838,9 @@ $(function() {
             // specCI 선택시, insertSpec으로 CI 형태로 보냄
             // ==> chatbot Controller가 받음
             const savedSpecCIs = [];
-			let completed = 0;
+			//let completed = 0;
+			
             checked.forEach(function(specCI) {
-
             	$.ajax({
             	    type: "POST",
             	    url: "insertCareerItem.do",
@@ -848,13 +848,21 @@ $(function() {
             	    data: JSON.stringify(specCI),
             	    success: function(returnedSpecCI) {
             	      savedSpecCIs.push(returnedSpecCI);
+            	      addToSpecList([returnedSpecCI]); // <-- 수정됨
             	    },
-            	    complete: function() {
+            	    error: function(xhr) {
+    		            if (xhr.status === 400) {
+    		              alert(xhr.responseText);  // 서버에서 보낸 실패 메시지
+    		            } else {
+    		              alert("스펙 추가 중 오류가 발생했습니다.");
+    		            }
+    		          }
+/*             	    complete: function() {
             	      completed++;
             	      if (completed === checked.length) {
             	        addToSpecList(savedSpecCIs);  // 모든 요청 성공 후 한 번만 호출
             	      }
-            	    }
+            	    } */
             	  });
   	    	});
             
@@ -969,9 +977,13 @@ $(function() {
                     console.log("직무에 스펙 추가 성공");
                     addToSpecList([specCI]); 
                 },
-                error: function() {
-                    alert("직무에 스펙 추가 실패!");
-                }
+                error: function(xhr) {
+		            if (xhr.status === 400) {
+		              alert(xhr.responseText);  // 서버에서 보낸 실패 메시지
+		            } else {
+		              alert("직무 추가 중 오류가 발생했습니다.");
+		            }
+		          }
             });
 
             // 입력 필드 초기화
