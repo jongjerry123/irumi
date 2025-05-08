@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:import url="/WEB-INF/views/common/header.jsp" />
 
 <!DOCTYPE html>
@@ -12,7 +13,7 @@
 body {
 	margin: 0;
 	font-family: 'Noto Sans KR', sans-serif;
-	background-color: #111;
+	background-color: #000 !important;
 	color: #fff;
 }
 
@@ -121,23 +122,23 @@ table.board-table {
 	width: 100%;
 	border-collapse: separate; 
 	border-spacing: 0;         
-	border: 1px solid #333;
+	border: 1px solid #3a1f41;
 	border-radius: 12px;
 	overflow: hidden;          
 }
 
 table.board-table th, table.board-table td {
-	border: 1px solid #333;
+	border: 1px solid #3a1f41;
 	padding: 12px;
 	text-align: center;
 }
 
 table.board-table th {
-	background-color: #000;
+	background-color: #A983A3;
 }
 
 table.board-table td {
-	background-color: #1a1a1a;
+	background-color: #000;
 }
 
 table.board-table td:nth-child(2) {
@@ -226,6 +227,34 @@ table.board-table td:nth-child(2) {
 	transform: translateY(-1px);
 	box-shadow: 0 4px 8px rgba(169, 131, 163, 0.25);
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+tbody tr {
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+/* 순차적으로 하나씩 뜨게 만들기 위한 딜레이 */
+tbody tr:nth-child(1) { animation-delay: 0.1s; }
+tbody tr:nth-child(2) { animation-delay: 0.12s; }
+tbody tr:nth-child(3) { animation-delay: 0.14s; }
+tbody tr:nth-child(4) { animation-delay: 0.16s; }
+tbody tr:nth-child(5) { animation-delay: 0.18s; }
+tbody tr:nth-child(6) { animation-delay: 0.2s; }
+tbody tr:nth-child(7) { animation-delay: 0.22s; }
+tbody tr:nth-child(8) { animation-delay: 0.24s; }
+tbody tr:nth-child(9) { animation-delay: 0.26s; }
+tbody tr:nth-child(10) { animation-delay: 0.28s; }
 </style>
 </head>
 
@@ -287,7 +316,7 @@ table.board-table td:nth-child(2) {
                   </c:otherwise>
 									</c:choose></td>
 								<td>${post.hasAnswer ? 'Y' : 'N'}</td>
-								<td>${post.postTime}</td>
+								<td><fmt:formatDate value="${post.postTime}" pattern="yyyy-MM-dd HH:mm" /></td>
 							</tr>
 						</c:forEach>
 					</c:when>

@@ -11,7 +11,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: #111;
+      background-color: #000;
       font-family: 'Noto Sans KR', sans-serif;
       color: white;
     }
@@ -19,7 +19,7 @@
     .page-wrapper {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      min-height: 45vh;
     }
 
     .main-content {
