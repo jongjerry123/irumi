@@ -723,7 +723,8 @@ $(function() {
 	                    data: JSON.stringify(subTopicJobCI),
 	                    contentType: "application/json",  // 꼭 필요함!
 	                    success: function (specList) {
-	                        addToSpecList(specList);      // 사이드바에 렌더링
+	                        $(".saved-spec-list").empty(); // 기존 사이드바에 있던 것들 제거
+	                    	addToSpecList(specList);      // 사이드바에 해당 직업에 저장된 스펙들 렌더링
 	                    },
 	                    error: function () {
 	                        alert("스펙 목록 불러오기 실패");
