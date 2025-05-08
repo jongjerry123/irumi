@@ -78,8 +78,10 @@ $(function() {
 	//SideBar
 	// 복수선택 옵션에서 직무 선택완료 했을 때 실행======================
 	  // ➤ 선택한 직무 리스트를 화면에 출력 가능한 카드로 만드는 함수
+	  // 선택 옵션 각각에 대해 ajax 요청으로 delete가능.
 	  function addToJobList(checkedJobCIs) {
 	    const $jobList = $(".saved-job-list");
+	    
 	    $.each(checkedJobCIs, function(_, jobCI) {
 	      const $card = $("<div>").addClass("citem-card");
 	      // ✕ 삭제 버튼
@@ -105,7 +107,6 @@ $(function() {
 	      console.log(jobCI.title);
 	      const $span = $("<span>").text(jobCI.title);
 
-
 	      $card.append($removeBtn).append($span);
 	      $jobList.append($card);
 	    });
@@ -113,57 +114,52 @@ $(function() {
 	 
 	 
 	   // 복수 선택 옵션 버튼 제공 관련 =================================
+	  // gpt가 추천된 직무들을 선택 가능한 체크박스로 제공하는 함수
 	  function renderCheckboxList(options) {
 	    removeCheckboxList(); // 기존 체크박스 목록 제거
 	    const $chatArea = $("#chatArea");
 	    const $listWrap = $("<div>").addClass("custom-checkbox-list").attr("id", "checkbox-list");
 
-
 	    //options에는 jobCI 객체가 들어있음(컨트롤러 수정필요)
+	    // 선택지 화면에 표시
 	    $.each(options, function(_, jobCI) {
-
-	      const $label = $("<label>").addClass("custom-checkbox");
-	      const $input = $("<input>").attr({ type: "checkbox", value: jobCI.title });
-	      const $optTitleSpan = $("<span>").addClass("checkbox-title").text(jobCI.title);
-	      const $optExplainSpan = $("<span>").addClass("checkbox-explain").text(jobCI.explain);
-	      const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
-
-
-	      $label.append($input, $optTitleSpan,  $optExplainSpan, $checkMark);
-
-	      $listWrap.append($label);
+		     const $label = $("<label>").addClass("custom-checkbox");
+		     const $input = $("<input>").attr({ type: "checkbox", value: jobCI.title });
+		     const $optTitleSpan = $("<span>").addClass("checkbox-title").text(jobCI.title);
+		     const $optExplainSpan = $("<span>").addClass("checkbox-explain").text(jobCI.explain);
+		     const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
+		      $label.append($input, $optTitleSpan,  $optExplainSpan, $checkMark);
+		      $listWrap.append($label);
 	    });
 	    // ➤ "선택 완료" 버튼 추가
 	    const $submitBtn = $("<button>").text("선택 완료").css("margin-left", "10px").on("click", function() {
 	    	const checked = $listWrap.find("input:checked").map(function() {
-	    	  const chosenJobTitle = this.value;
-	     	  return options.find(jobCI => jobCI.title === chosenJobTitle); // job 자체를 반환
-	      }).get();
-	      if (checked.length === 0) {
+	    	const chosenJobTitle = this.value;
+	     	return options.find(jobCI => jobCI.title === chosenJobTitle); // job 자체를 반환
+	    }).get();
+	    if (checked.length === 0) {
 	        alert("하나 이상 선택해 주세요!");
 	        return;
 	      }
-	      addToJobList(checked);
-	      removeCheckboxList();
-
 	      
-	   // jobCI 선택시, insertJob으로 Career Item 형태로 보냄   
-	   // ==> chatbot Controller로 보내서 먼저 Job 형태로 변환
-	   // 그 후 dashboard로 보내야 함
-	   // Job, Career Plan table에 모두 저장되도록 처리해야 함
 	      checked.forEach(function(jobCI) {
-
 	    	  $.ajax({
 	    	    type: "POST",
 	    	    url: "insertCareerItem.do",
 	    	    contentType: "application/json",
 	    	    data: JSON.stringify(jobCI),
-	    	    success: function() {
-	    	      console.log("직무 저장 성공:", jobCI.title);
+	    	    success: function(returnedJobCI) {
+	    	      console.log("직무 저장 성공:", returnedJobCI.title);
+	    	      addToJobList([returnedJobCI]); // 체크된 모든 것을 저장함.
+	    	      removeCheckboxList();
 	    	    },
-	    	    error: function() {
-	    	      console.error("직무 저장 실패:", jobCI.title);
-	    	    }
+	    	    error: function(xhr) {
+		            if (xhr.status === 400) {
+		              alert(xhr.responseText);  // 서버에서 보낸 실패 메시지
+		            } else {
+		              alert("직무 추가 중 오류가 발생했습니다.");
+		            }
+		          }
 	    	  });
 	    	});
 	  
@@ -171,7 +167,10 @@ $(function() {
 	    });
 	    $listWrap.append($submitBtn);
 	    $chatArea.append($listWrap);
-	  }	//체크박스 리스트 렌더링 함수
+	  }	
+	  
+	  
+	  //체크박스 리스트 렌더링 함수
 	// 택1 옵션 버튼 제공 관련 ===============================
 	  function renderOptionButtons(options) {
 	    removeOptionButtons(); // 기존 옵션 버튼 제거
@@ -228,14 +227,18 @@ $(function() {
 			        type: "POST",
 			        url: "insertCareerItem.do",
 			        data: JSON.stringify(jobCI),
-			        contentType: "application/json",
+			        contentType: "application/json; charset=UTF-8",
 			        success: function(returnedJobCI) {
 			          console.log("직무 추가 성공");
 			          addToJobList([returnedJobCI]); // 이 시점에만 호출하면 OK
 			        },
-			        error: function() {
-			          alert("직무 추가 실패!");
-			        }
+			        error: function(xhr) {
+			            if (xhr.status === 400) {
+			              alert(xhr.responseText);  // 서버에서 보낸 실패 메시지
+			            } else {
+			              alert("직무 추가 중 오류가 발생했습니다.");
+			            }
+			          }
 			      });
 			      $input.val("");
 			      $explainInput.val(""); // 설명 입력 초기화
