@@ -14,9 +14,9 @@
   --bg: #1a1a1a;
   --surface: #2b2b2b;
   --card-bg: #333;
-  --primary: #00f7d7;
+  --primary: #18d7c6;
   --text: #eee;
-  --text-secondary: #ccc;
+  --text-secondary: #fff;
   --radius: 12px;
   --gap: 16px;
 }
@@ -37,14 +37,23 @@ body {
   grid-template-columns: 1fr 2fr 1fr;
   gap: var(--gap);
   padding: var(--gap);
+  padding-left: 300px;
+  padding-right: 300px;
 }
-.education-info,
-.spec-info,
 .main {
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   padding: var(--gap);
+}
+.education-info,
+.spec-info {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  padding: var(--gap);
+  padding-left: 30px;
+  padding-right: 30px;
 }
 .education-info, .spec-info {
   position: relative;
@@ -136,7 +145,7 @@ input[type="checkbox"]:checked {
   padding: 5px 0;
   border-bottom: 1px solid #555;
 }
-.certCard a {
+a {
   color: var(--primary);
   text-decoration: underline;
 }
@@ -191,9 +200,10 @@ input[type="checkbox"]:checked {
 					$('<button>')
 						.text(item.jobName)
 						.on('click', function() {
-							$('#certCards').slideToggle(300);
+							$('#certCards').slideToggle(100);
 							$('#targetJob').empty();
-							$('#targetJob').html('목표 직무: ' + item.jobName + ' &nbsp;<div class="buttons"><button onclick=\"movetoDeleteJob(' + item.jobId + ')\">목표 직무 삭제하기</button></div>');
+							$('#targetJob').html('<div class=\"buttons\">목표 직무: ' + item.jobName + '<button onclick=\"movetoDeleteJob(' + item.jobId + ')\" style="background: #e64a19;">목표 직무 삭제하기</button></div>');
+							$('#targetSpec').html('목표 스펙');
 							viewSpecs(item.jobId);
 							$.ajax({
 								url: 'updateProgressBar.do',
@@ -204,8 +214,8 @@ input[type="checkbox"]:checked {
 	                                $('.progress').css('width',  data.progress + '%').text(data.progress + '%');
 	                            }
 							});
-							$('#jobExplain').html('<br><h2>직업 상세설명</h2><pre>' + item.jobExplain + '</pre><br>');
-							$('#certCards').slideToggle(300);
+							$('#jobExplain').html('<br><h2>직업 상세설명</h2><pre style=\"white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto;\">' + item.jobExplain + '</pre>');
+							$('#certCards').slideToggle(100);
 							
 							
 						})
@@ -227,7 +237,7 @@ input[type="checkbox"]:checked {
 				$('#certCards').empty();
 				if (!data || data.length === 0) {
 	                $('#certCards').append('<div>등록된 스펙이 없습니다.</div>');
-	                var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 340px;\">목표 스펙 추가하기</button></div>';
+	                var buttonHtml = '<br><div class=\"buttons\"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 300px\">목표 스펙 추가하기</button></div>';
 					$('#certCards').append(buttonHtml);
 	                return;
 				}
@@ -239,9 +249,8 @@ input[type="checkbox"]:checked {
 	                    '<div class="certCard">' +
 	                      '<h3>' + item.specName + '</h3>' +
 	                      '<h5>' + item.specType + '</h5>' +
-	                      '<div style=\"font-size:13px; margin-bottom:15px;\">' + item.specExplain + '</div>' +
+	                      '<div style=\"font-size:13px; margin-bottom:15px;\">' + (item.specExplain ?? '설명이 없습니다') + '</div>' +
 	                      '<table>';
-
 	                $.ajax({
 	                    url: 'userSpecStuff.do',
 	                    method: 'POST',
@@ -253,6 +262,9 @@ input[type="checkbox"]:checked {
 	                        $.each(json.specSchedules, function(i, sch) {
 	                            cardHtml += '<tr><td>' + formatDate(sch.ssDate) + '</td><td>' + sch.ssType + '</td></tr>';
 	                        });
+	                        if (!json.specSchedules || json.specSchedules.length === 0) {
+	                        	cardHtml += '<tr><td colspan=2>표시할 일정이 없습니다</td></tr>';
+	                        }
 	                        cardHtml += '</table><div style=\"font-size: 18px;\">';
 	                        cardHtml += '<table><tr><td width="80px">활동 달성</td><td>활동 내용</td></tr>'
 							$.each(json.acts, function(i, act) {
@@ -265,11 +277,14 @@ input[type="checkbox"]:checked {
 												'<td><label for=\"' + act.actId + '\">' + act.actContent + '</label></td></tr>';
 								}
 							});
+	                        if (!json.acts || json.acts.length === 0) {
+	                        	cardHtml += '<tr><td colspan=2>표시할 활동이 없습니다</td></tr>';
+	                        }
 							
 	                        cardHtml += '</table></div>' +
-	                        			'<div class="buttons">' +
-	                        			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 150px;\">변경</button>' +
-	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 150px;\">삭제</button>' +
+	                        			'<div class=\"buttons\" style=\"display: flex; align-items: center; justify-content: center;\">' +
+	                        			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 120px;\">변경</button>' +
+	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 120px; background: #e64a19;\">삭제</button>' +
 	                        			'</div>' +
 	                        			'<div class="buttons">' +
 	                        			'<button onclick=\"movetoAccomplishSpec(' + item.specId + ')\" style=\"width: 300px;\">스펙 달성</button>' +
@@ -280,7 +295,7 @@ input[type="checkbox"]:checked {
 	                        remaining--;
 	                        
 	                        if (remaining === 0) {
-	                        	var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 340px;\">목표 스펙 추가하기</button></div>';
+	                        	var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 300px;\">목표 스펙 추가하기</button></div>';
 								$('#certCards').append(buttonHtml);
 	                        }
 	                    }
@@ -296,11 +311,16 @@ input[type="checkbox"]:checked {
 	}
 
 	function deleteSpec(specId) {
-		location.href = 'deleteSpec.do?specId=' + specId;
+		if(confirm("해당 스펙을 삭제하시겠습니까?")) {
+			location.href = 'deleteSpec.do?specId=' + specId;
+		}
 	}
 	
 	function movetoDeleteJob(jobId) {
-		location.href = 'deleteJob.do?jobId=' + jobId;
+		if(confirm("해당 직무를 삭제하시겠습니까?")) {
+			location.href = 'deleteJob.do?jobId=' + jobId;
+		}
+		
 	}
 	
 	function movetoUpdateSpec(specId) {
@@ -348,7 +368,7 @@ input[type="checkbox"]:checked {
 
   <div class="dashboard-wrapper clearfix">
     <div class="education-info">
-      <h2>학력 정보</h2>
+      <h2 style="text-align: center;">학력 정보</h2>
       <label id="university">대학교: </label>
       <label id="degree">학위: </label>
       <label id="graduation">졸업 여부: </label>
@@ -359,17 +379,17 @@ input[type="checkbox"]:checked {
     <div class="main">
       <h2 id="targetJob">목표 직무</h2>
       <div id="jobs" class="buttons"></div>
-      <div id="jobExplain"></div>
+      <div id="jobExplain"></div><br>
 
       <h2>목표 스펙 달성도</h2>
-      <div class="progress-bar"><div class="progress" style="width:0%">0%</div></div>
+      <div class="progress-bar"><div class="progress" style="width:0%">0%</div></div><br>
 
-      <h2>목표 스펙</h2>
-      <div id="certSection"><div id="certCards"><h1>직업을 선택하세요</h1></div></div>
+      <h2 id="targetSpec">직업을 선택하세요</h2>
+      <div id="certSection"><div id="certCards"></div></div>
     </div>
 
     <div class="spec-info">
-      <h2>현재 스펙</h2>
+      <h2 style="text-align: center;">현재 스펙</h2>
       <label id="currSpecs"></label>
     </div>
   </div>

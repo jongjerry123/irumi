@@ -74,8 +74,8 @@ public class DashboardDao {
 		return (ArrayList<JobList>) list;
 	}
 	
-	public int selectSearchJobCount(String keyword) {
-		return sqlSessionTemplate.selectOne("dashboardMapper.selectSearchJobCount", keyword);
+	public int selectSearchJobCount(Search search) {
+		return sqlSessionTemplate.selectOne("dashboardMapper.selectSearchJobCount", search);
 	}
 	
 	public ArrayList<JobList> selectSearchJob(Search search) {

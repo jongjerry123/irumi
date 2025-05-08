@@ -211,6 +211,13 @@ input[type="radio"]:checked+label::before {
 	}
 	
 	function checkSchedule(event) {
+		const val = $('#specName').val();
+		
+		if (val.trim() === '') {
+			alert('목표 스펙에 공백이 입력되었습니다.');
+			event.preventDefault();
+		}
+		
 		if ((!$('.ssType').val() && $('.ssDate').val()) || ($('.ssType').val() && !$('.ssDate').val())) {
 			alert("주요 일정에 입력란 모두 채워져야 합니다.");
 			event.preventDefault();
@@ -232,7 +239,7 @@ input[type="radio"]:checked+label::before {
 		<table align="center" width="1000" border="1" cellspacing="0" cellpadding="5">
 			<tr>
 				<th>목표 스펙*</th>
-				<td><input type="text" name="specName" required></td>
+				<td><input type="text" id="specName" name="specName" required></td>
 			</tr>
 			<tr>
 				<th>스펙 종류*</th>
