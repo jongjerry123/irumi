@@ -1,7 +1,6 @@
 package com.project.irumi.user.model.dto;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 public class User implements java.io.Serializable{
 
@@ -13,7 +12,7 @@ public class User implements java.io.Serializable{
 	private java.sql.Date registDate;
 	private String userUniversity;
 	private String userDegree;
-	private String userGradulate;
+	private String userGraduate;
 	private double userPoint;
 	private String userAuthority;
 	private int userLoginType;
@@ -38,7 +37,7 @@ public class User implements java.io.Serializable{
 		this.registDate = registDate;
 		this.userUniversity = userUniversity;
 		this.userDegree = userDegree;
-		this.userGradulate = userGradulate;
+		this.userGraduate = userGradulate;
 		this.userPoint = userPoint;
 		this.userAuthority = userAuthority;
 		this.userLoginType = userLoginType;
@@ -91,10 +90,10 @@ public class User implements java.io.Serializable{
 		this.userDegree = userDegree;
 	}
 	public String getUserGradulate() {
-		return userGradulate;
+		return userGraduate;
 	}
 	public void setUserGradulate(String userGradulate) {
-		this.userGradulate = userGradulate;
+		this.userGraduate = userGradulate;
 	}
 	public double getUserPoint() {
 		return userPoint;
@@ -151,7 +150,7 @@ public class User implements java.io.Serializable{
 	public String toString() {
 		return "User [userId=" + userId + ", userPwd=" + userPwd + ", userName=" + userName + ", userEmail=" + userEmail
 				+ ", registDate=" + registDate + ", userUniversity=" + userUniversity + ", userDegree=" + userDegree
-				+ ", userGradulate=" + userGradulate + ", userPoint=" + userPoint + ", userAuthority=" + userAuthority
+				+ ", userGradulate=" + userGraduate + ", userPoint=" + userPoint + ", userAuthority=" + userAuthority
 				+ ", userLoginType=" + userLoginType + ", userSocialId=" + userSocialId + ", emailVerification="
 				+ emailVerification + ", emailVerificationToken=" + emailVerificationToken + ", emailTokenExpiry="
 				+ emailTokenExpiry + ", chPWD=" + chPWD + "]";

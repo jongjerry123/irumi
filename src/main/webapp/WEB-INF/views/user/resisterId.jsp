@@ -40,6 +40,10 @@ header {
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	border-left: 3px solid #2ccfcf;
+	border-top: 1px solid #2ccfcf;
+	border-bottom: 1px solid #2ccfcf;
+	border-right: 3px solid #2ccfcf;
 }
 
 h2 {
