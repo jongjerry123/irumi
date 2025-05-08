@@ -1,5 +1,6 @@
 package com.project.irumi.chatbot.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +35,8 @@ import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -259,34 +264,52 @@ public class ChatbotController {
 	// -- > 입력된 정보 다시 우측 사이드바에 받아오는 메소드 필요
 	@RequestMapping(value = "insertCareerItem.do", method = RequestMethod.POST)
 	@ResponseBody
-	public CareerItemDto insertCareerItem(
-			@RequestBody CareerItemDto insertedItem, HttpSession session) {
+	public ResponseEntity<?> insertCareerItem(
+			@RequestBody CareerItemDto insertedItem, 
+			HttpSession session,
+			 HttpServletResponse response){
+		/*
+		 * try { request.setCharacterEncoding("UTF-8");
+		 * response.setContentType("application/json; charset=UTF-8"); } catch
+		 * (UnsupportedEncodingException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
+		 response.setContentType("application/json; charset=UTF-8");
+		
 		User loginUser = (User) session.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
 		ConvSession convSession = convManager.getSession(userId);
 		String topic = convSession.getTopic();
-		
 
 		switch (topic) {
 		case "job":
-			Job job = new Job();
+			// 최대 5개까지 추가할 수 있도록 제한
+			if (dashboardService.selectUserJobs(userId).size() < 5) {
 
-			// insertedItem을 Job으로 전환
-			int jobId = dashboardService.selectNextJobId();
-			job.setJobId(String.valueOf(jobId));
-			job.setJobName(insertedItem.getTitle());
-			job.setJobExplain(insertedItem.getExplain());
-			insertedItem.setItemId(String.valueOf(jobId)); // ← 이게 빠졌어요
+				Job job = new Job();
 
-			// job table에 추가
-			dashboardService.insertJob(job);
+				// insertedItem을 Job으로 전환
+				int jobId = dashboardService.selectNextJobId();
+				job.setJobId(String.valueOf(jobId));
+				job.setJobName(insertedItem.getTitle());
+				job.setJobExplain(insertedItem.getExplain());
+				insertedItem.setItemId(String.valueOf(jobId));
 
-			// career plan 테이블에 추가
-			Specific specific = new Specific();
-			specific.setUserId(userId);
-			specific.setJobId(String.valueOf(jobId));
-			dashboardService.insertJobLink(specific);
+				// job table에 추가
+				dashboardService.insertJob(job);
+
+				// career plan 테이블에 추가
+				Specific specific = new Specific();
+				specific.setUserId(userId);
+				specific.setJobId(String.valueOf(jobId));
+				dashboardService.insertJobLink(specific);
+			}
+			else {
+				// 5개 초과해 추가하려고 할 경우
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("직무는 최대 5개까지만 추가할 수 있습니다.");
+				
+			}
 
 			break;
 
@@ -349,7 +372,8 @@ public class ChatbotController {
 		default:
 			return null;
 		}
-		return insertedItem;
+
+		return ResponseEntity.ok(insertedItem);
 
 	}
 
