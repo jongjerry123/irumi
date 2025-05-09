@@ -472,6 +472,7 @@ $(function() {
 					<i class="fa fa-paper-plane"></i>
 				</button>
 			</div>
+			<c:import url="/WEB-INF/views/common/footer.jsp" />
 			
 		</div>
 		
@@ -480,7 +481,7 @@ $(function() {
 		</div>
 		
 	</div><!--  chatbot-page-layout-->
-	<c:import url="/WEB-INF/views/common/footer.jsp" />
+	
 	
 </body>
 </html>

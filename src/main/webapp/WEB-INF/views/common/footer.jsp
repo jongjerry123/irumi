@@ -103,7 +103,7 @@
       text-align: center;
       font-size: 12px;
       opacity: 0.6;
-      padding: 20px 0;
+      padding: 5px 0; /*수정 필요.. .여기 때문에 footer 안나타남*/
     }
 
     .footer-note a {

@@ -128,7 +128,7 @@
     background: #232323;
     border: 1px solid #BAAC80;
     color: #BAAC80;
-    padding: 8px 16px;
+    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 12px;
@@ -138,6 +138,7 @@
 .specType:hover {
     background: #BAAC80;
     color: #232323;
+    opacity: 0.5;
 }
 
 /* active 상태에서 버튼 스타일 */
