@@ -32,4 +32,6 @@ public interface UserService {
     void updateChPwd(String userId, Date chPwd);
     //소셜 유저 권한 조회용
     String selectUserAuthority(String socialId);
+    // 유저 인증 정보 업데이트
+	void updateUserVerification(User user);
 }

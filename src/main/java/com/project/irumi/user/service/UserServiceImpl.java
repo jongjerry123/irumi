@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
             params.put("userDegree", userData.get("degree"));
         }
         if (userData.containsKey("graduated") && userData.get("graduated") != null) {
-            params.put("userGradulate", userData.get("graduated"));
+            params.put("userGraduate", userData.get("graduated"));
         }
         if (userData.containsKey("point") && userData.get("point") != null) {
             params.put("userPoint", userData.get("point"));
@@ -111,5 +111,9 @@ public class UserServiceImpl implements UserService {
 	public String selectUserAuthority(String socialId) {
 		return userDao.selectUserAuthority(socialId);
 	}
-    
+    // 유저 인증 정보 업데이트
+    @Override
+    public void updateUserVerification(User user) {
+        userDao.updateUserVerification(user);
+    }
 }
