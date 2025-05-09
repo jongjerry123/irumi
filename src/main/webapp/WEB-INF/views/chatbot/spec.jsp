@@ -32,7 +32,12 @@ let cacheSessionSpecOpts=null; // (스펙챗엔 필요 X)선택한 jobOpt에 따
 let subTopicJobCI= null; // subtopic 지정 위해 서버로 보낼 CI 객체;
 let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변수
 
+
+
 $(function() {
+	//기본으로는 채팅 버튼 비활성화 돼있음
+	$(".chat-send-btn").addClass("inactive");
+	
 	// 대쉬보드 requestScope에서 가져오는 값.
 	var dashJobName = "${job.jobName}";  
 	
@@ -114,6 +119,7 @@ $(function() {
 	            contentType: "application/json",
 	            success: function () {
 	                console.log("sub topic 설정 완료:", subTopicJobCI.title);
+	                selectedJobTitle=subTopicJobCI.title;
 	                // 해당 subtopic에 해당하는 spec들 불러오기
 	                $.ajax({
 	                    type: "POST",
@@ -134,12 +140,21 @@ $(function() {
 	                alert("서브 토픽 설정에 실패했습니다.");
 	            }
 	        });
-	    } else {
+	        //서브토픽 지정 후 봇의 첫 메세지 + 스펙 추가 버튼이 나타나게 함
+	        $("#first-bot-prompt").show();
+	        $(".manual-input-box").show();
+	        $(".selected-job-text").text(subTopicJobCI.title); // 봇 메세지에 나타날 직무 이름
+	        $(".chat-send-btn").removeClass("inactive");
+	    } 
+
+	    else {
 	        alert("선택된 항목이 없습니다.");
 	    }
 	});
 	
     function sendMessage(message) {
+    	//답변 올 때까지 버튼 일시적 비활성화
+    	$(".chat-send-btn").addClass("inactive");
         addMessageToChat(message, "user-msg");
 
         $.ajax({
@@ -149,7 +164,7 @@ $(function() {
             data: JSON.stringify({ userMsg: message, topic: "spec" }),
             success: function(gptReply) {
             	addBotMessageToChat(gptReply.gptAnswer, "bot-msg");
-
+				
             	// 복수 선택 옵션이 올 경우
                 if (gptReply.checkboxOptions && Array.isArray(gptReply.checkboxOptions) && gptReply.checkboxOptions.length > 0) {
                     renderCheckboxList(gptReply.checkboxOptions);
@@ -160,7 +175,6 @@ $(function() {
 
             	// 택1 선택 옵션이 올 경우
                 if (gptReply.options && Array.isArray(gptReply.options) && gptReply.options.length > 0) {
-                	
                     renderOptionButtons(gptReply.options);
                 } else {
                     removeOptionButtons();
@@ -170,6 +184,10 @@ $(function() {
             },
             error: function() {
                 addMessageToChat("서버 오류 또는 JSON 파싱 실패!", "bot-msg");
+            },
+            complete: function(){
+            	// 대답이 온 후 전송 버튼 활성화
+            	$(".chat-send-btn").removeClass("inactive");
             }
         });// sendMessageToChatbot.do   
     }
@@ -306,37 +324,6 @@ $(function() {
             $input.val("");
         }
     });
-	/* // + 버튼 클릭시 직접 입력한 스펙 보내게 설정
-    $(".add-btn").on("click", function() {
-        const $input = $(".manual-input");
-        const val = $input.val().trim();
-        if (val) {
-            const specCI={
-            		title:val,
-            		explain:"",
-            		type:"imsi"
-            };
-            
-         // DB에 저장    ----------- 변경사항
-  	      $.ajax({
-  	        type: "POST",
-  	        url: "insertCareerItem.do",
-  	     	 contentType: "application/json",
-  	     	data: JSON.stringify(specCI),
-  	        success: function() {
-  	          console.log("직무에 스펙 추가 성공");
-  	        },
-  	        error: function() {
-  	          alert("직무에 스펙 추가 실패!");
-  	        }
-  	      });
-         
-         $input.val("");
-        } else {
-            alert("스펙을 입력해 주세요!");
-        }
-    });
-	 */
 	 // 대체 내용
 	 // 버튼 클릭 시 active 상태 토글
     $(".specType").on("click", function() {
@@ -423,7 +410,7 @@ $(function() {
         const $chatArea = $("#chatArea");
         $chatArea.parent().scrollTop($chatArea.parent()[0].scrollHeight);
     }
-  // 추가 ---------- 선택 완료 클릭 시 목표 직무 업데이트
+  // 추가 ---------- 선택 완료 클릭시 사이드바에 선택한 직무 정보 뜸
    $(".confirm-select-btn").on("click", function () {
        const selectedBtn = $(".select-group .select-btn.active");
        if (selectedBtn.length > 0) {
@@ -467,8 +454,10 @@ $(function() {
 				</div>
 				<div class="chat-container" id="chat-container">
 					<div class="chat-area" id="chatArea">
-						<div class="answer bot-msg">
-							내게 맞는 스펙 추천 세션입니다.<br> 먼저, 현재 보유하고 있는 스펙이나 경험을 말씀해 주세요.
+						<div class="answer bot-msg" id="first-bot-prompt" style="display:none;">
+							내게 맞는 스펙 추천 세션입니다.
+							<br> 먼저, <span class="selected-job-text"></span>가 되기 위해
+							<br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
 						</div>
 					</div>
 				</div>
@@ -484,11 +473,13 @@ $(function() {
 		<div class="right-panel">
 			<div class="saved-schedule-section">
 				<div class="info-row">
-					<span class="label">➤ 목표 직무:</span> <span class="value"></span>
+					<span class="label">➤ 목표 직무</span>
+					<span class="value"></span>
 				</div>
-				<div class="section-title">➤ 저장한 스펙</div>
+				<div class="section-title">➤ 저장한 목표 스펙</div>
 				<div class="saved-spec-list"></div>
-				<div class="manual-input-box">
+				<div class="section-title">➤ 직접 추가하기</div>
+				<div class="manual-input-box" style="display:none;">
 					<input type="text" placeholder="직접 스펙 입력" class="manual-input" />
 					 <input type="text" placeholder="스펙 설명 (선택)" class="manual-input-explain" />
 					<div class="specTypeChoice">
