@@ -4,8 +4,10 @@
  
  <c:set var="paging" value="${ requestScope.paging }" />
  <%-- url 뒤에 추가할 쿼리스트링으로 사용할 변수로 저장함 --%>
- <c:set var="queryParams" value="keyword=${ requestScope.keyword }&begin=${ requestScope.begin }&end=${ end }" />
-
+<c:set var="queryParams" value="keyword=${ requestScope.keyword }&type=" />
+<c:forEach var="item" items="${ requestScope.type }" varStatus="status">
+    <c:set var="queryParams" value="${ queryParams }${ item }${ (status.last) ? '' : ',' }" />
+</c:forEach>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
