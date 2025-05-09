@@ -210,6 +210,7 @@ public class PostService {
 	public void deletePostsAndReports(List<Long> postIds) {
 		postDAO.deleteCommentRecommendsByPostIds(postIds); // 1. 댓글 추천 기록 삭제
 		postDAO.deleteCommentReportsByPostIds(postIds); // 2. 댓글 신고 기록 삭제
+		postDAO.deleteCommentReportReportsByPostIds(postIds);
 		postDAO.deleteCommentsByPostIds(postIds); // 3. 댓글 삭제
 		postDAO.deletePostRecommends(postIds); // 4. 게시글 추천 기록 삭제
 		postDAO.deletePostReports(postIds); // 5. 게시글 신고 기록 삭제

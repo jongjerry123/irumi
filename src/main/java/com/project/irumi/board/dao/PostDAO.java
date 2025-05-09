@@ -268,6 +268,11 @@ public class PostDAO {
 	public void deleteCommentReportsByPostIds(List<Long> postIds) {
 		sqlSession.delete("boardMapper.deleteCommentReportsByPostIds", postIds);
 	}
+	
+	// 게시글 ID 기준 댓글 신고 신고기록 삭제 (TB_COMREPORT)
+	public void deleteCommentReportReportsByPostIds(List<Long> postIds) {
+		sqlSession.delete("boardMapper.deleteCommentReportReportsByPostIds", postIds);
+	}
 
 	// 게시글 ID 기준 댓글 추천 기록 삭제
 	public void deleteCommentRecommendsByPostIds(List<Long> postIds) {
