@@ -473,6 +473,10 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; align-items: center; gap: 6px;">
       <a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
+<c:if test="${post.commentCount > 0}">
+  <span style="color: gray;">(${post.commentCount})</span>
+</c:if>
+</a>
       <c:if test="${not empty post.postSavedName}">
         <span title="첨부파일 있음">📎</span>
       </c:if>

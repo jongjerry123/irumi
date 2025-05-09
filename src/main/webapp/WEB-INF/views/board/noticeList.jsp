@@ -269,36 +269,36 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 								<td>${post.postWriter}</td>
 								<td>
   <div style="display: flex; justify-content: space-between; align-items: center;">
-    <!-- 제목 + 클립 아이콘 -->
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
-
-      <c:if test="${not empty post.postSavedName}">
-        <span title="첨부파일 있음">📎</span>
-      </c:if>
-    </div>
-
-    <!-- 썸네일 이미지 -->
-    <c:if test="${not empty post.postSavedName 
-              && (fn:endsWith(post.postSavedName, '.jpg') 
-               || fn:endsWith(post.postSavedName, '.png') 
-               || fn:endsWith(post.postSavedName, '.jpeg') 
-               || fn:endsWith(post.postSavedName, '.gif'))}">
-      <img src="resources/uploads/${post.postSavedName}" 
-           alt="썸네일"
-           style="
-             width: 30px;
-             height: 30px;
-             object-fit: cover;
-             border: 1px solid #a983a3;
-             border-radius: 4px;
-             transition: transform 0.3s ease;
-           "
-           onmouseover="this.style.transform='scale(1.8)'"
-           onmouseout="this.style.transform='scale(1)'"
-      />
+  <div style="display: flex; align-items: center; gap: 6px;">
+    <a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
+    <c:if test="${post.commentCount > 0}">
+      <span style="color: gray;">(${post.commentCount})</span>
+    </c:if>
+    <c:if test="${not empty post.postSavedName}">
+      <span title="첨부파일 있음">📎</span>
     </c:if>
   </div>
+
+  <c:if test="${not empty post.postSavedName 
+            && (fn:endsWith(post.postSavedName, '.jpg') 
+             || fn:endsWith(post.postSavedName, '.png') 
+             || fn:endsWith(post.postSavedName, '.jpeg') 
+             || fn:endsWith(post.postSavedName, '.gif'))}">
+    <img src="resources/uploads/${post.postSavedName}" 
+         alt="썸네일"
+         style="
+           width: 30px;
+           height: 30px;
+           object-fit: cover;
+           border: 1px solid #a983a3;
+           border-radius: 4px;
+           transition: transform 0.3s ease;
+         "
+         onmouseover="this.style.transform='scale(1.8)'"
+         onmouseout="this.style.transform='scale(1)'"
+    />
+  </c:if>
+</div>
 </td>
 								<td><fmt:formatDate value="${post.postTime}" pattern="yyyy-MM-dd HH:mm" /></td>
 							</tr>

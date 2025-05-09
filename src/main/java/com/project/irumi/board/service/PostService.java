@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.irumi.board.dao.PostDAO;
 import com.project.irumi.board.dto.CommentDTO;
@@ -206,16 +207,38 @@ public class PostService {
 		postDAO.deletePostReports(postIds);
 	}
 
-	// 게시글과 댓글, 신고기록을 모두 삭제하는 메서드
+	@Transactional
 	public void deletePostsAndReports(List<Long> postIds) {
-		postDAO.deleteCommentRecommendsByPostIds(postIds); // 1. 댓글 추천 기록 삭제
-		postDAO.deleteCommentReportsByPostIds(postIds); // 2. 댓글 신고 기록 삭제
-		postDAO.deleteCommentReportReportsByPostIds(postIds);
-		postDAO.deleteCommentsByPostIds(postIds); // 3. 댓글 삭제
-		postDAO.deletePostRecommends(postIds); // 4. 게시글 추천 기록 삭제
-		postDAO.deletePostReports(postIds); // 5. 게시글 신고 기록 삭제
-		postDAO.deletePosts(postIds); // 6. 게시글 삭제
+		postDAO.deleteCommentReportReportsByPostIds(postIds); // 🔹 댓글 신고 기록 (TB_COMREPORT)
+		postDAO.deleteCommentRecommendsByPostIds(postIds);     // 🔹 댓글 추천 기록
+		postDAO.deleteCommentReportsByPostIds(postIds);        // 🔹 댓글 신고 기록 (TB_COMMENT 관련)
+		postDAO.deleteCommentsByPostIds(postIds);              // 🔹 댓글
+
+		postDAO.deletePostRecommends(postIds);                 // 🔹 게시글 추천
+		postDAO.deletePostReports(postIds);                    // 🔹 게시글 신고
+		postDAO.deletePosts(postIds);                          // 🔹 게시글
 	}
+	
+	@Transactional
+	public void deletePostAndDependencies(Long postId) {
+	    // 1. 댓글 ID 목록 조회
+	    List<Long> commentIds = postDAO.getCommentIdsByPostId(postId);
+
+	    // 2. 댓글 관련 기록 삭제
+	    if (!commentIds.isEmpty()) {
+	        postDAO.deleteCommentReportReportsByCommentIds(commentIds); // TB_COMREPORT
+	        postDAO.deleteCommentRecommendsByCommentIds(commentIds);    // 댓글 추천
+	        postDAO.deleteCommentReportsByCommentIds(commentIds);       // 댓글 신고
+	        postDAO.deleteComments(commentIds);                         // 댓글
+	    }
+
+	    // 3. 게시글 관련 기록 삭제
+	    postDAO.deletePostRecommends(List.of(postId));     // 게시글 추천
+	    postDAO.deletePostReports(List.of(postId));        // 게시글 신고
+	    postDAO.deletePost(postId);                        // 게시글 삭제
+	}
+	
+	
 
 	// 선택된 댓글들을 추천/신고 기록 포함하여 안전하게 삭제
 	public void deleteReportedCommentsByIds(List<Long> commentIds) {

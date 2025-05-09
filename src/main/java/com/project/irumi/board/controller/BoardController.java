@@ -363,7 +363,7 @@ public class BoardController {
 	        if (fileToDelete.exists()) fileToDelete.delete();
 	    }
 
-	    postService.deletePost(postId);
+	    postService.deletePostAndDependencies(postId);
 	    return "redirect:/freeBoard.do";
 	}
 	
