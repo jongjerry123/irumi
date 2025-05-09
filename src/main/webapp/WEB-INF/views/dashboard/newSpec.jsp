@@ -231,7 +231,7 @@ input[type="radio"]:checked+label::before {
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
 	<h1 align="center">목표: ${ requestScope.job.jobName }</h1>
-	<pre style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto; color: #18d7c6;">
+	<pre style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto; color: lightgray;">
 		<h3>${ requestScope.job.jobExplain }</h3>
 	</pre>
 	<form action="insertSpec.do" method="post">
