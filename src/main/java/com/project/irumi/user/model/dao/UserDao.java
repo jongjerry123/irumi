@@ -96,5 +96,9 @@ public class UserDao {
     public void updateUserVerification(User user) {
         sqlSessionTemplate.update("userMapper.updateUserVerification", user);
     }
+    // 유저 아이디로 권한 조회
+    public String selectUserAuthorityByUserId(String userId) {
+    	return sqlSessionTemplate.selectOne("userMapper.selectUserAuthorityByUserId", userId);
+    }
 
 }
