@@ -92,5 +92,9 @@ public class UserDao {
 	public String selectUserAuthority(String socialId) {
 		return sqlSessionTemplate.selectOne("userMapper.selectUserAuthority", socialId);
 	}
+    // 유저 인증 정보 업데이트
+    public void updateUserVerification(User user) {
+        sqlSessionTemplate.update("userMapper.updateUserVerification", user);
+    }
 
 }

@@ -191,10 +191,7 @@ body {
     }
     function validateInputs() {
         const idValid = userId.value.trim().length >= 3;
-        const pwdValid = userPwd.value.trim().length >= 8 &&
-            /[A-Za-z]/.test(userPwd.value) &&
-            /\d/.test(userPwd.value) &&
-            /[!@#$%^&*(),.?":{}|<>]/.test(userPwd.value);
+        const pwdValid = userPwd.value.trim().length >= 8;
 
         loginBtn.disabled = !(idValid && pwdValid);
     }

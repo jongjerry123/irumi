@@ -60,7 +60,7 @@ import java.util.Properties;
 
 @Controller
 public class UserController {
-	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+	//private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	private static final String RANDOM_PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
 	private static final int PASSWORD_LENGTH = 16;
 //    private static final String REDIRECT_URI = "http://localhost:8080/irumi/oauth2callback";
@@ -151,6 +151,13 @@ public class UserController {
 //       logger.info("goToShowId: Displaying showId page");
 		return "user/showId";
 	}
+	// 이메일 정보 전송
+	@GetMapping("showId.do")
+	public String showId(@RequestParam(name = "email") String email, Model model) {
+		String userId = userservice.findIdByEmail(email);
+		model.addAttribute("userId", userId);
+		return "user/showId";
+	}
 
 	// 비밀번호 찾기 페이지 이동
 	@RequestMapping("findPassword.do")
@@ -178,8 +185,18 @@ public class UserController {
 		}
 		return "user/changeManage";
 	}
+	
+	//랜덤 비밀번호 생성기
+	private String generateRandomPassword() {
+		SecureRandom random = new SecureRandom();
+		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
+		for (int i = 0; i < PASSWORD_LENGTH; i++) {
+			password.append(RANDOM_PASSWORD_CHARS.charAt(random.nextInt(RANDOM_PASSWORD_CHARS.length())));
+		}
+		return password.toString();
+	}
 
-	// 수정: Naver Mail API를 사용한 인증번호 전송
+	// Naver Mail API를 사용한 인증번호 전송
 	@PostMapping("sendVerification.do")
 	@ResponseBody
 	public Map<String, Object> sendVerification(@RequestParam("email") String email, HttpSession session) {
@@ -218,7 +235,7 @@ public class UserController {
 		} catch (Exception e) {
 			response.put("success", false);
 			response.put("message", "인증번호 전송에 실패했습니다. 다시 시도해 주세요.");
-			logger.error("Naver Mail API 오류: ", e);
+			//logger.error("Naver Mail API 오류: ", e);
 		}
 
 		return response;
@@ -304,90 +321,7 @@ public class UserController {
 		}
 		return response;
 	}
-	@RequestMapping(value = "updatePassword1.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> updatePassword1(@RequestParam(name = "userId") String userId,
-			@RequestParam(name = "newPassword") String newPassword, HttpSession session) {
-		Map<String, Object> response = new HashMap<>();
-		try {
-			String encodedPassword = bcryptPasswordEncoder.encode(newPassword);
-			userservice.updatePassword(userId, encodedPassword);
-			response.put("success", true);
-			response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
-			response.put("redirectUrl", "login.do");
-		} catch (Exception e) {
-			response.put("success", false);
-			response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
-		}
-		return response;
-	}
-	@PostMapping("checkPassword1.do")
-    @ResponseBody
-    public Map<String, Object> checkPassword1(@RequestBody Map<String, String> data) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            String userId = data.get("userId");
-            String newPassword = data.get("password");
-
-            User user = userservice.selectUserById(userId);
-            if (user == null) {
-                response.put("success", false);
-                response.put("message", "사용자를 찾을 수 없습니다.");
-                return response;
-            }
-
-            String currentPassword = user.getUserPwd();
-            if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
-                response.put("success", false);
-                response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
-                return response;
-            }
-
-            if (newPassword == null || newPassword.isEmpty()) {
-                response.put("success", true);
-                response.put("isSame", false);
-                response.put("message", "");
-                return response;
-            }
-
-            boolean isSame = bcryptPasswordEncoder.matches(newPassword, currentPassword);
-            response.put("success", true);
-            response.put("isSame", isSame);
-            response.put("message", isSame ? "새 비밀번호는 현재 비밀번호와 달라야 합니다." : "");
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "비밀번호 확인 중 오류: " + e.getMessage());
-            logger.error("Error in checkPassword1: ", e);
-        }
-        return response;
-    }
-	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {
-		Map<String, Object> response = new HashMap<>();
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null || !loginUser.getUserId().equals(userId)) {
-			response.put("success", false);
-			response.put("message", "로그인 정보가 유효하지 않습니다.");
-			return response;
-		}
-		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-			response.put("success", false);
-			response.put("message", "소셜 로그인 사용자는 비밀번호 변경 연기를 할 수 없습니다.");
-			return response;
-		}
-		try {
-			long pastChPwdMillis = System.currentTimeMillis() - (120L * 24 * 60 * 60 * 1000);
-			userservice.updateChPwd(userId, new Date(pastChPwdMillis));
-			response.put("success", true);
-			response.put("message", "비밀번호 변경 주기가 120일 전으로 설정되었습니다.");
-		} catch (Exception e) {
-			response.put("success", false);
-			response.put("message", "연기 처리 중 오류가 발생했습니다.");
-		}
-		return response;
-	}
-
+	
 	@RequestMapping(value = "checkPassword.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkPassword(@RequestBody Map<String, String> data, HttpSession session) {
@@ -428,6 +362,33 @@ public class UserController {
 		} catch (Exception e) {
 			response.put("success", false);
 			response.put("message", "비밀번호 확인 중 오류: " + e.getMessage());
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {
+		Map<String, Object> response = new HashMap<>();
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !loginUser.getUserId().equals(userId)) {
+			response.put("success", false);
+			response.put("message", "로그인 정보가 유효하지 않습니다.");
+			return response;
+		}
+		if (Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+			response.put("success", false);
+			response.put("message", "소셜 로그인 사용자는 비밀번호 변경 연기를 할 수 없습니다.");
+			return response;
+		}
+		try {
+			long pastChPwdMillis = System.currentTimeMillis() - (120L * 24 * 60 * 60 * 1000);
+			userservice.updateChPwd(userId, new Date(pastChPwdMillis));
+			response.put("success", true);
+			response.put("message", "비밀번호 변경 주기가 120일 전으로 설정되었습니다.");
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "연기 처리 중 오류가 발생했습니다.");
 		}
 		return response;
 	}
@@ -480,15 +441,6 @@ public class UserController {
 			response.put("message", "업데이트 실패: " + e.getMessage());
 		}
 		return response;
-	}
-
-	private String generateRandomPassword() {
-		SecureRandom random = new SecureRandom();
-		StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
-		for (int i = 0; i < PASSWORD_LENGTH; i++) {
-			password.append(RANDOM_PASSWORD_CHARS.charAt(random.nextInt(RANDOM_PASSWORD_CHARS.length())));
-		}
-		return password.toString();
 	}
 
 	@PostMapping("idchk.do")
@@ -589,13 +541,7 @@ public class UserController {
 		return response;
 	}
 
-	@GetMapping("showId.do")
-	public String showId(@RequestParam(name = "email") String email, Model model) {
-		String userId = userservice.findIdByEmail(email);
-		model.addAttribute("userId", userId);
-		return "user/showId";
-	}
-
+	//아이디 찾기에서 아이디주인과 이메일이 일치한지
 	@PostMapping("checkUser.do")
 	@ResponseBody
 	public Map<String, Object> checkUser(@RequestParam("userId") String userId, @RequestParam("email") String email) {
@@ -607,23 +553,95 @@ public class UserController {
 		} catch (Exception e) {
 			response.put("matched", false);
 			response.put("message", "사용자 확인 중 오류가 발생했습니다.");
-			logger.error("Error in checkUser: ", e);
+			//logger.error("Error in checkUser: ", e);
 		}
 		return response;
 	}
 
-	@GetMapping("resetPassword.do")
-	public String resetPassword(@RequestParam(name = "userId") String userId, HttpSession session, Model model) {
-		logger.info("resetPassword.do: Processing for userId = {}", userId);
-		Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
-		if (emailVerified != null && emailVerified) {
-			model.addAttribute("userId", userId);
-			return "user/resetPassword";
-		} else {
-			logger.warn("resetPassword.do: Email not verified for userId = {}", userId);
-			return "redirect:/findPassword.do";
-		}
-	}
+    // 임시 비밀번호 생성 및 전송
+    @GetMapping("resetPassword.do")
+    @ResponseBody
+    public Map<String, Object> resetPassword(@RequestParam(name = "userId") String userId, 
+                                            @RequestParam(name = "email") String email, 
+                                            HttpSession session) {
+        //logger.info("resetPassword.do: Processing for userId = {}, email = {}", userId, email);
+        Map<String, Object> response = new HashMap<>();
+
+        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+        if (emailVerified == null || !emailVerified) {
+            response.put("success", false);
+            response.put("message", "이메일 인증이 필요합니다.");
+            response.put("redirectUrl", "findPassword.do");
+            return response;
+        }
+
+        try {
+            // 사용자 조회
+            User user = userservice.selectUserById(userId);
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "사용자를 찾을 수 없습니다.");
+                //logger.warn("resetPassword.do: User not found for userId = {}", userId);
+                return response;
+            }
+
+            // 이메일 유효성 검사
+            if (email == null || email.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "이메일 주소가 입력되지 않았습니다.");
+                //logger.warn("resetPassword.do: Email is null or empty for userId = {}", userId);
+                return response;
+            }
+
+            // 입력된 이메일과 DB 이메일 일치 여부 확인
+            boolean match = userservice.checkUserMatch(userId, email);
+            if (!match) {
+                response.put("success", false);
+                response.put("message", "입력한 이메일이 사용자 정보와 일치하지 않습니다.");
+                //logger.warn("resetPassword.do: Email mismatch for userId = {}, input email = {}인 유저가 없습니다.", 
+                            //userId, email, user.getUserEmail());
+                return response;
+            }
+
+            // 소셜 로그인 사용자 여부 확인
+            if (Arrays.asList(3, 4, 5).contains(user.getUserLoginType())) {
+                response.put("success", false);
+                response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+                //logger.warn("resetPassword.do: Social login user cannot reset password, userId = {}", userId);
+                return response;
+            }
+
+            // 임시 비밀번호 생성
+            String tempPassword = generateRandomPassword();
+            String encodedPassword = bcryptPasswordEncoder.encode(tempPassword);
+
+            // 비밀번호 업데이트
+            userservice.updatePassword(userId, encodedPassword);
+
+            // 이메일 전송
+            String subject = "임시 비밀번호";
+            String body = "귀하의 임시 비밀번호는 다음과 같습니다: " + tempPassword + "\n로그인 후 비밀번호를 변경해 주세요.";
+            naverMailService.sendEmail(email, subject, body);
+
+            // 인증 정보 초기화
+            user.setEmailVerification("N");
+            user.setEmailVerificationToken(null);
+            user.setEmailTokenExpiry(null);
+            userservice.updateUserVerification(user);
+
+            // 세션 인증 상태 초기화
+            session.removeAttribute("emailVerified");
+
+            response.put("success", true);
+            response.put("message", "임시 비밀번호가 이메일로 전송되었습니다.");
+            response.put("redirectUrl", "loginPage.do");
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "비밀번호 변경 중 오류가 발생했습니다: " + e.getMessage());
+            //logger.error("Error in resetPassword: ", e);
+        }
+        return response;
+    }
 
 
 	@GetMapping("/googleLogin.do")

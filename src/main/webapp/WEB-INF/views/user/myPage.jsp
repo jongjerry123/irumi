@@ -728,7 +728,7 @@ input[type="password"], input[type="email"], input[type="text"], select
                     const sessionEmail = '${sessionScope.loginUser.userEmail}' || '';
                     const sessionUniversity = '${sessionScope.loginUser.userUniversity}' || '';
                     const sessionDegree = '${sessionScope.loginUser.userDegree}' || '';
-                    const sessionGraduated = '${sessionScope.loginUser.userGradulate}' || '';
+                    const sessionGraduated = '${sessionScope.loginUser.userGraduate}' || '';
                     const sessionPoint = '${sessionScope.loginUser.userPoint}' || '';
 
                     // 변경 여부 확인
@@ -923,15 +923,15 @@ input[type="password"], input[type="email"], input[type="text"], select
 				<label for="graduated">졸업 여부</label> <select id="graduated"
 					name="graduated">
 					<option value=""
-						${empty sessionScope.loginUser.userGradulate ? 'selected' : ''}>선택하세요</option>
+						${empty sessionScope.loginUser.userGraduate ? 'selected' : ''}>선택하세요</option>
 					<option value="졸업"
-						${sessionScope.loginUser.userGradulate == '졸업' ? 'selected' : ''}>졸업</option>
+						${sessionScope.loginUser.userGraduate == '졸업' ? 'selected' : ''}>졸업</option>
 					<option value="재학"
-						${sessionScope.loginUser.userGradulate == '재학' ? 'selected' : ''}>재학</option>
+						${sessionScope.loginUser.userGraduate == '재학' ? 'selected' : ''}>재학</option>
 					<option value="휴학"
-						${sessionScope.loginUser.userGradulate == '휴학' ? 'selected' : ''}>휴학</option>
+						${sessionScope.loginUser.userGraduate == '휴학' ? 'selected' : ''}>휴학</option>
 					<option value="기타"
-						${sessionScope.loginUser.userGradulate == '기타' ? 'selected' : ''}>기타</option>
+						${sessionScope.loginUser.userGraduate == '기타' ? 'selected' : ''}>기타</option>
 				</select>
 				<div id="graduated-message" class="message"></div>
 			</div>

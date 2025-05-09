@@ -26,7 +26,7 @@ public class User implements java.io.Serializable{
 		super();
 	}
 	public User(String userId, String userPwd, String userName, String userEmail, Date registDate,
-			String userUniversity, String userDegree, String userGradulate, double userPoint, String userAuthority,
+			String userUniversity, String userDegree, String userGraduate, double userPoint, String userAuthority,
 			int userLoginType, String userSocialId, String emailVerification, String emailVerificationToken,
 			Date emailTokenExpiry, Date chPWD) {
 		super();
@@ -37,7 +37,7 @@ public class User implements java.io.Serializable{
 		this.registDate = registDate;
 		this.userUniversity = userUniversity;
 		this.userDegree = userDegree;
-		this.userGraduate = userGradulate;
+		this.userGraduate = userGraduate;
 		this.userPoint = userPoint;
 		this.userAuthority = userAuthority;
 		this.userLoginType = userLoginType;
@@ -89,11 +89,11 @@ public class User implements java.io.Serializable{
 	public void setUserDegree(String userDegree) {
 		this.userDegree = userDegree;
 	}
-	public String getUserGradulate() {
+	public String getUserGraduate() {
 		return userGraduate;
 	}
-	public void setUserGradulate(String userGradulate) {
-		this.userGraduate = userGradulate;
+	public void setUserGraduate(String userGraduate) {
+		this.userGraduate = userGraduate;
 	}
 	public double getUserPoint() {
 		return userPoint;
@@ -150,11 +150,11 @@ public class User implements java.io.Serializable{
 	public String toString() {
 		return "User [userId=" + userId + ", userPwd=" + userPwd + ", userName=" + userName + ", userEmail=" + userEmail
 				+ ", registDate=" + registDate + ", userUniversity=" + userUniversity + ", userDegree=" + userDegree
-				+ ", userGradulate=" + userGraduate + ", userPoint=" + userPoint + ", userAuthority=" + userAuthority
+				+ ", userGraduate=" + userGraduate + ", userPoint=" + userPoint + ", userAuthority=" + userAuthority
 				+ ", userLoginType=" + userLoginType + ", userSocialId=" + userSocialId + ", emailVerification="
 				+ emailVerification + ", emailVerificationToken=" + emailVerificationToken + ", emailTokenExpiry="
 				+ emailTokenExpiry + ", chPWD=" + chPWD + "]";
 	}
 	
-
+	
 }
