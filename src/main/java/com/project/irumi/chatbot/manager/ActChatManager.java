@@ -213,59 +213,93 @@ public class ActChatManager {
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
 	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session) {
 	    // 🔹 검색 키워드 생성
-		String userHistory = session.getHavebeenact() != null ? session.getHavebeenact().getMsgContent() : "";
+		String havebeen = session.getHavebeenact() != null ? session.getHavebeenact().getMsgContent() : "";
 
 		String prompt = switch (activityType) {
 		    case "도서" -> """
 		        %s를 공부하는 데 도움이 되는 도서를 3권만 추천해줘.
 		        단, 사용자가 이전에 언급한 활동: "%s" 과 중복되지 않도록 해줘.
-		        도서명, 저자, 간단한 이유만 포함해서 알려줘.
-		        """.formatted(spec, userHistory);
+		        도서명, 저자, 출판사만 포함해서 알려줘.
+		        """.formatted(spec, havebeen);
 		        
 		    case "영상" -> """
 		        %s에 대해 공부할 수 있는 유튜브 채널 또는 무료 강의 3개 추천해줘.
-		        단, "%s"와 유사한 내용은 제외하고 새로운 추천만 해줘.
+		        단, 사용자가 이전에 언급한 활동: "%s" 과 유사한 내용은 제외하고 새로운 추천만 해줘.
 		        제목과 링크 포함해서 알려줘.
-		        """.formatted(spec, userHistory);
+		        """.formatted(spec, havebeen);
 		        
 		    case "기타 활동" -> """
 		        %s와 관련된 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 중에서
-		        "%s"와 겹치지 않는 새로운 활동 3가지를 추천해줘.
-		        활동명과 URL 함께 제공해줘.
-		        """.formatted(spec, userHistory);
+		        단, 사용자가 이전에 언급한 활동: "%s" 과 겹치지 않는 새로운 활동 3가지를 추천해줘.
+		        활동명 제공해주고 관련 URL이 있다면 URL 함께 제공해줘.
+		        만약 관련 기타 활동이 없으면 반드시 빈칸을 보내줘.
+		        """.formatted(spec, havebeen);
 		        
 		    default -> """
 		        %s에 도움이 될 활동을 추천해줘. 단 "%s"와 비슷한 것은 제외해줘.
-		        """.formatted(spec, userHistory);
+		        """.formatted(spec, havebeen);
 		};
 
+		String gptAnswer = gptApiService.callGPT(prompt);
+		
+		if(gptAnswer == null || gptAnswer.trim().isEmpty()) {
+			ChatbotResponseDto crd = new ChatbotResponseDto();
+			
+			crd = cantChooseOptions(activityType, session);
+			
+			return crd;
+		    
+		} else {
+			List<CareerItemDto> checkboxList = extractCheckboxItems(gptAnswer);
+			
+			if (checkboxList.isEmpty()) {
+				ChatbotResponseDto crd = new ChatbotResponseDto();
+				
+				crd = cantChooseOptions(activityType, session);
+				
+				return crd;
+			}
+			
+		    // 🔹 응답 메시지 문자열 생성
+		    StringBuilder msgBuilder = new StringBuilder();
+		    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
+		    for (CareerItemDto dto : checkboxList) {
+		        msgBuilder.append("- ").append(dto.getTitle()).append(" (").append(dto.getExplain()).append(")\n");
+		    }
 
-	    // 🔹 SerpAPI 호출 → 아래는 예시로 고정된 항목 사용
-	    // 실제 구현 시 serpApiService.searchActivities(keyword) 로 치환
-	    List<CareerItemDto> checkboxList = serpApiService.searchSerpActivity(prompt, activityType);
-	    // 🔹 응답 메시지 문자열 생성
-	    StringBuilder msgBuilder = new StringBuilder();
-	    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
-	    for (CareerItemDto dto : checkboxList) {
-	        msgBuilder.append("- ").append(dto.getTitle()).append(" (").append(dto.getExplain()).append(")\n");
-	    }
+		    // 🔹 대화 로그 DB 저장
+		    ChatMsg botMsg = new ChatMsg();
+		    botMsg.setConvId(session.getConvId());
+		    botMsg.setConvTopic(session.getTopic());
+		    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
+		    botMsg.setUserId(session.getUserId());
+		    botMsg.setRole("BOT");
+		    botMsg.setMsgContent(msgBuilder.toString());
+		    chatbotService.insertChatMsg(botMsg);
 
-	    // 🔹 대화 로그 DB 저장
-	    ChatMsg botMsg = new ChatMsg();
+		    // 🔹 상태 전이
+		    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
+
+		    return new ChatbotResponseDto(
+		        "아래 추천된 항목 중 원하는 요소를 선택해 주세요!",
+		        checkboxList,
+		        List.of("다른 유형", "종료")
+		    );
+		}
+	}
+	
+	private ChatbotResponseDto cantChooseOptions(String activityType, ConvSession session){
+		ChatMsg botMsg = new ChatMsg();
 	    botMsg.setConvId(session.getConvId());
 	    botMsg.setConvTopic(session.getTopic());
 	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
 	    botMsg.setUserId(session.getUserId());
 	    botMsg.setRole("BOT");
-	    botMsg.setMsgContent(msgBuilder.toString());
+	    botMsg.setMsgContent(activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.");
 	    chatbotService.insertChatMsg(botMsg);
-
-	    // 🔹 상태 전이
-	    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
-
+	    
 	    return new ChatbotResponseDto(
-	        "아래 추천된 항목 중 원하는 요소를 선택해 주세요!",
-	        checkboxList,
+	    	activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.",
 	        List.of("다른 유형", "종료")
 	    );
 	}
