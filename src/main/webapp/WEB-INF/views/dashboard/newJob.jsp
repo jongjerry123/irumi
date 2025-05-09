@@ -58,7 +58,7 @@ input[type="search"] {
 	color: white;
 }
 
-input[type="submit"] {
+input[type="submit"], #re {
 	padding: 8px 16px;
 	border: none;
 	border-radius: 5px;
@@ -69,7 +69,7 @@ input[type="submit"] {
 	transition: background-color 0.3s;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, #re:hover {
 	background-color: #00796b;
 }
 
@@ -105,11 +105,49 @@ td a:hover {
 }
 .checkbox-grid {
 	display: grid;
-	grid-template-columns: repeat(6, 1fr);
-	gap: 20px 0px;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 5px 5px;
 	max-width: 1200px;
 }
+
+.checkbox-grid input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-grid label {
+    background-color: #333;
+    color: #ccc;
+    padding: 5px 5px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #555;
+    transition: all 0.2s ease-in-out;
+}
+
+.checkbox-grid input[type="checkbox"]:checked + label {
+    background-color: #00bfa5;
+    color: white;
+    font-weight: bold;
+    border-color: #00bfa5;
+}
+
+.checkbox-grid label:hover {
+    background-color: #444;
+}
 </style>
+
+</style>
+<script>
+	function toggleCheckboxes() {
+		const container = document.getElementById('checkboxContainer');
+		container.style.display = (container.style.display === 'none') ? 'block' : 'none';
+	}
+	
+	function resetPage() {
+		location.href = 'addJob.do?page=1';
+	}
+</script>
 </head>
 <body>
 	<c:set var="menu" value="dashboard" scope="request" />
@@ -119,7 +157,11 @@ td a:hover {
 	<fieldset>
 		<legend>검색할 직업을 입력하세요.</legend>
 			<input type="search" name="keyword" size="50"> &nbsp;
-			<input type="submit" value="검색"><br>
+			<input type="submit" value="검색">&nbsp;&nbsp;&nbsp;<button id="re" type="button" onclick="resetPage()">목록</button><br>
+		<button type="button" onclick="toggleCheckboxes()" style="margin-top: 20px; padding: 10px 20px; background-color: #00bfa5; color: white; border: none; border-radius: 5px; cursor: pointer;">
+			상세검색
+		</button>
+		<div id="checkboxContainer" style="display: none; margin-top: 20px;">
 		<div class="checkbox-grid">
 		<input type="checkbox" name="type" value="IT관련전문직" id="IT관련전문직">
 		    <label for="IT관련전문직">IT관련전문직</label>
@@ -206,6 +248,7 @@ td a:hover {
 		<input type="checkbox" name="type" value="회계 관련직" id="회계 관련직">
     		<label for="회계 관련직">회계 관련직</label>
     	</div>
+    </div>
 	</fieldset>
 	</form>
 	<c:if test="${ empty requestScope.list }">

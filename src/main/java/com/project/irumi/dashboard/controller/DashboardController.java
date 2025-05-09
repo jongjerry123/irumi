@@ -203,7 +203,7 @@ public class DashboardController {
 			currentPage = Integer.parseInt(page);
 		}
 
-		// 한 페이지에 출력할 목록 갯수 기본 10개로 지정함
+		// 한 페이지에 출력할 목록 갯수 기본 20개로 지정함
 		int limit = 20;
 		if (slimit != null) {
 			limit = Integer.parseInt(slimit);
@@ -224,14 +224,14 @@ public class DashboardController {
 		ss.setEndRow(paging.getEndRow());
 
 		// 서비스 모델로 페이징 적용된 목록 조회 요청하고 결과받기
-		ArrayList<JobList> list = dashboardService.selectSearchJob(search);
+		ArrayList<JobList> list = dashboardService.selectSearchJob(ss);
 
 
 		// ModelAndView : Model + View
 		mv.addObject("list", list); // request.setAttribute("list", list) 와 같음
 		mv.addObject("paging", paging);
 		mv.addObject("keyword", search.getKeyword());
-
+		mv.addObject("type", search.getType());
 		mv.setViewName("dashboard/newJob");
 
 		return mv;
@@ -257,12 +257,19 @@ public class DashboardController {
 	@RequestMapping(value = "insertJob.do", method = RequestMethod.POST)
 	public ModelAndView insertJobMethod(Job job, ModelAndView mv, HttpSession session) {
 		
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (dashboardService.selectUserJobs(loginUser.getUserId()).size() >= 5) {
+			mv.addObject("message", "직무 한도 초과!");
+			mv.setViewName("common/error");
+			return mv;
+		}
+		
 		int jobId = dashboardService.selectNextJobId();
 		job.setJobId(String.valueOf(jobId));
 		
 		int resultOne = dashboardService.insertJob(job);
 		
-		User loginUser = (User) session.getAttribute("loginUser");
+		
 		Specific specific = new Specific();
 		specific.setUserId(loginUser.getUserId());
 		specific.setJobId(String.valueOf(jobId));
@@ -384,16 +391,24 @@ public class DashboardController {
 	@RequestMapping(value = "insertSpec.do", method = RequestMethod.POST)
 	public ModelAndView insertSpecMethod(Spec spec, @RequestParam("jobId") String jobId, @RequestParam("ssType") List<String> ssType, @RequestParam("ssDate") List<String> ssDate, @RequestParam("actContent") List<String> actContent, ModelAndView mv, HttpSession session) {
 		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		if (dashboardService.selectUserSpecs(specific).size() >= 7) {
+			mv.addObject("message", "스펙 한도 초과!");
+			mv.setViewName("common/error");
+			return mv;
+		}
+		
 		// 스펙 추가
 		boolean resultOne = true;
 		String specId = String.valueOf(dashboardService.selectNextSpecId());
 		spec.setSpecId(specId);
 		int one = dashboardService.insertSpec(spec);
 		
-		User loginUser = (User) session.getAttribute("loginUser");
-		Specific specific = new Specific();
-		specific.setUserId(loginUser.getUserId());
-		specific.setJobId(jobId);
+		
+		
 		specific.setSpecId(specId);
 		int two = dashboardService.insertSpecLink(specific);
 		
@@ -482,16 +497,24 @@ public class DashboardController {
 		// 기존 스펙 삭제 -- 활동은 안지워짐 (TB_CAREER_PLAN에는 없지만 TB_ACTIVITY에는 남아있음)
 		int resultDelete = dashboardService.deleteSpec(spec.getSpecId());
 		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Specific specific = new Specific();
+		specific.setUserId(loginUser.getUserId());
+		specific.setJobId(jobId);
+		if (dashboardService.selectUserSpecs(specific).size() >= 7) {
+			mv.addObject("message", "스펙 한도 초과!");
+			mv.setViewName("common/error");
+			return mv;
+		}
+		
+		
 		// 스펙 추가
 		boolean resultOne = true;
 		String specId = String.valueOf(dashboardService.selectNextSpecId());
 		spec.setSpecId(specId);
 		int one = dashboardService.insertSpec(spec);
 
-		User loginUser = (User) session.getAttribute("loginUser");
-		Specific specific = new Specific();
-		specific.setUserId(loginUser.getUserId());
-		specific.setJobId(jobId);
+		
 		specific.setSpecId(specId);
 		int two = dashboardService.insertSpecLink(specific);
 

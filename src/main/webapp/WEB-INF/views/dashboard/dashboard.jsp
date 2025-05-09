@@ -34,7 +34,7 @@ body {
 }
 .dashboard-wrapper {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: 1fr 2.05fr 1fr;
   gap: var(--gap);
   padding: var(--gap);
   padding-left: 300px;
@@ -189,6 +189,7 @@ a {
 			}
 		});
 		
+		
 		$.ajax({
 			url: 'userJobView.do',
 			method: 'POST',
@@ -221,8 +222,15 @@ a {
 						})
 						.appendTo('#jobs');
 				});
-				$('<button>').text('목표 직업 추가하기').on('click', addJob).appendTo('#jobs');
-				$('<button>').text('목표 직업 탐색하기').on('click', searchJob).appendTo('#jobs');
+				if (data.length >= 5) {
+					$('<button>').text('목표 직업 추가하기').on('click', maxNumJobs).appendTo('#jobs');
+					$('<button>').text('목표 직업 탐색하기').on('click', maxNumJobs).appendTo('#jobs');
+				}
+				else {
+					$('<button>').text('목표 직업 추가하기').on('click', addJob).appendTo('#jobs');
+					$('<button>').text('목표 직업 탐색하기').on('click', searchJob).appendTo('#jobs');
+				}
+				
 			}
 		});
 	});
@@ -295,8 +303,15 @@ a {
 	                        remaining--;
 	                        
 	                        if (remaining === 0) {
-	                        	var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 300px;\">목표 스펙 추가하기</button></div>';
-								$('#certCards').append(buttonHtml);
+	                        	if (data.length >= 7) {
+	                        		var buttonHtml = '<div class="buttons"><button onclick=\"maxNumSpecs()\" style=\"width: 300px;\">목표 스펙 추가하기</button></div>';
+									$('#certCards').append(buttonHtml);
+	                        	}
+	                        	else {
+	                        		var buttonHtml = '<div class="buttons"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 300px;\">목표 스펙 추가하기</button></div>';
+									$('#certCards').append(buttonHtml);
+	                        	}
+	                        	
 	                        }
 	                    }
 	                });
@@ -304,6 +319,14 @@ a {
 				
 			}
 	    });
+	}
+	
+	function maxNumJobs() {
+		alert('직무 갯수 한도를 초과하였습니다(최대: 5개)');
+	}
+	
+	function maxNumSpecs() {
+		alert('스펙 갯수 한도를 초과하였습니다(최대: 7개)');
 	}
 	
 	function updateActStatus(actId, actState) {
@@ -320,7 +343,6 @@ a {
 		if(confirm("해당 직무를 삭제하시겠습니까?")) {
 			location.href = 'deleteJob.do?jobId=' + jobId;
 		}
-		
 	}
 	
 	function movetoUpdateSpec(specId) {
