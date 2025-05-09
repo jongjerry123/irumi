@@ -253,6 +253,9 @@ public class ActChatManager {
 		
 	    // 🔹 검색 키워드 생성
 		String havebeen = session.getHavebeenact() != null ? session.getHavebeenact().getMsgContent() : "";
+		if ("없음".equals(havebeen.trim())) {
+		    havebeen = "";
+		}
 		
 		String prompt;
 		
@@ -310,6 +313,7 @@ public class ActChatManager {
 		
 
 		String gptAnswer = gptApiService.callGPT(prompt);
+		System.out.println(gptAnswer);
 		
 		if(gptAnswer == null || gptAnswer.trim().isEmpty()) {
 			ChatbotResponseDto crd = new ChatbotResponseDto();
@@ -396,7 +400,7 @@ public class ActChatManager {
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isSpecRelatedInput(String input) {
         String prompt = """
-            다음 문장이 사용자가 원하는 스펙을 이루기 위한 활동에 관한 내용이거나 관련 활동을 하지 않아서 없다는 내용의 답변이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
+            다음 문장이 사용자가 원하는 스펙을 이루기 위한 활동에 관한 내용 혹은 "없음" 이라는 내용의 답변이면 '예', 관련 없으면 '아니오'로만 대답해 주세요.
             입력: "%s"
             """.formatted(input);
 
