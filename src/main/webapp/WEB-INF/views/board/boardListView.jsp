@@ -249,11 +249,40 @@ table.board-table td:nth-child(2) {
   color: #C69BC6;         /* 선택사항: 호버 시 색 변경 */
 }
 
+.board-table td {
+  overflow: visible; /* 기본값은 hidden일 수 있음 */
+  position: relative; /* z-index가 동작하려면 필요 */
+}
+
 .empty-message {
 	text-align: center;
 	padding: 40px;
 	font-size: 16px;
 	color: #aaa;
+}
+
+
+.thumbnail-hover {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border: 1px solid #3a1f41;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.big-preview {
+  position: fixed;
+  width: 200px;
+  height: auto;
+  top: 100px;
+  left: 100px;
+  z-index: 99999;
+  background-color: #000;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.6);
 }
 
 .board-footer {
@@ -440,33 +469,37 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 						<c:forEach var="post" items="${postList}">
 							<tr>
 								<td>${post.postWriter}</td>
-								<td>
-  <!-- 게시글 제목 + 아이콘/썸네일 -->
-<div style="display: flex; justify-content: space-between; align-items: center;">
-  <div style="display: flex; align-items: center; gap: 6px;">
-    <a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
+								<td style="overflow: visible; position: relative;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
+<c:if test="${post.commentCount > 0}">
+  <span style="color: gray;">(${post.commentCount})</span>
+</c:if>
+</a>
+      <c:if test="${not empty post.postSavedName}">
+        <span title="첨부파일 있음">📎</span>
+      </c:if>
+    </div>
 
-    <c:if test="${not empty post.postSavedName}">
-      <span title="첨부파일 있음">📎</span>
-    </c:if>
+    <c:choose>
+      <c:when test="${not empty post.postSavedName && (fn:endsWith(post.postSavedName, '.jpg') || fn:endsWith(post.postSavedName, '.png') || fn:endsWith(post.postSavedName, '.jpeg') || fn:endsWith(post.postSavedName, '.gif'))}">
+        <img src="resources/uploads/${post.postSavedName}" 
+     alt="썸네일" 
+     class="thumbnail-hover" 
+     onmouseover="showPreview(this)" 
+     onmouseout="hidePreview()" />
+      </c:when>
+
+      <c:when test="${not empty post.firstImageUrl}">
+  <img src="${post.firstImageUrl}" 
+     alt="본문 썸네일" 
+     class="thumbnail-hover" 
+     onmouseover="showPreview(this)" 
+     onmouseout="hidePreview()" />
+</c:when>
+    </c:choose>
   </div>
-
-  <c:choose>
-    
-    <c:when test="${not empty post.postSavedName && (fn:endsWith(post.postSavedName, '.jpg') || fn:endsWith(post.postSavedName, '.png') || fn:endsWith(post.postSavedName, '.jpeg') || fn:endsWith(post.postSavedName, '.gif'))}">
-      <img src="resources/uploads/${post.postSavedName}" alt="썸네일"
-        style="width: 30px; height: 30px; object-fit: cover; border: 1px solid #3a1f41; border-radius: 4px;"
-        onmouseover="this.style.transform='scale(2)'" onmouseout="this.style.transform='scale(1)'" />
-    </c:when>
-
-    
-    <c:when test="${not empty post.firstImageUrl}">
-      <img src="${post.firstImageUrl}" alt="본문 썸네일"
-        style="width: 30px; height: 30px; object-fit: cover; border: 1px solid #3a1f41; border-radius: 4px;"
-        onmouseover="this.style.transform='scale(2)'" onmouseout="this.style.transform='scale(1)'" />
-    </c:when>
-  </c:choose>
-</div>
 </td>
 								<td><fmt:formatDate value="${post.postTime}" pattern="yyyy-MM-dd HH:mm" /></td>
 								<td>${post.postViewCount}</td>
@@ -529,5 +562,35 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
     form.submit();
   }
 </script>
+
+<script>//썸내일 크기조정
+function showPreview(img) {
+  const clone = img.cloneNode(true);
+  clone.classList.remove("thumbnail-hover");
+  clone.classList.add("big-preview");
+  clone.id = "image-preview-popup";
+
+  // 마우스 위치 기준으로 위치 조정
+  document.body.appendChild(clone);
+  document.addEventListener("mousemove", movePreview);
+}
+
+function movePreview(e) {
+  const preview = document.getElementById("image-preview-popup");
+  if (preview) {
+    preview.style.left = (e.pageX + 20) + "px";
+    preview.style.top = (e.pageY - 20) + "px";
+  }
+}
+
+function hidePreview() {
+  const preview = document.getElementById("image-preview-popup");
+  if (preview) {
+    preview.remove();
+    document.removeEventListener("mousemove", movePreview);
+  }
+}
+</script>
+
 </body>
 </html>

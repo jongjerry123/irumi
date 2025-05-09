@@ -228,7 +228,7 @@ input[type="checkbox"] {
       }
 
     function registerBadUsersFromComments() {
-    	  const selected = validateCommentSelectionOrAlert();
+    	  const selected = validateSelectionOrAlert();
     	  if (!selected) return;
 
     	  const reason = prompt("등록 사유를 입력해주세요.");
@@ -321,7 +321,7 @@ input[type="checkbox"] {
 					<button type="button" class="btn-action"
 						onclick="deleteSelectedComments()">선택한 댓글 삭제</button>
 					<button type="button" class="btn-action btn-danger"
-						onclick="registerBadUsers()">불량 이용자 등록</button>
+        onclick="registerBadUsersFromComments()">불량 이용자 등록</button>
 				</div>
 			</div>
 		</form>

@@ -95,6 +95,7 @@ header.active {
 	margin-bottom: 50px;
 	margin-left: 100px;
 	text-align: left;
+	filter: drop-shadow(0 0 10px #BAAC80);
 }
 
 .main-container h2 strong {

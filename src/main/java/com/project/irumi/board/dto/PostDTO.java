@@ -20,6 +20,15 @@ public class PostDTO {
     // ✨ 추가된 가상 필드 (DB와 무관) 
     private boolean hasAnswer;
     
+    private int commentCount;
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+    
     private String firstImageUrl; // Quill 본문 중 첫 이미지 src
     public String getFirstImageUrl() {
         return firstImageUrl;

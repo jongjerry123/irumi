@@ -263,10 +263,26 @@ public class PostDAO {
 	public void deletePosts(List<Long> postIds) {
 		sqlSession.delete("boardMapper.deletePosts", postIds);
 	}
+	
+	//
+	public List<Long> getCommentIdsByPostId(Long postId) {
+	    return sqlSession.selectList("boardMapper.selectCommentIdsByPostId", postId);
+	}
+
 
 	// 게시글 ID 기준 댓글 신고 기록 삭제
 	public void deleteCommentReportsByPostIds(List<Long> postIds) {
 		sqlSession.delete("boardMapper.deleteCommentReportsByPostIds", postIds);
+	}
+	
+	// 게시글 ID 기준 댓글 신고 신고기록 삭제 (TB_COMREPORT)
+	public void deleteCommentReportReportsByPostIds(List<Long> postIds) {
+		sqlSession.delete("boardMapper.deleteCommentReportReportsByPostIds", postIds);
+	}
+	
+	// TB_COMREPORT: 댓글 신고 기록 삭제 - 댓글 ID 기준
+	public void deleteCommentReportReportsByCommentIds(List<Long> commentIds) {
+		sqlSession.delete("boardMapper.deleteCommentReportReportsByCommentIds", commentIds);
 	}
 
 	// 게시글 ID 기준 댓글 추천 기록 삭제
