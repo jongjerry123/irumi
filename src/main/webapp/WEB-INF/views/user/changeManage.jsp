@@ -241,9 +241,7 @@ $(document).ready(function() {
                 return;
             }
 
-            const authority = $authorityUser.is(':checked') 
-            ? ($someOtherCondition ? '1' : '2') 
-            : ($yetAnotherCondition ? '3' : '4');
+            const authority = $('input[name="authority"]:checked').val();
             console.log('Submitting authority:', authority, 'for userId:', selectedUserId);
             $.ajax({
                 url: 'updateAuthority.do',
