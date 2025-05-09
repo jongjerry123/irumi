@@ -116,4 +116,9 @@ public class UserServiceImpl implements UserService {
     public void updateUserVerification(User user) {
         userDao.updateUserVerification(user);
     }
+	@Override
+	public String selectUserAuthorityByUserId(String userId) {
+		// TODO Auto-generated method stub
+		return userDao.selectUserAuthorityByUserId(userId);
+	}
 }

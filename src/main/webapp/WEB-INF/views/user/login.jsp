@@ -28,6 +28,10 @@ body {
 	border-radius: 12px;
 	width: 300px;
 	text-align: center;
+	border-left: 3px solid #2ccfcf;
+	border-top: 1px solid #2ccfcf;
+	border-bottom: 1px solid #2ccfcf;
+	border-right: 3px solid #2ccfcf;
 }
 
 .logo-area {
@@ -38,7 +42,7 @@ body {
 	font-weight: bold;
 	cursor: pointer;
 	justify-content: center;
-	margin-bottom : 30px
+	margin-bottom: 30px
 }
 
 .triangle-img {

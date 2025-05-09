@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
@@ -7,115 +8,124 @@
 <title>비밀번호 변경 - Irumi</title>
 <style>
 body {
-    background-color: #111;
-    color: white;
-    font-family: 'Noto Sans KR', sans-serif;
-    margin: 0;
-    padding: 0;
+	background-color: #111;
+	color: white;
+	font-family: 'Noto Sans KR', sans-serif;
+	margin: 0;
+	padding: 0;
 }
 
 .change-pwd-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 80px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: calc(100vh - 80px);
 }
 
 .change-pwd-box {
-    background-color: #1e1e1e;
-    padding: 40px;
-    border-radius: 12px;
-    width: 300px;
-    text-align: center;
+	background-color: #1e1e1e;
+	padding: 40px;
+	border-radius: 12px;
+	width: 300px;
+	text-align: center;
+	border-left: 3px solid #2ccfcf;
+	border-top: 1px solid #2ccfcf;
+	border-bottom: 1px solid #2ccfcf;
+	border-right: 3px solid #2ccfcf;
 }
 
 .change-pwd-box h2 {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .change-pwd-box input {
-    width: 100%;
-    padding: 10px;
-    height: 40px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 6px;
-    background-color: #333;
-    color: white;
-    box-sizing: border-box;
-    font-size: 14px;
-    line-height: 20px;
+	width: 100%;
+	padding: 10px;
+	height: 40px;
+	margin-bottom: 10px;
+	border: none;
+	border-radius: 6px;
+	background-color: #333;
+	color: white;
+	box-sizing: border-box;
+	font-size: 14px;
+	line-height: 20px;
 }
 
 .change-btn {
-    background-color: #3ccfcf;
-    color: black;
-    border: none;
-    width: 100%;
-    padding: 10px;
-    height: 40px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    box-sizing: border-box;
-    font-size: 14px;
-    line-height: 20px;
+	background-color: #3ccfcf;
+	color: black;
+	border: none;
+	width: 100%;
+	padding: 10px;
+	height: 40px;
+	border-radius: 6px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	box-sizing: border-box;
+	font-size: 14px;
+	line-height: 20px;
 }
 
 .defer-btn {
-    background-color: #ccc;
-    color: black;
-    border: none;
-    width: 100%;
-    padding: 10px;
-    height: 40px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    box-sizing: border-box;
-    font-size: 14px;
-    line-height: 20px;
+	background-color: #ccc;
+	color: black;
+	border: none;
+	width: 100%;
+	padding: 10px;
+	height: 40px;
+	border-radius: 6px;
+	margin-bottom: 20px;
+	cursor: pointer;
+	box-sizing: border-box;
+	font-size: 14px;
+	line-height: 20px;
 }
 
 .change-btn:disabled, .defer-btn:disabled {
-    background-color: #000;
-    color: #fff;
-    cursor: not-allowed;
+	background-color: #000;
+	color: #fff;
+	cursor: not-allowed;
 }
 
 .error-message, .success-message {
-    font-size: 0.9em;
-    margin-bottom: 10px;
-    text-align: left;
+	font-size: 0.9em;
+	margin-bottom: 10px;
+	text-align: left;
 }
 
 .error-message {
-    color: #ff5a5a;
+	color: #ff5a5a;
 }
 
 .success-message {
-    color: #3ccfcf;
+	color: #3ccfcf;
 }
 </style>
 </head>
 <body>
-    <div class="change-pwd-container">
-        <div class="change-pwd-box">
-            <h2>비밀번호 변경</h2>
-            <form id="changePwdForm">
-                <input type="hidden" name="_csrf" value="${_csrf.token}" />
-                <input type="password" name="newPassword" placeholder="새 비밀번호" id="newPassword" maxlength="16" required>
-                <div class="error-message" id="newPasswordMessage"></div>
-                <input type="password" name="confirmPassword" placeholder="비밀번호 확인" id="confirmPassword" maxlength="16" required>
-                <div class="error-message success-message" id="confirmPasswordMessage"></div>
-                <button type="button" class="change-btn" id="changeBtn" disabled>변경 완료</button>
-                <button type="button" class="defer-btn" id="deferBtn">2개월간 보지 않기</button>
-            </form>
-        </div>
-    </div>
+	<div class="change-pwd-container">
+		<div class="change-pwd-box">
+			<h2>비밀번호 변경</h2>
+			<form id="changePwdForm">
+				<input type="hidden" name="_csrf" value="${_csrf.token}" /> <input
+					type="password" name="newPassword" placeholder="새 비밀번호"
+					id="newPassword" maxlength="16" required>
+				<div class="error-message" id="newPasswordMessage"></div>
+				<input type="password" name="confirmPassword" placeholder="비밀번호 확인"
+					id="confirmPassword" maxlength="16" required>
+				<div class="error-message success-message"
+					id="confirmPasswordMessage"></div>
+				<button type="button" class="change-btn" id="changeBtn" disabled>변경
+					완료</button>
+				<button type="button" class="defer-btn" id="deferBtn">2개월간
+					보지 않기</button>
+			</form>
+		</div>
+	</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
         $(document).ready(function() {
             const $newPasswordInput = $('#newPassword');
             const $confirmPasswordInput = $('#confirmPassword');
