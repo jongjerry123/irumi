@@ -1,7 +1,11 @@
 package com.project.irumi.chatbot.context;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.project.irumi.chatbot.model.dto.ChatMsg;
@@ -25,7 +29,7 @@ public class ConvSession {
 	private String lastActivityType;
 	
 
-
+	private Map<String, Set<String>> recommendedoptions = new HashMap<>();
 	private final List<String> contextHistory = new ArrayList<>();
 	
 
@@ -71,6 +75,29 @@ public class ConvSession {
 	public String getContext() {
 		return String.join("\n", contextHistory);
 	}
+	
+	
+	public Map<String, Set<String>> getRecommendedOption() {
+		return recommendedoptions;
+	}
+	
+	public void addRecommendedOption(String type, String content) {
+		recommendedoptions
+	        .computeIfAbsent(type, k -> new HashSet<>())  
+	        .add(content);                                
+	}
+	
+	public void resetRecommendedOption() {
+		this.recommendedoptions = null;
+	}
+	
+	public Set<String> getOptions(String type) {
+	    return recommendedoptions.getOrDefault(type, Set.of());
+	}
+
+	
+	
+	
 
 	// ✅ Getter/Setter
 	public String getConvId() {
@@ -136,6 +163,7 @@ public class ConvSession {
 	public void setHavebeenact(ChatMsg umsg) {
 		this.havebeenact = umsg;
 	}
+
     
    
 

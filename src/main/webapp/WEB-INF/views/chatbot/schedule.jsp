@@ -130,7 +130,6 @@ document.addEventListener("DOMContentLoaded", function() {
 		    	})
 		    	.then(response => {
 		    	  if (response.ok) {
-		    		window.location.href = "viewScheduleRecChat.do";
 		    	    console.log("일정 삭제 성공");
 		    	  } else {
 		    	    alert("일정 삭제 실패!");
@@ -542,7 +541,8 @@ a {
   display: flex;
   background: #232323;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding-left: 10px;
+  padding-right : 10px;
   margin-top: 12px;
   flex-direction: column;
   gap: 6px;
@@ -558,14 +558,22 @@ a {
   outline: none;
 }
 .manual-input-box .manual-date {
+  border-top-left-radius: 8px;
+  border-top-right-radius : 8px;
+  width : 100%;
   flex: 1;
-  background: transparent;
+  background: #BAAC80;
   border: none;
-  color: #BAAC80;
+  color: #232323;
   font-size: 14px;
   padding: 8px 4px;
+  padding-left: 10px;
+  padding-right : 10px;
   outline: none;
+  font-weight : bold;
+  align-items : center;
 }
+
 .manual-input-box .add-btn {
   background: #232323;
   border: 1px solid #BAAC80;
@@ -658,7 +666,8 @@ a {
  color: #d9d9d9;
  font-size: 15px;
  font-weight: 600;
- margin-bottom: 2px;  /* 라벨 아래 약간 여백 */
+ margin-bottom: 2px;  
+ margin-top : 3px;
 }
 .select-btn {
  background: none;
