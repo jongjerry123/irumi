@@ -279,7 +279,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			</div>
 
 			<div class="card" onclick="moveToAi()">
-				<img src="/irumi/resources/images/ai1.png" class="card-image"
+				<img src="/irumi/resources/images/ai9.png" class="card-image"
 					alt="AI 도우미 이미지" />
 				<div class="card-info ai">
 					<div class="card-title">대화형 도우미</div>
