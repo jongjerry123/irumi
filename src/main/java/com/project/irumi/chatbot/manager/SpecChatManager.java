@@ -84,7 +84,7 @@ public class SpecChatManager {
 				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
 				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDto(StateSpecChat.OPT_SPEC_TYPE.getPrompt(),
-						List.of("어학 능력", "자격증", "인턴십 및 현장실습", "대외 활동", "연구활동", "기타"));
+						List.of("어학 능력", "자격증", "인턴십 및 현장실습", "대외 활동", "연구 활동", "기타"));
 			}
 			// 제대로 된 현재스펙 입력하지 않은 경우, 같은 케이스 반복
 			else {

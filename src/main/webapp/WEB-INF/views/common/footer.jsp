@@ -103,7 +103,7 @@
       text-align: center;
       font-size: 12px;
       opacity: 0.6;
-      padding: 20px 0;
+      padding: 5px 0; /*수정 필요.. .여기 때문에 footer 안나타남*/
     }
 
     .footer-note a {
@@ -117,16 +117,23 @@
   <c:set var="menu" value="community" scope="request" />
 </c:if>
 
-<div class="page-wrapper">
+<!-- <div class="page-wrapper">
   <div class="main-content">
-    <!-- 실제 페이지 내용 -->
+    실제 페이지 내용
   </div>
 
-  <!-- 푸터 노트 (페이지 맨 아래 정중앙 고정) -->
+  푸터 노트 (페이지 맨 아래 정중앙 고정)
   <div class="footer-note">
     © 2025 이루미. by Team.iruminaty <a href="about.do">사이트 소개</a>
   </div>
 </div>
+ -->
+
+ 
+ <!--   푸터 노트 (페이지 맨 아래 정중앙 고정) -->
+ <div class="footer-note">
+   © 2025 이루미. by Team.iruminaty <a href="about.do">사이트 소개</a>
+ </div>
 
 <!-- 고정된 좌측 하단 사이드 메뉴 -->
 <div class="floating-menu">

@@ -1,0 +1,248 @@
+@charset "UTF-8";
+
+.first-row {
+	height: 100px;
+	display: flex;  /* flexbox로 설정 */
+    justify-content: left;  /* 가로 방향으로 가운데 정렬 */
+    align-items: center;  /* 세로 방향으로도 가운데 정렬 */
+}
+
+
+
+.login-actions {
+	display: flex;
+	gap: 10px;
+	margin-left: 20px;
+	/* margin-left: auto; */ /* 오른쪽 정렬 강제 */
+}
+
+.login-actions button {
+	background-color: #000; /* ✅ 완전한 검은색 */
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	color: #eeeeee;
+	padding: 8px 18px;
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(5px);
+	letter-spacing: 0.5px;
+}
+
+.login-actions button:hover {
+	background-color: #111; /* ✅ 호버 시 살짝 밝은 블랙 */
+	border-color: #eeeeee;
+	color: #eeeeee;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+}
+
+
+/**==============   right pannel   ===================**/
+
+.right-panel {
+	width: 230px;
+	padding-right: 20px;
+	padding-left: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+}
+
+.right-panel .spec-value {
+	color: #eeeeee;
+	font-size: 9px;
+	margin-left: 4px;
+}
+
+.right-panel .citem-value {
+	color: #eeeeee;
+	font-size: 9px;
+	margin-left: 4px;
+}
+
+.right-panel .info-row {
+	align-items: center;
+	margin-bottom: 10px;
+	flex-direction: column; /*세로 정렬*/
+}
+
+.right-panel .label {
+	font-size: 14px;
+	color: #BAAC80;
+	font-weight: bold;
+}
+
+.right-panel .value {
+	color: #BAAC80;
+	font-size: 14px;
+	margin-left: 4px;
+	font-weight: bold;
+}
+
+
+.manual-input-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: #232323;
+	border-radius: 8px;
+	padding: 6px 10px;
+	margin-top: 12px;
+	gap: 6px;
+}
+
+.manual-input-box .manual-input {
+	flex: 1;
+	background: transparent;
+	border: none;
+	color: #facc15;
+	font-size: 12px;
+	padding: 8px 4px;
+	outline: none;
+	border-radius: 5px;
+	border: 1px solid eeeeee;
+}
+
+.manual-input-box .manual-input-explain {
+	flex: 1;
+	background: transparent;
+	border: none;
+	color: #facc15;
+	font-size: 12px;
+	padding: 8px 4px;
+	border-radius: 5px;
+	border: 1px solid eeeeee;
+	outline: none;
+}
+
+.specTypeChoice {
+    display: flex;
+    flex-wrap: wrap;  /* 버튼들이 화면 크기에 맞게 줄바꿈될 수 있도록 설정 */
+    gap: 10px; /* 버튼들 사이의 간격 */
+    justify-content: flex-start; /* 버튼들을 왼쪽 정렬 */
+}
+
+.specType {
+    background: #232323;
+    border: 1px solid #BAAC80;
+    color: #BAAC80;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.specType:hover {
+    background: #BAAC80;
+    color: #232323;
+    opacity: 0.5;
+}
+
+/* active 상태에서 버튼 스타일 */
+.specType.active {
+    background-color: #BAAC80; /* 활성화된 버튼 배경 색 */
+    color: #232323;  /* 활성화된 버튼 글씨 색 */
+    border: 1.5px solid #232323; /* 활성화된 버튼 테두리 색 */
+}
+
+.manual-input-box .add-btn {
+	background: skyblue;
+	border: 1px solid #BAAC80;
+	color: #eeeeee;
+	border-radius: 6px;
+	font-size: 15px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	margin-left: 4px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.manual-input-box .add-btn:hover {
+	background: #BAAC80;
+	color: #232323;
+}
+
+
+
+.saved-citem-section {
+	margin-bottom: 20px;
+}
+
+.section-title {
+	color: #eeeeee;
+	font-weight: bold;
+	font-size: 15px;
+	margin: 25px 0 10px 0;
+}
+
+.saved-citem-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 14px;
+}
+
+.citem-card {
+	background: #232323;
+	border: 1.5px solid #BAAC80;
+	border-radius: 7px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 14px;
+	margin-bottom: 5px;
+	font-size: 12px;
+	color: #eeeeee;
+	position: relative;
+}
+
+.remove-btn {
+	background: none;
+	border: none;
+	color: #888;
+	font-size: 16px;
+	margin-right: 2px;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.remove-btn:hover {
+	color: #f87171;
+}
+
+.add-citem-btn {
+	margin-top: 10px;
+	width: 100%;
+	padding: 9px 0;
+	border-radius: 8px;
+	border: 1.5px solid #BAAC80;
+	background: none;
+	color: #BAAC80;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	transition: background 0.2s, color 0.2s;
+}
+
+.add-citem-btn span {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.add-citem-btn:hover {
+	background: #BAAC80;
+	color: #232323;
+}

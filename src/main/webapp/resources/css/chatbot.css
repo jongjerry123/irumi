@@ -2,79 +2,116 @@
 
 body {
 	background-color: #111;
-	color: white;
+	color: eeeeee;
 	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
 	padding: 0;
-	min-height: 70vh;
+	min-height: 100vh;
 }
 
-.container {
-	display: flex;
-	min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
-	margin-top: 20px; /* header 높이만큼 아래로 */
+/* chatbot-page-layout의 최대 크기 설정 */
+.chatbot-page-layout {
+
+    display: flex;
+    max-width: 1200px;   /* 최대 너비 설정 */
+    max-height: 100vh;   /* 최대 높이 설정 (화면 높이) */
+    width: 100%;         /* 너비를 부모에 맞게 확장 */
+    height: 100%;        /* 높이를 부모에 맞게 확장 */
+    margin: 0 auto;      /* 중앙 정렬 */
+    overflow: hidden;    /* 내용이 넘치지 않도록 숨김 */
 }
 
-.sidebar, .right-panel {
-	height: auto; /* 높이 자동 (100vh 등 절대값 X) */
+/* 왼쪽 컨테이너 (사이드바) */
+.left-container {
+    width: 200px;        /* 고정된 너비 */
+    padding: 20px;
+    flex-shrink: 0;      /* 사이드바가 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
+    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
 }
 
-.sidebar {
-	width: 200px;
-	background-color: #141414;
-	padding: 30px 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
+/* 중앙 컨테이너 (메인 콘텐츠) */
+.main-container {
+    flex: 1;             /* 남은 공간을 모두 차지 */
+    display: flex;       /* 자식 요소들을 세로로 배치 */
+    flex-direction: column; /* 세로 배치 */
+    background-color: #1e1e1e;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 100%;        /* 부모 높이에 맞게 확장 */
 }
 
-.sidebar button {
-	background-color: #222;
-	border: none;
-	color: white;
-	text-align: left;
-	padding: 10px 20px;
-	cursor: pointer;
-	border-radius: 8px;
-	transition: background 0.3s;
-	text-align: center;
-	font-weight: bold;
+
+.select-bar {
+    flex-shrink: 0;      /* 크기가 축소되지 않게 */
+    margin-bottom: 20px; /* 아래쪽 여백 추가 */
+    height: 120px;       /* 고정된 높이 설정 */
+    flex-direction: column;
+    display: flex;
+    height:auto;
 }
 
-.sidebar button:hover {
-	background-color: #BAAC80;
-	color: black;
+/* .select-bar내의 hr을 flex 아이템처럼 다루기 */
+.select-bar hr {
+    width: 100%;   /* 부모 컨테이너에 맞춰 확장 */
+    height: 0.3px;   /* 선의 두께 */
+    background-color: #BAAC80;
+    border: none;
+    margin: 20px 0;
+    flex-grow: 1;   /* 남은 공간을 차지 */
+    opacity:0.3;
 }
 
-.sidebar button.active {
-	background-color: #BAAC80;
-	color: black;
+/* 중앙 컨테이너의 자식 요소 (채팅창, 입력창 등) */
+.content-box {
+    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
+    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
+    height:auto;
+    /* background-color: #222; */
 }
 
-.main {
+/* 채팅 입력창은 고정된 크기 */
+.chat-input-box {
+    flex-shrink: 0;      /* 입력창은 축소되지 않게 */
+}
+
+
+/* 오른쪽 컨테이너 (정보 패널) */
+.right-container {
+    width: 250px;        /* 고정된 너비 */
+    color: #333;
+    padding: 20px;
+    flex-shrink: 0;      /* 오른쪽 패널이 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
+    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
+}
+
+/* .main {
 	flex: 1;
 	padding-right: 40px;
 	padding-left: 40px;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-}
+} */
 
 .content-box {
-	background-color: #1e1e1e;
-	max-width: 700px; padding-right : 20px;
-	padding-left: 20px;
+	
+	max-width: 700px; 
+	/* padding-right : 20px;
+	padding-left: 20px; */
 	border-radius: 12px;
 	line-height: 1.7;
 	font-size: 14px;
-	margin-bottom: 30px;
+	
 	height: 700px;
-	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
+	overflow-y: auto; /*내부 콘텐츠가 넘칠 경우 스크롤 활성화*/
 	display: flex;
 	flex-direction: column;
-	/*위아래 패딩 추가*/
+	/* 위아래 패딩 추가
 	padding-top: 30px;
-	padding-right: 20px;
+	padding-right: 20px; */
 }
 
 .content-box::-webkit-scrollbar {
@@ -92,44 +129,6 @@ body {
 	scrollbar-width: thin;
 }
 
-.right-panel {
-	width: 230px;
-	padding-right: 20px;
-	padding-left: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 30px;
-}
-
-.right-panel .spec-value {
-	color: #fff;
-	font-size: 9px;
-	margin-left: 4px;
-}
-
-.right-panel .citem-value {
-	color: #fff;
-	font-size: 9px;
-	margin-left: 4px;
-}
-
-.right-panel .info-row {
-	align-items: center;
-	margin-bottom: 10px;
-	flex-direction: column; /*세로 정렬*/
-}
-
-.right-panel .label {
-	font-size: 14px;
-	color: #BAAC80;
-	font-weight: bold;
-}
-
-.right-panel .value {
-	color: #fff;
-	font-size: 14px;
-	margin-left: 4px;
-}
 /* 기본 버튼 스타일 */
 .chat-input-box .chat-send-btn {
     width: 36px;
@@ -169,97 +168,7 @@ body {
 }
 
 
-/* .manual-input-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* input과 버튼 사이 간격 */
 
-
-.manual-input-box {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	background: #232323;
-	border-radius: 8px;
-	padding: 6px 10px;
-	margin-top: 12px;
-	gap: 6px;
-}
-
-.manual-input-box .manual-input {
-	flex: 1;
-	background: transparent;
-	border: none;
-	color: #facc15;
-	font-size: 14px;
-	padding: 8px 4px;
-	outline: none;
-	border-radius: 5px;
-	border: 1px solid white;
-}
-
-.manual-input-box .manual-input-explain {
-	flex: 1;
-	background: transparent;
-	border: none;
-	color: #facc15;
-	font-size: 14px;
-	padding: 8px 4px;
-	border-radius: 5px;
-	border: 1px solid white;
-	outline: none;
-}
-
-.specTypeChoice {
-    display: flex;
-    flex-wrap: wrap;  /* 버튼들이 화면 크기에 맞게 줄바꿈될 수 있도록 설정 */
-    gap: 10px; /* 버튼들 사이의 간격 */
-    justify-content: flex-start; /* 버튼들을 왼쪽 정렬 */
-}
-
-.specType {
-    background: #232323;
-    border: 1px solid #BAAC80;
-    color: #BAAC80;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background 0.3s, color 0.3s;
-}
-
-.specType:hover {
-    background: #BAAC80;
-    color: #232323;
-}
-
-/* active 상태에서 버튼 스타일 */
-.specType.active {
-    background-color: #BAAC80; /* 활성화된 버튼 배경 색 */
-    color: #232323;  /* 활성화된 버튼 글씨 색 */
-    border: 1.5px solid #232323; /* 활성화된 버튼 테두리 색 */
-}
-
-.manual-input-box .add-btn {
-	background: skyblue;
-	border: 1px solid #BAAC80;
-	color: black;
-	border-radius: 6px;
-	width: 28px;
-	height: 28px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	font-size: 18px;
-	margin-left: 4px;
-}
-
-.manual-input-box .add-btn:hover {
-	background: #BAAC80;
-	color: #232323;
-}
 
 .content-box .custom-checkbox-list {
 	margin: 24px 0 0 0;
@@ -332,114 +241,46 @@ body {
 	background: #222;
 }
 
-.saved-citem-section {
-	margin-bottom: 20px;
-}
-
-.section-title {
-	color: #BAAC80;
-	font-weight: bold;
-	font-size: 15px;
-	margin: 35px 0 10px 0;
-}
-
-.saved-citem-list {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	margin-bottom: 14px;
-}
-
-.citem-card {
-	background: #232323;
-	border: 1.5px solid #444;
-	border-radius: 7px;
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 8px 14px;
-	font-size: 10px;
-	color: #fff;
-	position: relative;
-}
-
-.remove-btn {
-	background: none;
-	border: none;
-	color: #888;
-	font-size: 16px;
-	margin-right: 2px;
-	cursor: pointer;
-	transition: color 0.2s;
-}
-
-.remove-btn:hover {
-	color: #f87171;
-}
-
-.add-citem-btn {
-	margin-top: 10px;
-	width: 100%;
-	padding: 9px 0;
-	border-radius: 8px;
-	border: 1.5px solid #BAAC80;
-	background: none;
-	color: #BAAC80;
-	font-size: 16px;
-	font-weight: 600;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	transition: background 0.2s, color 0.2s;
-}
-
-.add-citem-btn span {
-	font-size: 18px;
-	font-weight: bold;
-}
-
-.add-citem-btn:hover {
-	background: #BAAC80;
-	color: #232323;
-}
 
 .select-group {
 	display: flex;
 	flex-direction: column; /* 세로 정렬 */
 	align-items: flex-start; /* 좌측 정렬 */
 	gap: 8px;
+	padding-top: 20px;
+	/* margin-left: 10px; */
 }
 
 .select-label {
-	color: #d9d9d9;
+	color: #eeeeee;
 	font-size: 18px;
 	font-weight: 600;
-	margin-bottom: 2px; /* 라벨 아래 약간 여백 */
+	margin-bottom: 15px; /* 라벨 아래 약간 여백 */
+	padding-left: 10px;
 }
+
 
 .select-btn {
 	background: none;
 	border: 1.5px solid #BAAC80;
 	color: #BAAC80;
 	border-radius: 22px;
-	font-size: 15px;
+	font-size: 12px;
 	font-weight: 500;
 	padding: 7px 20px;
 	margin-right: 8px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-bottom: 7px; /* 버튼들끼리 간격 */
+	margin-bottom: 6px; /* 버튼들 위아래 간격 */
 }
 
-/*select-job-btn-list 와 같이 option-buttons내의 버튼들이 정렬되도록 고쳐줘. 한 버튼은 텍스트 크기 만해야 해*/
+
 .select-btn:hover {
 	background: #BAAC80;
 	border: 1.5px solid #BAAC80;
 	color: #1e1e1e;
 	border-radius: 22px;
-	font-size: 15px;
+	font-size: 12px;
 	font-weight: 500;
 	padding: 7px 20px;
 	margin-right: 8px;
@@ -457,7 +298,8 @@ body {
 }
 
 .select-job-btn-list {
-	padding: 10px 10px 0px 10px;
+	/* padding: 10px 10px 0px 10px; */
+	padding: 5px;
 }
 
 .select-btn.active {
@@ -479,28 +321,11 @@ body {
 
 /**/
 .selected-job-text {
-	color: #ff8040;
+	color: #BAAC80;
+	font-weight: bold;
 }
 
 
-/*************************************************************************** */
-/*추가*/
-/* .chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* 전체 높이에서 상단/하단 제외하고 채움 */
-}
-/*
-.chat-area {
-	flex: 1;
-	overflow-y: auto;
-	background-color: #1e1e1e;
-	border-radius: 12px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 8px; 
-} */
 .chat-container {
 	display: flex;
 	flex-direction: column;
@@ -514,7 +339,7 @@ body {
 	overflow-y: auto;
 	background-color: #1e1e1e;
 	border-radius: 12px;
-	padding: 20px;
+/* 	padding: 20px; */
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -592,7 +417,6 @@ body {
 	text-align: center;
 	color: #eeeeee;
 	background: none;
-	margin-right: 20px;
 }
 
 .confirm-select-box .confirm-select-btn:hover {
