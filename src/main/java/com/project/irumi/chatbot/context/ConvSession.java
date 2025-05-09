@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.project.irumi.chatbot.model.dto.ChatMsg;
+
 
 
 public class ConvSession {
@@ -12,7 +14,7 @@ public class ConvSession {
 	private String subJobTopicId = null; 
 	private String subSpecTopicId = null;
 	private String userId;
-	private String havebeenact;	 	// 해왔던 활동 
+	private ChatMsg havebeenact;	 	// 해왔던 활동 
 	
 
 	
@@ -127,12 +129,12 @@ public class ConvSession {
         this.lastActivityType = lastActivityType;
     }
 
-	public String getHavebeenact() {
+	public ChatMsg getHavebeenact() {
 		return havebeenact;
 	}
 
-	public void setHavebeenact(String havebeenact) {
-		this.havebeenact = havebeenact;
+	public void setHavebeenact(ChatMsg umsg) {
+		this.havebeenact = umsg;
 	}
     
    

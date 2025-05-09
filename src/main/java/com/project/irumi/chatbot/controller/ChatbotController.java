@@ -108,12 +108,10 @@ public class ChatbotController {
 
 		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
-		ArrayList<Spec> userSpecs;
 
 
 		// CareerItemDto 리스트로 변환하여 저장
 		List<CareerItemDto> jobCItemList = new ArrayList<>();
-		List<CareerItemDto> specCItemList = new ArrayList<>();
 
 
 		switch (topic) {

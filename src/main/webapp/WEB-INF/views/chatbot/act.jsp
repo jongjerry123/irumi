@@ -29,70 +29,83 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 	const CHAT_TOPIC = "act";
 	
-	// 추가 - 위쪽 직무 버튼 불러오기
-	fetch("userJobView.do", {
-		  method: "POST"
-		})
-		.then(res => res.json())
-		.then(jobs => {
-		  const jobList = document.getElementById("job-btn-list");
-		  jobList.innerHTML = "";
-		  jobs.forEach(job => {
-		    const btn = document.createElement("button");
-		    btn.className = "select-btn";
-		    btn.textContent = job.jobName;
-		    btn.dataset.jobId = job.jobId;
-		    btn.onclick = () => loadSpecOptions(job.jobId);
-		    jobList.appendChild(btn);
-		  });
-		});
+	// 추가 
+	fetch("startChatSession.do", {
+	    method: "POST",
+	    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	    body: "topic=" + CHAT_TOPIC
+	  })
+	    .then(() => {
+	      return fetch("userJobView.do", { method: "POST" });
+	    })
+	    .then(res => res.json())
+	    .then(jobs => {
+	      const jobList = document.getElementById("job-btn-list");
+	      jobList.innerHTML = "";
+	      jobs.forEach(job => {
+	        const btn = document.createElement("button");
+	        btn.className = "select-btn";
+	        btn.textContent = job.jobName;
+	        btn.dataset.jobId = job.jobId;
+	        btn.onclick = () => {
+	          
+	          
+	          fetch("setConvSubJobTopic.do", {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({
+	              itemId: job.jobId,
+	              title: job.jobName,
+	              explain: job.jobExplain
+	            })
+	          });
+
+	          loadSpecOptions(job.jobId);
+	        };
+	        jobList.appendChild(btn);
+	      });
+	    });
+
+	  function loadSpecOptions(jobId) {
+	    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
+
+	    fetch("selectSpecByJobId.do", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/json" },
+	      body: JSON.stringify({ jobId: jobId })
+	    })
+	      .then(res => res.json())
+	      .then(specs => {
+	        const specList = document.getElementById("spec-btn-list");
+	        specList.innerHTML = "";
+	        specs.forEach(spec => {
+	          const btn = document.createElement("button");
+	          btn.className = "select-btn";
+	          btn.textContent = spec.title;
+	          btn.dataset.specId = spec.itemId;
+	          btn.onclick = () => {
+	            window.selectedJobId = jobId;
+	            window.selectedSpecId = spec.itemId;
+	            window.selectedSpecName = spec.title;
+	            window.selectedSpecType = spec.type;
+	            window.selectedSpecExplain = spec.explain;
+
+	            fetch("setConvSubSpecTopic.do", {
+	              method: "POST",
+	              headers: { "Content-Type": "application/json" },
+	              body: JSON.stringify({
+	                itemId: spec.itemId,
+	                title: spec.title,
+	                explain: spec.explain,
+	                type: spec.type
+	              })
+	            });
+	          };
+	          specList.appendChild(btn);
+	        });
+	      });
+	  }
 	
-	// 추가
-	function loadSpecOptions(jobId) {
-    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
-
-    fetch("userSpecsView.do", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "jobId=" + encodeURIComponent(jobId) 
-    })
-    .then(res => res.json())
-    .then(specs => {
-      console.log("[DEBUG] 불러온 스펙 목록:", specs);
-      const specList = document.getElementById("spec-btn-list");
-      specList.innerHTML = "";
-      specs.forEach(spec => {
-        const btn = document.createElement("button");
-        btn.className = "select-btn";
-        btn.textContent = spec.specName;
-        btn.dataset.specId = spec.specId;
-        btn.onclick = () => {
-      	  window.selectedJobId = jobId;
-      	  window.selectedSpecId = spec.specId;
-      	  window.selectedSpecName = spec.specName;
-      	  window.selectedSpecType = spec.specType;
-  	  	  window.selectedSpecExplain = spec.specExplain;
-  	 	  window.selectedSpecState = spec.specState;
-      	  
-  	 	fetch("setConvSubSpecTopic.do", {
-        	  method: "POST",
-        	  headers: { "Content-Type": "application/json" },
-        	  body: JSON.stringify({
-        	    itemId: spec.specId,
-        	    title: spec.specName,
-        	    explain: spec.specExplain,
-        	    type: spec.specType
-        	  })
-        	});
-      	};
-      	
-        specList.appendChild(btn);
-        
-        
-
-      });
-    });
-  }
 	
 	
 	  // 활동 리스트에 추가하는 함수
@@ -188,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	        if (data.success) {
 	          addToActivityList([{ text: content, actId: data.actId }]);
 	        } else {
-	          alert(`'${content}' 저장 실패`);
+	          alert("'" + content + "' 저장 실패");
 	        }
 	      })
 	    ))
@@ -404,13 +417,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	  }
 	  });
 	
-	});
+});
+	
+	
 	
 	
 </script>
 <style>
 body {
-	background-color: #111;
+	background-color: #000;
 	color: white;
 	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
@@ -435,7 +450,7 @@ body {
 }
 .sidebar {
 	width: 200px;
-	background-color: #141414;
+	background-color: #000;
 	padding: 30px 20px;
 	display: flex;
 	flex-direction: column;
@@ -463,6 +478,7 @@ body {
 }
 /* 컨텐츠 박스 ***********************************************/
 .content-box {
+	padding-top : 30px;
 	background-color: #1e1e1e;
 	padding-right: 20px;
 	padding-left: 20px;
@@ -974,4 +990,3 @@ body {
 		<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
-
