@@ -10,7 +10,8 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<link rel="stylesheet" type="text/css" href="${ pageContext.servletContext.contextPath}/resources/css/chatbot.css" />
+<link rel="stylesheet" type="text/css"
+	href="${ pageContext.servletContext.contextPath}/resources/css/chatbot.css" />
 
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -144,6 +145,7 @@ $(function() {
 	        $("#first-bot-prompt").show();
 	        $(".manual-input-box").show();
 	        $(".selected-job-text").text(subTopicJobCI.title); // 봇 메세지에 나타날 직무 이름
+	        $(".value").show();
 	        $(".chat-send-btn").removeClass("inactive");
 	    } 
 
@@ -426,38 +428,39 @@ $(function() {
 <link rel="stylesheet" href="/css/chatbot-style.css">
 </head>
 <body>
-	<c:import url="/WEB-INF/views/common/header.jsp" />
-	<c:set var="menu" value="chat" scope="request" />
-	<div class="container">
-		<div class="sidebar">
-			<button onclick="moveJobPage();">직무 찾기</button>
-			<button onclick="moveSpecPage();" class="active">스펙 찾기</button>
-			<button onclick="moveSchedulePage();">일정 찾기</button>
-			<button onclick="moveActPage();">활동 찾기</button>
+		<div class="chatbot-page-layout">
+		<div class="left-container">
+			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
+			<c:set var="menu" value="chat" scope="request" />
+			
+			
 		</div>
-		<div class="main">
-			<div class="content-box">
-				<div class="select-bar">
-					<div class="select-group">
-						<span class="select-label">스펙 대상 직무 선택</span>
-						<div class="select-job-btn-list">
-							<!-- <button class="select-btn active">프론트엔드 개발자</button>
-							<button class="select-btn">백엔드 개발자</button> -->
-						</div>
-						<!--  스펙 페이지에는 필요없지만 넣어봄 -->
-						<div class="select-spec-btn-list"></div>
+		
+		
+		<div class="main-container">
+			<div class="select-bar">
+				<div class="select-group">
+					<span class="select-label">📜 어떤 직무에 필요한 스펙이 궁금하세요?</span>
+					<div class="select-job-btn-list">
+						<!-- <button class="select-btn active">프론트엔드 개발자</button>
+								<button class="select-btn">백엔드 개발자</button> -->
 					</div>
-					<div class="confirm-select-box">
-						<!--  클릭시 setSubTopic 해야함 -->
-						<button class="confirm-select-btn">선택 완료</button>
-					</div>
+					<!--  스펙 페이지에는 필요없지만 넣어봄 -->
+					<div class="select-spec-btn-list"></div>
 				</div>
+				<div class="confirm-select-box">
+					<!--  클릭시 setSubTopic 해야함 -->
+					<button class="confirm-select-btn">선택 완료</button>
+				</div>
+				<hr>
+			</div>
+			<div class="content-box">
 				<div class="chat-container" id="chat-container">
 					<div class="chat-area" id="chatArea">
-						<div class="answer bot-msg" id="first-bot-prompt" style="display:none;">
-							내게 맞는 스펙 추천 세션입니다.
-							<br> 먼저, <span class="selected-job-text"></span>가 되기 위해
-							<br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
+						<div class="answer bot-msg" id="first-bot-prompt"
+							style="display: none;">
+							내게 맞는 스펙 추천 세션입니다. <br> 먼저, <span class="selected-job-text"></span>가
+							되기 위해 <br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
 						</div>
 					</div>
 				</div>
@@ -469,34 +472,16 @@ $(function() {
 					<i class="fa fa-paper-plane"></i>
 				</button>
 			</div>
+			
 		</div>
-		<div class="right-panel">
-			<div class="saved-schedule-section">
-				<div class="info-row">
-					<span class="label">➤ 목표 직무</span>
-					<span class="value"></span>
-				</div>
-				<div class="section-title">➤ 저장한 목표 스펙</div>
-				<div class="saved-spec-list"></div>
-				<div class="section-title">➤ 직접 추가하기</div>
-				<div class="manual-input-box" style="display:none;">
-					<input type="text" placeholder="직접 스펙 입력" class="manual-input" />
-					 <input type="text" placeholder="스펙 설명 (선택)" class="manual-input-explain" />
-					<div class="specTypeChoice">
-					<!--  List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타")); -->
-						<button class="specType">어학 능력</button>
-						<button class="specType">자격증</button>
-						<button class="specType">인턴십 및 현장실습</button>
-						<button class="specType">대외 활동</button>
-						<button class="specType">연구 활동</button>
-						<button class="specType">기타</button>
-						<button class="add-btn">+</button>
-					</div>
-				</div>
-			</div>
+		
+		<div class="right-container">
+			<c:import url="/WEB-INF/views/common/sidebar_right.jsp" />
 		</div>
-	</div>
+		
+	</div><!--  chatbot-page-layout-->
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
+	
 </body>
 </html>
 
