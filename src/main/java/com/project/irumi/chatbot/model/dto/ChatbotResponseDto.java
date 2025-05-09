@@ -77,6 +77,9 @@ public class ChatbotResponseDto {
 	public void setOptions(List<String> options) {
 		this.options = options;
 	}
+
+
+	
 	
 }
 

@@ -121,20 +121,20 @@ document.addEventListener("DOMContentLoaded", function() {
 	      removeBtn.textContent = "✕";
 	      removeBtn.onclick = function() {
 	        card.remove();
+	        console.log(activity.actId);
 	        
-	        fetch("deleteAct.do", {
+	        fetch("deleteSavedOption.do", {
 		    	  method: "POST",
 		    	  headers: {
-		    	    "Content-Type": "application/x-www-form-urlencoded"
+		    		  "Content-Type": "application/json"
 		    	  },
-		    	  body: new URLSearchParams({ actId: activity.actId }).toString()
+		    	  body: JSON.stringify({ itemId: activity.actId }) 
 		    	})
 		    	.then(response => {
 		    	  if (response.ok) {
-		    		window.location.href = "viewActRecChat.do";
-		    	    console.log("일정 삭제 성공");
+		    	    console.log("활동 삭제 성공");
 		    	  } else {
-		    	    alert("일정 삭제 실패!");
+		    	    alert("활동 삭제 실패!");
 		    	  }
 		    	});
 	      };
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	    .then(list => {
 	    	      // 🔄 CareerItemDto 형식 기반으로 변환
 	    	      const formatted = list.map(item => ({
-	    	        ssId: item.itemId,
+	    	        actId: item.itemId,
 	    	        text: item.title
 	    	      }));
 	    	      addToActivityList(formatted);
@@ -705,7 +705,8 @@ body {
 	color: #d9d9d9;
 	font-size: 15px;
 	font-weight: 600;
-	margin-bottom: 2px; /* 라벨 아래 약간 여백 */
+	margin-bottom: 2px; 
+	margin-top : 3px;
 }
 .select-btn {
 	background: none;
@@ -947,9 +948,9 @@ body {
 				<div class="chat-area" id="chatArea">
 					<div class="message bot-msg">
 						이곳은 활동 찾기 세션입니다. <br>
-						선택하신 활동 대상 스펙에 관련된 활동을 하신 적이 있으신가요? <br>
-						활동 경험이 있으시다면 적어주시고, 없으시다면 빈칸을 입력해주세요! <br>
-						(예시 : ooo 문제집 풀어본 경험이 있다, xx 스펙 관련 박람회를 가본 적이 있다 등등)
+						위에서 선택하신 목표 스펙을 이루기 위해 관련 활동을 하신 적이 있으신가요? <br>
+						활동 경험이 있으시다면 적어주시고, 없으시다면 "없음"을 입력해주세요! <br>
+						(예시 : 기사 자격증을 따기 위해 ooo 문제집 풀어본 경험이 있다, xx 인턴십에 도움이 되도록 사전 프로젝트를 해본 경험이 있다 등등)
 					</div>
 				</div>
 			</div>

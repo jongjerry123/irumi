@@ -481,7 +481,7 @@ public class ChatbotController {
 		case "ss":
 			break;
 		case "act":
-			break;
+			dashboardService.deleteAct(itemToDelete.getItemId());
 		}
 
 	}
