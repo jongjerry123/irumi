@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	
 
 	<div class="sidebar">
-		<button onclick="moveJobPage();" id="act">직무 찾기</button>
+		<button onclick="moveJobPage();" id="job">직무 찾기</button>
 		<button onclick="moveSpecPage();" id="spec">스펙 찾기</button>
 		<button onclick="moveSchedulePage();" id="ss">일정 찾기</button>
 		<button onclick="moveActPage();" id="act">활동 찾기</button>
