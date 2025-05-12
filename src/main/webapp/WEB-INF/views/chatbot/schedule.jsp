@@ -361,47 +361,59 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <style>
 body {
-  background-color: #000;
+  background-color: #111;
   color: white;
   font-family: 'Noto Sans KR', sans-serif;
   margin: 0;
   padding: 0;
-  min-height: 70vh;
-}
-.container {
-  display: flex;
-  min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
-  margin-top: 20px; /* header 높이만큼 아래로 */
-}
-.main {
-  flex: 1;
-  padding-right: 40px;
-  padding-left: 40px;
-  display: flex;
-  flex-direction: column;
-}
-a {
- color: #BAAC80; /* 초록색 */
- text-decoration: underline; /* 밑줄 */
+  min-height: 100vh;
 }
 
+/* chatbot-page-layout의 최대 크기 설정 */
+.container {
+    display: flex;
+    max-width: 1200px;   /* 최대 너비 설정 */
+    max-height: 100vh;   /* 최대 높이 설정 (화면 높이) */
+    width: 100%;         /* 너비를 부모에 맞게 확장 */
+    height: 100%;        /* 높이를 부모에 맞게 확장 */
+    margin: 0 auto;      /* 중앙 정렬 */
+    overflow: hidden;    /* 내용이 넘치지 않도록 숨김 */
+}
+
+
+
+.main {
+    flex: 1;            
+    display: flex;      
+    flex-direction: column; 
+    background-color: #1e1e1e;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 100%;  
+}
+
+.left-containter {
+    width: 200px;        /* 고정된 너비 */
+    padding: 20px;
+    flex-shrink: 0;      /* 사이드바가 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
+}
 
 /* 채팅 부분 ************************************************************************************* */
 .content-box {
-  padding-top : 30px;
-  background-color: #1e1e1e;
-  padding-right: 20px;
-  padding-left: 20px;
-  border-radius: 12px;
-  line-height: 1.7;
-  font-size: 14px;
-  margin-bottom: 30px;
-  height: 700px;
-  overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
-  display: flex;
-  flex-direction: column;
-  border-left: 4px solid #BAAC80;
-   
+    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
+    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
+    height:auto;
+    max-width: 700px; 
+	border-radius: 12px;
+	line-height: 1.7;
+	font-size: 14px;
+	
+	height: 700px;
+	overflow-y: auto; /*내부 콘텐츠가 넘칠 경우 스크롤 활성화*/
+	display: flex;
+	flex-direction: column;
 }
 .content-box::-webkit-scrollbar {
  width: 9px;
@@ -419,18 +431,19 @@ a {
 
 /* 오른쪽 페널 ******************************************************** */
 .right-panel {
-  width: 230px;
-  padding-right: 20px;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+    width: 250px;        /* 고정된 너비 */
+    color: #333;
+    padding: 20px;
+    flex-shrink: 0;      /* 오른쪽 패널이 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
+    overflow-y: auto; 
 }
 
 .right-panel .spec-value {
-	color: #eeeeee;
-	font-size: 9px;
+	color: #BAAC80;
+	font-size: 14px;
 	margin-left: 4px;
+	font-weight: bold;
 }
 
 .right-panel .info-row {
@@ -440,9 +453,10 @@ a {
 }
 
 .right-panel .label {
-	font-size: 14px;
-	color: #BAAC80;
+	color: #eeeeee;
 	font-weight: bold;
+	font-size: 15px;
+	margin: 25px 0 25px 0;
 }
 
 .right-panel .value {
@@ -457,6 +471,8 @@ a {
   font-size : 9px;  
   margin-left : 4px;
 }
+
+
 /* 채팅 쪽 부분 */
 .chat-input-box .chat-send-btn:hover {
   background: #BAAC80;
@@ -469,7 +485,6 @@ a {
   padding: 8px 16px;
   margin-top: 40px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
-  border-left: 4px solid #BAAC80;
 }
 .chat-input-box .chat-input {
   flex: 1;
@@ -516,39 +531,40 @@ a {
   display: flex;
   background: #232323;
   border-radius: 8px;
-  padding-left: 10px;
-  padding-right : 10px;
+  padding-left: 0; /* 수정: 왼쪽 패딩 제거로 배경색이 끝까지 채워지도록 */
+  padding-right: 0; /* 유지: 오른쪽 패딩 제거로 .add-btn이 끝에 붙도록 */
   margin-top: 12px;
   flex-direction: column;
   gap: 6px;
-  align-items : center;
+  align-items: stretch; /* 유지: 자식 요소가 너비를 채우도록 */
+  width: 100%; /* 유지: 부모 너비를 완전히 사용 */
+  box-sizing: border-box; /* 유지: 패딩 포함 크기 계산 */
 }
 .manual-input-box .manual-input {
-  flex: 1;
+  width: 100%; /* 유지: .manual-date와 동일한 너비 */
+  box-sizing: border-box; /* 유지: 패딩 포함 크기 계산 */
   background: transparent;
   border: none;
   color: #BAAC80;
   font-size: 14px;
-  padding: 8px 4px;
+  padding: 8px 14px; /* 수정: .manual-date와 패딩 통일 */
   outline: none;
 }
 .manual-input-box .manual-date {
   border-top-left-radius: 8px;
-  border-top-right-radius : 8px;
-  width : 100%;
+  border-top-right-radius: 8px;
+  width: 100%; /* 유지: 부모 너비를 채움 */
+  box-sizing: border-box; /* 유지: 패딩 포함 크기 계산 */
   flex: 1;
   background: #BAAC80;
   border: none;
   color: #232323;
   font-size: 14px;
-  padding: 8px 4px;
-  padding-left: 10px;
-  padding-right : 10px;
+  padding: 8px 14px; /* 수정: 오른쪽 끝까지 배경색 채우기 위해 패딩 조정 */
   outline: none;
-  font-weight : bold;
-  align-items : center;
+  font-weight: bold;
+  align-items: center;
 }
-
 .manual-input-box .add-btn {
   background: #232323;
   border: 1px solid #BAAC80;
@@ -560,9 +576,11 @@ a {
   justify-content: center;
   cursor: pointer;
   font-size: 18px;
-  margin-left: 4px;
-  align-self: flex-end;
+  margin-left: auto; /* 유지: 오른쪽 끝 정렬 */
+  margin-right: 2px; /* 유지: 최소 여백 */
+  align-self: flex-end; /* 유지: 수직 하단 정렬 */
 }
+
 .manual-input-box .add-btn:hover {
   background: #BAAC80;
   color: #232323;
@@ -571,10 +589,10 @@ a {
    margin-bottom: 20px;
 }
 .section-title {
-   color: #BAAC80;
+   color: #eeeeee;
    font-weight: bold;
    font-size: 15px;
-   margin: 15px 0 10px 0;
+   margin: 25px 0 10px 0;
 }
 .saved-schedule-list {
    display: flex;
@@ -583,16 +601,17 @@ a {
    margin-bottom: 14px;
 }
 .schedule-card {
-   background: #232323;
-   border: 1.5px solid #444;
-   border-radius: 7px;
-   display: flex;
-   align-items: center;
-   gap: 12px;
-   padding: 8px 14px;
-   font-size: 10px;
-   color: #fff;
-   position: relative;
+	background: #232323;
+	border: 1.5px solid #BAAC80;
+	border-radius: 7px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 14px;
+	margin-bottom: 2px;
+	font-size: 12px;
+	color: #eeeeee;
+	position: relative;
 }
 .remove-btn {
    background: none;
@@ -674,7 +693,7 @@ a {
 .select-btn-list {
  display: flex;
  flex-direction: row;
- gap: 8px; /* 버튼 사이 간격 */
+ gap: 5px; /* 버튼 사이 간격 */
  flex-wrap: nowrap; 
 }
 .select-btn.active {
@@ -766,23 +785,16 @@ a {
 
 
 
-
-.first-row {
-	height: 100px;
-	display: flex;  /* flexbox로 설정 */
-    justify-content: left;  /* 가로 방향으로 가운데 정렬 */
-    align-items: center;  /* 세로 방향으로도 가운데 정렬 */
-}
-
-
-
 </style>
 </head>
 <body>
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+
+
 <c:set var="menu" value="chat" scope="request" />
 <div class="container">
 <!-- Sidebar -->
-     <div class="left-sidebar">
+     <div class="left-containter">
 		     <c:set var="chatTopic" value="ss" scope="request" />
 			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
      </div>
@@ -804,6 +816,7 @@ a {
 						<button class="confirm-select-btn">선택 완료</button>
 					</div>
 				</div>
+
 				<div class="chat-area" id="chatArea">
 					<div class="message bot-msg">
 						이곳은 일정 찾기 세션입니다.<br> 어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! <br>
@@ -824,35 +837,17 @@ a {
 			</div>
 		</div>
 
-		<div class="first-row">
-			<div class="login-actions">
-				<c:choose>
-					<c:when test="${not empty sessionScope.loginUser}">
-						<c:if test="${sessionScope.loginUser.userAuthority == '2'}">
-							<button onclick="location.href='changeManage.do'">관리자 기능</button>
-						</c:if>
-						<c:if test="${sessionScope.loginUser.userAuthority == '1'}">
-							<button onclick="location.href='myPage.do'">마이페이지</button>
-						</c:if>
-						<button onclick="logout()">로그아웃</button>
-					</c:when>
-					<c:otherwise>
-						<button onclick="moveToLogin()">로그인</button>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</div>
 		<div class="right-panel">
 			<div class="info-row">
-				<span class="label">➤ 목표 직무:</span> <span class="value"></span>
+				<span class="label">🎯 목표 직무:</span> <span class="value"></span>
 			</div>
 			<div class="info-row">
-				<span class="label">➤ 목표 스펙:</span> <span class="spec-value"></span>
+				<span class="label">🎯 목표 스펙:</span> <span class="spec-value"></span>
 			</div>
-			<div class="saved-schedule-section">
-				<div class="section-title">➤ 저장한 일정</div>
-				<div class="saved-schedule-list" id="savedScheduleList"></div>
+			<div class="saved-schedule-list" id="savedScheduleList"></div>
 
+			<div class="saved-schedule-section">
+				<div class="section-title">➤ 직접 일정 추가하기</div>
 
 				<div class="manual-input-box">
 					<input type="date" class="manual-date" id="manualDate" /> <input
@@ -862,10 +857,8 @@ a {
 				</div>
 			</div>
 		</div>
-		<div class="right-container">
-			<c:import url="/WEB-INF/views/common/sidebar_right.jsp" />
-		</div>
-<!-- Footer -->
+
+		<!-- Footer -->
   <c:import url="/WEB-INF/views/common/footer.jsp"/>
 </body>
 </html>
