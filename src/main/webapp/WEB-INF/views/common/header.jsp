@@ -3,11 +3,51 @@
 
 <!-- Pretendard CDN -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
-
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.6/dist/web/static/pretendard.css" rel="stylesheet">
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
 <style>
+
+
+body, input, textarea, button, select {
+    font-family: 'Pretendard', sans-serif !important;
+  }
+  
+header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 9999;
+	background-color: #000;
+	height: 70px; 
+	padding: 0 50px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	box-sizing: border-box;
+	font-family: 'Pretendard', sans-serif;
+	border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo-area {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	cursor: pointer;
+	transition: transform 0.2s ease;
+}
+
+.logo-area:hover {
+	transform: scale(1.1);
+}
+
+.triangle-img {
+	width: 32px;
+	height: 32px;
+	vertical-align: middle;
+}
 
 </style>
 

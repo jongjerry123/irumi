@@ -6,6 +6,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.6/dist/web/static/pretendard.css" rel="stylesheet">
 <title>irumi</title>
 <link
 	href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap"
@@ -187,13 +188,11 @@ header.active {
 .card-title {
 	font-size: 20px;
 	font-weight: bold;
-	margin-bottom: 6px;
+	margin-top: 20px;
+	margin-bottom: 20px;
 }
 
-.card-desc {
-	font-size: 14px;
-	line-height: 1.4;
-}
+.card-desc { display: none; }
 
 .irumi-link {
 	color: inherit;
@@ -204,102 +203,242 @@ header.active {
 .irumi-link:hover {
 	color: #ff4c4c;
 }
+
+
+.detail-section {
+  background: #000;
+  padding: 0;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.detail-card {
+  scroll-snap-align: start;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  padding: 1px 5vw;
+  opacity: 0;
+  transform: translateY(0);
+  transition: all 0.8s ease;
+  cursor: pointer;
+}
+
+.detail-card.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.detail-card:nth-child(even) { flex-direction: row-reverse; }
+
+.detail-card img {
+  width: 50%;
+  height: 80%;
+  object-fit: cover;
+  border-radius: 20px;
+  filter: grayscale(90%);
+  transition: filter 0.4s ease;
+}
+
+.detail-card:hover img {
+  filter: grayscale(0%) brightness(1.05);
+}
+
+.detail-content {
+  width: 40%;
+  padding: 0 40px;
+  color: #fff;
+}
+
+.detail-content h3 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 5px #BAAC80);
+}
+
+.detail-content p {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.detail-content button {
+  margin-top: 24px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.detail-content.dashboard button {
+  background: #43B7B7;
+  color: #fff;
+}
+.detail-content.ai button {
+  background: #BAAC80;
+  color: #fff;
+}
+.detail-content.community button {
+  background: #A983A3;
+  color: #fff;
+}
+
+.detail-content.dashboard button:hover {
+  background: #2f9797;
+}
+
+.detail-content.ai button:hover {
+  background: #9d8f61;
+}
+
+.detail-content.community button:hover {
+  background: #8c6c8c;
+}
+
+
+
 </style>
 
 <script>
-function moveToLogin() {
-	location.href = 'loginPage.do';
-}
-function moveToAi() {
-	location.href = 'Ai.do';
-}
-function moveToDash() {
-	location.href = 'dashboard.do';
-}
-function moveToCommu() {
-	location.href = 'freeBoard.do';
+function moveToLogin() { location.href = 'loginPage.do'; }
+function moveToAi() { location.href = 'Ai.do'; }
+function moveToDash() { location.href = 'dashboard.do'; }
+function moveToCommu() { location.href = 'freeBoard.do'; }
+
+function scrollToDetail(index) {
+  const cards = document.querySelectorAll('.detail-card');
+  if (cards[index]) {
+    cards[index].scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
-// [인트로 클릭 시 전체 콘텐츠 활성화]
 window.addEventListener("DOMContentLoaded", function () {
-	const main = document.querySelector(".main-container");
-	const header = document.querySelector("header");
+  const main = document.querySelector(".main-container");
+  const header = document.querySelector("header");
 
-	<c:choose>
-		<c:when test="${empty loginUser}">
-			// 비로그인: 클릭 시 보여지도록 설정
-			const intro = document.getElementById("introOverlay");
-			intro.querySelector("img").addEventListener("click", () => {
-				intro.style.opacity = "0";
-				setTimeout(() => {
-					intro.style.display = "none";
-					main.classList.add("active");
-					header.classList.add("active");
-				}, 500);
-			});
-		</c:when>
-		<c:otherwise>
-			// 로그인: 처음부터 바로 보이도록 설정
-			main.classList.add("active");
-			header.classList.add("active");
-		</c:otherwise>
-	</c:choose>
+  <c:choose>
+    <c:when test="${empty loginUser}">
+      const intro = document.getElementById("introOverlay");
+      intro.querySelector("img").addEventListener("click", () => {
+        intro.style.opacity = "0";
+        setTimeout(() => {
+          intro.style.display = "none";
+          main.classList.add("active");
+          header.classList.add("active");
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }, 500);
+      });
+    </c:when>
+    <c:otherwise>
+      main.classList.add("active");
+      header.classList.add("active");
+    </c:otherwise>
+  </c:choose>
+
+  const cards = document.querySelectorAll('.detail-card');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      } else {
+        entry.target.classList.remove('active');
+      }
+    });
+  }, { threshold: 0.6 });
+
+  cards.forEach(card => observer.observe(card));
 });
 </script>
 </head>
-<body>
-	<c:if test="${empty loginUser}">
-	<!-- ✅ 인트로 오버레이 (비로그인 유저만) -->
-	<div id="introOverlay">
-		<div class="intro-content">
-			<img src="/irumi/resources/images/eye.png" alt="irumi 로고 클릭" />
-			<p class="intro-subtitle">Project Irumi</p>
-		</div>
-	</div>
-</c:if>
+<body style="overflow-y: auto; font-family: 'Pretendard', sans-serif;">
+  <c:if test="${empty loginUser}">
+    <div id="introOverlay">
+      <div class="intro-content">
+        <img src="/irumi/resources/images/eye.png" alt="irumi 로고 클릭" />
+        <p class="intro-subtitle">Project Irumi</p>
+      </div>
+    </div>
+  </c:if>
 
-	<c:import url="/WEB-INF/views/common/header.jsp" />
-	<div class="main-container">
-		<h2>
-			<a href="about.do" class="irumi-link"><strong>이루미</strong></a>와 함께<br>
-			원하는 <strong>직무</strong>에 꼭 맞는 <strong>스펙</strong>을 발견하고<br> 나만의
-			성장 스토리를 쌓아보세요.
-		</h2>
+  <c:import url="/WEB-INF/views/common/header.jsp" />
 
-		<div class="card-section">
-			<div class="card" onclick="moveToDash()">
-				<img src="/irumi/resources/images/dashboard5.png" class="card-image"
-					alt="대시보드 이미지" />
-				<div class="card-info dashboard">
-					<div class="card-title">내 스펙 대시보드</div>
-					<div class="card-desc">
-						내가 설정한 목표에 따른<br>실행 상황을 살펴볼 수 있습니다.
-					</div>
-				</div>
-			</div>
 
-			<div class="card" onclick="moveToAi()">
-				<img src="/irumi/resources/images/ai9.png" class="card-image"
-					alt="AI 도우미 이미지" />
-				<div class="card-info ai">
-					<div class="card-title">대화형 도우미</div>
-					<div class="card-desc">
-						최신 정보를 AI와의 대화를 통해<br>스펙 대시보드에 저장할 수 있습니다.
-					</div>
-				</div>
-			</div>
+  <div class="main-container">
+    <h2>
+      <a href="about.do" class="irumi-link"><strong>이루미</strong></a>와 함께<br>
+      원하는 <strong>직무</strong>에 꼭 맞는 <strong>스펙</strong>을 발견하고<br>
+      나만의 성장 스토리를 쌓아보세<a href="worldCup.do" style="text-decoration: none; color: inherit;">요</a>.
+    </h2>
 
-			<div class="card" onclick="moveToCommu()">
-				<img src="/irumi/resources/images/community3.png" class="card-image"
-					alt="유저 커뮤니티 이미지" />
-				<div class="card-info community">
-					<div class="card-title">유저 커뮤니티</div>
-					<div class="card-desc">
-						유저들과 취업 팁, 후기를 공유하고<br>스터디 그룹을 구할 수 있습니다.
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="card-section">
+      <div class="card" onclick="scrollToDetail(0)">
+        <img src="/irumi/resources/images/dashboard5.png" class="card-image" alt="대시보드 이미지" />
+        <div class="card-info dashboard">
+          <div class="card-title">내 스펙 대시보드</div>
+        </div>
+      </div>
+
+      <div class="card" onclick="scrollToDetail(1)">
+        <img src="/irumi/resources/images/ai9.png" class="card-image" alt="AI 도우미 이미지" />
+        <div class="card-info ai">
+          <div class="card-title">대화형 도우미</div>
+        </div>
+      </div>
+
+      <div class="card" onclick="scrollToDetail(2)">
+        <img src="/irumi/resources/images/community3.png" class="card-image" alt="유저 커뮤니티 이미지" />
+        <div class="card-info community">
+          <div class="card-title">유저 커뮤니티</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="detail-section">
+    <div class="detail-card">
+      <img src="/irumi/resources/images/dashboard5.png" alt="대시보드 상세">
+      <div class="detail-content dashboard">
+        <h3>나의 스펙 대시보드</h3>
+        <p>
+          나의 스펙 여정을 한 눈에 살펴보고,<br>
+          목표 달성을 위한 현재 위치를 가시적으로 파악할 수 있습니다.<br>
+          실천 항목들을 설정하고 진행 상황을 추적하며,<br>
+          나만의 커리어 트래커를 운영해 보세요.
+        </p>
+        <button onclick="moveToDash()">바로가기</button>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <img src="/irumi/resources/images/ai1.png" alt="AI 상세">
+      <div class="detail-content ai">
+        <h3>대화형 도우미</h3>
+        <p>
+          AI와 함께 진로를 설계해보세요.<br>
+          이루미 도우미는 자격증, 활동, 일정까지 개인화된 정보를 제공하며,<br>
+          궁금한 내용을 실시간으로 물어보고 곧바로 기록할 수 있는 강력한 도구입니다.
+        </p>
+        <button onclick="moveToAi()">바로가기</button>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <img src="/irumi/resources/images/community3.png" alt="커뮤니티 상세">
+      <div class="detail-content community">
+        <h3>유저 커뮤니티</h3>
+        <p>
+          같은 목표를 가진 사람들과 함께하세요.<br>
+          취업 팁과 준비 경험을 공유하고,<br>
+          실전적인 스터디 그룹이나 활동 정보를 통해 서로를 격려하고 도울 수 있습니다.
+        </p>
+        <button onclick="moveToCommu()">바로가기</button>
+      </div>
+    </div>
+  </section>
+  <c:import url="/WEB-INF/views/common/backToTop.jsp" />
 </body>
 </html>

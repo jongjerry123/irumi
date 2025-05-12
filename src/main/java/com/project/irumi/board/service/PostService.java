@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.irumi.board.dao.PostDAO;
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
+import com.project.irumi.dashboard.model.dto.Job;
 
 @Service
 public class PostService {
@@ -332,4 +333,9 @@ public class PostService {
 	public int getUserAuthority(String userId) {
 	    return postDAO.getUserAuthority(userId);
 	}
+	
+	//몰래하는 월드컵
+	public List<Job> getAllJobs() {
+        return postDAO.getAllJobs();
+    }
 }
