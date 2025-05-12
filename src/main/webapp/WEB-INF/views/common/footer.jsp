@@ -8,22 +8,41 @@
   <title>irumi : footer</title>
   <style>
     html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      height: 100%;
-      background-color: #000;
       font-family: 'Noto Sans KR', sans-serif;
+      background-color: #000;
       color: white;
     }
 
     .page-wrapper {
       display: flex;
       flex-direction: column;
-      min-height: 45vh;
+      min-height: 100vh;
     }
 
     .main-content {
       flex: 1;
+    }
+
+    .footer-note {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+  padding: 10px 0;
+  
+  width: max-content; /* ✅ 글자 크기에만 맞게 */
+  z-index: 9999; /* ✅ 최상단 유지 */
+}
+
+    .footer-note a {
+      color: #BAAC80;
+      text-decoration: none;
     }
 
     .floating-menu {
@@ -98,18 +117,6 @@
       height: 30px;
       filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));
     }
-
-    .footer-note {
-      text-align: center;
-      font-size: 12px;
-      opacity: 0.6;
-      padding: 5px 0; /*수정 필요.. .여기 때문에 footer 안나타남*/
-    }
-
-    .footer-note a {
-      color: #BAAC80;
-      text-decoration: none;
-    }
   </style>
 </head>
 <body>
@@ -117,23 +124,16 @@
   <c:set var="menu" value="community" scope="request" />
 </c:if>
 
-<!-- <div class="page-wrapper">
+<div class="page-wrapper">
   <div class="main-content">
-    실제 페이지 내용
+    <!-- 페이지별 내용은 여기에 import되어 들어옵니다 -->
   </div>
 
-  푸터 노트 (페이지 맨 아래 정중앙 고정)
-  <div class="footer-note">
+  <!-- 푸터 영역 -->
+  <footer class="footer-note">
     © 2025 이루미. by Team.iruminaty <a href="about.do">사이트 소개</a>
-  </div>
+  </footer>
 </div>
- -->
-
- 
- <!--   푸터 노트 (페이지 맨 아래 정중앙 고정) -->
- <div class="footer-note">
-   © 2025 이루미. by Team.iruminaty <a href="about.do">사이트 소개</a>
- </div>
 
 <!-- 고정된 좌측 하단 사이드 메뉴 -->
 <div class="floating-menu">
@@ -167,7 +167,6 @@
   </ul>
 </div>
 
-<!-- 메뉴 제어 스크립트 -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const mainIcon = document.querySelector('.main-icon');
