@@ -3,11 +3,16 @@
 
 <!-- Pretendard CDN -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
-
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.6/dist/web/static/pretendard.css" rel="stylesheet">
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
 <style>
+
+body, input, textarea, button, select {
+    font-family: 'Pretendard', sans-serif !important;
+  }
+  
 header {
 	position: fixed;
 	top: 0;

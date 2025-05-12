@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
+import com.project.irumi.dashboard.model.dto.Job;
 
 @Repository
 public class PostDAO {
@@ -371,5 +372,10 @@ public class PostDAO {
 	public int getUserAuthority(String userId) {
 	    return sqlSession.selectOne("boardMapper.selectUserAuthority", userId);
 	}
+	
+	//몰래하는월드컵
+	public List<Job> getAllJobs() {
+        return sqlSession.selectList("selectAllJobs");
+    } 
 
 }

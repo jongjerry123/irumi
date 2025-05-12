@@ -53,6 +53,8 @@ public class HomeController {
 	public String showAboutPage() {
 	    return "board/about";  
 	}
+	
+	
 
 
 	

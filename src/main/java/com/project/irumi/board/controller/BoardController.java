@@ -14,13 +14,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
 import com.project.irumi.board.service.PostService;
+import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.user.model.dto.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +47,7 @@ public class BoardController {
 		List<PostDTO> posts = postService.getFilteredPosts("일반", period, sort, keyword, offset, pageSize);
 		 // 썸네일 URL 세팅
 	    for (PostDTO post : posts) {
-	        if (post.getPostSavedName() == null || post.getPostSavedName().isBlank()) {
+	    	if (post.getPostSavedName() == null || !isImageFile(post.getPostSavedName())) {
 	            String thumbUrl = extractFirstImageUrl(post.getPostContent());
 	            post.setFirstImageUrl(thumbUrl);
 	        }
@@ -393,6 +396,11 @@ public class BoardController {
 	    return matcher.find() ? matcher.group(1) : null;
 	}
 	
+	// 이미지 확장자 확인
+	private boolean isImageFile(String filename) {
+	    return filename != null && filename.toLowerCase().matches(".*\\.(jpg|jpeg|png|gif)$");
+	}
+	
 	
 
 	// ✅ 신고된 게시글 목록
@@ -514,6 +522,14 @@ public class BoardController {
 	    return "redirect:/badUserList.do";
 	}
 	
-	
+	//몰래하는 월드컵
+	@RequestMapping("worldCup.do")
+	public String worldCupPage(Model model) throws Exception {
+	    List<Job> jobList = postService.getAllJobs();
+	    ObjectMapper mapper = new ObjectMapper(); // Jackson 사용
+	    String jobListJson = mapper.writeValueAsString(jobList); // JSON 문자열로 변환
+	    model.addAttribute("jobListJson", jobListJson);
+	    return "worldCup";
+	}
 
 }
