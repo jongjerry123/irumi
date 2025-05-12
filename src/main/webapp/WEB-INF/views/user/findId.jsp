@@ -5,32 +5,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>아이디 찾기</title>
+<title>irumi</title>
 <style>
 body {
-	background-color: #111; /* main.jsp와 동일한 배경색 */
-	font-family: 'Noto Sans KR', sans-serif; /* main.jsp와 동일한 폰트 */
+	background-color: #000; 
+	font-family: 'Noto Sans KR', sans-serif; 
 	color: white;
 	margin: 0;
 	padding: 0;
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh; /* 화면 전체 높이 유지 */
-}
-
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
-	background-color: #111;
-	position: fixed;
-	width: 100%;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 1000;
-	box-sizing: border-box;
+	min-height: 100vh; 
 }
 
 .container {
@@ -39,12 +24,12 @@ header {
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	margin: 200px auto 50px; /* 헤더와의 간격 조정 */
+	margin: 200px auto 50px;
 	text-align: center;
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 h2 {
@@ -74,7 +59,7 @@ input[type="email"], input[type="text"] {
 	padding: 0 12px;
 	border: none;
 	border-radius: 6px;
-	background-color: #2ccfcf;
+	background-color: #fff;
 	color: black;
 	font-weight: bold;
 	cursor: pointer;
@@ -86,6 +71,10 @@ input[type="email"], input[type="text"] {
 	background-color: black;
 	color: white;
 	cursor: not-allowed;
+	border-left: 1px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
 }
 
 .inline-group {
@@ -121,7 +110,7 @@ input[type="email"], input[type="text"] {
 	right: 10px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #2ccfcf;
+	color: #fff;
 	font-size: 12px;
 	pointer-events: none;
 	z-index: 10;
@@ -221,7 +210,7 @@ input[type="email"], input[type="text"] {
                     } else {
                         $emailMessage.text('등록된 이메일입니다. 인증을 진행해주세요.').addClass('success').removeClass('error');
                         $sendVerificationButton.prop('disabled', false);
-                        $sendVerificationButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                        $sendVerificationButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                         isEmailRegistered = true;
                     }
                 },
@@ -256,7 +245,7 @@ input[type="email"], input[type="text"] {
                     $verificationMessage.text('인증번호를 입력해주세요.').addClass('success');
                     $verificationCode.prop('disabled', false);
                     $verifyCodeButton.prop('disabled', false);
-                    $verifyCodeButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                    $verifyCodeButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                     $verificationCode.focus();
                     $sendVerificationButton.text('재발송');
                     startTimer();
@@ -266,7 +255,7 @@ input[type="email"], input[type="text"] {
                 setTimeout(() => {
                     if (isEmailRegistered) {
                         $sendVerificationButton.prop('disabled', false);
-                        $sendVerificationButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                        $sendVerificationButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                     }
                 }, 5000);
             } catch (error) {
@@ -274,7 +263,7 @@ input[type="email"], input[type="text"] {
                 setTimeout(() => {
                     if (isEmailRegistered) {
                         $sendVerificationButton.prop('disabled', false);
-                        $sendVerificationButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                        $sendVerificationButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                     }
                 }, 5000);
             }
@@ -298,7 +287,7 @@ input[type="email"], input[type="text"] {
                     if (response.success) {
                         $verificationMessage.text('인증 성공!').addClass('success');
                         $findIdButton.prop('disabled', false);
-                        $findIdButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                        $findIdButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                         clearInterval(timerInterval);
                         $timerDisplay.hide();
                     } else {

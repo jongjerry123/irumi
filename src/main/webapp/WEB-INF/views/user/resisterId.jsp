@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-	<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>회원가입</title>
+<title>irumi</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 body {
-	background-color: #121212;
+	background-color: #000;
 	font-family: Arial, sans-serif;
 	color: white;
 	display: flex;
@@ -19,31 +19,16 @@ body {
 	margin: 0;
 }
 
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
-	background-color: #111;
-	position: fixed;
-	width: 100%;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 1000;
-	box-sizing: border-box;
-}
-
 .container {
 	background-color: #1e1e1e;
 	border-radius: 10px;
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 h2 {
@@ -73,7 +58,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 	padding: 0 12px;
 	border: none;
 	border-radius: 6px;
-	background-color: #2ccfcf;
+	background-color: #fff;
 	color: black;
 	font-weight: bold;
 	cursor: pointer;
@@ -86,6 +71,10 @@ input[type="text"], input[type="password"], input[type="email"] {
 	background-color: black;
 	color: white;
 	cursor: not-allowed;
+	border-left: 1px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
 }
 
 .inline-group {
@@ -115,16 +104,19 @@ input[type="text"], input[type="password"], input[type="email"] {
 	height: 40px;
 	padding-right: 60px;
 }
+
 #check-id {
-    transition: background-color 0.3s ease, color 0.3s ease, cursor 0.3s ease;
+	transition: background-color 0.3s ease, color 0.3s ease, cursor 0.3s
+		ease;
 }
+
 #timer {
 	display: none;
 	position: absolute;
 	right: 10px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #2ccfcf;
+	color: #fff;
 	font-size: 12px;
 	pointer-events: none;
 	z-index: 10;
@@ -162,8 +154,8 @@ input[type="text"], input[type="password"], input[type="email"] {
 
 			<!-- 이름 입력 -->
 			<div class="input-group">
-				<input type="text" id="userName" name="userName" placeholder="닉네임 입력"
-					maxlength="4">
+				<input type="text" id="userName" name="userName"
+					placeholder="닉네임 입력" maxlength="4">
 				<div id="name-message" class="message"></div>
 			</div>
 
@@ -269,7 +261,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 	            idMessage.textContent = '중복 확인을 진행해주세요.';
 	            idMessage.classList.remove('success', 'error');
 	            checkIdButton.disabled = false;
-	            checkIdButton.style.backgroundColor = '#2ccfcf';
+	            checkIdButton.style.backgroundColor = '#fff';
 	            checkIdButton.style.color = 'black';
 	            checkIdButton.style.cursor = 'pointer';
 	            return true;
@@ -392,7 +384,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 	                    emailMessage.classList.remove('error');
 	                    isEmailAvailable = true;
 	                    sendVerificationButton.disabled = false;
-	                    sendVerificationButton.style.backgroundColor = '#2ccfcf';
+	                    sendVerificationButton.style.backgroundColor = '#fff';
 	                    sendVerificationButton.style.color = 'black';
 	                    sendVerificationButton.style.cursor = 'pointer';
 	                } else {
@@ -454,7 +446,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 	                verificationMessage.classList.add('success');
 	                verificationCodeInput.disabled = false;
 	                verifyCodeButton.disabled = false;
-	                verifyCodeButton.style.backgroundColor = '#2ccfcf';
+	                verifyCodeButton.style.backgroundColor = '#fff';
 	                verifyCodeButton.style.color = 'black';
 	                verifyCodeButton.style.cursor = 'pointer';
 	                verificationCodeInput.focus();
@@ -474,7 +466,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 	            setTimeout(() => {
 	                if (isEmailValid && isEmailAvailable) {
 	                    sendVerificationButton.disabled = false;
-	                    sendVerificationButton.style.backgroundColor = '#2ccfcf';
+	                    sendVerificationButton.style.backgroundColor = '#fff';
 	                    sendVerificationButton.style.color = 'black';
 	                    sendVerificationButton.style.cursor = 'pointer';
 	                }
@@ -493,7 +485,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 	            setTimeout(() => {
 	                if (isEmailValid && isEmailAvailable) {
 	                    sendVerificationButton.disabled = false;
-	                    sendVerificationButton.style.backgroundColor = '#2ccfcf';
+	                    sendVerificationButton.style.backgroundColor = '#fff';
 	                    sendVerificationButton.style.color = 'black';
 	                    sendVerificationButton.style.cursor = 'pointer';
 	                }
