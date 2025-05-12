@@ -7,15 +7,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <link rel="stylesheet" type="text/css"
 	href="${ pageContext.servletContext.contextPath}/resources/css/chatbot.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script>
+function moveToMain() {
+    location.href = 'main.do';
+}
+
+const CHAT_TOPIC = "${chatTopic}";
+
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById(CHAT_TOPIC);
+    if (btn) {
+        btn.classList.add("active");
+    }
+});
+</script>
 
 
 <title>chatbot 스펙 찾기</title>
@@ -37,6 +51,7 @@ let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변
 
 $(function() {
 	//기본으로는 채팅 버튼 비활성화 돼있음
+	const CHAT_TOPIC = "spec";
 	$(".chat-send-btn").addClass("inactive");
 	
 	// 대쉬보드 requestScope에서 가져오는 값.
@@ -430,43 +445,46 @@ $(function() {
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
-		<div class="chatbot-page-layout">
+	<div class="chatbot-page-layout">
 		<div class="left-container">
 			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
 			<c:set var="menu" value="chat" scope="request" />
-			
-			
 		</div>
-		
-		
+
+
 		<div class="main-container">
-			<div class="select-bar">
-				<div class="select-group">
-					<span class="select-label">📜 어떤 직무에 필요한 스펙이 궁금하세요?</span>
-					<div class="select-job-btn-list">
-						<!-- <button class="select-btn active">프론트엔드 개발자</button>
+
+			<div class="chatbox">
+				<div class="select-bar">
+					<div class="select-group">
+						<span class="select-label">📜 어떤 직무에 필요한 스펙이 궁금하세요?</span>
+						<div class="select-job-btn-list">
+							<!-- <button class="select-btn active">프론트엔드 개발자</button>
 								<button class="select-btn">백엔드 개발자</button> -->
+						</div>
+						<!--  스펙 페이지에는 필요없지만 넣어봄 -->
+						<div class="select-spec-btn-list"></div>
 					</div>
-					<!--  스펙 페이지에는 필요없지만 넣어봄 -->
-					<div class="select-spec-btn-list"></div>
+					<div class="confirm-select-box">
+						<!--  클릭시 setSubTopic 해야함 -->
+						<button class="confirm-select-btn">선택 완료</button>
+					</div>
+					<hr>
 				</div>
-				<div class="confirm-select-box">
-					<!--  클릭시 setSubTopic 해야함 -->
-					<button class="confirm-select-btn">선택 완료</button>
-				</div>
-				<hr>
-			</div>
-			<div class="content-box">
-				<div class="chat-container" id="chat-container">
-					<div class="chat-area" id="chatArea">
-						<div class="answer bot-msg" id="first-bot-prompt"
-							style="display: none;">
-							내게 맞는 스펙 추천 세션입니다. <br> 먼저, <span class="selected-job-text"></span>가
-							되기 위해 <br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
+				<div class="content-box">
+					<div class="chat-container" id="chat-container">
+						<div class="chat-area" id="chatArea">
+							<div class="answer bot-msg" id="first-bot-prompt"
+								style="display: none;">
+								내게 맞는 스펙 추천 세션입니다. <br> 먼저, <span class="selected-job-text"></span>가
+								되기 위해 <br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</div><!--  chatbox -->
+
+
 			<div class="chat-input-box">
 				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
 					id="userInput" />
@@ -475,16 +493,17 @@ $(function() {
 				</button>
 			</div>
 			<c:import url="/WEB-INF/views/common/footer.jsp" />
-			
+
 		</div>
-		
+
 		<div class="right-container">
 			<c:import url="/WEB-INF/views/common/sidebar_right.jsp" />
 		</div>
-		
-	</div><!--  chatbot-page-layout-->
-	
-	
+
+	</div>
+	<!--  chatbot-page-layout-->
+
+
 </body>
 </html>
 

@@ -75,7 +75,7 @@ function logout() {
 				</div>
 <!-- 				<div class="section-title">저장한 목표 스펙</div> -->
 				<div class="saved-spec-list"></div>
-				<div class="section-title">직접 추가하기</div>
+				<div class="section-title">➕ 직접 추가하기</div>
 				<div class="manual-input-box" style="display: none;">
 					<input type="text" placeholder="직접 스펙 입력" class="manual-input" />
 					<input type="text" placeholder="스펙 설명 (선택)"
