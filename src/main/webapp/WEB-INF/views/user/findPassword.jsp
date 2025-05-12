@@ -5,10 +5,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>비밀번호 찾기</title>
+<title>irumi</title>
 <style>
 body {
-	background-color: #111;
+	background-color: #000;
 	font-family: 'Noto Sans KR', sans-serif;
 	color: white;
 	margin: 0;
@@ -16,21 +16,6 @@ body {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
-}
-
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
-	background-color: #111;
-	position: fixed;
-	width: 100%;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 1000;
-	box-sizing: border-box;
 }
 
 .container {
@@ -41,10 +26,10 @@ header {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 	margin: 150px auto 50px;
 	text-align: center;
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 h2 {
@@ -74,8 +59,8 @@ input[type="text"], input[type="email"] {
 	padding: 0 12px;
 	border: none;
 	border-radius: 6px;
-	background-color: #2ccfcf;
-	color: black;
+	background-color: #000;
+	color: #fff;
 	font-weight: bold;
 	cursor: pointer;
 	font-size: 14px;
@@ -86,6 +71,10 @@ input[type="text"], input[type="email"] {
 	background-color: black;
 	color: white;
 	cursor: not-allowed;
+	border-left: 1px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
 }
 
 .inline-group {
@@ -121,7 +110,7 @@ input[type="text"], input[type="email"] {
 	right: 10px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #2ccfcf;
+	color: #fff;
 	font-size: 12px;
 	pointer-events: none;
 	z-index: 10;
@@ -247,7 +236,7 @@ input[type="text"], input[type="email"] {
                                 if (response.matched) {
                                     $emailMessage.text('아이디와 이메일이 일치합니다.').addClass('success').removeClass('error');
                                     $sendVerificationButton.prop('disabled', false);
-                                    $sendVerificationButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                                    $sendVerificationButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                                     isUserMatched = true;
                                 } else {
                                     $emailMessage.text('아이디와 이메일이 일치하지 않습니다.').addClass('error').removeClass('success');
@@ -277,7 +266,7 @@ input[type="text"], input[type="email"] {
                     const email = $emailInput.val().trim();
                     const userId = $userIdInput.val().trim();
                     $sendVerificationButton.prop('disabled', true);
-                    $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                    $sendVerificationButton.css({ 'backgroundColor': 'white', 'color': 'black', 'cursor': 'not-allowed' });
                     try {
                         const formData = new FormData();
                         formData.append('email', email);
@@ -293,7 +282,7 @@ input[type="text"], input[type="email"] {
                             $verificationMessage.text('인증번호를 입력해주세요.').addClass('success');
                             $verificationCode.prop('disabled', false);
                             $verifyCodeButton.prop('disabled', false);
-                            $verifyCodeButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                            $verifyCodeButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                             $verificationCode.focus();
                             $sendVerificationButton.text('재발송');
                             startTimer();
@@ -303,7 +292,7 @@ input[type="text"], input[type="email"] {
                         setTimeout(() => {
                             if (isUserMatched) {
                                 $sendVerificationButton.prop('disabled', false);
-                                $sendVerificationButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                                $sendVerificationButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                             }
                         }, 5000);
                     } catch (error) {
@@ -311,7 +300,7 @@ input[type="text"], input[type="email"] {
                         setTimeout(() => {
                             if (isUserMatched) {
                                 $sendVerificationButton.prop('disabled', false);
-                                $sendVerificationButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                                $sendVerificationButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                             }
                         }, 5000);
                     }
@@ -333,7 +322,7 @@ input[type="text"], input[type="email"] {
                             if (response.success) {
                                 $verificationMessage.text('인증 성공!').addClass('success');
                                 $resetPasswordButton.prop('disabled', false);
-                                $resetPasswordButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                                $resetPasswordButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                                 clearInterval(timerInterval);
                                 $timerDisplay.hide();
                                 isEmailVerified = true;
@@ -420,14 +409,14 @@ input[type="text"], input[type="email"] {
                             }
                             // 버튼 재활성화
                             $resetPasswordButton.prop('disabled', false);
-                            $resetPasswordButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                            $resetPasswordButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                         },
                         error: function(xhr, status, error) {
                             $verificationMessage.text('임시 비밀번호 전송에 실패했습니다: ' + error).addClass('error').removeClass('success');
                             console.error('AJAX error:', status, error);
                             // 버튼 재활성화
                             $resetPasswordButton.prop('disabled', false);
-                            $resetPasswordButton.css({ 'backgroundColor': '#2ccfcf', 'color': 'black', 'cursor': 'pointer' });
+                            $resetPasswordButton.css({ 'backgroundColor': '#fff', 'color': 'black', 'cursor': 'pointer' });
                         }
                     });
                 });

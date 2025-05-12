@@ -4,13 +4,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.6/dist/web/static/pretendard.css" rel="stylesheet">
 <meta charset="UTF-8">
-<title>비밀번호 변경 - Irumi</title>
+<title>irumi</title>
 <style>
 body {
-	background-color: #111;
+	background-color: #000;
 	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
 	padding: 0;
 }
@@ -28,10 +28,10 @@ body {
 	border-radius: 12px;
 	width: 300px;
 	text-align: center;
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 .change-pwd-box h2 {
@@ -53,7 +53,7 @@ body {
 }
 
 .change-btn {
-	background-color: #3ccfcf;
+	background-color: #fff;
 	color: black;
 	border: none;
 	width: 100%;
@@ -124,7 +124,7 @@ body {
 		</div>
 	</div>
 
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script>
         $(document).ready(function() {
             const $newPasswordInput = $('#newPassword');

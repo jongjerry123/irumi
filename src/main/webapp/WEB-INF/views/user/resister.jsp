@@ -5,10 +5,10 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>이용 약관</title>
+<title>irumi</title>
 <style>
 body {
-	background-color: #111;
+	background-color: #000;
 	color: #fff;
 	font-family: 'Arial', sans-serif;
 	display: flex;
@@ -18,31 +18,16 @@ body {
 	margin: 0;
 }
 
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
-	background-color: #111;
-	position: fixed;
-	width: 100%;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 1000;
-	box-sizing: border-box;
-}
-
 .container {
-	background-color: #1e1e1e;
+	background-color: #000;
 	border-radius: 10px;
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 h2 {
@@ -80,18 +65,18 @@ h2 {
 }
 
 .terms-box::-webkit-scrollbar-thumb {
-	background: #33e3da; /* 버튼 및 체크박스 색상 */
+	background: #fff; /* 버튼 및 체크박스 색상 */
 	border-radius: 5px;
 	border: 2px solid #333;
 }
 
 .terms-box::-webkit-scrollbar-thumb:hover {
-	background: #2ccfcf;
+	background: #fff;
 }
 
 .terms-box {
 	scrollbar-width: thin;
-	scrollbar-color: #33e3da #333;
+	scrollbar-color: #fff #333;
 }
 
 .checkbox-group {
@@ -123,7 +108,7 @@ input[type="checkbox"] {
 	width: 18px;
 	height: 18px;
 	cursor: pointer;
-	accent-color: #33e3da;
+	accent-color: #fff;
 }
 
 .all-agree-section {
@@ -136,7 +121,7 @@ input[type="checkbox"] {
 	width: 100%;
 	padding: 12px;
 	margin-top: 20px;
-	background-color: #33e3da;
+	background-color: #fff;
 	border: none;
 	border-radius: 8px;
 	font-size: 16px;
@@ -146,8 +131,13 @@ input[type="checkbox"] {
 }
 
 #nextBtn:disabled {
-	background-color: #666;
+	background-color: #000;
+	color:#fff;
 	cursor: not-allowed;
+	border-left: 1px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
 }
 </style>
 <script>

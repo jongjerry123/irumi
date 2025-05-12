@@ -5,10 +5,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>아이디 찾기 결과</title>
+<title>irumi</title>
 <style>
 body {
-	background-color: #111;
+	background-color: #000;
 	font-family: 'Noto Sans KR', sans-serif;
 	color: white;
 	margin: 0;
@@ -16,21 +16,6 @@ body {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
-}
-
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 50px;
-	background-color: #111;
-	position: fixed;
-	width: 100%;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 1000;
-	box-sizing: border-box;
 }
 
 .container {
@@ -41,10 +26,10 @@ header {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 	margin: 150px auto 50px;
 	text-align: center;
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 h2 {
@@ -74,7 +59,7 @@ h2 {
 	padding: 0 12px;
 	border: none;
 	border-radius: 6px;
-	background-color: #2ccfcf;
+	background-color: #fff;
 	color: black;
 	font-weight: bold;
 	cursor: pointer;
@@ -82,9 +67,6 @@ h2 {
 	box-sizing: border-box;
 }
 
-.btn:hover {
-	background-color: #24b0b0;
-}
 
 .message {
 	font-size: 12px;
@@ -98,7 +80,7 @@ h2 {
 .message.error {
 	color: #ff5a5a;
 }
-/* 미디어 쿼리로 화면 크기에 따라 간격 조정 */
+
 @media screen and (max-width: 600px) {
 	.container {
 		margin-top: 120px;

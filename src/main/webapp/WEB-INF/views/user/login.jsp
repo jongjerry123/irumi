@@ -4,13 +4,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.6/dist/web/static/pretendard.css" rel="stylesheet">
 <meta charset="UTF-8">
-<title>로그인 - Irumi</title>
+<title>irumi</title>
 <style>
 body {
-	background-color: #111;
+	background-color: #000;
 	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
 	padding: 0;
 }
@@ -23,37 +23,41 @@ body {
 }
 
 .login-box {
-	background-color: #1e1e1e;
+	background-color: #000;
 	padding: 40px;
 	border-radius: 12px;
 	width: 300px;
 	text-align: center;
-	border-left: 3px solid #2ccfcf;
-	border-top: 1px solid #2ccfcf;
-	border-bottom: 1px solid #2ccfcf;
-	border-right: 3px solid #2ccfcf;
+	border-left: 3px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 3px solid #fff;
 }
 
 .logo-area {
 	display: flex;
 	align-items: center;
 	gap: 5px;
-	font-size: 32px;
-	font-weight: bold;
 	cursor: pointer;
+	transition: transform 0.2s ease;
 	justify-content: center;
 	margin-bottom: 30px
 }
 
+.logo-area:hover {
+	transform: scale(1.1);
+}
+
 .triangle-img {
-	height: 50px;
-	width: 50px;
-	transition: transform 0.2s ease;
+	width: 32px;
+	height: 32px;
 	vertical-align: middle;
 }
 
-.logo-area:hover .triangle-img {
-	transform: scale(1.3);
+.logo-area span {
+	font-size: 30px;
+	font-weight: 700;
+	line-height: 1;
 }
 
 .login-box input {
@@ -71,8 +75,8 @@ body {
 }
 
 .login-btn {
-	background-color: #3ccfcf;
-	color: black;
+	background-color: #fff;
+	color: #000;
 	border: none;
 	width: 100%;
 	padding: 10px;
@@ -83,6 +87,10 @@ body {
 	box-sizing: border-box;
 	font-size: 14px;
 	line-height: 20px;
+	border-left: 1px solid #fff;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	border-right: 1px solid #fff;
 }
 
 .login-btn:disabled {
@@ -92,8 +100,8 @@ body {
 }
 
 .signup-btn {
-	background-color: white;
-	color: black;
+	background-color: #444;
+	color: #fff;
 	border: none;
 	width: 100%;
 	padding: 10px;
@@ -166,7 +174,7 @@ body {
 			</div>
 			<div class="social-login">
 				<img
-					src="${pageContext.request.contextPath}/resources/images/naver.png"
+					src="${pageContext.request.contextPath}/resources/images/naver2.png"
 					alt="네이버 로그인" class="social-icon"
 					onclick="location.href='naverLogin.do'"> <img
 					src="${pageContext.request.contextPath}/resources/images/google.png"
