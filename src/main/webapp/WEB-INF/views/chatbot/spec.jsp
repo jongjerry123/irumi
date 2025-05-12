@@ -220,7 +220,9 @@ $(function() {
         $.each(specs, function(_, specCI) {
             const $card = $("<div>").addClass("citem-card");
             const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
-                // 카드 모양 삭제
+                // 정말 삭제하시겠습니까? (예 클릭시 진행)
+            	if (confirm("정말 삭제하시겠습니까?")) { 
+            	// 카드 모양 삭제
             	$card.remove(); 
                 // db에서 삭제
                 $.ajax({
@@ -235,6 +237,10 @@ $(function() {
     	              console.error("DB에서 항목 삭제 실패:", specCI.title);
     	            }
     	          });
+            	}
+            	else{
+            		console.log("삭제 취소됨");
+            	}
             });
             const $span = $("<span>").text(specCI.title);
             $card.append($removeBtn).append($span);
