@@ -31,7 +31,7 @@
 		text-align: center;
 		margin-top: 40px;
 		font-size: 32px;
-		color: #00adb5;
+		color: #009688;
 	}
 
 	form {
@@ -78,18 +78,19 @@
 	}
 
 	button {
-		background-color: #00adb5;
-		color: white;
-		border: none;
+		background: #1a1a1a;
+		color: #009688;
+		border: 1px solid #009688;
 		padding: 12px 24px;
 		font-size: 16px;
 		border-radius: 6px;
 		cursor: pointer;
-		transition: background-color 0.3s ease;
+		transition: background-color 0.2s, color 0.2s;
 	}
 
 	button:hover {
-		background-color: #019ca4;
+		background-color: #009688;
+		color: #fff;
 	}
 </style>
 </head>

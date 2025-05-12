@@ -54,22 +54,23 @@ tbody tr:hover { background: #2a2a2a; }
 
 /* 버튼 공통 */
 .btn {
-  background: #009688;
-  color: #fff;
-  border: none;
+  background: #222;
+  color: #009688;
+  border: 1px solid #009688;
   padding: 8px 16px;
   margin: 5px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.2s, color 0.2s;
 }
 .btn:hover {
-  background: #00bfae;
-  transform: translateY(-2px);
+  background: #009688;
+  color: #fff;
 }
 .btn-danger {
-  background: #e64a19;
+  color: #e64a19;
+  border: 1px solid #e64a19;
 }
 .btn-danger:hover { background: #ff5722; }
 

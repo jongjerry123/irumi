@@ -14,7 +14,7 @@
   --bg: #1a1a1a;
   --surface: #2b2b2b;
   --card-bg: #333;
-  --primary: #18d7c6;
+  --primary: #32ab9f;
   --text: #eee;
   --text-secondary: #fff;
   --radius: 12px;
@@ -37,8 +37,8 @@ body {
   grid-template-columns: 1fr 2.05fr 1fr;
   gap: var(--gap);
   padding: var(--gap);
-  padding-left: 300px;
-  padding-right: 300px;
+  padding-left: 200px;
+  padding-right: 200px;
 }
 .main {
   background: var(--surface);
@@ -79,16 +79,26 @@ label, p {
   margin-top: var(--gap);
 }
 .buttons button {
-  background: var(--primary);
-  border: none;
-  color: var(--bg);
+  background: var(--card-bg);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 16px;
   padding: 8px 16px;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.2s, color 0.2s;
 }
 .buttons button:hover {
-  transform: scale(1.05);
+	background: var(--primary);
+	color: white;
+}
+.buttons button.deleteButton {
+	border: 1px solid #D10000;
+	color: #D10000;
+}
+.buttons button.deleteButton:hover {
+	background: #D10000;
+	color: white;
 }
 input[type="checkbox"] {
   width: 20px;
@@ -203,7 +213,7 @@ a {
 						.on('click', function() {
 							$('#certCards').slideToggle(100);
 							$('#targetJob').empty();
-							$('#targetJob').html('<div class=\"buttons\">목표 직무: ' + item.jobName + '<button onclick=\"movetoDeleteJob(' + item.jobId + ')\" style="background: #e64a19;">목표 직무 삭제하기</button></div>');
+							$('#targetJob').html('<div class=\"buttons\">목표 직무: ' + item.jobName + '<button class="deleteButton" onclick=\"movetoDeleteJob(' + item.jobId + ')\">목표 직무 삭제하기</button></div>');
 							$('#targetSpec').html('목표 스펙');
 							viewSpecs(item.jobId);
 							$.ajax({
@@ -212,7 +222,11 @@ a {
 	                            data: { jobId: item.jobId },
 	                            dataType: 'json',
 	                            success: function(data) {
-	                                $('.progress').css('width',  data.progress + '%').text(data.progress + '%');
+	                            	$('#specProgress').html('목표 스펙 달성도');
+	                            	$('#progressBarSection').html('<div class="progress-bar"><div class="progress" style="width:' + data.progress + '%">' + (Math.round((data.progress + Number.EPSILON) * 100) / 100) + '%</div></div><br>');
+									if (data.progress === 0) {
+										$('.progress').prepend('&nbsp;&nbsp;&nbsp;');
+	                            	}
 	                            }
 							});
 							$('#jobExplain').html('<br><h2>직업 상세설명</h2><pre style=\"white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto;\">' + item.jobExplain + '</pre>');
@@ -292,7 +306,7 @@ a {
 	                        cardHtml += '</table></div>' +
 	                        			'<div class=\"buttons\" style=\"display: flex; align-items: center; justify-content: center;\">' +
 	                        			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 120px;\">변경</button>' +
-	                        			'<button onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 120px; background: #e64a19;\">삭제</button>' +
+	                        			'<button class=\"deleteButton\" onclick=\"deleteSpec(' + item.specId + ')\" style=\"width: 120px;\">삭제</button>' +
 	                        			'</div>' +
 	                        			'<div class="buttons">' +
 	                        			'<button onclick=\"movetoAccomplishSpec(' + item.specId + ')\" style=\"width: 300px;\">스펙 달성</button>' +
@@ -403,8 +417,9 @@ a {
       <div id="jobs" class="buttons"></div>
       <div id="jobExplain"></div><br>
 
-      <h2>목표 스펙 달성도</h2>
-      <div class="progress-bar"><div class="progress" style="width:0%">0%</div></div><br>
+      <h2 id="specProgress"></h2>
+      <div id="progressBarSection"></div>
+      
 
       <h2 id="targetSpec">직업을 선택하세요</h2>
       <div id="certSection"><div id="certCards"></div></div>

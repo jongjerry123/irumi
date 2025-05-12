@@ -35,8 +35,8 @@ header {
 
 .buttons button {
 	background-color: transparent;
-	color: white;
-	border: 1px solid #ccc;
+	color: #009688;
+	border: 1px solid #009688;
 	padding: 6px 12px;
 	border-radius: 5px;
 	font-size: 14px;
@@ -45,8 +45,8 @@ header {
 }
 
 .buttons button:hover {
-	background-color: #fff;
-	color: #000;
+	background-color: #009688;
+	color: #fff;
 }
 
 /* 기본 라디오 숨김 */
