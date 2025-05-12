@@ -56,7 +56,7 @@ let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변
 $(function() {
 	//기본으로는 채팅 버튼 비활성화 돼있음
 	const CHAT_TOPIC = "spec";
-	$(".chat-send-btn").addClass("inactive");
+	$(".chat-send-btn").prop("disabled", true);
 	
 	// 대쉬보드 requestScope에서 가져오는 값.
 	var dashJobName = "${job.jobName}";  
@@ -165,7 +165,7 @@ $(function() {
 	        $(".manual-input-box").show();
 	        $(".selected-job-text").text(subTopicJobCI.title); // 봇 메세지에 나타날 직무 이름
 	        $(".value").show();
-	        $(".chat-send-btn").removeClass("inactive");
+	        $(".chat-send-btn").prop("disabled", false);
 	    } 
 
 	    else {
@@ -175,7 +175,7 @@ $(function() {
 	
     function sendMessage(message) {
     	//답변 올 때까지 버튼 일시적 비활성화
-    	$(".chat-send-btn").addClass("inactive");
+    	$(".chat-send-btn").prop("disabled", true);
         addMessageToChat(message, "user-msg");
 
         $.ajax({
@@ -208,7 +208,7 @@ $(function() {
             },
             complete: function(){
             	// 대답이 온 후 전송 버튼 활성화
-            	$(".chat-send-btn").removeClass("inactive");
+            	$(".chat-send-btn").prop("disabled", true);
             }
         });// sendMessageToChatbot.do   
     }
@@ -328,13 +328,15 @@ $(function() {
 
     //키보드 엔터시 메세지 보내게 설정
     $("#userInput").on("keyup", function(event) {
-        if (event.key === "Enter") {
-            const val = $(this).val().trim();
-            if (val) {
-                sendMessage(val);
-                $(this).val("");
-            }
-        }
+    	 if (event.key === "Enter") {
+    	        const val = $(this).val().trim();
+    	        const isBtnDisabled = $(".chat-send-btn").prop("disabled");
+
+    	        if (val && !isBtnDisabled) {
+    	            sendMessage(val);
+    	            $(this).val("");
+    	        }
+    	    }
     });
 	//send 버튼 클릭시 메세지 보내게 설정
     $(".chat-send-btn").on("click", function() {

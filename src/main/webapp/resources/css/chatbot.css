@@ -54,6 +54,7 @@ body {
     padding-left: 20px;
     padding-right: 20px;
     height: 80%;
+    border-radius: 10px;
 }
 .select-bar {
     flex-shrink: 0;      /* 크기가 축소되지 않게 */
@@ -163,12 +164,12 @@ body {
 }
 
 /* hover 효과를 사용되지 않는 버튼에 대해 비활성화 */
-.chat-input-box .chat-send-btn:not(.inactive):hover {
+.chat-input-box .chat-send-btn:hover:not(:disabled) {
     background: #BAAC80;  /* hover 시 배경색 */
 }
 
 /* 사용하지 못하게 비활성화된 버튼 스타일 */
-.chat-input-box .chat-send-btn.inactive {
+.chat-input-box .chat-send-btn:disabled {
     background-color: #333;  /* 비활성화 상태 배경색 */
     color: #999;             /* 비활성화 상태 글자색 */
     cursor: not-allowed;     /* 비활성화 상태 커서 모양 */
@@ -177,7 +178,7 @@ body {
 }
 
 /* hover 상태가 비활성화 상태에서도 적용되지 않도록 */
-.chat-input-box .chat-send-btn.inactive:hover {
+.chat-input-box .chat-send-btn:disabled:hover{
     background-color: #333;  /* hover 시에도 배경색 유지 */
     color: #999;             /* 글자색 유지 */
     cursor: not-allowed;     /* 클릭 불가 커서 유지 */
@@ -410,7 +411,7 @@ body {
 	display: flex;
 	align-items: center;
 	background: #222;
-	border-radius: 12px;
+	border-radius: 10px;
 	padding: 8px 16px;
 	margin-top: 10px;
 }

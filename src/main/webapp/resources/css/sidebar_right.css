@@ -96,7 +96,7 @@
 .manual-input-box .manual-input {
 	flex: 1;
 	background: transparent;
-	color: #facc15; 
+	color: white;
 	font-size: 12px;
 	padding: 8px 4px;
 	/* outline: none; */
@@ -113,7 +113,7 @@
 	flex: 1;
 	background: transparent;
 	border: none;
-	color: #facc15;
+	color: white;
 	font-size: 12px;
 	padding: 8px 4px;
 	border-radius: 5px;
@@ -173,7 +173,7 @@
 
 .manual-input-box .add-btn {
 	background: none;
-	border: 1px solid #BAAC80;
+	border: 1px solid #eeeeee;
 	color: #eeeeee;
 	border-radius: 6px;
 	font-size: 12px;
