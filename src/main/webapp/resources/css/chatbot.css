@@ -424,7 +424,7 @@ body {
 .confirm-select-box .confirm-select-btn {
 	border: 1.5px solid #eeeeee;
 	border-radius: 10px;
-	font-size: 15px;
+	font-size: 12px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
@@ -432,12 +432,12 @@ body {
 	font-weight: bold;
 	text-align: center;
 	color: #eeeeee;
-	background: none;
+	background:none;
 }
 
 .confirm-select-box .confirm-select-btn:hover {
 	border-radius: 10px;
-	font-size: 15px;
+	font-size: 12px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
@@ -446,7 +446,7 @@ body {
 	text-align: center;
 	color: #383838;
 	background: #eeeeee;
-	opacity: 0.3;
+	opacity:1;
 }
 
 
