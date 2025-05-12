@@ -189,7 +189,7 @@ public class DashboardController {
 		}
 		else {
 			mv.addObject("message", currentPage + "페이지에 출력할 직업 목록 조회 실패!");
-			mv.setViewName("common.error");
+			mv.setViewName("common/error");
 		}
 		return mv;
 	}
@@ -264,6 +264,15 @@ public class DashboardController {
 			return mv;
 		}
 		
+		ArrayList<Job> list = dashboardService.selectUserJobs(loginUser.getUserId());
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).getJobName().equals(job.getJobName())) {
+				mv.addObject("message", "해당 직무가 이미 존재합니다!");
+				mv.setViewName("common/error");
+				return mv;
+			}
+		}
+		
 		int jobId = dashboardService.selectNextJobId();
 		job.setJobId(String.valueOf(jobId));
 		
@@ -278,7 +287,7 @@ public class DashboardController {
 		
 		if (resultOne > 0 && resultTwo > 0) {
 			mv.addObject("job", job);
-			mv.setViewName("chatbot/spec");
+			mv.setViewName("redirect:viewSpecRecChat.do");
 		} else {
 			mv.addObject("message", "직무 추가 실패!");
 			mv.setViewName("common/error");

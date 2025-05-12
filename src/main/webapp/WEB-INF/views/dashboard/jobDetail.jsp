@@ -99,7 +99,7 @@
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
 	<h1 align="center">${ requestScope.jobList.jobName }</h1>
-	<form action="insertJob.do" method="post">
+	<form id="jobForm" action="insertJob.do" method="post">
 		<input type="text" name="jobName" readonly value="${ requestScope.jobList.jobName }" hidden>
 		<table align="center" width="1000" border="1" cellspacing="0" cellpadding="5">
 			<tr>
@@ -112,6 +112,30 @@
 			<button type="submit">목표 직무에 추가하고 스펙 설정하러 가기</button>
 		</div>
 	</form>
+	<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
+	<script>
+	$('#jobForm').submit(function(e) {
+	  e.preventDefault();
+	
+	  var form = this;
+	  $.ajax({
+	    url: 'userJobView.do',
+	    method: 'POST',
+	    dataType: 'json',
+	    contentType: 'application/json; charset=UTF-8',
+	    success: function(data) {
+	      var duplicate = data.some(function(item) {
+	        return item.jobName === '${ requestScope.jobList.jobName }';
+	      });
+	      if (duplicate) {
+	        alert('해당 직무가 이미 존재합니다.');
+	      } else {
+	        form.submit();
+	      }
+	    }
+	  });
+	});
+	</script>
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
