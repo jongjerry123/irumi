@@ -220,7 +220,7 @@ input[type="radio"]:checked+label::before {
 		}
 		
 		if ((!$('.ssType').val() && $('.ssDate').val()) || ($('.ssType').val() && !$('.ssDate').val())) {
-			alert("주요 일정에 입력란 모두 채워져야 합니다.");
+			alert('주요 일정에 입력란 모두 채워져야 합니다.');
 			event.preventDefault();
 		}
 	}
