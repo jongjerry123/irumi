@@ -7,15 +7,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+
+
+</style>
 
 <link rel="stylesheet" type="text/css"
 	href="${ pageContext.servletContext.contextPath}/resources/css/chatbot.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script>
+function moveToMain() {
+    location.href = 'main.do';
+}
+
+const CHAT_TOPIC = "${chatTopic}";
+
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById(CHAT_TOPIC);
+    if (btn) {
+        btn.classList.add("active");
+    }
+});
+</script>
 
 
 <title>chatbot 스펙 찾기</title>
@@ -37,7 +55,8 @@ let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변
 
 $(function() {
 	//기본으로는 채팅 버튼 비활성화 돼있음
-	$(".chat-send-btn").addClass("inactive");
+	const CHAT_TOPIC = "spec";
+	$(".chat-send-btn").prop("disabled", true);
 	
 	// 대쉬보드 requestScope에서 가져오는 값.
 	var dashJobName = "${job.jobName}";  
@@ -146,7 +165,7 @@ $(function() {
 	        $(".manual-input-box").show();
 	        $(".selected-job-text").text(subTopicJobCI.title); // 봇 메세지에 나타날 직무 이름
 	        $(".value").show();
-	        $(".chat-send-btn").removeClass("inactive");
+	        $(".chat-send-btn").prop("disabled", false);
 	    } 
 
 	    else {
@@ -156,7 +175,7 @@ $(function() {
 	
     function sendMessage(message) {
     	//답변 올 때까지 버튼 일시적 비활성화
-    	$(".chat-send-btn").addClass("inactive");
+    	$(".chat-send-btn").prop("disabled", true);
         addMessageToChat(message, "user-msg");
 
         $.ajax({
@@ -189,7 +208,7 @@ $(function() {
             },
             complete: function(){
             	// 대답이 온 후 전송 버튼 활성화
-            	$(".chat-send-btn").removeClass("inactive");
+            	$(".chat-send-btn").prop("disabled", true);
             }
         });// sendMessageToChatbot.do   
     }
@@ -201,7 +220,9 @@ $(function() {
         $.each(specs, function(_, specCI) {
             const $card = $("<div>").addClass("citem-card");
             const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
-                // 카드 모양 삭제
+                // 정말 삭제하시겠습니까? (예 클릭시 진행)
+            	if (confirm("정말 삭제하시겠습니까?")) { 
+            	// 카드 모양 삭제
             	$card.remove(); 
                 // db에서 삭제
                 $.ajax({
@@ -216,6 +237,10 @@ $(function() {
     	              console.error("DB에서 항목 삭제 실패:", specCI.title);
     	            }
     	          });
+            	}
+            	else{
+            		console.log("삭제 취소됨");
+            	}
             });
             const $span = $("<span>").text(specCI.title);
             $card.append($removeBtn).append($span);
@@ -309,13 +334,15 @@ $(function() {
 
     //키보드 엔터시 메세지 보내게 설정
     $("#userInput").on("keyup", function(event) {
-        if (event.key === "Enter") {
-            const val = $(this).val().trim();
-            if (val) {
-                sendMessage(val);
-                $(this).val("");
-            }
-        }
+    	 if (event.key === "Enter") {
+    	        const val = $(this).val().trim();
+    	        const isBtnDisabled = $(".chat-send-btn").prop("disabled");
+
+    	        if (val && !isBtnDisabled) {
+    	            sendMessage(val);
+    	            $(this).val("");
+    	        }
+    	    }
     });
 	//send 버튼 클릭시 메세지 보내게 설정
     $(".chat-send-btn").on("click", function() {
@@ -430,43 +457,46 @@ $(function() {
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
-		<div class="chatbot-page-layout">
+	<div class="chatbot-page-layout">
 		<div class="left-container">
 			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
 			<c:set var="menu" value="chat" scope="request" />
-			
-			
 		</div>
-		
-		
+
+
 		<div class="main-container">
-			<div class="select-bar">
-				<div class="select-group">
-					<span class="select-label">📜 어떤 직무에 필요한 스펙이 궁금하세요?</span>
-					<div class="select-job-btn-list">
-						<!-- <button class="select-btn active">프론트엔드 개발자</button>
+
+			<div class="chatbox">
+				<div class="select-bar">
+					<div class="select-group">
+						<span class="select-label">📜 어떤 직무에 필요한 스펙이 궁금하세요?</span>
+						<div class="select-job-btn-list">
+							<!-- <button class="select-btn active">프론트엔드 개발자</button>
 								<button class="select-btn">백엔드 개발자</button> -->
+						</div>
+						<!--  스펙 페이지에는 필요없지만 넣어봄 -->
+						<div class="select-spec-btn-list"></div>
 					</div>
-					<!--  스펙 페이지에는 필요없지만 넣어봄 -->
-					<div class="select-spec-btn-list"></div>
+					<div class="confirm-select-box">
+						<!--  클릭시 setSubTopic 해야함 -->
+						<button class="confirm-select-btn">선택 완료</button>
+					</div>
+					<hr>
 				</div>
-				<div class="confirm-select-box">
-					<!--  클릭시 setSubTopic 해야함 -->
-					<button class="confirm-select-btn">선택 완료</button>
-				</div>
-				<hr>
-			</div>
-			<div class="content-box">
-				<div class="chat-container" id="chat-container">
-					<div class="chat-area" id="chatArea">
-						<div class="answer bot-msg" id="first-bot-prompt"
-							style="display: none;">
-							내게 맞는 스펙 추천 세션입니다. <br> 먼저, <span class="selected-job-text"></span>가
-							되기 위해 <br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
+				<div class="content-box">
+					<div class="chat-container" id="chat-container">
+						<div class="chat-area" id="chatArea">
+							<div class="answer bot-msg" id="first-bot-prompt"
+								style="display: none;">
+								내게 맞는 스펙 추천 세션입니다. <br> 먼저, <span class="selected-job-text"></span>가
+								되기 위해 <br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</div><!--  chatbox -->
+
+
 			<div class="chat-input-box">
 				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
 					id="userInput" />
@@ -475,16 +505,17 @@ $(function() {
 				</button>
 			</div>
 			<c:import url="/WEB-INF/views/common/footer.jsp" />
-			
+
 		</div>
-		
+
 		<div class="right-container">
 			<c:import url="/WEB-INF/views/common/sidebar_right.jsp" />
 		</div>
-		
-	</div><!--  chatbot-page-layout-->
-	
-	
+
+	</div>
+	<!--  chatbot-page-layout-->
+
+
 </body>
 </html>
 

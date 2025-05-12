@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
-<title>매니저 관리</title>
+<title>irumi</title>
 <style>
 body {
-    background-color: #111;
+    background-color: #000;
     font-family: 'Noto Sans KR', sans-serif;
     color: white;
     margin: 0;
@@ -18,23 +18,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-}
-
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 50px;
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: #111;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    box-sizing: border-box;
 }
 
 .container {

@@ -9,6 +9,7 @@
 
 <style>
 
+
 body, input, textarea, button, select {
     font-family: 'Pretendard', sans-serif !important;
   }
@@ -48,41 +49,6 @@ header {
 	vertical-align: middle;
 }
 
-.logo-area span {
-	font-size: 30px;
-	font-weight: 700;
-	line-height: 1;
-}
-
-.login-actions {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 10px;
-	min-width: 300px; /* 페이지마다 버튼이 달라도 넓이 확보 */
-	height: 100%;     /* header 높이에 맞춤 */
-}
-
-.login-actions button {
-	background-color: #000;
-	border: 1px solid rgba(255, 255, 255, 0.25);
-	color: #fff;
-	padding: 8px 18px;
-	border-radius: 10px;
-	font-size: 15px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	backdrop-filter: blur(5px);
-	letter-spacing: 0.5px;
-}
-
-.login-actions button:hover {
-	background-color: #111;
-	border-color: #fff;
-	transform: translateY(-1px);
-	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
-}
 </style>
 
 <script type="text/javascript">

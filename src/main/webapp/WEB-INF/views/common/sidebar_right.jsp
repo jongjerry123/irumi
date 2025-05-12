@@ -1,14 +1,15 @@
-<%--  --%><%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%--  --%><%@ page language="java"
+	contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-	
+
 <!DOCTYPE html>
 <html>
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" type="text/css" href="${ pageContext.servletContext.contextPath}/resources/css/sidebar_right.css" />
+<link rel="stylesheet" type="text/css"
+	href="${ pageContext.servletContext.contextPath}/resources/css/sidebar_right.css" />
 
 <head>
 <meta charset="UTF-8">
@@ -66,22 +67,29 @@ function logout() {
 }
 </script>
 <body>
-	
+
 	<div class="right-panel">
-			<div class="saved-schedule-section">
-				<div class="info-row">
+		<div class="saved-schedule-section">
+			<div class="info-row">
 				<div class="section-title">🎯 목표 직무</div>
-					 <span class="value" style="display: none;"></span>
+				<span class="value" style="display: none;"></span>
+			</div>
+			<!-- 				<div class="section-title">저장한 목표 스펙</div> -->
+			<div class="saved-spec-list"></div>
+			<div class="section-title">➕ 직접 추가하기</div>
+			<div class="manual-input-box" style="display: none;">
+				<div class="specNameExplain">추가할 스펙</div>
+				<div class="manual-input-div">
+					<input type="text" placeholder="직접 스펙 입력 (필수)" class="manual-input" />
 				</div>
-<!-- 				<div class="section-title">저장한 목표 스펙</div> -->
-				<div class="saved-spec-list"></div>
-				<div class="section-title">직접 추가하기</div>
-				<div class="manual-input-box" style="display: none;">
-					<input type="text" placeholder="직접 스펙 입력" class="manual-input" />
+				<div class="manual-input-div">
 					<input type="text" placeholder="스펙 설명 (선택)"
 						class="manual-input-explain" />
-					<div class="specTypeChoice">
-						<!--  List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타")); -->
+				</div>
+				<div class="specTypeChoice">
+					<div class="specTypeTitle">타입 선택 *</div>
+					<!--  List.of("자격증", "어학", "인턴십", "대회/공모전", "자기계발", "기타")); -->
+					<div class="specTypes">
 						<button class="specType">어학 능력</button>
 						<button class="specType">자격증</button>
 						<button class="specType">인턴십 및 현장실습</button>
@@ -89,11 +97,13 @@ function logout() {
 						<button class="specType">연구 활동</button>
 						<button class="specType">기타</button>
 					</div>
-					<button class="add-btn">목표 스펙 추가</button>
+					<!-- specTypes -->
 				</div>
+				<button class="add-btn">목표 스펙으로 추가</button>
 			</div>
 		</div>
-	
-	
+	</div>
+
+
 </body>
 </html>

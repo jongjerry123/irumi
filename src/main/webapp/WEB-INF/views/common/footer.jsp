@@ -124,17 +124,11 @@
   <c:set var="menu" value="community" scope="request" />
 </c:if>
 
-<div class="page-wrapper">
-  <div class="main-content">
-    <!-- 페이지별 내용은 여기에 import되어 들어옵니다 -->
-  </div>
 
-  <!-- 푸터 영역 -->
-  <footer class="footer-note">
+<footer class="footer-note">
     © 2025 이루미. by Team.iruminaty <a href="about.do">사이트 소개</a>
-  </footer>
-</div>
-
+</footer>
+  
 <!-- 고정된 좌측 하단 사이드 메뉴 -->
 <div class="floating-menu">
   <div class="main-icon">

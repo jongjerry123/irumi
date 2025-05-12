@@ -425,120 +425,104 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <style>
 body {
-	background-color: #000;
-	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
-	margin: 0;
-	padding: 0;
-	min-height: 70vh;
+  background-color: #111;
+  color: white;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 .container {
-	display: flex;
-	min-height: calc(100vh - 72px); /* 전체화면에서 header 빼기 */
-	margin-top: 20px; /* header 높이만큼 아래로 */
+    display: flex;
+    max-width: 1200px;   /* 최대 너비 설정 */
+    max-height: 100vh;   /* 최대 높이 설정 (화면 높이) */
+    width: 100%;         /* 너비를 부모에 맞게 확장 */
+    height: 100%;        /* 높이를 부모에 맞게 확장 */
+    margin: 0 auto;      /* 중앙 정렬 */
+    overflow: hidden; 
 }
 .main {
-	flex: 1;
-	padding-right: 40px;
-	padding-left: 40px;
-	display: flex;
-	flex-direction: column;
+    flex: 1;            
+    display: flex;      
+    flex-direction: column; 
+    background-color: #1e1e1e;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 100%;  
 }
-/* 사이드바 ************************************************************************************* */
-.sidebar, .right-panel {
-	height: auto; /* 높이 자동 (100vh 등 절대값 X) */
+
+.left-container {
+    width: 200px;        /* 고정된 너비 */
+    padding: 20px;
+    flex-shrink: 0;      /* 사이드바가 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
 }
-.sidebar {
-	width: 200px;
-	background-color: #000;
-	padding: 30px 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-}
-.sidebar button {
-	background-color: #222;
-	border: none;
-	color: white;
-	text-align: left;
-	padding: 10px 20px;
-	cursor: pointer;
-	border-radius: 8px;
-	transition: background 0.3s;
-	text-align: center;
-	font-weight: bold;
-}
-.sidebar button:hover {
-	background-color: #BAAC80;
-	color: black;
-}
-.sidebar button.active {
-	background-color: #BAAC80;
-	color: black;
-}
+
+
 /* 컨텐츠 박스 ***********************************************/
 .content-box {
-	padding-top : 30px;
-	background-color: #1e1e1e;
-	padding-right: 20px;
-	padding-left: 20px;
+    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
+    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
+    height:auto;
+    max-width: 700px; 
 	border-radius: 12px;
 	line-height: 1.7;
 	font-size: 14px;
-	margin-bottom: 30px;
+	
 	height: 700px;
-	overflow-y: auto; /* 내부 콘텐츠가 넘칠 경우 스크롤 활성화 */
+	overflow-y: auto; /*내부 콘텐츠가 넘칠 경우 스크롤 활성화*/
 	display: flex;
 	flex-direction: column;
-	 border-left: 4px solid #BAAC80;
-
-	
 }
 .content-box::-webkit-scrollbar {
-	width: 9px;
-	background: #222;
+ width: 9px;
+ background: #222;
 }
 .content-box::-webkit-scrollbar-thumb {
-	background: #BAAC80;
-	border-radius: 6px;
+ background: #BAAC80;
+ border-radius: 6px;
 }
 .content-box {
-	scrollbar-color: #BAAC80 #222;
-	scrollbar-width: thin;
+ scrollbar-color: #BAAC80 #222;
+ scrollbar-width: thin;
 }
 /* 오른쪽 페널********************************************************* */
 .right-panel {
-	width: 230px;
-	padding-right: 20px;
-	padding-left: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 30px;
+    width: 250px;        /* 고정된 너비 */
+    color: #333;
+    padding: 20px;
+    flex-shrink: 0;      /* 오른쪽 패널이 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
+    overflow-y: auto; 
 }
 .right-panel .info-row {
-	display: flex;
 	align-items: center;
 	margin-bottom: 10px;
+	flex-direction: column; /*세로 정렬*/
 }
 .right-panel .label {
-	font-size: 14px;
-	color: #BAAC80;
+	color: #eeeeee;
 	font-weight: bold;
+	font-size: 15px;
+	margin: 25px 0 25px 0;
 }
 .right-panel .value {
-	color: #fff;
-	font-size: 11px;
+	color: #BAAC80;
+	font-size: 14px;
 	margin-left: 4px;
+	font-weight: bold;
 }
 .right-panel .spec-value {
-	color: #fff;
-	font-size: 11px;
+	color: #BAAC80;
+	font-size: 14px;
 	margin-left: 4px;
+	font-weight: bold;
 }
 .right-panel .schedule-value {
-	color: #fff;
-	font-size: 9px;
-	margin-left: 4px;
+  color: #fff;
+  font-size : 9px;  
+  margin-left : 4px;
 }
 /* 채팅 쪽 부분 */
 .chat-input-box .chat-send-btn:hover {
@@ -595,22 +579,22 @@ body {
 
 /* manual 부분 */
 .manual-input-box {
-	display: flex;
-	align-items: center;
-	background: #232323;
-	border-radius: 8px;
-	padding: 6px 10px;
-	margin-top: 12px;
-	gap: 6px;
+   display: flex;
+   align-items: center;
+   background: #232323;
+   border-radius: 8px;
+   padding: 6px 10px;
+   margin-top: 12px;
+   gap: 6px;
 }
 .manual-input-box .manual-input {
-	flex: 1;
-	background: transparent;
-	border: none;
-	color: #BAAC80;
-	font-size: 14px;
-	padding: 8px 4px;
-	outline: none;
+   flex: 1;
+   background: transparent;
+   border: none;
+   color: #BAAC80;
+   font-size: 14px;
+   padding: 8px 4px;
+   outline: none;
 }
 .manual-input-box .add-btn {
 	background: #232323;
@@ -635,10 +619,10 @@ body {
 	margin-bottom: 20px;
 }
 .section-title {
-	color: #BAAC80;
+	color: #eeeeee;
 	font-weight: bold;
 	font-size: 15px;
-	margin: 15px 0 10px 0;
+	margin: 25px 0 10px 0;
 }
 .saved-schedule-list {
 	display: flex;
@@ -648,14 +632,14 @@ body {
 }
 .schedule-card {
 	background: #232323;
-	border: 1.5px solid #444;
+	border: 1.5px solid #BAAC80;
 	border-radius: 7px;
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	padding: 8px 14px;
-	font-size: 10px;
-	color: #fff;
+	font-size: 12px;
+	color: #eeeeee;
 	position: relative;
 }
 .remove-btn {
@@ -795,7 +779,6 @@ body {
 	border-radius: 12px;
 	padding: 8px 16px;
 	margin-top: 10px;
-	border-left: 4px solid #BAAC80;
 	
 }
 /* 옵션 버튼 css 추가  */
@@ -919,12 +902,10 @@ body {
 	<c:set var="menu" value="chat" scope="request" />
 	<div class="container">
 		<!-- Sidebar -->
-		<div class="sidebar">
-			<button onclick="moveJobPage();">직무 찾기</button>
-			<button onclick="moveSpecPage();">스펙 찾기</button>
-			<button onclick="moveSchedulePage();">일정 찾기</button>
-			<button onclick="moveActPage();" class="active">활동 찾기</button>
-		</div>
+		<div class="left-container">
+		     <c:set var="chatTopic" value="act" scope="request" />
+			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
+     </div>
 		<!-- Main content -->
 		<div class="main">
 			<!-- 콘텐츠 영역 -->
@@ -969,20 +950,18 @@ body {
 		<!-- Right panel -->
 		<div class="right-panel">
 			<div class="info-row">
-				<span class="label">➤ 목표 직무:</span> <span class="value"></span>
+				<span class="label">🎯 목표 직무:</span> <span class="value"></span>
 			</div>
 			<div class="info-row">
-				<span class="label">➤ 목표 스펙:</span> <span class="spec-value"></span>
+				<span class="label">🎯 목표 스펙:</span> <span class="spec-value"></span>
 			</div>
-			<!-- <div class="info-row">
-				<span class="label">➤ 스펙 일정 :</span> <span class="schedule-value">20xx.xx.xx
-					(정보처리기사 필기)</span>
-			</div> -->
+
+			<div class="saved-schedule-list" id="savedActivityList"></div>
+
 			<div class="saved-schedule-section">
-				<div class="section-title">➤ 저장한 활동</div>
-				<div class="saved-schedule-list" id="savedActivityList"></div>
+				<div class="section-title">➤ 직접 활동 추가하기</div>
 				<div class="manual-input-box">
-					<input type="text" placeholder="직접 활동 입력" class="manual-input" />
+					<input type="text" placeholder="저장할 활동 입력" class="manual-input" />
 					<button class="add-btn">+</button>
 				</div>
 			</div>
