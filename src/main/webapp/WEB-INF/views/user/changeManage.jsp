@@ -195,8 +195,8 @@ $(document).ready(function() {
                             // 권한에 따라 라디오 버튼 체크
                             $authorityUser.prop('checked', response.currentAuthority === '1');
                             $authorityAdmin.prop('checked', response.currentAuthority === '2');
-                            $authorityReport.prop('checked', response.currentAuthority === '1');
-                            $authorityExit.prop('checked', response.currentAuthority === '2');
+                            $authorityReport.prop('checked', response.currentAuthority === '3');
+                            $authorityExit.prop('checked', response.currentAuthority === '4');
                             
                             $submitButton.prop('disabled', false).css({
                                 'background-color': '#2ccfcf',
@@ -302,7 +302,7 @@ $(document).ready(function() {
         <div class="authority-group">
             <label><input type="radio" name="authority" id="authority-user" value="1"> 유저</label>
             <label><input type="radio" name="authority" id="authority-admin" value="2"> 관리자</label>
-            <label><input type="radio" name="authority" id="authority-retort" value="3"> 불량</label>
+            <label><input type="radio" name="authority" id="authority-report" value="3"> 불량</label>
             <label><input type="radio" name="authority" id="authority-exit" value="4"> 탈퇴</label>
             <div class="message" id="authority-message"></div>
         </div>

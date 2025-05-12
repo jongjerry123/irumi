@@ -76,7 +76,7 @@
         <h2>${socialProvider} 계정 회원가입</h2>
         <form action="registerSocialUser.do" method="post">
             <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-            <input type="text" name="userName" placeholder="이름 입력" id="userName" maxlength="20" pattern=".{1,}" title="이름을 입력하세요." required>
+            <input type="text" name="userName" placeholder="닉네임 입력" id="userName" maxlength="10" pattern=".{1,}" title="닉네임을 입력하세요." required>
             <div class="error-message" id="error-message">
                 <c:if test="${not empty message}">${message}</c:if>
             </div>

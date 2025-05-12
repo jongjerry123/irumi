@@ -1,17 +1,16 @@
 package com.project.irumi.user.controller;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -458,6 +457,7 @@ public class UserController {
 	public Map<String, Object> checkId(@RequestParam(name = "userId") String userId) {
 		boolean available = userservice.checkIdAvailability(userId);
 		Map<String, Object> response = new HashMap<>();
+		
 		response.put("available", available);
 		response.put("message", available ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.");
 		return response;
@@ -879,7 +879,7 @@ public class UserController {
 
 			User newUser = new User();
 			String prefix = loginType == 3 ? "google_" : loginType == 4 ? "naver_" : "kakao_";
-			String baseId = prefix + socialId.substring(0, Math.min(10, socialId.length()));
+			String baseId = prefix + socialId.substring(0, Math.min(6, socialId.length()));
 			String userId = baseId;
 			int suffix = 1;
 			while (!userservice.checkIdAvailability(userId)) {

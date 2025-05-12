@@ -169,7 +169,7 @@ input[type="email"], input[type="text"] {
 				<div id="verification-message" class="message"></div>
 			</div>
 
-			<button type="submit" class="btn" id="find-id" disabled>아이디
+			<button type="button" class="btn" id="find-id" disabled>아이디
 				찾기</button>
 		</form>
 	</div>
