@@ -428,6 +428,8 @@ $(function() {
 <link rel="stylesheet" href="/css/chatbot-style.css">
 </head>
 <body>
+	<c:import url="/WEB-INF/views/common/header.jsp" />
+
 		<div class="chatbot-page-layout">
 		<div class="left-container">
 			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />

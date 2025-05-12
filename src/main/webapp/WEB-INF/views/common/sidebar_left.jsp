@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -16,20 +17,27 @@
 function moveToMain() {
     location.href = 'main.do';
 }
+
+const CHAT_TOPIC = "${chatTopic}";
+
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById(CHAT_TOPIC);
+    if (btn) {
+        btn.classList.add("active");
+    }
+});
 </script>
 </head>
 <body>
 
 <div class="left-sidebar">
-	<div class="logo-area" onclick="moveToMain()">
-		<img src="/irumi/resources/images/logo_simplified.png" > 
-	</div>
+	
 
 	<div class="sidebar">
-		<button onclick="moveJobPage();">직무 찾기</button>
-		<button onclick="moveSpecPage();" class="active">스펙 찾기</button>
-		<button onclick="moveSchedulePage();">일정 찾기</button>
-		<button onclick="moveActPage();">활동 찾기</button>
+		<button onclick="moveJobPage();" id="act">직무 찾기</button>
+		<button onclick="moveSpecPage();" id="spec">스펙 찾기</button>
+		<button onclick="moveSchedulePage();" id="ss">일정 찾기</button>
+		<button onclick="moveActPage();" id="act">활동 찾기</button>
 	</div>
 	
 </div>

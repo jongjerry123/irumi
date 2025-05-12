@@ -66,24 +66,7 @@ function logout() {
 }
 </script>
 <body>
-	<div class="first-row">
-		<div class="login-actions">
-			<c:choose>
-				<c:when test="${not empty sessionScope.loginUser}">
-					<c:if test="${sessionScope.loginUser.userAuthority == '2'}">
-						<button onclick="location.href='changeManage.do'">관리자 기능</button>
-					</c:if>
-					<c:if test="${sessionScope.loginUser.userAuthority == '1'}">
-						<button onclick="location.href='myPage.do'">마이페이지</button>
-					</c:if>
-					<button onclick="logout()">로그아웃</button>
-				</c:when>
-				<c:otherwise>
-					<button onclick="moveToLogin()">로그인</button>
-				</c:otherwise>
-			</c:choose>
-		</div>
-	</div>
+	
 	<div class="right-panel">
 			<div class="saved-schedule-section">
 				<div class="info-row">

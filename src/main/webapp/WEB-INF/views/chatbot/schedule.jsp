@@ -384,40 +384,9 @@ a {
  color: #BAAC80; /* 초록색 */
  text-decoration: underline; /* 밑줄 */
 }
-/* 사이드바 ************************************************************************************* */
-.sidebar, .right-panel {
-  height: auto; /* 높이 자동 (100vh 등 절대값 X) */
-}
-.sidebar {
-  width: 200px;
-  background-color: #000;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.sidebar button {
-  background-color: #222;
-  border: none;
-  color: white;
-  text-align: left;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.3s;
-  text-align: center;
-  font-weight : bold;
- 
-}
-.sidebar button:hover {
-  background-color: #BAAC80;
-  color: black;
-}
-.sidebar button.active {
- background-color: #BAAC80;
- color: black;
-}
-/* 사이드바 ************************************************************************************* */
+
+
+/* 채팅 부분 ************************************************************************************* */
 .content-box {
   padding-top : 30px;
   background-color: #1e1e1e;
@@ -448,7 +417,7 @@ a {
 }
 
 
-/* 오른쪽 페널 */
+/* 오른쪽 페널 ******************************************************** */
 .right-panel {
   width: 230px;
   padding-right: 20px;
@@ -457,26 +426,32 @@ a {
   flex-direction: column;
   gap: 30px;
 }
-.right-panel .info-row{
-  display: flex;
-   align-items: center;
-   margin-bottom: 10px;
-}
-.right-panel .label {
-  font-size : 14px;
-  color: #BAAC80;
-   font-weight: bold;
-}
-.right-panel .value {
-  color: #fff;
-  font-size : 11px;
-  margin-left : 4px;
-}
+
 .right-panel .spec-value {
-  color: #fff;
-  font-size : 11px;
-  margin-left : 4px;
+	color: #eeeeee;
+	font-size: 9px;
+	margin-left: 4px;
 }
+
+.right-panel .info-row {
+	align-items: center;
+	margin-bottom: 10px;
+	flex-direction: column; /*세로 정렬*/
+}
+
+.right-panel .label {
+	font-size: 14px;
+	color: #BAAC80;
+	font-weight: bold;
+}
+
+.right-panel .value {
+	color: #BAAC80;
+	font-size: 14px;
+	margin-left: 4px;
+	font-weight: bold;
+}
+
 .right-panel .schedule-value {
   color: #fff;
   font-size : 9px;  
@@ -788,18 +763,28 @@ a {
 }
 
 
+
+
+
+
+.first-row {
+	height: 100px;
+	display: flex;  /* flexbox로 설정 */
+    justify-content: left;  /* 가로 방향으로 가운데 정렬 */
+    align-items: center;  /* 세로 방향으로도 가운데 정렬 */
+}
+
+
+
 </style>
 </head>
 <body>
-  <c:import url="/WEB-INF/views/common/header.jsp"/>
 <c:set var="menu" value="chat" scope="request" />
 <div class="container">
 <!-- Sidebar -->
-     <div class="sidebar">
-        <button onclick="moveJobPage();">직무 찾기</button>
-        <button onclick="moveSpecPage();">스펙 찾기</button>
-        <button onclick="moveSchedulePage();" class="active">일정 찾기</button>
-        <button onclick="moveActPage();">활동 찾기</button>
+     <div class="left-sidebar">
+		     <c:set var="chatTopic" value="ss" scope="request" />
+			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
      </div>
      <!-- Main content -->
 		<div class="main">
@@ -838,26 +823,48 @@ a {
 					재차 확인하세요.</span>
 			</div>
 		</div>
-		<!-- Right panel -->
-<div class="right-panel">
-  <div class="info-row">
-       <span class="label">➤ 목표 직무:</span> <span class="value"></span>
-  </div>
-  <div class="info-row">
-       <span class="label">➤ 목표 스펙:</span> <span class="spec-value"></span>
-  </div>
-  <div class="saved-schedule-section">
-       <div class="section-title">➤ 저장한 일정</div>
-       <div class="saved-schedule-list" id="savedScheduleList"></div>
-      
-      
-  <div class="manual-input-box">
-  <input type="date" class="manual-date" id="manualDate"/>
-   <input type="text" placeholder="일정 입력" class="manual-input" id="manualComment"/>
-   <button class="add-btn">+</button>
-</div>
-</div>
-</div>
+
+		<div class="first-row">
+			<div class="login-actions">
+				<c:choose>
+					<c:when test="${not empty sessionScope.loginUser}">
+						<c:if test="${sessionScope.loginUser.userAuthority == '2'}">
+							<button onclick="location.href='changeManage.do'">관리자 기능</button>
+						</c:if>
+						<c:if test="${sessionScope.loginUser.userAuthority == '1'}">
+							<button onclick="location.href='myPage.do'">마이페이지</button>
+						</c:if>
+						<button onclick="logout()">로그아웃</button>
+					</c:when>
+					<c:otherwise>
+						<button onclick="moveToLogin()">로그인</button>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</div>
+		<div class="right-panel">
+			<div class="info-row">
+				<span class="label">➤ 목표 직무:</span> <span class="value"></span>
+			</div>
+			<div class="info-row">
+				<span class="label">➤ 목표 스펙:</span> <span class="spec-value"></span>
+			</div>
+			<div class="saved-schedule-section">
+				<div class="section-title">➤ 저장한 일정</div>
+				<div class="saved-schedule-list" id="savedScheduleList"></div>
+
+
+				<div class="manual-input-box">
+					<input type="date" class="manual-date" id="manualDate" /> <input
+						type="text" placeholder="일정 입력" class="manual-input"
+						id="manualComment" />
+					<button class="add-btn">+</button>
+				</div>
+			</div>
+		</div>
+		<div class="right-container">
+			<c:import url="/WEB-INF/views/common/sidebar_right.jsp" />
+		</div>
 <!-- Footer -->
   <c:import url="/WEB-INF/views/common/footer.jsp"/>
 </body>
