@@ -9,6 +9,8 @@
 <head>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <title>chatbot 활동 찾기</title>
 <script>
 function moveJobPage() {
@@ -68,6 +70,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	  function loadSpecOptions(jobId) {
 	    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
+	    
+	    $(".select-group:nth-of-type(2) .select-label").show();
+
 
 	    fetch("selectSpecByJobId.do", {
 	      method: "POST",
@@ -415,6 +420,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	      console.error("일정 조회 실패:", err);
 	    	    });
 	    	  }
+	        $("#first-bot-prompt").show();
 	  });
 	
 });
@@ -425,54 +431,80 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <style>
 body {
-  background-color: #111;
-  color: white;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+	background-color: #111;
+	color: #eeeeee;
+	margin: 0;
+	padding: 0 0 0 0 ;
+	min-height: 100vh;
+	display: flex;
+	flex-direction:column;
+	overflow-y:hidden;
 }
 .container {
-    display: flex;
-    max-width: 1200px;   /* 최대 너비 설정 */
-    max-height: 100vh;   /* 최대 높이 설정 (화면 높이) */
-    width: 100%;         /* 너비를 부모에 맞게 확장 */
-    height: 100%;        /* 높이를 부모에 맞게 확장 */
-    margin: 0 auto;      /* 중앙 정렬 */
-    overflow: hidden; 
+	display: flex;
+	max-width: 1200px; /* 최대 너비 설정 */
+	width: 100%; /* 너비를 부모에 맞게 확장 */
+	height: 95%;
+	margin: 0 auto; /* 중앙 정렬 */
+	overflow: hidden; /* 내용이 넘치지 않도록 숨김 */
+	flex-grow: 1;
 }
 .main {
-    flex: 1;            
-    display: flex;      
-    flex-direction: column; 
-    background-color: #1e1e1e;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    height: 100%;  
+	flex: 1; /* 남은 공간을 모두 차지 */
+	display: flex; /* 자식 요소들을 세로로 배치 */
+	flex-direction: column; /* 세로 배치 */
+	flex-grow: 1;
+	height: 100%; 
 }
 
 .left-container {
-    width: 200px;        /* 고정된 너비 */
-    padding: 20px;
-    flex-shrink: 0;      /* 사이드바가 축소되지 않게 */
-    height: 100%;        /* 부모 높이 차지 */
+	width: 230px; /* 고정된 너비 */
+	padding-top: 0px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 0px;
+	flex-shrink: 0; /* 사이드바가 축소되지 않게 */
+	height: 100%; /* 부모 높이 차지 */
+}
+
+.right-container {
+	width: 250px; /* 고정된 너비 */
+	color: #333;
+	padding-top: 0px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 0px;
+	flex-shrink: 0; /* 오른쪽 패널이 축소되지 않게 */
+	height: 100%; /* 부모 높이 차지 */
 }
 
 
 /* 컨텐츠 박스 ***********************************************/
+.chat-box {
+	background-color: #1e1e1e;
+	padding-top: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
+	height: 80%;
+	border-radius: 10px;
+	overflow-y: auto;
+}
 .content-box {
-    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
-    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
-    height:auto;
-    max-width: 700px; 
+	flex-grow: 1; /* 나머지 공간을 모두 차지 */
+	overflow-y: auto; /* 내용이 넘치면 스크롤 */
+	height: auto;
+	max-width: 700px;
+	/* padding-right : 20px;
+	padding-left: 20px; */
 	border-radius: 12px;
 	line-height: 1.7;
 	font-size: 14px;
-	
-	height: 700px;
+	/* 	height: 700px; */
 	overflow-y: auto; /*내부 콘텐츠가 넘칠 경우 스크롤 활성화*/
 	display: flex;
 	flex-direction: column;
+	scrollbar-color: #BAAC80 #222;
+	scrollbar-width: thin;
 }
 .content-box::-webkit-scrollbar {
  width: 9px;
@@ -482,47 +514,70 @@ body {
  background: #BAAC80;
  border-radius: 6px;
 }
-.content-box {
- scrollbar-color: #BAAC80 #222;
- scrollbar-width: thin;
+
+.select-bar {
+	flex-shrink: 0; /* 크기가 축소되지 않게 */
+	margin-bottom: 20px; /* 아래쪽 여백 추가 */
+	height: 120px; /* 고정된 높이 설정 */
+	flex-direction: column;
+	display: flex;
+	height: auto;
 }
+
+/* .select-bar내의 hr을 flex 아이템처럼 다루기 */
+.select-bar hr {
+	width: 100%; /* 부모 컨테이너에 맞춰 확장 */
+	height: 0.3px; /* 선의 두께 */
+	background-color: #BAAC80;
+	border: none;
+	margin: 20px 0;
+	flex-grow: 1; /* 남은 공간을 차지 */
+	opacity: 0.3;
+}
+
 /* 오른쪽 페널********************************************************* */
 .right-panel {
-    width: 250px;        /* 고정된 너비 */
-    color: #333;
-    padding: 20px;
-    flex-shrink: 0;      /* 오른쪽 패널이 축소되지 않게 */
-    height: 100%;        /* 부모 높이 차지 */
-    overflow-y: auto; 
+	width: 250px; /* 고정된 너비 */
+	color: #333;
+	padding: 20px;
+	flex-shrink: 0; /* 오른쪽 패널이 축소되지 않게 */
+	height: 100%; /* 부모 높이 차지 */
+	overflow-y: auto;
 }
-.right-panel .info-row {
-	align-items: center;
-	margin-bottom: 10px;
-	flex-direction: column; /*세로 정렬*/
-}
-.right-panel .label {
-	color: #eeeeee;
-	font-weight: bold;
-	font-size: 15px;
-	margin: 25px 0 25px 0;
-}
-.right-panel .value {
-	color: #BAAC80;
-	font-size: 14px;
-	margin-left: 4px;
-	font-weight: bold;
-}
+
 .right-panel .spec-value {
 	color: #BAAC80;
 	font-size: 14px;
 	margin-left: 4px;
 	font-weight: bold;
 }
-.right-panel .schedule-value {
-  color: #fff;
-  font-size : 9px;  
-  margin-left : 4px;
+
+.right-panel .info-row {
+	display: flex;
+	margin-bottom: 25px;
+	flex-direction: column; /*세로 정렬*/
 }
+
+.right-panel .label {
+	color: #eeeeee;
+	font-weight: bold;
+	font-size: 15px;
+	margin-bottom: 10px;
+}
+
+.right-panel .value {
+	color: #BAAC80;
+	font-size: 14px;
+	margin-left: 4px;
+	font-weight: bold;
+}
+
+.right-panel .schedule-value {
+	color: #fff;
+	font-size: 9px;
+	margin-left: 4px;
+}
+
 /* 채팅 쪽 부분 */
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
@@ -531,10 +586,10 @@ body {
 	display: flex;
 	align-items: center;
 	background: #222;
-	border-radius: 24px;
+	border-radius: 10px;
 	padding: 8px 16px;
-	margin-top: 40px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+	margin-top: 10px;
+	flex-shrink: 0;
 }
 .chat-input-box .chat-input {
 	flex: 1;
@@ -563,18 +618,6 @@ body {
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
-
-.warning-box {
-  margin-top: 12px;
-  padding: 8px 12px;
-  max-width: 100%;
-  display: flex;
-  justify-content: center;
-}
-.warning-text {
-  font-size: 13px;
-}
-
 
 /* manual 부분 */
 .manual-input-box {
@@ -613,6 +656,7 @@ body {
 	background: #BAAC80;
 	color: #232323;
 }
+
 /* 왼쪽 저장한 활동 부분 */
 .saved-schedule-section {
 	margin-bottom: 20px;
@@ -685,31 +729,31 @@ body {
 	gap: 8px;
 }
 .select-label {
-	color: #d9d9d9;
-	font-size: 15px;
+	color: #eeeeee;
+	font-size: 18px;
 	font-weight: 600;
-	margin-bottom: 2px; 
-	margin-top : 3px;
+	margin-bottom: 8px; /* 라벨 아래 약간 여백 */
+	padding-left: 10px;
 }
 .select-btn {
 	background: none;
 	border: 1.5px solid #BAAC80;
 	color: #BAAC80;
 	border-radius: 22px;
-	font-size: 15px;
+	font-size: 12px;
 	font-weight: 500;
 	padding: 7px 20px;
 	margin-right: 8px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-bottom: 4px; /* 버튼들끼리 간격 */
+	margin-bottom: 6px; /* 버튼들 위아래 간격 */
 }
 .select-btn:hover {
 	background: #BAAC80;
 	border: 1.5px solid #BAAC80;
 	color: #1e1e1e;
 	border-radius: 22px;
-	font-size: 15px;
+	font-size: 12px;
 	font-weight: 500;
 	padding: 7px 20px;
 	margin-right: 8px;
@@ -719,10 +763,7 @@ body {
 	opacity: 0.5;
 }
 .select-btn-list {
-	display: flex;
-	flex-direction: row;
-	gap: 8px; /* 버튼 사이 간격 */
-	flex-wrap: nowrap;
+	padding: 5px;
 }
 .select-btn.active {
 	background: #BAAC80;
@@ -730,12 +771,19 @@ body {
 	font-weight: 700;
 }
 /*************************************************************************** */
+.chat-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+}
+
 .chat-area {
 	flex: 1;
+	min-height: 0;
 	overflow-y: auto;
 	background-color: #1e1e1e;
 	border-radius: 12px;
-	padding: 20px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -760,11 +808,10 @@ body {
 	word-wrap: break-word;
 }
 .user-msg {
-	background-color: #BAAC80;
-	color: black;
+	background-color: #383838;
+	color: white;
 	align-self: flex-end;
 	text-align: right;
-	font-weight: bold;
 }
 .bot-msg {
 	align-self: flex-start;
@@ -775,10 +822,9 @@ body {
 	display: flex;
 	align-items: center;
 	background: #222;
-	border-radius: 12px;
+	border-radius: 10px;
 	padding: 8px 16px;
 	margin-top: 10px;
-	
 }
 /* 옵션 버튼 css 추가  */
 #option-buttons button.select-btn {
@@ -866,10 +912,25 @@ body {
 	background: #222;
 }
 /* 추가 - 선택 버튼 css */
+.chat-input-box {
+	display: flex;
+	align-items: center;
+	background: #222;
+	border-radius: 10px;
+	padding: 8px 16px;
+	margin-top: 10px;
+}
+
+.confirm-select-box {
+	display: flex;
+	justify-content: center; /* 수평 가운데 정렬 */
+	align-items: center; /* 수직 가운데 정렬 (선택사항) */
+}
+
 .confirm-select-box .confirm-select-btn {
 	border: 1.5px solid #eeeeee;
 	border-radius: 10px;
-	font-size: 15px;
+	font-size: 12px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
@@ -878,12 +939,11 @@ body {
 	text-align: center;
 	color: #eeeeee;
 	background: none;
-	margin-right: 20px;
 }
 
 .confirm-select-box .confirm-select-btn:hover {
 	border-radius: 10px;
-	font-size: 15px;
+	font-size: 12px;
 	padding: 7px 20px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
@@ -892,7 +952,7 @@ body {
 	text-align: center;
 	color: #383838;
 	background: #eeeeee;
-	opacity: 0.3;
+	opacity: 1;
 }
 </style>
 </head>
@@ -908,15 +968,15 @@ body {
 		<!-- Main content -->
 		<div class="main">
 			<!-- 콘텐츠 영역 -->
-			<div class="content-box">
+			<div class="chat-box">
 				<div class="select-bar">
 					<div class="select-group">
-						<span class="select-label">스펙 대상 직무 선택</span>
+						<span class="select-label">🏃 어떤 분야의 활동을 원하시나요? 먼저 직무를 선택해주세요</span>
 						<div class="select-btn-list" id="job-btn-list">
 						</div>
 					</div>
 					<div class="select-group">
-						<span class="select-label">활동 대상 스펙 선택</span>
+						<span class="select-label" style="display: none;">📌 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
 						<div class="select-btn-list" id="spec-btn-list">
 						</div>
 					</div>
@@ -924,44 +984,52 @@ body {
 						<!--  클릭시 setSubTopic 해야함 -->
 						<button class="confirm-select-btn">선택 완료</button>
 					</div>
+					<hr>
 				</div>
-				<div class="chat-area" id="chatArea">
-					<div class="message bot-msg">
-						이곳은 활동 찾기 세션입니다. <br>
-						위에서 선택하신 목표 스펙을 이루기 위해 관련 활동을 하신 적이 있으신가요? <br>
-						활동 경험이 있으시다면 적어주시고, 없으시다면 "없음"을 입력해주세요! <br>
-						(예시 : 기사 자격증을 따기 위해 ooo 문제집 풀어본 경험이 있다, xx 인턴십에 도움이 되도록 사전 프로젝트를 해본 경험이 있다 등등)
+
+				<div class="content-box">
+					<div class="chat-container" id="chat-container">
+						<div class="chat-area" id="chatArea">
+							<div class="message bot-msg" id="first-bot-prompt"
+							style="display: none;">
+								이곳은 활동 찾기 세션입니다. <br> 위에서 선택하신 목표 스펙을 이루기 위해 관련 활동을 하신 적이
+								있으신가요? <br> 활동 경험이 있으시다면 적어주시고, 없으시다면 "없음"을 입력해주세요! <br>
+								(예시 : 기사 자격증을 따기 위해 ooo 문제집 풀어본 경험이 있다, xx 인턴십에 도움이 되도록 사전 프로젝트를
+								해본 경험이 있다 등등)
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
+			
 			<div class="chat-input-box">
 				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
 					id="userInput" />
-				<button class="chat-send-btn">
+				<button class="chat-send-btn" onclick="sendMessage()">
 					<i class="fa fa-paper-plane"></i>
 				</button>
 			</div>
-			<div class="warning-box">
-				<span class="warning-text">Irumi 챗봇은 실수를 할 수 있습니다. 중요한 정보는
-					재차 확인하세요.</span>
-			</div>
 		</div>
-		<!-- Right panel -->
-		<div class="right-panel">
-			<div class="info-row">
-				<span class="label">🎯 목표 직무:</span> <span class="value"></span>
-			</div>
-			<div class="info-row">
-				<span class="label">🎯 목표 스펙:</span> <span class="spec-value"></span>
-			</div>
 
-			<div class="saved-schedule-list" id="savedActivityList"></div>
+		<div class="right-container">
+			<div class="right-panel">
+				<div class="info-row">
+					<span class="label">🎯 목표 직무</span>
+					<span class="value"></span>
+				</div>
+				<div class="info-row">
+					<span class="label">🏅 목표 스펙</span> <span class="spec-value"></span>
+				</div>
 
-			<div class="saved-schedule-section">
-				<div class="section-title">➤ 직접 활동 추가하기</div>
-				<div class="manual-input-box">
-					<input type="text" placeholder="저장할 활동 입력" class="manual-input" />
-					<button class="add-btn">+</button>
+				<div class="saved-schedule-list" id="savedActivityList"></div>
+
+				<div class="saved-schedule-section">
+					<div class="section-title">➕ 직접 활동 추가하기</div>
+					
+					<div class="manual-input-box">
+						<input type="text" placeholder="저장할 활동 입력" class="manual-input" />
+						<button class="add-btn">+</button>
+					</div>
 				</div>
 			</div>
 		</div>

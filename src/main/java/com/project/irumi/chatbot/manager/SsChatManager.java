@@ -151,7 +151,7 @@ public class SsChatManager {
 	            }
 
 	        case ASK_WANT_MORE:
-	            if ("다른 시험 검색".equals(userMsg)) {
+	            if ("다른 일정 검색".equals(userMsg)) {
 	            	botChatMsg.setMsgContent("다른 일정 검색");
 					chatbotService.insertChatMsg(botChatMsg);
 	                session.setChatState(StateSsChat.SERP_SEARCH);
