@@ -55,11 +55,11 @@ body {
     padding-right: 20px;
     height: 80%;
     border-radius: 10px;
-    overflow-y: auto;
+   /*  overflow-y: auto; */
 }
 .select-bar {
     flex-shrink: 0;      /* 크기가 축소되지 않게 */
-    margin-bottom: 20px; /* 아래쪽 여백 추가 */
+/*     margin-bottom: 20px; 아래쪽 여백 추가 */
     height: 120px;       /* 고정된 높이 설정 */
     flex-direction: column;
     display: flex;
@@ -83,6 +83,19 @@ body {
     overflow-y: auto;    /* 내용이 넘치면 스크롤 */
     height:auto;
     /* background-color: #222; */
+}
+
+.content-box::-webkit-scrollbar {
+ width: 9px;
+ background: #222;
+}
+.content-box::-webkit-scrollbar-thumb {
+ background: #BAAC80;
+ border-radius: 6px;
+}
+.content-box {
+ scrollbar-color: #BAAC80 #222;
+ scrollbar-width: thin;
 }
 
 /* 채팅 입력창은 고정된 크기 */
@@ -189,10 +202,9 @@ body {
 
 
 .content-box .custom-checkbox-list {
-	margin: 24px 0 0 0;
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 5px;
 }
 
 .content-box .custom-checkbox {
@@ -203,7 +215,7 @@ body {
 	align-items: left;
 	justify-content: space-between;
 	background: #181818;
-	border: 1.5px solid #fff;
+	border: 1.5px solid #383838;
 	border-radius: 10px;
 	padding: 10px 18px;
 	font-size: 16px;
@@ -242,23 +254,26 @@ body {
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkmark {
 	display: block;
+	color: #B2E86F;
 }
 
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkbox-text {
-	color: #BAAC80;
+	color: #B2E86F;
 	font-weight: 600;
 }
 
-.content-box .custom-checkbox input[type="checkbox"]:checked ~
-	.checkmark {
-	color: #BAAC80;
+.content-box .custom-checkbox input[type="checkbox"]:checked {
+    background: rgba(186, 172, 128, 0.3);  /* 배경색을 체크된 상태에서 적용 */
 }
+
 
 .content-box .custom-checkbox:hover {
-	background: #222;
+	background: rgba(186, 172, 128, 0.3);
 }
-
+.content-box .custom-checkbox:hover .checkbox-text {
+	color: #B2E86F;
+}
 
 .select-group {
 	display: flex;
@@ -289,7 +304,7 @@ body {
 	margin-right: 8px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-bottom: 6px; /* 버튼들 위아래 간격 */
+	margin-bottom: 4px; /* 버튼들 위아래 간격 */
 }
 
 

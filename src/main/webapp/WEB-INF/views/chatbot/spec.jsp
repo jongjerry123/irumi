@@ -8,12 +8,12 @@
 <html>
 <head>
 <style>
-
-
 </style>
 
 <link rel="stylesheet" type="text/css"
 	href="${ pageContext.servletContext.contextPath}/resources/css/chatbot.css" />
+<link rel="stylesheet" type="text/css"
+	href="${ pageContext.servletContext.contextPath}/resources/css/sidebar_left.css" />
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -257,11 +257,24 @@ $(function() {
 
         $.each(options, function(_, specCI) {
             const $label = $("<label>").addClass("custom-checkbox");
+            
             const $input = $("<input>").attr({ type: "checkbox", value: specCI.title });
             const $titleSpan = $("<span>").addClass("checkbox-text").text(specCI.title);
             const $explainSpan = $("<span>").addClass("checkbox-explain").text(specCI.explain);
             const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
-            $label.append($input, $titleSpan, $explainSpan, $checkMark);
+            
+            $label.append($input, $titleSpan, $explainSpan/*,  $checkMark */);
+            $input.on("change", function() {
+                if ($(this).prop("checked")) {
+                    // 체크된 상태일 때 배경색 변경
+                    $(this).closest('.custom-checkbox').css("background", "rgba(186, 172, 128, 0.3)");
+                } else {
+                    // 체크 해제된 상태로 돌아갈 때 배경색 초기화
+                    $(this).closest('.custom-checkbox').css("background", "transparent");
+                }
+            });
+            
+            /* $label.append($input, $textWrapper, $explainSpan);  */
             $listWrap.append($label);
         });
 
@@ -300,12 +313,7 @@ $(function() {
     		              alert("스펙 추가 중 오류가 발생했습니다.");
     		            }
     		          }
-/*             	    complete: function() {
-            	      completed++;
-            	      if (completed === checked.length) {
-            	        addToSpecList(savedSpecCIs);  // 모든 요청 성공 후 한 번만 호출
-            	      }
-            	    } */
+
             	  });
   	    	});
             
@@ -320,7 +328,7 @@ $(function() {
     function renderOptionButtons(options) {
         removeOptionButtons();
         const $chatArea = $("#chatArea");
-        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "15px", display: "flex", gap: "2px" });
+        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "5px", display: "flex", gap: "2px" });
 
         $.each(options, function(_, option) {
             const $btn = $("<button>").addClass("select-btn").text(option).on("click", function() {
@@ -452,15 +460,24 @@ $(function() {
 
 });
 </script>
-<link rel="stylesheet" href="/css/chatbot-style.css">
+
 </head>
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
 	<div class="chatbot-page-layout">
 		<div class="left-container">
-			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
+			<%-- <c:import url="/WEB-INF/views/common/sidebar_left.jsp" /> --%>
+			<div class="left-sidebar">
+				<div class="sidebar">
+					<button onclick="moveJobPage();" id="job">직무 찾기</button>
+					<button onclick="moveSpecPage();" id="spec" class="active">스펙 찾기</button>
+					<button onclick="moveSchedulePage();" id="ss">일정 찾기</button>
+					<button onclick="moveActPage();" id="act">활동 찾기</button>
+				</div>
+			</div>
 			<c:set var="menu" value="chat" scope="request" />
+			
 		</div>
 
 
@@ -494,7 +511,8 @@ $(function() {
 						</div>
 					</div>
 				</div>
-			</div><!--  chatbox -->
+			</div>
+			<!--  chatbox -->
 
 
 			<div class="chat-input-box">
