@@ -427,7 +427,6 @@ document.addEventListener("DOMContentLoaded", function() {
 body {
   background-color: #111;
   color: white;
-  font-family: 'Noto Sans KR', sans-serif;
   margin: 0;
   padding: 0;
   min-height: 100vh;
