@@ -8,12 +8,12 @@
 <html>
 <head>
 <style>
-
-
 </style>
 
 <link rel="stylesheet" type="text/css"
 	href="${ pageContext.servletContext.contextPath}/resources/css/chatbot.css" />
+<link rel="stylesheet" type="text/css"
+	href="${ pageContext.servletContext.contextPath}/resources/css/sidebar_left.css" />
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -50,7 +50,7 @@ let cacheSessionSpecOpts=null; // (스펙챗엔 필요 X)선택한 jobOpt에 따
 
 let subTopicJobCI= null; // subtopic 지정 위해 서버로 보낼 CI 객체;
 let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변수
-
+let sendActive=false;
 
 
 $(function() {
@@ -120,8 +120,6 @@ $(function() {
 	    //서버에서 받아왔던 cacheSessionJobOpts 중에서
 	    // 선택된 Job에 해당하는 Career Item 객체를 서버로 보내기 위해 저장.
 	    subTopicJobCI = cacheSessionJobOpts.find(jobCI => jobCI.title === clickedJobName);
-	    
-
 	});
 	
 	// 토픽 선택 후 '선택 완료' 버튼 클릭시 setSubTopic
@@ -174,6 +172,7 @@ $(function() {
 	});
 	
     function sendMessage(message) {
+    	
     	//답변 올 때까지 버튼 일시적 비활성화
     	$(".chat-send-btn").prop("disabled", true);
         addMessageToChat(message, "user-msg");
@@ -184,19 +183,18 @@ $(function() {
             contentType: "application/json",
             data: JSON.stringify({ userMsg: message, topic: "spec" }),
             success: function(gptReply) {
-            	addBotMessageToChat(gptReply.gptAnswer, "bot-msg");
+            	addBotMessageToChat(gptReply.gptAnswer, "bot-msg"); 
 				
             	// 복수 선택 옵션이 올 경우
                 if (gptReply.checkboxOptions && Array.isArray(gptReply.checkboxOptions) && gptReply.checkboxOptions.length > 0) {
                     renderCheckboxList(gptReply.checkboxOptions);
-                  
                 } else {
                     removeCheckboxList();
                 }
 
             	// 택1 선택 옵션이 올 경우
                 if (gptReply.options && Array.isArray(gptReply.options) && gptReply.options.length > 0) {
-                    renderOptionButtons(gptReply.options);
+                	renderOptionButtons(gptReply.options);
                 } else {
                     removeOptionButtons();
                 }
@@ -208,7 +206,7 @@ $(function() {
             },
             complete: function(){
             	// 대답이 온 후 전송 버튼 활성화
-            	$(".chat-send-btn").prop("disabled", true);
+            	$(".chat-send-btn").prop("disabled", false);
             }
         });// sendMessageToChatbot.do   
     }
@@ -257,16 +255,29 @@ $(function() {
 
         $.each(options, function(_, specCI) {
             const $label = $("<label>").addClass("custom-checkbox");
+            
             const $input = $("<input>").attr({ type: "checkbox", value: specCI.title });
             const $titleSpan = $("<span>").addClass("checkbox-text").text(specCI.title);
             const $explainSpan = $("<span>").addClass("checkbox-explain").text(specCI.explain);
             const $checkMark = $("<span>").addClass("checkmark").html("&#10003;");
-            $label.append($input, $titleSpan, $explainSpan, $checkMark);
+            
+            $label.append($input, $titleSpan, $explainSpan/*,  $checkMark */);
+            $input.on("change", function() {
+                if ($(this).prop("checked")) {
+                    // 체크된 상태일 때 배경색 변경
+                    $(this).closest('.custom-checkbox').css("background", "rgba(186, 172, 128, 0.3)");
+                } else {
+                    // 체크 해제된 상태로 돌아갈 때 배경색 초기화
+                    $(this).closest('.custom-checkbox').css("background", "transparent");
+                }
+            });
+            
+            /* $label.append($input, $textWrapper, $explainSpan);  */
             $listWrap.append($label);
         });
 
         //t선택 완료 버튼
-        const $submitBtn = $("<button>").text("선택 완료").css("margin-left", "10px").on("click", function() {
+        const $submitBtn = $("<button>").text("목표 스펙으로 추가하기").addClass("check-confirm-btn").on("click", function() {
             const checked = $listWrap.find("input:checked").map(function() {
             	const selectedTitle = this.value;
          		   return options.find(specCI => specCI.title === selectedTitle);
@@ -300,12 +311,7 @@ $(function() {
     		              alert("스펙 추가 중 오류가 발생했습니다.");
     		            }
     		          }
-/*             	    complete: function() {
-            	      completed++;
-            	      if (completed === checked.length) {
-            	        addToSpecList(savedSpecCIs);  // 모든 요청 성공 후 한 번만 호출
-            	      }
-            	    } */
+
             	  });
   	    	});
             
@@ -320,7 +326,7 @@ $(function() {
     function renderOptionButtons(options) {
         removeOptionButtons();
         const $chatArea = $("#chatArea");
-        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "15px", display: "flex", gap: "2px" });
+        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "5px", display: "flex", gap: "2px" });
 
         $.each(options, function(_, option) {
             const $btn = $("<button>").addClass("select-btn").text(option).on("click", function() {
@@ -452,15 +458,27 @@ $(function() {
 
 });
 </script>
-<link rel="stylesheet" href="/css/chatbot-style.css">
+
 </head>
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
 
 	<div class="chatbot-page-layout">
 		<div class="left-container">
-			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
+			<%-- <c:import url="/WEB-INF/views/common/sidebar_left.jsp" /> --%>
+			<div class="chatpage-title">
+				대화형 도우미
+			</div>
+			<div class="left-sidebar">
+				<div class="sidebar">
+					<button onclick="moveJobPage();" id="job">직무 찾기</button>
+					<button onclick="moveSpecPage();" id="spec" class="active">스펙 찾기</button>
+					<button onclick="moveSchedulePage();" id="ss">일정 찾기</button>
+					<button onclick="moveActPage();" id="act">활동 찾기</button>
+				</div>
+			</div>
 			<c:set var="menu" value="chat" scope="request" />
+			
 		</div>
 
 
@@ -494,7 +512,8 @@ $(function() {
 						</div>
 					</div>
 				</div>
-			</div><!--  chatbox -->
+			</div>
+			<!--  chatbox -->
 
 
 			<div class="chat-input-box">
@@ -503,6 +522,7 @@ $(function() {
 				<button class="chat-send-btn">
 					<i class="fa fa-paper-plane"></i>
 				</button>
+				
 			</div>
 			<c:import url="/WEB-INF/views/common/footer.jsp" />
 
