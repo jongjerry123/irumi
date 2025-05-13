@@ -96,13 +96,11 @@
 .manual-input-box .manual-input {
 	flex: 1;
 	background: transparent;
-	border: none;
 	color: white;
 	font-size: 12px;
 	padding: 8px 4px;
-	border-radius: 5px;
-	border: 1px solid eeeeee;
-	outline: none;
+	/* outline: none; */
+	
 }
 
 .manual-input-div {
