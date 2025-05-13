@@ -280,5 +280,6 @@ td a:hover {
 	</div>
 	
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
+	<br><br><br>
 </body>
 </html>

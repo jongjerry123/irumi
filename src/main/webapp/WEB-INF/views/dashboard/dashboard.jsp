@@ -18,7 +18,7 @@
   --text: #eee;
   --text-secondary: #fff;
   --radius: 12px;
-  --gap: 16px;
+  --gap: 20px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -91,6 +91,15 @@ label, p {
 	background: var(--primary);
 	color: white;
 }
+.buttons button.addButton {
+	border-radius: 20px;
+	border: 1px solid #44a87c;
+	color: #44a87c;
+}
+.buttons button.addButton:hover {
+	background: #44a87c;
+	color: white;
+}
 .buttons button.deleteButton {
 	border: 1px solid #D10000;
 	color: #D10000;
@@ -126,12 +135,14 @@ input[type="checkbox"]:checked {
   color: var(--bg);
   transition: width 0.3s;
 }
-#certCards {
+#certCards, #specCards {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--gap);
   margin-top: 10px;
 }
+
 .certCard {
   background: var(--card-bg);
   border-radius: var(--radius);
@@ -190,11 +201,17 @@ a {
 			dataType: 'json',
 			contentType: 'application/json; charset=UTF-8',
 			success: function(data) {
-				$('#currSpecs').html('<ul>');
+				$('#specCards').html();
 				data.forEach(function(item) {
-					$('#currSpecs').append('<li><a href=\"#\" onclick=\"movetoUpdateSpec(' + item.specId + ')\">' + item.specName + '</a></li>');					
+		             var cardHtml = 
+		                 '<div class="certCard">' +
+		                   '<h3>' + item.specName + '</h3>' +
+		                   '<h5>' + item.specType + '</h5>' +
+		                   '<div style=\"font-size:13px; margin-bottom:15px;\">' + (item.specExplain ?? '설명이 없습니다') + '</div>' +
+               			'<div class=\"buttons\" style=\"display: flex; align-items: center; justify-content: center;\">' +
+            			'<button onclick=\"movetoUpdateSpec(' + item.specId + ')\" style=\"width: 120px;\">변경</button></div></div>';
+					$('#specCards').append(cardHtml);					
 				});
-				$('#currSpecs').append('</ul>');
 			}
 		});
 		
@@ -235,12 +252,12 @@ a {
 						.appendTo('#jobs');
 				});
 				if (data.length >= 5) {
-					$('<button>').text('목표 직업 추가하기').on('click', maxNumJobs).appendTo('#jobs');
-					$('<button>').text('목표 직업 탐색하기').on('click', maxNumJobs).appendTo('#jobs');
+					$('<button class=\"addButton\">').text('목표 직업 추가하기').on('click', maxNumJobs).appendTo('#jobs');
+					$('<button class=\"addButton\">').text('목표 직업 탐색하기').on('click', maxNumJobs).appendTo('#jobs');
 				}
 				else {
-					$('<button>').text('목표 직업 추가하기').on('click', addJob).appendTo('#jobs');
-					$('<button>').text('목표 직업 탐색하기').on('click', searchJob).appendTo('#jobs');
+					$('<button class=\"addButton\">').text('목표 직업 추가하기').on('click', addJob).appendTo('#jobs');
+					$('<button class=\"addButton\">').text('목표 직업 탐색하기').on('click', searchJob).appendTo('#jobs');
 				}
 				
 			}
@@ -256,8 +273,8 @@ a {
 			success: function(data) {
 				$('#certCards').empty();
 				if (!data || data.length === 0) {
-	                $('#certCards').append('<div>등록된 스펙이 없습니다.</div>');
-	                var buttonHtml = '<br><div class=\"buttons\"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 300px\">목표 스펙 추가하기</button></div>';
+	                $('#certCards').append('<div style=\"flex: 0 0 100%;\">등록된 스펙이 없습니다.</div>');
+	                var buttonHtml = '<div class=\"buttons\"><button onclick=\"movetoAddSpec(' + jobId + ')\" style=\"width: 300px\">목표 스펙 추가하기</button></div>';
 					$('#certCards').append(buttonHtml);
 	                return;
 				}
@@ -403,10 +420,10 @@ a {
   <div class="dashboard-wrapper clearfix">
     <div class="education-info">
       <h2 style="text-align: center;">학력 정보</h2>
-      <label id="university">대학교: </label>
-      <label id="degree">학위: </label>
-      <label id="graduation">졸업 여부: </label>
-      <label id="gpa">학점: </label>
+      <h4 id="university">대학교: </h4>
+      <h4 id="degree">학위: </h4>
+      <h4 id="graduation">졸업 여부: </h4>
+      <h4 id="gpa">학점: </h4>
       <div class="buttons"><button onclick="movetoUpDash()">수정하기</button></div>
     </div>
 
@@ -420,12 +437,17 @@ a {
       
 
       <h2 id="targetSpec">직업을 선택하세요</h2>
-      <div id="certSection"><div id="certCards"></div></div>
+      <div id="certSection">
+      	<div id="certCards">
+      		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+      	</div>
+      </div>
     </div>
 
     <div class="spec-info">
       <h2 style="text-align: center;">현재 스펙</h2>
-      <label id="currSpecs"></label>
+      <div id="specCards">
+      </div>
     </div>
   </div>
 
