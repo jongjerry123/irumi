@@ -329,8 +329,7 @@ input[type="email"], input[type="text"] {
 
         // 아이디 찾기 버튼 클릭
         $findIdButton.on('click', function() {
-            const email = $emailInput.val().trim();
-            window.location.href = 'showId.do?email=' + encodeURIComponent(email);
+            $('#findIdForm').submit();
         });
     });
     </script>

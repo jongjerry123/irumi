@@ -50,9 +50,10 @@ public class UserDao {
 	}
 	//비밀번호 변경
 	public void updatePassword(String userId, String encodedPassword) {
-		Map<String, String> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("userId", userId);
 		params.put("userPwd", encodedPassword);
+		params.put("chPwd", new java.sql.Date(System.currentTimeMillis()));
 		sqlSessionTemplate.update("userMapper.updatePassword", params);
 	}
 

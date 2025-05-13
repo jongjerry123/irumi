@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
@@ -22,7 +21,7 @@ public class NaverMailService {
 
     @Value("${naver.mail.sender-email}")
     private String senderEmail;
-    
+
     public void sendEmail(String recipientEmail, String subject, String body) throws MessagingException {
         try {
             // MIME 메시지 생성

@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService {
         if (userData.containsKey("password") && userData.get("password") != null) {
             String encodedPassword = bcryptPasswordEncoder.encode((String) userData.get("password"));
             params.put("userPwd", encodedPassword);
+            params.put("chPwd", new java.sql.Date(System.currentTimeMillis()));
         }
         if (userData.containsKey("email") && userData.get("email") != null) {
             params.put("userEmail", userData.get("email"));

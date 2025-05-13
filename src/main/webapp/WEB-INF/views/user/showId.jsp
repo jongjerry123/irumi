@@ -66,7 +66,6 @@ h2 {
 	box-sizing: border-box;
 }
 
-
 .message {
 	font-size: 12px;
 	margin-top: 5px;
@@ -105,7 +104,7 @@ h2 {
 		<h2>아이디 찾기 결과</h2>
 		<div class="result-group">
 			<c:choose>
-				<c:when test="${not empty userId}">
+				<c:when test="${not empty userId and userId != ''}">
 					<div class="result-text">
 						조회된 아이디:
 						<c:out value="${userId}" />
@@ -114,7 +113,7 @@ h2 {
 				</c:when>
 				<c:otherwise>
 					<div class="result-text">아이디를 찾을 수 없습니다.</div>
-					<div class="message error">입력한 이메일로 등록된 아이디가 없습니다.</div>
+					<div class="message error">입력한 이메일로 등록된 아이가 없습니다.</div>
 				</c:otherwise>
 			</c:choose>
 		</div>
