@@ -526,10 +526,10 @@ public class BoardController {
 	@RequestMapping("worldCup.do")
 	public String worldCupPage(Model model) throws Exception {
 	    List<Job> jobList = postService.getAllJobs();
-	    ObjectMapper mapper = new ObjectMapper(); // Jackson 사용
-	    String jobListJson = mapper.writeValueAsString(jobList); // JSON 문자열로 변환
+	    ObjectMapper mapper = new ObjectMapper();
+	    String jobListJson = mapper.writeValueAsString(jobList);
 	    model.addAttribute("jobListJson", jobListJson);
-	    return "worldCup";
+	    return "/job/worldCup";
 	}
 
 }
