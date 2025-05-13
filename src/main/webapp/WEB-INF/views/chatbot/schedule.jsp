@@ -365,6 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <style>
 body {
+
 	background-color: #111;
 	color: #eeeeee;
 	margin: 0;
@@ -373,6 +374,7 @@ body {
 	display: flex;
 	flex-direction:column;
 	overflow-y:hidden;
+
 }
 
 /* chatbot-page-layout의 최대 크기 설정 */
