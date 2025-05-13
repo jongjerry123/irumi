@@ -280,6 +280,7 @@ input[type="radio"]:checked+label::before {
 	    </div>
 	  </form>
 	</div>
+	<br><br><br>
 
 	<c:import url="/WEB-INF/views/common/footer.jsp" />
 </body>

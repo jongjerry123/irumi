@@ -6,7 +6,7 @@
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
 <style>
-body, input, textarea, button, select {
+* {
     font-family: 'Pretendard', sans-serif !important;
 }
 
