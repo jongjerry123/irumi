@@ -11,7 +11,6 @@
 <style>
 body {
     background-color: #000;
-    font-family: 'Noto Sans KR', sans-serif;
     color: white;
     margin: 0;
     padding: 0;
