@@ -35,7 +35,12 @@ body {
 }
 
 .change-pwd-box h2 {
+	margin-bottom: 5px;
+}
+.change-pwd-box h5 {
+	font-size: 12px;
 	margin-bottom: 20px;
+	color:red;
 }
 
 .change-pwd-box input {
@@ -89,8 +94,8 @@ body {
 }
 
 .error-message, .success-message {
-	font-size: 0.9em;
-	margin-bottom: 10px;
+	font-size: 12px;
+	margin-top: 5px;
 	text-align: left;
 }
 
@@ -99,7 +104,7 @@ body {
 }
 
 .success-message {
-	color: #3ccfcf;
+	color: #00ffaa;
 }
 </style>
 </head>
@@ -107,6 +112,7 @@ body {
 	<div class="change-pwd-container">
 		<div class="change-pwd-box">
 			<h2>비밀번호 변경</h2>
+			<h5>6개월 간 비밀번호가 변경되지 않았습니다. <br>보안을 위하여 비밀번호를 변경해 주시기 바랍니다.</h5>
 			<form id="changePwdForm">
 				<input type="hidden" name="_csrf" value="${_csrf.token}" /> <input
 					type="password" name="newPassword" placeholder="새 비밀번호"
@@ -253,15 +259,26 @@ body {
                     success: function(response) {
                         console.log('Update password response:', response);
                         if (response.success) {
-                            alert('비밀번호가 성공적으로 변경되었습니다.');
-                            window.location.href = '/main.do';
+                            alert(response.message);
+                            if (response.isPasswordChanged) {
+                                console.log('Password changed, redirecting to logout.do');
+                                window.location.href = '${pageContext.request.contextPath}/logout.do';
+                            } else {
+                                console.log('Redirecting to main.do');
+                                window.location.href = '${pageContext.request.contextPath}/main.do';
+                            }
                         } else {
                             $newPasswordMessage.text(response.message || '비밀번호 변경 중 오류가 발생했습니다.').addClass('error');
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        console.error('Update password error:', textStatus, errorThrown);
-                        $newPasswordMessage.text('비밀번호 변경 중 오류가 발생했습니다.').addClass('error');
+                        console.error('Update password error:', textStatus, errorThrown, 'Status:', jqXHR.status);
+                        $newPasswordMessage.text('비밀번호 변경 중 오류가 발생했습니다: ' + textStatus).addClass('error');
+                        if (jqXHR.status === 403) {
+                            alert('보안 토큰이 유효하지 않습니다. 페이지를 새로고침해주세요.');
+                        } else if (jqXHR.status === 404) {
+                            alert('main.do 경로를 찾을 수 없습니다.');
+                        }
                     }
                 });
             });
@@ -287,7 +304,7 @@ body {
                         console.log('Defer password change response:', response);
                         if (response.success) {
                             alert('비밀번호 변경이 2개월 연기되었습니다.');
-                            window.location.href = 'main.do';
+                            window.location.href = '${pageContext.request.contextPath}/main.do';
                         } else {
                             $newPasswordMessage.text(response.message || '연기 처리 중 오류가 발생했습니다.').addClass('error');
                         }
