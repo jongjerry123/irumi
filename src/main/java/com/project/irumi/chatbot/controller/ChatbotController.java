@@ -51,13 +51,13 @@ public class ChatbotController {
 	private ConvSessionManager convManager;
 	private static final Logger logger = LoggerFactory.getLogger(ChatbotController.class);
 
-	// 추가
-	@Autowired
-	private ConvSessionManager convSessionManager;
-
-	// 추가
-	@Autowired
-	private GptApiService gptApiService;
+//	// 추가
+//	@Autowired
+//	private ConvSessionManager convSessionManager;
+//
+//	// 추가
+//	@Autowired
+//	private GptApiService gptApiService;
 
 	@Autowired
 	private DashboardService dashboardService;
