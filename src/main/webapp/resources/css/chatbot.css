@@ -1,7 +1,7 @@
 body {
 	background-color: #111;
 	color: #eeeeee;
-	font-family: 'Noto Sans KR', sans-serif;
+	/* font-family: 'Noto Sans KR', sans-serif; */
 	margin: 0;
 	padding: 0 0 0 0 ;
 	min-height: 100vh;
@@ -55,6 +55,7 @@ body {
     padding-right: 20px;
     height: 80%;
     border-radius: 10px;
+    overflow-y: auto;
 }
 .select-bar {
     flex-shrink: 0;      /* 크기가 축소되지 않게 */
@@ -191,7 +192,7 @@ body {
 	margin: 24px 0 0 0;
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 2px;
 }
 
 .content-box .custom-checkbox {
@@ -328,7 +329,7 @@ body {
 .option-buttons {
 	display: flex; /* 버튼을 가로로 배치 */
 	flex-direction: row; /* 수평 정렬 */
-	gap: 8px; /* 버튼 사이의 간격 */
+	gap: 2px; /* 버튼 사이의 간격 */
 	flex-wrap: wrap; /* 버튼들이 화면에 맞게 자동으로 줄바꿈되게 */
 	justify-content: flex-start; /* 왼쪽 정렬 */
 	margin: 0; /* 부모 요소에서 오는 불필요한 여백 제거 */

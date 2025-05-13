@@ -320,7 +320,7 @@ $(function() {
     function renderOptionButtons(options) {
         removeOptionButtons();
         const $chatArea = $("#chatArea");
-        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "15px", display: "flex", gap: "10px" });
+        const $btnWrap = $("<div>").addClass("option-buttons").css({ marginTop: "15px", display: "flex", gap: "2px" });
 
         $.each(options, function(_, option) {
             const $btn = $("<button>").addClass("select-btn").text(option).on("click", function() {
