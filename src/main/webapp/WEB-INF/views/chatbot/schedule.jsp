@@ -9,6 +9,8 @@
 <head>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <title>chatbot 일정 찾기</title>
 <script>
 function moveJobPage() {
@@ -354,6 +356,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	      console.error("일정 조회 실패:", err);
 	    	    });
 	    	  }
+	      
+	        $("#first-bot-prompt").show();
 	  });
 	 
 	});
@@ -361,23 +365,27 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <style>
 body {
-  background-color: #111;
-  color: white;
-  /* font-family: 'Noto Sans KR', sans-serif; */
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+
+	background-color: #111;
+	color: #eeeeee;
+	margin: 0;
+	padding: 0 0 0 0 ;
+	min-height: 100vh;
+	display: flex;
+	flex-direction:column;
+	overflow-y:hidden;
+
 }
 
 /* chatbot-page-layout의 최대 크기 설정 */
 .container {
     display: flex;
     max-width: 1200px;   /* 최대 너비 설정 */
-    max-height: 100vh;   /* 최대 높이 설정 (화면 높이) */
     width: 100%;         /* 너비를 부모에 맞게 확장 */
-    height: 100%;        /* 높이를 부모에 맞게 확장 */
+     height: 95%;
     margin: 0 auto;      /* 중앙 정렬 */
     overflow: hidden;    /* 내용이 넘치지 않도록 숨김 */
+     flex-grow:1; 
 }
 
 
@@ -400,17 +408,35 @@ body {
     height: 100%;        /* 부모 높이 차지 */
 }
 
+.right-container {
+    width: 250px;        /* 고정된 너비 */
+    color: #333;
+
+    padding-top:0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 0px;
+    
+    flex-shrink: 0;      /* 오른쪽 패널이 축소되지 않게 */
+    height: 100%;        /* 부모 높이 차지 */
+}
+
 /* 채팅 부분 ************************************************************************************* */
 .content-box {
-    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
-    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
-    height:auto;
+	background-color: #1e1e1e;
+	padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 80%;
+    border-radius: 10px;
     max-width: 700px; 
+	/* padding-right : 20px;
+	padding-left: 20px; */
 	border-radius: 12px;
 	line-height: 1.7;
 	font-size: 14px;
 	
-	height: 700px;
+/* 	height: 700px; */
 	overflow-y: auto; /*내부 콘텐츠가 넘칠 경우 스크롤 활성화*/
 	display: flex;
 	flex-direction: column;
@@ -428,8 +454,37 @@ body {
  scrollbar-width: thin;
 }
 
+.select-bar {
+    flex-shrink: 0;      /* 크기가 축소되지 않게 */
+    margin-bottom: 20px; /* 아래쪽 여백 추가 */
+    height: 120px;       /* 고정된 높이 설정 */
+    flex-direction: column;
+    display: flex;
+    height:auto;
+}
+
+/* .select-bar내의 hr을 flex 아이템처럼 다루기 */
+.select-bar hr {
+    width: 100%;   /* 부모 컨테이너에 맞춰 확장 */
+    height: 0.3px;   /* 선의 두께 */
+    background-color: #BAAC80;
+    border: none;
+    margin: 20px 0;
+    flex-grow: 1;   /* 남은 공간을 차지 */
+    opacity:0.3;
+}
+
+.content-box {
+    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
+    overflow-y: auto;    /* 내용이 넘치면 스크롤 */
+    height:auto;
+    /* background-color: #222; */
+}
+
 
 /* 오른쪽 페널 ******************************************************** */
+
+
 .right-panel {
     width: 250px;        /* 고정된 너비 */
     color: #333;
@@ -815,12 +870,18 @@ body {
 						<!--  클릭시 setSubTopic 해야함 -->
 						<button class="confirm-select-btn">선택 완료</button>
 					</div>
+					<hr>
 				</div>
 
-				<div class="chat-area" id="chatArea">
-					<div class="message bot-msg">
-						이곳은 일정 찾기 세션입니다.<br> 어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! <br>
-						(예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)
+				<div class="content-box">
+					<div class="chat-container" id="chat-container">
+						<div class="chat-area" id="chatArea">
+							<div class="message bot-msg" id="first-bot-prompt"
+								style="display: none;">
+								이곳은 일정 찾기 세션입니다.<br> 어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요!
+								<br> (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -837,23 +898,25 @@ body {
 			</div>
 		</div>
 
-		<div class="right-panel">
-			<div class="info-row">
-				<span class="label">🎯 목표 직무:</span> <span class="value"></span>
-			</div>
-			<div class="info-row">
-				<span class="label">🎯 목표 스펙:</span> <span class="spec-value"></span>
-			</div>
-			<div class="saved-schedule-list" id="savedScheduleList"></div>
+		<div class="right-container">
+			<div class="right-panel">
+				<div class="info-row">
+					<span class="label">🎯 목표 직무:</span> <span class="value"></span>
+				</div>
+				<div class="info-row">
+					<span class="label">🎯 목표 스펙:</span> <span class="spec-value"></span>
+				</div>
+				<div class="saved-schedule-list" id="savedScheduleList"></div>
 
-			<div class="saved-schedule-section">
-				<div class="section-title">➤ 직접 일정 추가하기</div>
+				<div class="saved-schedule-section">
+					<div class="section-title">➕ 직접 일정 추가하기</div>
 
-				<div class="manual-input-box">
-					<input type="date" class="manual-date" id="manualDate" /> <input
-						type="text" placeholder="일정 입력" class="manual-input"
-						id="manualComment" />
-					<button class="add-btn">+</button>
+					<div class="manual-input-box">
+						<input type="date" class="manual-date" id="manualDate" /> <input
+							type="text" placeholder="일정 입력" class="manual-input"
+							id="manualComment" />
+						<button class="add-btn">+</button>
+					</div>
 				</div>
 			</div>
 		</div>
