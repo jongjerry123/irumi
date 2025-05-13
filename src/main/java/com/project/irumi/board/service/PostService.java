@@ -334,8 +334,4 @@ public class PostService {
 	    return postDAO.getUserAuthority(userId);
 	}
 	
-	//몰래하는 월드컵
-	public List<Job> getAllJobs() {
-        return postDAO.getAllJobs();
-    }
 }

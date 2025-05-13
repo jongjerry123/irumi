@@ -184,7 +184,7 @@ header.active {
 }
 
 .card-title {
-	font-size: 20px;
+	font-size: 25px;
 	font-weight: bold;
 	margin-top: 20px;
 	margin-bottom: 20px;
@@ -221,7 +221,7 @@ header.active {
   opacity: 0;
   transform: translateY(0);
   transition: all 0.8s ease;
-  cursor: pointer;
+  
 }
 
 .detail-card.active {
@@ -369,28 +369,28 @@ window.addEventListener("DOMContentLoaded", function () {
     <h2>
       <a href="about.do" class="irumi-link"><strong>이루미</strong></a>와 함께<br>
       원하는 <strong>직무</strong>에 꼭 맞는 <strong>스펙</strong>을 발견하고<br>
-      나만의 성장 스토리를 쌓아보세<a href="worldCup.do" style="text-decoration: none; color: inherit;">요</a>.
+      나만의 성장 스토리를 쌓아보세<a href="https://www.illuminatiofficial.org/" style="text-decoration: none; color: inherit;">요</a>.
     </h2>
 
     <div class="card-section">
       <div class="card" onclick="scrollToDetail(0)">
         <img src="/irumi/resources/images/dashboard5.png" class="card-image" alt="대시보드 이미지" />
         <div class="card-info dashboard">
-          <div class="card-title">내 스펙 대시보드</div>
+          <div class="card-title">My Dashboard</div>
         </div>
       </div>
 
       <div class="card" onclick="scrollToDetail(1)">
-        <img src="/irumi/resources/images/ai9.png" class="card-image" alt="AI 도우미 이미지" />
+        <img src="/irumi/resources/images/ai2.png" class="card-image" alt="AI 도우미 이미지" />
         <div class="card-info ai">
-          <div class="card-title">대화형 도우미</div>
+          <div class="card-title">AI Chatbot</div>
         </div>
       </div>
 
       <div class="card" onclick="scrollToDetail(2)">
-        <img src="/irumi/resources/images/community3.png" class="card-image" alt="유저 커뮤니티 이미지" />
+        <img src="/irumi/resources/images/community2.png" class="card-image" alt="유저 커뮤니티 이미지" />
         <div class="card-info community">
-          <div class="card-title">유저 커뮤니티</div>
+          <div class="card-title">User Community</div>
         </div>
       </div>
     </div>
@@ -403,7 +403,7 @@ window.addEventListener("DOMContentLoaded", function () {
         <h3>나의 스펙 대시보드</h3>
         <p>
           나의 스펙 여정을 한 눈에 살펴보고,<br>
-          목표 달성을 위한 현재 위치를 가시적으로 파악할 수 있습니다.<br>
+          목표 달성을 위한 현재 위치를 <br>가시적으로 파악할 수 있습니다.<br>
           실천 항목들을 설정하고 진행 상황을 추적하며,<br>
           나만의 커리어 트래커를 운영해 보세요.
         </p>
@@ -412,26 +412,26 @@ window.addEventListener("DOMContentLoaded", function () {
     </div>
 
     <div class="detail-card">
-      <img src="/irumi/resources/images/ai1.png" alt="AI 상세">
+      <img src="/irumi/resources/images/ai2.png" alt="AI 상세">
       <div class="detail-content ai">
         <h3>대화형 도우미</h3>
         <p>
           AI와 함께 진로를 설계해보세요.<br>
-          이루미 도우미는 자격증, 활동, 일정까지 개인화된 정보를 제공하며,<br>
-          궁금한 내용을 실시간으로 물어보고 곧바로 기록할 수 있는 강력한 도구입니다.
+          이루미 도우미는 자격증, 활동, 일정까지 <br>개인화된 정보를 제공하며,<br>
+          궁금한 내용을 실시간으로 물어보고 <br>곧바로 기록할 수 있는 유용한 파트너입니다.
         </p>
         <button onclick="moveToAi()">바로가기</button>
       </div>
     </div>
 
     <div class="detail-card">
-      <img src="/irumi/resources/images/community3.png" alt="커뮤니티 상세">
+      <img src="/irumi/resources/images/community2.png" alt="커뮤니티 상세">
       <div class="detail-content community">
         <h3>유저 커뮤니티</h3>
         <p>
           같은 목표를 가진 사람들과 함께하세요.<br>
           취업 팁과 준비 경험을 공유하고,<br>
-          실전적인 스터디 그룹이나 활동 정보를 통해 서로를 격려하고 도울 수 있습니다.
+          실전적인 스터디 그룹이나 활동 정보를 통해서 <br>서로를 격려하고 도울 수 있습니다.
         </p>
         <button onclick="moveToCommu()">바로가기</button>
       </div>

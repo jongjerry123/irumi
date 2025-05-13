@@ -373,9 +373,4 @@ public class PostDAO {
 	    return sqlSession.selectOne("boardMapper.selectUserAuthority", userId);
 	}
 	
-	//몰래하는월드컵
-	public List<Job> getAllJobs() {
-        return sqlSession.selectList("selectAllJobs");
-    } 
-
 }

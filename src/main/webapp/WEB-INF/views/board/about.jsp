@@ -10,7 +10,7 @@
   <style>
     body {
       margin: 0;
-      background-color: #111;
+      background-color: #000;
       color: #fff;
       overflow-x: hidden;
     }
@@ -29,9 +29,9 @@
     }
 
     .rotating-logo {
-      width: 160px;
-      height: 160px;
-      animation: spin 12s linear infinite;
+      width: 220px;
+      height: 220px;
+      animation: spin 20s linear infinite;
       filter: drop-shadow(0 0 10px #BAAC80);
       opacity: 0.92;
     }
@@ -92,7 +92,7 @@
 
   <!-- 로고 -->
   <div class="about-logo-container">
-    <img src="/irumi/resources/images/eye.png" alt="이루미 로고" class="rotating-logo" />
+    <img src="/irumi/resources/images/ill.png" alt="이루미 로고" class="rotating-logo" />
   </div>
 
   <!-- 타자 애니메이션 -->

@@ -25,13 +25,13 @@ body {
 .category-bar {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 30px;
 	margin-bottom: 30px;
 }
 
 .category-bar h2 {
 	margin: 0;
-	font-weight: normal;
 }
 
 .tabs {
@@ -86,10 +86,15 @@ body {
 }
 
 .filters {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 5px 30px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background-color: #000;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
 }
 
 .filters-left {
@@ -98,7 +103,7 @@ body {
 }
 
 .write-btn {
-  background-color: #A983A3;
+  background-color: #552960;
   color: #fff;
   border: none;
   padding: 10px 24px;
@@ -121,19 +126,19 @@ table.board-table {
 	width: 100%;
 	border-collapse: separate; 
 	border-spacing: 0;         
-	border: 1px solid #3a1f41;
+	border: 1px solid #222;
 	border-radius: 12px;
 	overflow: hidden;          
 }
 
 table.board-table th, table.board-table td {
-	border: 1px solid #3a1f41;
+	border: 1px solid #222;
 	padding: 12px;
 	text-align: center;
 }
 
 table.board-table th {
-	background-color: #A983A3;
+	background-color: #552960;
 }
 
 table.board-table td {
