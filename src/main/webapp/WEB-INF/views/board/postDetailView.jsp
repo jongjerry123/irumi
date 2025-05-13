@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<c:import url="/WEB-INF/views/common/header.jsp" />
+
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -13,7 +13,6 @@
 body {
 	background-color: #000 !important;
 	color: #fff;
-	font-family: 'Noto Sans KR', sans-serif;
 }
 
 .main-content {
@@ -245,6 +244,7 @@ body {
 </head>
 
 <body>
+<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="main-content">
 
 		<div class="post-header">

@@ -6,7 +6,6 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.6/dist/web/static/pretendard.css" rel="stylesheet">
 <title>irumi</title>
 <link
 	href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap"
@@ -61,7 +60,6 @@
 body {
 	background-color: #000;
 	color: white;
-	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
 	padding: 0;
 	transition: background-color 1.5s ease;

@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<c:import url="/WEB-INF/views/common/header.jsp" />
+
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -12,7 +12,6 @@
 <style>
 body {
 	margin: 0;
-	font-family: 'Noto Sans KR', sans-serif;
 	background-color: #000 !important;
 	color: #fff;
 }
@@ -221,6 +220,7 @@ input[type="checkbox"] {
 </head>
 
 <body>
+<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="main-content">
 
 		<!-- 상단 카테고리 -->
