@@ -15,7 +15,6 @@
 	body {
 		background-color: #111;
 		color: #f1f1f1;
-		font-family: 'Noto Sans KR', sans-serif;
 		margin: 0;
 		padding: 0;
 	}

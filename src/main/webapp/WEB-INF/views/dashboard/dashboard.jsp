@@ -24,7 +24,6 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Noto Sans KR', sans-serif;
   line-height: 1.6;
 }
 .clearfix::after {
@@ -207,7 +206,6 @@ a {
 			contentType: 'application/json; charset=UTF-8',
 			success: function(data) {
 				data.forEach(function(item) {
-					/* TODO: 이 부분에 클릭 시 토글 기능이 들어가도록 수정 */
 					$('<button>')
 						.text(item.jobName)
 						.on('click', function() {
@@ -229,7 +227,7 @@ a {
 	                            	}
 	                            }
 							});
-							$('#jobExplain').html('<br><h2>직업 상세설명</h2><pre style=\"white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%; overflow-x: auto;\">' + item.jobExplain + '</pre>');
+							$('#jobExplain').html('<br><h2>직업 상세설명</h2><pre style=\"white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;\">' + (item.jobExplain ?? '설명이 없습니다') + '</pre>');
 							$('#certCards').slideToggle(100);
 							
 							
