@@ -280,7 +280,7 @@ $(function() {
         });
 
         //t선택 완료 버튼
-        const $submitBtn = $("<button>").text("목표 스펙으로 추가하기").css("margin-left", "10px").addClass("check-confirm-btn").on("click", function() {
+        const $submitBtn = $("<button>").text("목표 스펙으로 추가하기").addClass("check-confirm-btn").on("click", function() {
             const checked = $listWrap.find("input:checked").map(function() {
             	const selectedTitle = this.value;
          		   return options.find(specCI => specCI.title === selectedTitle);

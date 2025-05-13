@@ -10,6 +10,11 @@ body {
 	overflow: hidden;
 }
 
+.jobchat-explain {
+	font-size: 12px;
+	color: #bbbbbb;
+}
+
 /* chatbot-page-layout의 최대 크기 설정 */
 .chatbot-page-layout {
 	display: flex;
@@ -394,7 +399,7 @@ body {
 
 /* 추가된 클래스 - 챗봇 응답이 꽉 차게 함 - html 에 적용해야 함*/
 .answer {
-	max-width: 100%;
+	max-width: 70%;
 	/*padding: 10px 15px;*/
 	border-radius: 12px;
 	line-height: 1.5;

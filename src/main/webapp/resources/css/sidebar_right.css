@@ -2,8 +2,6 @@
 
 .right-panel {
 	width: 230px;
-	padding-right: 20px;
-	padding-left: 20px;
 	display: flex;
 	flex-direction: column;
 	gap: 30px;
@@ -85,8 +83,13 @@
 .specNameExplain{
 	color: #eeeeee;
 	font-size: 15px;
-	
 }
+
+.jobNameExplain{
+	color: #eeeeee;
+	font-size: 15px;
+}
+
 .specTypeTitle{
 	color: #eeeeee;
 	font-size: 12px;
@@ -153,6 +156,8 @@
 .manual-input-box .add-btn:hover {
 	background: #BAAC80;
 	color: #232323;
+	border: none;
+	font-weight: bold;
 }
 
 
