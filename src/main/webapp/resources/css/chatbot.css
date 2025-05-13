@@ -15,6 +15,14 @@ body {
 	color: #bbbbbb;
 }
 
+.chatpage-title {
+	text-align: center;
+	font-size: 25px;
+	font-weight: bold;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
 /* chatbot-page-layout의 최대 크기 설정 */
 .chatbot-page-layout {
 	display: flex;
@@ -328,33 +336,6 @@ body {
 	min-height: 0;
 }
 
-/* .chat-area {
-	flex: 1;
-	min-height: 0;
-	overflow-y: auto; background-color : #1e1e1e; border-radius : 12px;
-		padding: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	background-color: #1e1e1e;
-	border-radius: 12px;
-	
-	scrollbar-color: #BAAC80 #222;
-	scrollbar-width: thin;
-	height: 80%;
-}
-
-
-.chat-area::-webkit-scrollbar {
-	width: 9px;
-	background: #222;
-}
-
-.chat-area::-webkit-scrollbar-thumb {
-	background: #BAAC80;
-	border-radius: 6px;
-}
- */
  
  .chat-area {
     flex: 1;
