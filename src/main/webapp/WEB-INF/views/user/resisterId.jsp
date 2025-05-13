@@ -10,7 +10,6 @@
 <style>
 body {
 	background-color: #000;
-	font-family: Arial, sans-serif;
 	color: white;
 	display: flex;
 	justify-content: center;

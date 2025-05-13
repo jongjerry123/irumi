@@ -13,11 +13,6 @@ import java.util.Map;
 //import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.irumi.social.dto.SocialUserInfo;
+import com.project.irumi.social.service.SocialOAuthService;
 //import com.google.api.client.auth.oauth2.TokenResponse;
 //import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 //import com.google.api.client.http.javanet.NetHttpTransport;
@@ -75,7 +70,7 @@ public class UserController {
 	private String NAVER_CLIENT_SECRET;
 	@Value("${kakao.client.id}")
 	private String KAKAO_CLIENT_ID;
-	// 추가: Naver Mail API 인증 정보
+	// Naver Mail API 인증 정보
 	@Value("${naver.mail.sender-email}")
 	private String NAVER_MAIL_SENDER_EMAIL;
 
@@ -85,12 +80,13 @@ public class UserController {
 	@Autowired
 	private BCryptPasswordEncoder bcryptPasswordEncoder;
 
-	@Autowired
-	private RestTemplate restTemplate;
-
-	// 추가: Naver Mail Service 의존성 주입
+	//Naver Mail Service 의존성 주입
 	@Autowired
 	private NaverMailService naverMailService;
+	
+	//소셜로그인
+	@Autowired
+	private Map<String, SocialOAuthService> socialOAuthServices;
 
 	// 로그인 페이지로 이동하는 메소드
 	@RequestMapping(value = "loginPage.do", method = RequestMethod.GET)
@@ -402,62 +398,12 @@ public class UserController {
 		return response;
 	}
 
-	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
-		Map<String, Object> response = new HashMap<>();
-		try {
-			User loginUser = (User) session.getAttribute("loginUser");
-			if (loginUser == null) {
-				response.put("success", false);
-				response.put("message", "로그인이 필요합니다.");
-				return response;
-			}
-
-			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()
-					&& Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
-				response.put("success", false);
-				response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
-				return response;
-			}
-
-			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()) {
-				String currentPassword = loginUser.getUserPwd();
-				if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
-					response.put("success", false);
-					response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
-					return response;
-				}
-
-				if (bcryptPasswordEncoder.matches(userData.get("password").toString(), currentPassword)) {
-					response.put("success", false);
-					response.put("message", "새 비밀번호는 현재 비밀번호와 달라야 합니다.");
-					return response;
-				}
-				userData.put("password", bcryptPasswordEncoder.encode(userData.get("password").toString()));
-			}
-
-			userData.put("userId", loginUser.getUserId());
-			userservice.updateUserProfile(userData);
-
-			User updatedUser = userservice.selectUser(loginUser);
-			session.setAttribute("loginUser", updatedUser);
-
-			response.put("success", true);
-			response.put("message", "업데이트 성공");
-		} catch (Exception e) {
-			response.put("success", false);
-			response.put("message", "업데이트 실패: " + e.getMessage());
-		}
-		return response;
-	}
-
 	@PostMapping("idchk.do")
 	@ResponseBody
 	public Map<String, Object> checkId(@RequestParam(name = "userId") String userId) {
 		boolean available = userservice.checkIdAvailability(userId);
 		Map<String, Object> response = new HashMap<>();
-		
+
 		response.put("available", available);
 		response.put("message", available ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.");
 		return response;
@@ -691,175 +637,45 @@ public class UserController {
 		return "redirect:" + authUrl;
 	}
 
-	// 소셜 로그인 토합 콜백
+	// 소셜 로그인 통합 콜백
 	@GetMapping("/socialCallback.do")
 	public String socialCallback(@RequestParam("code") String code,
-			@RequestParam(value = "provider", defaultValue = "google") String provider, HttpSession session,
-			Model model, HttpServletRequest request) {
-		try {
-			int loginType;
-			String socialId, email, name;
-			String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-					+ request.getContextPath() + "/socialCallback.do?provider=" + provider;
+	                             @RequestParam(value = "provider") String provider,
+	                             HttpSession session, Model model, HttpServletRequest request) {
+	    try {
+	        SocialOAuthService oAuthService = socialOAuthServices.get(provider.toLowerCase() + "OAuthService");
+	        if (oAuthService == null) {
+	            throw new IllegalArgumentException("Unsupported provider: " + provider);
+	        }
 
-			if ("google".equalsIgnoreCase(provider)) {
-				loginType = 3;
-				String tokenUrl = String.format(
-						"https://oauth2.googleapis.com/token?grant_type=authorization_code&client_id=%s&client_secret=%s&redirect_uri=%s&code=%s",
-						GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectUri, code);
-				ResponseEntity<String> tokenResponse = restTemplate.postForEntity(tokenUrl, null, String.class);
-				if (tokenResponse.getStatusCode() != HttpStatus.OK) {
-					throw new IllegalStateException("Google token request failed: " + tokenResponse.getBody());
-				}
-				ObjectMapper mapper = new ObjectMapper();
-				JsonNode tokenJson = mapper.readTree(tokenResponse.getBody());
-				if (tokenJson.has("error")) {
-					throw new IllegalStateException(
-							"Google token error: " + tokenJson.get("error_description").asText());
-				}
-				JsonNode accessTokenNode = tokenJson.get("access_token");
-				if (accessTokenNode == null) {
-					throw new IllegalStateException(
-							"Google token response missing access_token: " + tokenResponse.getBody());
-				}
-				String accessToken = accessTokenNode.asText();
+	        SocialUserInfo userInfo = oAuthService.getUserInfo(code, request);
 
-				HttpHeaders headers = new HttpHeaders();
-				headers.setBearerAuth(accessToken);
-				HttpEntity<?> entity = new HttpEntity<>(headers);
-				ResponseEntity<String> userResponse = restTemplate.exchange(
-						"https://www.googleapis.com/oauth2/v2/userinfo", HttpMethod.GET, entity, String.class);
-				if (userResponse.getStatusCode() != HttpStatus.OK) {
-					throw new IllegalStateException("Google user info request failed: " + userResponse.getBody());
-				}
-				JsonNode userJson = mapper.readTree(userResponse.getBody());
-				JsonNode idNode = userJson.get("id");
-				if (idNode == null) {
-					throw new IllegalStateException(
-							"Google user response missing 'id' field: " + userResponse.getBody());
-				}
-				socialId = idNode.asText();
-				JsonNode emailNode = userJson.get("email");
-				email = emailNode != null ? emailNode.asText() : null;
-				JsonNode nameNode = userJson.get("name");
-				name = nameNode != null ? nameNode.asText() : null;
-				if (name == null) {
-					name = "Google User";
-				}
+	        if (userInfo.getEmail() == null) {
+	            userInfo.setEmail(userInfo.getSocialId() + "@" + provider.toLowerCase() + ".com");
+	        }
 
-				if (email != null) {
-					int suffix = 100000 + new java.util.Random().nextInt(900000);
-					email = socialId + "@gmail.com" + suffix;
-					while (!userservice.checkEmailAvailability(email)) {
-						suffix++;
-						email = socialId + "@gmail.com" + suffix;
-					}
-				}
-			} else if ("naver".equalsIgnoreCase(provider)) {
-				loginType = 4;
-				String tokenUrl = String.format(
-						"https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id=%s&client_secret=%s&code=%s",
-						NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, code);
-				ResponseEntity<String> tokenResponse = restTemplate.getForEntity(tokenUrl, String.class);
-				if (tokenResponse.getStatusCode() != HttpStatus.OK) {
-					throw new IllegalStateException("Naver token request failed: " + tokenResponse.getBody());
-				}
-				ObjectMapper mapper = new ObjectMapper();
-				JsonNode tokenJson = mapper.readTree(tokenResponse.getBody());
-				if (tokenJson.has("error")) {
-					throw new IllegalStateException(
-							"Naver token error: " + tokenJson.get("error_description").asText());
-				}
-				JsonNode accessTokenNode = tokenJson.get("access_token");
-				if (accessTokenNode == null) {
-					throw new IllegalStateException(
-							"Naver token response missing access_token: " + tokenResponse.getBody());
-				}
-				String accessToken = accessTokenNode.asText();
+	        User existingUser = userservice.findUserBySocialId(userInfo.getSocialId(), userInfo.getLoginType());
+	        if (existingUser != null) {
+	            String authority = userservice.selectUserAuthority(userInfo.getSocialId());
+	            if ("3".equals(authority)) return "user/cantLoginPage";
+	            if ("4".equals(authority)) return "user/blockLogin";
+	            session.setAttribute("loginUser", existingUser);
+	            return "redirect:/main.do";
+	        }
 
-				HttpHeaders headers = new HttpHeaders();
-				headers.setBearerAuth(accessToken);
-				HttpEntity<?> entity = new HttpEntity<>(headers);
-				ResponseEntity<String> userResponse = restTemplate.exchange("https://openapi.naver.com/v1/nid/me",
-						HttpMethod.GET, entity, String.class);
-				if (userResponse.getStatusCode() != HttpStatus.OK) {
-					throw new IllegalStateException("Naver user info request failed: " + userResponse.getBody());
-				}
-				JsonNode userJson = mapper.readTree(userResponse.getBody());
-				JsonNode responseNode = userJson.get("response");
-				if (responseNode == null) {
-					throw new IllegalStateException(
-							"Naver user response missing 'response' field: " + userResponse.getBody());
-				}
-				JsonNode idNode = responseNode.get("id");
-				if (idNode == null) {
-					throw new IllegalStateException(
-							"Naver user response missing 'id' field: " + userResponse.getBody());
-				}
-				socialId = idNode.asText();
-				JsonNode emailNode = responseNode.get("email");
-				email = emailNode != null ? emailNode.asText() : null;
-				JsonNode nicknameNode = responseNode.get("nickname");
-				name = nicknameNode != null ? nicknameNode.asText() : null;
-				if (name == null) {
-					name = "Naver User";
-				}
-			} else if ("kakao".equalsIgnoreCase(provider)) {
-				loginType = 5;
-				String tokenUrl = String.format(
-						"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=%s&redirect_uri=%s&code=%s",
-						KAKAO_CLIENT_ID, redirectUri, code);
-				ResponseEntity<String> tokenResponse = restTemplate.postForEntity(tokenUrl, null, String.class);
-				ObjectMapper mapper = new ObjectMapper();
-				JsonNode tokenJson = mapper.readTree(tokenResponse.getBody());
-				String accessToken = tokenJson.get("access_token").asText();
+	        session.setAttribute("socialId", userInfo.getSocialId());
+	        session.setAttribute("socialEmail", userInfo.getEmail());
+	        session.setAttribute("socialName", userInfo.getName());
+	        session.setAttribute("socialLoginType", userInfo.getLoginType());
+	        model.addAttribute("socialProvider",
+	            provider.substring(0, 1).toUpperCase() + provider.substring(1).toLowerCase());
 
-				HttpHeaders headers = new HttpHeaders();
-				headers.setBearerAuth(accessToken);
-				HttpEntity<?> entity = new HttpEntity<>(headers);
-				ResponseEntity<String> userResponse = restTemplate.exchange("https://kapi.kakao.com/v2/user/me",
-						HttpMethod.GET, entity, String.class);
-				JsonNode userJson = mapper.readTree(userResponse.getBody());
-				socialId = userJson.get("id").asText();
-				email = userJson.get("kakao_account").get("email") != null
-						? userJson.get("kakao_account").get("email").asText()
-						: null;
-				name = userJson.get("properties").get("nickname").asText();
-				if (name == null) {
-					name = "Kakao User";
-				}
-			} else {
-				throw new IllegalArgumentException("Unsupported provider: " + provider);
-			}
+	        return "user/registerSocialUser";
 
-			if (email == null) {
-				email = socialId + "@" + provider.toLowerCase() + ".com";
-			}
-
-			User existingUser = userservice.findUserBySocialId(socialId, loginType);
-			if (existingUser != null) {
-				String authority = userservice.selectUserAuthority(socialId);
-				if ("3".equals(authority)) {
-					return "user/cantLoginPage";
-				}
-				if ("4".equals(authority)) {
-					return "user/blockLogin";
-				}
-				session.setAttribute("loginUser", existingUser);
-				return "redirect:/main.do";
-			}
-
-			session.setAttribute("socialId", socialId);
-			session.setAttribute("socialEmail", email);
-			session.setAttribute("socialName", name);
-			session.setAttribute("socialLoginType", loginType);
-			model.addAttribute("socialProvider",
-					provider.substring(0, 1).toUpperCase() + provider.substring(1).toLowerCase());
-			return "user/registerSocialUser";
-		} catch (Exception e) {
-			model.addAttribute("message", provider + " 로그인 중 오류가 발생했습니다: " + e.getMessage());
-			return "user/login";
-		}
+	    } catch (Exception e) {
+	        model.addAttribute("message", provider + " 로그인 중 오류가 발생했습니다: " + e.getMessage());
+	        return "user/login";
+	    }
 	}
 
 	// 소설 로그인 첫 이용자 회원가입용
@@ -911,7 +727,58 @@ public class UserController {
 			return "user/registerSocialUser";
 		}
 	}
-	//유저 총괄 관리에서 유저 조회 
+
+	@RequestMapping(value = "updateUserProfile.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> userData, HttpSession session) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			User loginUser = (User) session.getAttribute("loginUser");
+			if (loginUser == null) {
+				response.put("success", false);
+				response.put("message", "로그인이 필요합니다.");
+				return response;
+			}
+
+			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()
+					&& Arrays.asList(3, 4, 5).contains(loginUser.getUserLoginType())) {
+				response.put("success", false);
+				response.put("message", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+				return response;
+			}
+
+			if (userData.get("password") != null && !userData.get("password").toString().isEmpty()) {
+				String currentPassword = loginUser.getUserPwd();
+				if (currentPassword == null || !currentPassword.startsWith("$2a$")) {
+					response.put("success", false);
+					response.put("message", "현재 비밀번호 정보가 유효하지 않습니다.");
+					return response;
+				}
+
+				if (bcryptPasswordEncoder.matches(userData.get("password").toString(), currentPassword)) {
+					response.put("success", false);
+					response.put("message", "새 비밀번호는 현재 비밀번호와 달라야 합니다.");
+					return response;
+				}
+				userData.put("password", bcryptPasswordEncoder.encode(userData.get("password").toString()));
+			}
+
+			userData.put("userId", loginUser.getUserId());
+			userservice.updateUserProfile(userData);
+
+			User updatedUser = userservice.selectUser(loginUser);
+			session.setAttribute("loginUser", updatedUser);
+
+			response.put("success", true);
+			response.put("message", "업데이트 성공");
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "업데이트 실패: " + e.getMessage());
+		}
+		return response;
+	}
+
+	// 유저 총괄 관리에서 유저 조회
 	@RequestMapping(value = "checkMaUser.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkMaUser(@RequestBody Map<String, String> data, HttpSession session) {
@@ -923,26 +790,24 @@ public class UserController {
 				response.put("message", "관리자 권한이 필요합니다.");
 				return response;
 			}
-
 			String userId = data.get("userId");
 			if (userId == null || userId.trim().isEmpty()) {
 				response.put("success", false);
 				response.put("message", "유저 ID를 입력해주세요.");
 				return response;
 			}
-
 			User user = userservice.selectUserById(userId.trim());
-			String Authority= userservice.selectUserAuthorityByUserId(userId.trim());
+			String Authority = userservice.selectUserAuthorityByUserId(userId.trim());
 			if (user != null) {
 				response.put("success", true);
 				response.put("exists", true);
-				if("1".equals(Authority)) {
+				if ("1".equals(Authority)) {
 					response.put("message", "일반 유저입니다.");
-				}else if("2".equals(Authority)) {
+				} else if ("2".equals(Authority)) {
 					response.put("message", "관리자입니다.");
-				}else if("3".equals(Authority)) {
+				} else if ("3".equals(Authority)) {
 					response.put("message", "불량 유저입니다.");
-				}else {
+				} else {
 					response.put("message", "탈퇴 유저입니다.");
 				}
 				response.put("userId", user.getUserId());
@@ -970,7 +835,6 @@ public class UserController {
 				response.put("message", "관리자 권한이 필요합니다.");
 				return response;
 			}
-
 			String userId = (String) data.get("userId");
 			String authority = data.get("authority").toString();
 			if (userId == null || userId.trim().isEmpty() || authority == null) {
@@ -978,14 +842,12 @@ public class UserController {
 				response.put("message", "유효하지 않은 입력입니다.");
 				return response;
 			}
-
 			User user = userservice.selectUserById(userId.trim());
 			if (user == null) {
 				response.put("success", false);
 				response.put("message", "존재하지 않는 유저입니다.");
 				return response;
 			}
-
 			userservice.updateUserAuthority(userId, authority);
 			response.put("success", true);
 			response.put("message", "권한이 성공적으로 변경되었습니다.");
@@ -1001,13 +863,10 @@ public class UserController {
 	public Map<String, Object> exit(@RequestBody Map<String, Object> data, HttpSession session) {
 		Map<String, Object> response = new HashMap<>();
 		User loginUser = (User) session.getAttribute("loginUser");
-
 		if (loginUser != null) {
 			String userId = loginUser.getUserId();
 			String authority = data.get("authority").toString();
-
 			userservice.updateUserAuthority(userId, authority);
-
 			session.invalidate();
 			response.put("status", "success");
 			response.put("message", "탈퇴 처리 완료");
@@ -1015,7 +874,6 @@ public class UserController {
 			response.put("status", "error");
 			response.put("message", "로그인 정보 없음");
 		}
-
 		return response;
 	}
 }
