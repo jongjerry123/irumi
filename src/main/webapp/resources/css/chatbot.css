@@ -55,7 +55,7 @@ body {
     padding-right: 20px;
     height: 80%;
     border-radius: 10px;
-   /*  overflow-y: auto; */
+    overflow-y: auto; 
 }
 .select-bar {
     flex-shrink: 0;      /* 크기가 축소되지 않게 */
@@ -79,7 +79,8 @@ body {
 
 /* 중앙 컨테이너의 자식 요소 (채팅창, 입력창 등) */
 .content-box {
-    flex-grow: 1;        /* 나머지 공간을 모두 차지 */
+    /* flex-grow: 1;        나머지 공간을 모두 차지 */
+    height: 100%;
     overflow-y: auto;    /* 내용이 넘치면 스크롤 */
     height:auto;
     /* background-color: #222; */
@@ -376,6 +377,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	/* height: 80%; */
 }
 
 #userInput {

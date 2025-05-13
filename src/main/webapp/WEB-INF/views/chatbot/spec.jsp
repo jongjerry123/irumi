@@ -50,7 +50,7 @@ let cacheSessionSpecOpts=null; // (스펙챗엔 필요 X)선택한 jobOpt에 따
 
 let subTopicJobCI= null; // subtopic 지정 위해 서버로 보낼 CI 객체;
 let selectedType = null; // 사이드바에서 타입 버튼을 추적하는 변수
-
+let sendActive=false;
 
 
 $(function() {
@@ -174,6 +174,7 @@ $(function() {
 	});
 	
     function sendMessage(message) {
+    	
     	//답변 올 때까지 버튼 일시적 비활성화
     	$(".chat-send-btn").prop("disabled", true);
         addMessageToChat(message, "user-msg");
@@ -208,7 +209,7 @@ $(function() {
             },
             complete: function(){
             	// 대답이 온 후 전송 버튼 활성화
-            	$(".chat-send-btn").prop("disabled", true);
+            	$(".chat-send-btn").prop("disabled", false);
             }
         });// sendMessageToChatbot.do   
     }
@@ -521,6 +522,7 @@ $(function() {
 				<button class="chat-send-btn">
 					<i class="fa fa-paper-plane"></i>
 				</button>
+				
 			</div>
 			<c:import url="/WEB-INF/views/common/footer.jsp" />
 
