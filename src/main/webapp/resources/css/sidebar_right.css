@@ -1,46 +1,5 @@
 @charset "UTF-8";
 
-.first-row {
-	height: 100px;
-	display: flex;  /* flexbox로 설정 */
-    justify-content: left;  /* 가로 방향으로 가운데 정렬 */
-    align-items: center;  /* 세로 방향으로도 가운데 정렬 */
-}
-
-
-
-.login-actions {
-	display: flex;
-	gap: 10px;
-	margin-left: 20px;
-	/* margin-left: auto; */ /* 오른쪽 정렬 강제 */
-}
-
-.login-actions button {
-	background-color: #000; /* ✅ 완전한 검은색 */
-	border: 1px solid rgba(255, 255, 255, 0.25);
-	color: #eeeeee;
-	padding: 8px 18px;
-	border-radius: 10px;
-	font-size: 15px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	backdrop-filter: blur(5px);
-	letter-spacing: 0.5px;
-}
-
-.login-actions button:hover {
-	background-color: #111; /* ✅ 호버 시 살짝 밝은 블랙 */
-	border-color: #eeeeee;
-	color: #eeeeee;
-	transform: translateY(-1px);
-	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
-}
-
-
-/**==============   right pannel   ===================**/
-
 .right-panel {
 	width: 230px;
 	padding-right: 20px;
