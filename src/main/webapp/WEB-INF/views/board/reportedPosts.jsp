@@ -24,13 +24,13 @@ body {
 .category-bar {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 30px;
 	margin-bottom: 30px;
 }
 
 .category-bar h2 {
 	margin: 0;
-	font-weight: normal;
 }
 
 .tabs {
@@ -93,20 +93,20 @@ table {
 	width: 100%;
 	border-collapse: separate; 
 	border-spacing: 0;         
-	border: 1px solid #333;
+	border: 1px solid #222;
 	border-radius: 12px;
 	overflow: hidden; 
 	margin-top: 40px;         
 }
 
 th, td {
-	border: 1px solid #333;
+	border: 1px solid #222;
 	padding: 14px;
 	text-align: center;
 }
 
 th {
-	background-color: #A983A3;
+	background-color: #552960;
 }
 
 td {

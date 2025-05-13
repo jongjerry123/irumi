@@ -11,10 +11,9 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.irumi.board.dto.CommentDTO;
 import com.project.irumi.board.dto.PostDTO;
 import com.project.irumi.board.service.PostService;
-import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.user.model.dto.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +35,7 @@ public class BoardController {
 	private PostService postService;
 
 	// 자유게시판
-	@GetMapping("/freeBoard.do")
+	@RequestMapping(value = "/freeBoard.do", method = RequestMethod.GET)
 	public String showFreeBoard(@RequestParam(value = "period", required = false, defaultValue = "전체") String period,
 			@RequestParam(value = "sort", required = false, defaultValue = "") String sort,
 			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
@@ -68,7 +66,7 @@ public class BoardController {
 	}
 
 	// 공지사항
-	@GetMapping("/noticeList.do")
+	@RequestMapping(value = "/noticeList.do", method = RequestMethod.GET)
 	public String showNoticeList(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 			Model model) {
 		int pageSize = 10;
@@ -87,7 +85,7 @@ public class BoardController {
 	}
 
 	// QnA 목록
-	@GetMapping("/qnaList.do")
+	@RequestMapping(value = "/qnaList.do", method = RequestMethod.GET)
 	public String showQnaList(@RequestParam(value = "period", required = false, defaultValue = "전체") String period,
 			@RequestParam(value = "sort", required = false, defaultValue = "") String sort,
 			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
@@ -118,7 +116,7 @@ public class BoardController {
 	}
 
 	// 내 질문만 보기
-	@GetMapping("/myQna.do")
+	@RequestMapping(value = "/myQna.do", method = RequestMethod.GET)
 	public String showMyQnaPosts(HttpSession session, Model model,
 			@RequestParam(value = "page", required = false, defaultValue = "1") int page) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -141,14 +139,14 @@ public class BoardController {
 	}
 
 	// 글쓰기 화면
-	@GetMapping("/writePost.do")
+	@RequestMapping(value = "/writePost.do", method = RequestMethod.GET)
 	public String showWritePostForm(@RequestParam("type") String type, Model model) {
 		model.addAttribute("postType", type);
 		return "board/writePost";
 	}
 
 	// 글 등록
-	@PostMapping("/insertPost.do")
+	@RequestMapping(value = "/insertPost.do", method = RequestMethod.POST)
 	public String insertPost(@ModelAttribute PostDTO post,
 	                         @RequestParam("uploadFile") MultipartFile file,
 	                         HttpSession session) throws IOException {
@@ -186,7 +184,7 @@ public class BoardController {
 	}
 
 	// 게시글 상세보기
-	@GetMapping("/postDetail.do")
+	@RequestMapping(value = "/postDetail.do", method = RequestMethod.GET)
 	public String showPostDetail(@RequestParam("postId") Long postId, Model model) {
 		postService.increasePostViewCount(postId);
 		PostDTO post = postService.getPostById(postId);
@@ -198,7 +196,7 @@ public class BoardController {
 	}
 
 	// 게시글 추천 (중복 방지)
-	@PostMapping("/recommendPost.do")
+	@RequestMapping(value = "/recommendPost.do", method = RequestMethod.POST)
 	public String recommendPost(@RequestParam("postId") Long postId, HttpSession session, HttpServletResponse response)
 			throws IOException {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -216,7 +214,7 @@ public class BoardController {
 	}
 
 	// 게시글 신고 (중복 방지)
-	@PostMapping("/reportPost.do")
+	@RequestMapping(value = "/reportPost.do", method = RequestMethod.POST)
 	public String reportPost(@RequestParam("postId") Long postId, HttpSession session, HttpServletResponse response)
 			throws IOException {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -234,7 +232,7 @@ public class BoardController {
 	}
 
 	// 댓글 등록
-	@PostMapping("/addComment.do")
+	@RequestMapping(value = "/addComment.do", method = RequestMethod.POST)
 	public String addComment(@RequestParam("postId") Long postId,
             @RequestParam("commentContent") String commentContent,
             @RequestParam(value = "parentId", required = false) Long parentId,
@@ -255,7 +253,7 @@ public class BoardController {
 	}
 
 	// 댓글 추천 (중복 방지)
-	@PostMapping("/recommendComment.do")
+	@RequestMapping(value = "/recommendComment.do", method = RequestMethod.POST)
 	public String recommendComment(@RequestParam("commentId") Long commentId, @RequestParam("postId") Long postId,
 			HttpSession session, HttpServletResponse response) throws IOException {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -273,7 +271,7 @@ public class BoardController {
 	}
 
 	// 댓글 신고 (중복 방지)
-	@PostMapping("/reportComment.do")
+	@RequestMapping(value = "/reportComment.do", method = RequestMethod.POST)
 	public String reportComment(@RequestParam("commentId") Long commentId, @RequestParam("postId") Long postId,
 			HttpSession session, HttpServletResponse response) throws IOException {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -291,14 +289,14 @@ public class BoardController {
 	}
 
 	// 댓글 삭제
-	@PostMapping("/deleteComment.do")
+	@RequestMapping(value = "/deleteComment.do", method = RequestMethod.POST)
 	public String deleteComment(@RequestParam("commentId") Long commentId, @RequestParam("postId") Long postId) {
 		postService.deleteComment(commentId);
 		return "redirect:/postDetail.do?postId=" + postId;
 	}
 
 	// 게시글 수정
-	@PostMapping("/updatePost.do")
+	@RequestMapping(value = "/updatePost.do", method = RequestMethod.POST)
 	public String updatePost(@ModelAttribute PostDTO post,
 	                         @RequestParam(value = "uploadFile", required = false) MultipartFile file,
 	                         @RequestParam(value = "deleteFile", required = false) String deleteFile,
@@ -348,14 +346,14 @@ public class BoardController {
 	}
 
 	// 게시글 수정 화면
-	@GetMapping("/editPost.do")
+	@RequestMapping(value = "/editPost.do", method = RequestMethod.GET)
 	public String editPostForm(@RequestParam("postId") Long postId, Model model) {
 		PostDTO post = postService.getPostById(postId);
 		model.addAttribute("post", post);
 		return "board/editPost";
 	}
 
-	@PostMapping("/deletePost.do")
+	@RequestMapping(value = "/deletePost.do", method = RequestMethod.POST)
 	public String deletePost(@RequestParam("postId") Long postId, HttpSession session) {
 	    PostDTO post = postService.getPostById(postId);
 
@@ -371,7 +369,7 @@ public class BoardController {
 	}
 	
 	// 이미지 업로드용
-	@PostMapping("/uploadImage.do")
+	@RequestMapping(value = "/uploadImage.do", method = RequestMethod.POST)
 	@ResponseBody
 	public String uploadImage(@RequestParam("image") MultipartFile file, HttpServletRequest request) throws IOException {
 	    String uploadDir = request.getServletContext().getRealPath("/resources/uploads/");
@@ -385,7 +383,7 @@ public class BoardController {
 	    File dest = new File(uploadDir, savedName);
 	    file.transferTo(dest);
 
-	    // ✅ 브라우저에서 접근 가능한 URL로 리턴해야 이미지가 보임!
+	    // 브라우저에서 접근 가능한 URL로 리턴해야 이미지가 보임
 	    return request.getContextPath() + "/resources/uploads/" + savedName;
 	}
 	
@@ -403,8 +401,8 @@ public class BoardController {
 	
 	
 
-	// ✅ 신고된 게시글 목록
-	@GetMapping("/reportedPosts.do")
+	// 신고된 게시글 목록
+	@RequestMapping(value = "/reportedPosts.do", method = RequestMethod.GET)
 	public String showReportedPosts(HttpSession session, Model model,
 			@RequestParam(value = "page", required = false, defaultValue = "1") int page) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -421,15 +419,15 @@ public class BoardController {
 		return "board/reportedPosts";
 	}
 
-	// ✅ 게시글 다중 삭제 + 신고기록 삭제
-	@PostMapping("/deleteSelectedPosts.do")
+	// 게시글 다중 삭제 + 신고기록 삭제
+	@RequestMapping(value = "/deleteSelectedPosts.do", method = RequestMethod.POST)
 	public String deleteSelectedPosts(@RequestParam("selectedPosts") List<Long> postIds) {
 		postService.deletePostsAndReports(postIds); // 🔄 게시글과 연결된 신고 기록 먼저 삭제 후 게시글 삭제
 		return "redirect:/reportedPosts.do";
 	}
 
-	// ✅ 신고된 댓글 목록
-	@GetMapping("/reportedComments.do")
+	// 신고된 댓글 목록
+	@RequestMapping(value = "/reportedComments.do", method = RequestMethod.GET)
 	public String showReportedComments(HttpSession session, Model model,
 			@RequestParam(value = "page", required = false, defaultValue = "1") int page) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -446,15 +444,15 @@ public class BoardController {
 		return "board/reportedComments";
 	}
 
-	// ✅ 신고 댓글 삭제
-	@PostMapping("/deleteSelectedComments.do")
+	// 신고 댓글 삭제
+	@RequestMapping(value = "/deleteSelectedComments.do", method = RequestMethod.POST)
 	public String deleteSelectedComments(@RequestParam("selectedComments") List<Long> commentIds) {
 		postService.deleteReportedCommentsByIds(commentIds);
 		return "redirect:/reportedComments.do";
 	}
 
-	// ✅ 불량 이용자 목록
-	@GetMapping("/badUserList.do")
+	// 불량 이용자 목록
+	@RequestMapping(value = "/badUserList.do", method = RequestMethod.GET)
 	public String showBadUserList(Model model) {
 		List<Map<String, Object>> badUserList = postService.getBadUsers();
 		model.addAttribute("badUserList", badUserList);
@@ -462,7 +460,7 @@ public class BoardController {
 	}
 
 	// 불량 이용자 등록
-	@PostMapping("/registerBadUsers.do")
+	@RequestMapping(value = "/registerBadUsers.do", method = RequestMethod.POST)
 	public void registerBadUsers(@RequestParam("selectedPosts") List<Long> postIds,
 			@RequestParam("reason") String reason, HttpSession session, HttpServletResponse response)
 			throws IOException {
@@ -478,8 +476,8 @@ public class BoardController {
 		}
 	}
 
-	// ✅ 댓글 작성자 불량 등록
-	@PostMapping("/registerBadUsersFromComments.do")
+	// 댓글 작성자 불량 등록
+	@RequestMapping(value = "/registerBadUsersFromComments.do", method = RequestMethod.POST)
 	public void registerBadUsersFromComments(@RequestParam("selectedComments") List<Long> commentIds,
 			@RequestParam("reason") String reason, HttpSession session, HttpServletResponse response)
 			throws IOException {
@@ -495,14 +493,15 @@ public class BoardController {
 		}
 	}
 
-	@PostMapping("/restoreBadUsers.do")
+	// 일반 유저로 변경
+	@RequestMapping(value = "/restoreBadUsers.do", method = RequestMethod.POST)
 	public String restoreBadUsers(@RequestParam("selectedUsers") List<String> userIds) {
-		postService.updateUserAuthority(userIds, 1); // 일반 유저로 변경
+		postService.updateUserAuthority(userIds, 1);
 		return "redirect:badUserList.do";
 	}
 
 	// 유저 탈퇴시키기
-	@PostMapping("/withdrawBadUsers.do")
+	@RequestMapping(value = "/withdrawBadUsers.do", method = RequestMethod.POST)
 	public String withdrawBadUsers(@RequestParam("selectedUsers") List<String> userIds, HttpServletResponse response) throws IOException {
 	    // 관리자 유저 제외 (userAuthority == 2 인 유저 제외)
 	    List<String> filtered = userIds.stream()
@@ -522,14 +521,5 @@ public class BoardController {
 	    return "redirect:/badUserList.do";
 	}
 	
-	//몰래하는 월드컵
-	@RequestMapping("worldCup.do")
-	public String worldCupPage(Model model) throws Exception {
-	    List<Job> jobList = postService.getAllJobs();
-	    ObjectMapper mapper = new ObjectMapper();
-	    String jobListJson = mapper.writeValueAsString(jobList);
-	    model.addAttribute("jobListJson", jobListJson);
-	    return "/job/worldCup";
-	}
 
 }

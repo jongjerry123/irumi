@@ -25,13 +25,14 @@ body {
 .category-bar {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 30px;
 	margin-bottom: 30px;
 }
 
 .category-bar h2 {
 	margin: 0;
-	font-weight: normal;
+
 }
 
 .tabs {
@@ -86,10 +87,15 @@ body {
 }
 
 .filters {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 5px 30px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background-color: #000;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
 }
 
 .filters-left {
@@ -191,7 +197,7 @@ body {
 }
 
 .write-btn {
-  background-color: #A983A3;
+  background-color: #552960;
   color: #fff;
   border: none;
   padding: 10px 24px;
@@ -214,19 +220,19 @@ table.board-table {
 	width: 100%;
 	border-collapse: separate; 
 	border-spacing: 0;         
-	border: 1px solid #3a1f41;
+	border: 1px solid #222;
 	border-radius: 12px;
 	overflow: hidden;          
 }
 
 table.board-table th, table.board-table td {
-	border: 1px solid #3a1f41;
+	border: 1px solid #222;
 	padding: 12px;
 	text-align: center;
 }
 
 table.board-table th {
-	background-color: #A983A3;
+	background-color: #552960;
 }
 
 table.board-table td {
@@ -262,8 +268,8 @@ table.board-table td:nth-child(2) {
 
 
 .thumbnail-hover {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   object-fit: cover;
   border: 1px solid #3a1f41;
   border-radius: 4px;
@@ -341,7 +347,7 @@ table.board-table td:nth-child(2) {
   color: #fff;
   font-size: 14px;
   transition: all 0.3s ease;
-  width: 200px;
+  width: 160px;
 }
 
 .board-footer input[type="text"]:focus {
@@ -351,7 +357,7 @@ table.board-table td:nth-child(2) {
 }
 
 .board-footer button.search-btn {
-  background-color: #A983A3;
+  background-color: #552960;
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -447,8 +453,8 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 						onclick="location.href='writePost.do?type=일반'">✏ 글쓰기</button>
 				</c:when>
 				<c:otherwise>
-					<button class="write-btn" onclick="location.href='loginPage.do'">✏
-						글쓰기</button>
+					<button class="write-btn" onclick="location.href='loginPage.do'">✏ 글쓰기
+			</button>
 				</c:otherwise>
 			</c:choose>
 		</div>
@@ -524,7 +530,7 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 						<input type="hidden" name="period" value="${selectedPeriod}" /> <input
 							type="hidden" name="sort" value="${selectedSort}" /> <input
 							type="hidden" name="page" value="1" /> <input type="text"
-							name="keyword" value="${keyword}" placeholder="검색 키워드 입력 후 엔터" />
+							name="keyword" value="${keyword}" placeholder="검색 키워드 입력 후 엔터 🔍" />
 						<button type="submit" class="search-btn">↵</button>
 					</form>
 				</div>
