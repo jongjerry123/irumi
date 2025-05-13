@@ -120,8 +120,6 @@ $(function() {
 	    //서버에서 받아왔던 cacheSessionJobOpts 중에서
 	    // 선택된 Job에 해당하는 Career Item 객체를 서버로 보내기 위해 저장.
 	    subTopicJobCI = cacheSessionJobOpts.find(jobCI => jobCI.title === clickedJobName);
-	    
-
 	});
 	
 	// 토픽 선택 후 '선택 완료' 버튼 클릭시 setSubTopic
@@ -185,19 +183,18 @@ $(function() {
             contentType: "application/json",
             data: JSON.stringify({ userMsg: message, topic: "spec" }),
             success: function(gptReply) {
-            	addBotMessageToChat(gptReply.gptAnswer, "bot-msg");
+            	addBotMessageToChat(gptReply.gptAnswer, "bot-msg"); 
 				
             	// 복수 선택 옵션이 올 경우
                 if (gptReply.checkboxOptions && Array.isArray(gptReply.checkboxOptions) && gptReply.checkboxOptions.length > 0) {
                     renderCheckboxList(gptReply.checkboxOptions);
-                  
                 } else {
                     removeCheckboxList();
                 }
 
             	// 택1 선택 옵션이 올 경우
                 if (gptReply.options && Array.isArray(gptReply.options) && gptReply.options.length > 0) {
-                    renderOptionButtons(gptReply.options);
+                	renderOptionButtons(gptReply.options);
                 } else {
                     removeOptionButtons();
                 }
@@ -469,6 +466,9 @@ $(function() {
 	<div class="chatbot-page-layout">
 		<div class="left-container">
 			<%-- <c:import url="/WEB-INF/views/common/sidebar_left.jsp" /> --%>
+			<div class="chatpage-title">
+				대화형 도우미
+			</div>
 			<div class="left-sidebar">
 				<div class="sidebar">
 					<button onclick="moveJobPage();" id="job">직무 찾기</button>

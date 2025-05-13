@@ -485,39 +485,29 @@ public class ChatbotController {
 		}
 
 	}
-
-	@RequestMapping(value = "submitChatbotOption.do", method = RequestMethod.POST)
-	@ResponseBody
-	public ChatbotResponseDto submitChatbotOption(
-
-			@RequestParam("userChoice") String userChoice, HttpSession loginSession) {
-		String userId = (String) loginSession.getAttribute("userId");
-		ConvSession session = convManager.getSession(userId);
-		String topic = session.getTopic();
-
-		ChatbotResponseDto responseDto;
-
-		// handleChatbotOption: // 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라 // 다르게 동작하여
-		// 유저 선택에 대해 응답하도록 함.
-		switch (topic) {
-		case "job":
-			responseDto = jobManager.handleChatbotOption(session, userChoice);
-			break;
-		case "spec":
-			responseDto = specManager.handleChatbotOption(session, userChoice);
-			break;
-		case "ss":
-			responseDto = ssManager.handleChatMessage(session, userChoice);
-			break;
-		case "act":
-			responseDto = actManager.handleChatMessage(session, userChoice);
-			break;
-		default:
-			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
-		}
-
-		return responseDto;
-	}
+	/*
+	 * @RequestMapping(value = "submitChatbotOption.do", method =
+	 * RequestMethod.POST)
+	 * 
+	 * @ResponseBody public ChatbotResponseDto submitChatbotOption(
+	 * 
+	 * @RequestParam("userChoice") String userChoice, HttpSession loginSession) {
+	 * String userId = (String) loginSession.getAttribute("userId"); ConvSession
+	 * session = convManager.getSession(userId); String topic = session.getTopic();
+	 * 
+	 * ChatbotResponseDto responseDto;
+	 * 
+	 * // handleChatbotOption: // 옵션 유형(대시보드 저장, 추가 추천 여부, 내용 추가 희망 여부)에 따라 // 다르게
+	 * 동작하여 // 유저 선택에 대해 응답하도록 함. switch (topic) { case "job": responseDto =
+	 * jobManager.handleChatbotOption(session, userChoice); break; case "spec":
+	 * responseDto = specManager.handleChatbotOption(session, userChoice); break;
+	 * case "ss": responseDto = ssManager.handleChatMessage(session, userChoice);
+	 * break; case "act": responseDto = actManager.handleChatMessage(session,
+	 * userChoice); break; default: responseDto = new
+	 * ChatbotResponseDto("유효하지 않은 주제입니다.", null); }
+	 * 
+	 * return responseDto; }
+	 */
 
 	// SPEC CHAT에서 SUBTOPIC JOB 에 따른 저장해둔 스펙 불러와 사이드바에 넣기 위함
 	@RequestMapping(value = "getSpecsByJob.do", method = RequestMethod.POST)
