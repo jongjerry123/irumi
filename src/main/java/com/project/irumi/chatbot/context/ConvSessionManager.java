@@ -5,8 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
-import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.dto.CareerItemDTO;
+import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
 
 /* 
 한 유저는 항상 하나의 세션만 가질 수 있다
@@ -44,12 +44,12 @@ public class ConvSessionManager {
     }
 
     //세션의 subJobTopic 아이디 지정.
-	public void setConvSubJobTopic(ConvSession session, CareerItemDto selectedItem) {
+	public void setConvSubJobTopic(ConvSession session, CareerItemDTO selectedItem) {
 		session.setSubJobTopicId(selectedItem.getItemId());
 	}
 	
 	//세션의 subSpecTopic 아이디 지정.
-		public void setConvSubSpecTopic(ConvSession session, CareerItemDto selectedItem) {
+		public void setConvSubSpecTopic(ConvSession session, CareerItemDTO selectedItem) {
 			session.setSubSpecTopicId(selectedItem.getItemId());
 		}
 }

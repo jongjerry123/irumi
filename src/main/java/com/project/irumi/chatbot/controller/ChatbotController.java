@@ -26,9 +26,9 @@ import com.project.irumi.chatbot.manager.ActChatManager;
 import com.project.irumi.chatbot.manager.JobChatManager;
 import com.project.irumi.chatbot.manager.SpecChatManager;
 import com.project.irumi.chatbot.manager.SsChatManager;
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
-import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
-import com.project.irumi.chatbot.model.dto.SessionTopicOpts;
+import com.project.irumi.chatbot.model.dto.CareerItemDTO;
+import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
+import com.project.irumi.chatbot.model.dto.TopicOptsDTO;
 import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.Spec;
@@ -96,7 +96,7 @@ public class ChatbotController {
 	// 세션매니저 관리 시작 (tab 유형에 따라 현재 로그인한 유저가 진행중인 session 정보)
 	@RequestMapping(value = "startChatSession.do", method = RequestMethod.POST)
 	@ResponseBody
-	public SessionTopicOpts startChatSession(@RequestParam("topic") String topic, HttpSession loginSession) {
+	public TopicOptsDTO startChatSession(@RequestParam("topic") String topic, HttpSession loginSession) {
 
 		// 로그인 세션에서 현 유저 받아옴.
 		User loginUser = (User) loginSession.getAttribute("loginUser");
@@ -104,21 +104,21 @@ public class ChatbotController {
 		// 챗봇 세션 생성
 		ConvSession session = convManager.createNewSession(userId, topic);
 
-		SessionTopicOpts sessionTopicOpts = new SessionTopicOpts();
+		TopicOptsDTO sessionTopicOpts = new TopicOptsDTO();
 
 		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
 
 
 		// CareerItemDto 리스트로 변환하여 저장
-		List<CareerItemDto> jobCItemList = new ArrayList<>();
+		List<CareerItemDTO> jobCItemList = new ArrayList<>();
 
 
 		switch (topic) {
 		case "job":
 			userJobs = dashboardService.selectUserJobs(userId);
 			for (Job job : userJobs) {
-				CareerItemDto dto = new CareerItemDto();
+				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(job.getJobId());
 				dto.setTitle(job.getJobName());
 				dto.setExplain(job.getJobExplain());
@@ -130,7 +130,7 @@ public class ChatbotController {
 		case "spec":
 			userJobs = dashboardService.selectUserJobs(userId);
 			for (Job job : userJobs) {
-				CareerItemDto dto = new CareerItemDto();
+				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(job.getJobId());
 				dto.setTitle(job.getJobName());
 				dto.setExplain(job.getJobExplain());
@@ -145,7 +145,7 @@ public class ChatbotController {
 			userJobs = dashboardService.selectUserJobs(userId);
 			
 			for (Job job : userJobs) {
-				CareerItemDto dto = new CareerItemDto();
+				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(job.getJobId());
 				dto.setTitle(job.getJobName());
 				dto.setExplain(job.getJobExplain());
@@ -163,7 +163,7 @@ public class ChatbotController {
 			userJobs = dashboardService.selectUserJobs(userId);
 			
 			for (Job job : userJobs) {
-				CareerItemDto dto = new CareerItemDto();
+				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(job.getJobId());
 				dto.setTitle(job.getJobName());
 				dto.setExplain(job.getJobExplain());
@@ -183,7 +183,7 @@ public class ChatbotController {
 	
 	@RequestMapping(value = "selectSpecByJobId.do", method = RequestMethod.POST)
 	@ResponseBody
-	public List<CareerItemDto> selectSpecByJobId(@RequestBody Map<String, String> data, HttpSession session) {
+	public List<CareerItemDTO> selectSpecByJobId(@RequestBody Map<String, String> data, HttpSession session) {
 	    String jobId = data.get("jobId");
 
 	    User loginUser = (User) session.getAttribute("loginUser");
@@ -194,10 +194,10 @@ public class ChatbotController {
 	    specific.setJobId(jobId);
 
 	    List<Spec> specList = dashboardService.selectUserSpecs(specific);
-	    List<CareerItemDto> result = new ArrayList<>();
+	    List<CareerItemDTO> result = new ArrayList<>();
 
 	    for (Spec spec : specList) {
-	        CareerItemDto dto = new CareerItemDto();
+	        CareerItemDTO dto = new CareerItemDTO();
 	        dto.setItemId(spec.getSpecId());
 	        dto.setTitle(spec.getSpecName());
 	        dto.setExplain(spec.getSpecExplain());
@@ -212,7 +212,7 @@ public class ChatbotController {
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
 	@RequestMapping(value = "setConvSubJobTopic.do", method = RequestMethod.POST)
 	@ResponseBody
-	public void setConvSubJobTopic(@RequestBody CareerItemDto selectedItem, HttpSession loginSession) {
+	public void setConvSubJobTopic(@RequestBody CareerItemDTO selectedItem, HttpSession loginSession) {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
@@ -240,7 +240,7 @@ public class ChatbotController {
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
 	@RequestMapping(value = "setConvSubSpecTopic.do", method = RequestMethod.POST)
 	@ResponseBody
-	public void setConvSubSpecTopic(@RequestBody CareerItemDto selectedItem, HttpSession loginSession) {
+	public void setConvSubSpecTopic(@RequestBody CareerItemDTO selectedItem, HttpSession loginSession) {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
@@ -274,7 +274,7 @@ public class ChatbotController {
 	// -- > 입력된 정보 다시 우측 사이드바에 받아오는 메소드 필요
 	@RequestMapping(value = "insertCareerItem.do", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> insertCareerItem(@RequestBody CareerItemDto insertedItem, HttpSession session,
+	public ResponseEntity<?> insertCareerItem(@RequestBody CareerItemDTO insertedItem, HttpSession session,
 			HttpServletResponse response) {
 		/*
 		 * try { request.setCharacterEncoding("UTF-8");
@@ -416,7 +416,7 @@ public class ChatbotController {
 	// 메소드 추가 =====================================================
 	@RequestMapping(value = "/sendMessageToChatbot.do", method = RequestMethod.POST)
 	@ResponseBody
-	public ChatbotResponseDto sendMessageToChatbot(@RequestBody Map<String, Object> body, HttpSession session) {
+	public ChatbotResponseDTO sendMessageToChatbot(@RequestBody Map<String, Object> body, HttpSession session) {
 		// 보낸 유저 정보
 		User loginUser = (User) session.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
@@ -431,10 +431,9 @@ public class ChatbotController {
 		if (convSession == null || !topic.equals(convSession.getTopic())) {
 			convSession = convManager.createNewSession(userId, topic);
 			System.out.println("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);
-
 		}
 
-		ChatbotResponseDto responseDto;
+		ChatbotResponseDTO responseDto;
 
 		switch (topic) {
 		case "job":
@@ -450,7 +449,7 @@ public class ChatbotController {
 			responseDto = actManager.handleChatMessage(convSession, userMsg);
 			break;
 		default:
-			responseDto = new ChatbotResponseDto("유효하지 않은 주제입니다.", null);
+			responseDto = new ChatbotResponseDTO("유효하지 않은 주제입니다.", null);
 		}
 
 		return responseDto;
@@ -461,7 +460,7 @@ public class ChatbotController {
 
 	@RequestMapping(value = "deleteSavedOption.do", method = RequestMethod.POST)
 	@ResponseBody
-	public void deleteSavedOption(@RequestBody CareerItemDto itemToDelete, HttpSession session) {
+	public void deleteSavedOption(@RequestBody CareerItemDTO itemToDelete, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
@@ -512,7 +511,7 @@ public class ChatbotController {
 	// SPEC CHAT에서 SUBTOPIC JOB 에 따른 저장해둔 스펙 불러와 사이드바에 넣기 위함
 	@RequestMapping(value = "getSpecsByJob.do", method = RequestMethod.POST)
 	@ResponseBody
-	public List<CareerItemDto> getSpecsByJob(@RequestBody CareerItemDto targetJobCI, HttpSession loginSession) {
+	public List<CareerItemDTO> getSpecsByJob(@RequestBody CareerItemDTO targetJobCI, HttpSession loginSession) {
 
 		// 로그인 세션에서 현 유저 받아옴.
 		User loginUser = (User) loginSession.getAttribute("loginUser");
@@ -523,9 +522,9 @@ public class ChatbotController {
 		specific.setJobId(targetJobCI.getItemId());
 
 		List<Spec> specList = dashboardService.selectUserSpecs(specific);
-		List<CareerItemDto> specCIList = new ArrayList<>();
+		List<CareerItemDTO> specCIList = new ArrayList<>();
 		for (Spec spec : specList) {
-			CareerItemDto dto = new CareerItemDto();
+			CareerItemDTO dto = new CareerItemDTO();
 			dto.setItemId(spec.getSpecId()); // 또는 적절한 ID 매핑
 			dto.setTitle(spec.getSpecName());
 			dto.setExplain(spec.getSpecExplain());
@@ -538,7 +537,7 @@ public class ChatbotController {
 	
 		@RequestMapping(value = "getActByCI.do", method = RequestMethod.POST)
 		@ResponseBody
-		public List<CareerItemDto> getActByCI(@RequestBody CareerItemDto targetCI, HttpSession loginSession) {
+		public List<CareerItemDTO> getActByCI(@RequestBody CareerItemDTO targetCI, HttpSession loginSession) {
 
 			// 로그인 세션에서 현 유저 받아옴.
 			User loginUser = (User) loginSession.getAttribute("loginUser");
@@ -550,9 +549,9 @@ public class ChatbotController {
 			specific.setSpecId(targetCI.getItemId());
 
 			List<Activity> activityList = dashboardService.selectUserActs(specific);
-			List<CareerItemDto> actCIList = new ArrayList<>();
+			List<CareerItemDTO> actCIList = new ArrayList<>();
 			for (Activity act : activityList) {
-				CareerItemDto dto = new CareerItemDto();
+				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(act.getActId()); 
 				dto.setTitle(act.getActContent());
 				dto.setState(act.getActState());
@@ -565,7 +564,7 @@ public class ChatbotController {
 		
 		@RequestMapping(value = "getSs.do", method = RequestMethod.POST)
 		@ResponseBody
-		public List<CareerItemDto> getSs(@RequestBody Map<String, String> data, HttpSession loginSession) {
+		public List<CareerItemDTO> getSs(@RequestBody Map<String, String> data, HttpSession loginSession) {
 			String specId = data.get("specId");
 			
 			// 로그인 세션에서 현 유저 받아옴.
@@ -573,9 +572,9 @@ public class ChatbotController {
 			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
 			List<SpecSchedule> scheduleList = dashboardService.selectUserSpecSchedule(specId);
-			List<CareerItemDto> ssList = new ArrayList<>();
+			List<CareerItemDTO> ssList = new ArrayList<>();
 			for (SpecSchedule ss : scheduleList) {
-				CareerItemDto dto = new CareerItemDto();
+				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(ss.getSsId()); 
 				dto.setpId(ss.getSpecId());
 				dto.setExplain(ss.getSsType());
