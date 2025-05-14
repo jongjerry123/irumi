@@ -431,7 +431,6 @@ public class ChatbotController {
 		if (convSession == null || !topic.equals(convSession.getTopic())) {
 			convSession = convManager.createNewSession(userId, topic);
 			System.out.println("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);
-
 		}
 
 		ChatbotResponseDTO responseDto;
