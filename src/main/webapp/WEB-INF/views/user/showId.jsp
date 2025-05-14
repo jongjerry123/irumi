@@ -18,17 +18,14 @@ body {
 }
 
 .container {
-	background-color: #1e1e1e;
+	background-color: #000;
 	border-radius: 10px;
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 	margin: 150px auto 50px;
 	text-align: center;
-	border-left: 3px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 3px solid #fff;
+	border: 1px solid #333;
 }
 
 h2 {
