@@ -87,7 +87,7 @@ label, p {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.buttons button:hover {
+.buttons button:hover, #chosen {
 	background: var(--primary);
 	color: white;
 }
@@ -230,6 +230,8 @@ a {
 							$('#targetJob').empty();
 							$('#targetJob').html('<div class=\"buttons\">목표 직무: ' + item.jobName + '<button class="deleteButton" onclick=\"movetoDeleteJob(' + item.jobId + ')\">목표 직무 삭제하기</button></div>');
 							$('#targetSpec').html('목표 스펙');
+							$('#jobs button').removeAttr('id');
+							$(this).attr('id', 'chosen');
 							viewSpecs(item.jobId);
 							$.ajax({
 								url: 'updateProgressBar.do',
@@ -251,6 +253,7 @@ a {
 						})
 						.appendTo('#jobs');
 				});
+				$('#jobs').append('<div style="flex-basis:100%;height:0;"></div>');
 				if (data.length >= 5) {
 					$('<button class=\"addButton\">').text('목표 직업 추가하기').on('click', maxNumJobs).appendTo('#jobs');
 					$('<button class=\"addButton\">').text('목표 직업 탐색하기').on('click', maxNumJobs).appendTo('#jobs');
