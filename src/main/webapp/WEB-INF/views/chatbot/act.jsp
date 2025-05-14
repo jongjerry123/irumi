@@ -169,12 +169,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	      const textSpan = document.createElement("span");
 	      textSpan.className = "checkbox-text";
 	      textSpan.textContent = opt.title;
-	      const checkMark = document.createElement("span");
-	      checkMark.className = "checkmark";
-	      checkMark.innerHTML = "&#10003;";
 	      label.appendChild(input);
 	      label.appendChild(textSpan);
-	      label.appendChild(checkMark);
 	      listWrap.appendChild(label);
 	    });
 	   
@@ -313,24 +309,29 @@ document.addEventListener("DOMContentLoaded", function() {
 	      }
 	    }
 	  });
-	  document.querySelector(".chat-send-btn").addEventListener("click", function() {
-	    const input = document.getElementById("userInput");
-	    const val = input.value.trim();
-	    if(!isSelectionComplete()){
-	    	  alert("먼저 목표 직무와 스펙을 선택하세요.");
-	    	  return;
-	     }
-	    if (val) {
-	      sendMessage(val);
-	      input.value = "";
-	    }
-	  });
+	  
+	  $(".chat-send-btn").on("click", function () {
+		  const val = $("#userInput").val().trim();
+		  if (!isSelectionComplete()) {
+		    alert("먼저 목표 직무와 스펙을 선택하세요.");
+		    return;
+		  }
+		  if (val) {
+		    sendMessage(val);
+		    $("#userInput").val("");
+		  }
+		});
+	  
 	  function scrollToBottom() {
 	    const chatArea = document.getElementById("chatArea");
 	    chatArea.parentElement.scrollTop = chatArea.parentElement.scrollHeight;
 	  }
 	
 	  document.querySelector(".add-btn").addEventListener("click", function() {
+		  if(!isSelectionComplete()){
+	    	  alert("먼저 목표 직무와 스펙을 선택하세요.");
+	    	  return;
+	     }
 		  const input = document.querySelector(".manual-input");
 		  const val = input.value.trim();
 		  if (val) {
@@ -358,15 +359,12 @@ document.addEventListener("DOMContentLoaded", function() {
 		  }
 		});
 	 
-	  document.addEventListener("click", function (e) {
-		  if (e.target.classList.contains("select-btn")) {
-		    // 같은 부모 아래 다른 버튼들의 active 제거
-		    const parent = e.target.closest(".select-btn-list");
-		    if (parent) {
-		      parent.querySelectorAll(".select-btn").forEach(btn => btn.classList.remove("active"));
-		    }
-		    e.target.classList.add("active");
+	  $(document).on("click", ".select-btn", function () {
+		  const $parent = $(this).closest(".select-btn-list");
+		  if ($parent.length) {
+		    $parent.find(".select-btn").removeClass("active");
 		  }
+		  $(this).addClass("active");
 		});
 	 
 	// 추가--------- 선택 완료 클릭 시 목표 직무 및 스펙 반영
@@ -630,13 +628,14 @@ body {
    gap: 6px;
 }
 .manual-input-box .manual-input {
-   flex: 1;
-   background: transparent;
-   border: none;
-   color: #BAAC80;
-   font-size: 14px;
-   padding: 8px 4px;
-   outline: none;
+	width: 100%; /* 유지: .manual-date와 동일한 너비 */
+	box-sizing: border-box; /* 유지: 패딩 포함 크기 계산 */
+	background: transparent;
+	border: none;
+	color: #BAAC80;
+	font-size: 14px;
+	padding: 8px 14px; /* 수정: .manual-date와 패딩 통일 */
+	outline: none;
 }
 .manual-input-box .add-btn {
 	background: #232323;
@@ -651,6 +650,7 @@ body {
 	cursor: pointer;
 	font-size: 18px;
 	margin-left: 4px;
+	line-height: 28px;
 }
 .manual-input-box .add-btn:hover {
 	background: #BAAC80;
@@ -839,23 +839,26 @@ body {
 #option-buttons button.select-btn:hover {
 	background: #222;
 }
+
+
 /* 추가 **********************************************/
 .content-box .custom-checkbox-list {
-	margin: 24px 0 0 0;
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 5px;
 }
 .content-box .custom-checkbox {
+	flex-direction: column; /* 세로로 배치 */
+	align-items: flex-start; /* 왼쪽 정렬 */
 	display: flex;
-	align-items: center;
+	align-items: left;
 	justify-content: space-between;
 	background: #181818;
-	border: 1.5px solid #BAAC80;
+	border: 1.5px solid #383838;
 	border-radius: 10px;
 	padding: 10px 18px;
 	font-size: 16px;
-	color: #BAAC80;
+	color: #facc15;
 	position: relative;
 	cursor: pointer;
 	transition: border 0.2s, background 0.2s;
@@ -866,9 +869,9 @@ body {
 	display: none;
 }
 .content-box .custom-checkbox .checkbox-text {
-	color: #fff;
+	color: #BAAC80;
 	font-size: 15px;
-	letter-spacing: 0.5px;
+	font-weight: bold;
 }
 .content-box .custom-checkbox .checkmark {
 	display: none;
@@ -877,21 +880,24 @@ body {
 	margin-left: 12px;
 }
 /* checked 상태일 때만 checkmark 보이기 */
-.content-box .custom-checkbox input[type="checkbox"]:checked ~
+/* .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkmark {
 	display: block;
-}
+	color: #B2E86F;
+} */
 .content-box .custom-checkbox input[type="checkbox"]:checked ~
 	.checkbox-text {
-	color: #BAAC80;
+	color: #B2E86F;
 	font-weight: 600;
 }
-.content-box .custom-checkbox input[type="checkbox"]:checked ~
-	.checkmark {
-	color: #BAAC80;
+.content-box .custom-checkbox input[type="checkbox"]:checked {
+	background: rgba(186, 172, 128, 0.3); /* 배경색을 체크된 상태에서 적용 */
 }
 .content-box .custom-checkbox:hover {
-	background: #222;
+	background: rgba(186, 172, 128, 0.3);
+}
+.content-box .custom-checkbox:hover .checkbox-text {
+	color: #B2E86F;
 }
 .custom-checkbox-list button {
 	width: 50%;
@@ -976,7 +982,7 @@ body {
 						</div>
 					</div>
 					<div class="select-group">
-						<span class="select-label" style="display: none;">📌 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
+						<span class="select-label" style="display: none;">🗓️ 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
 						<div class="select-btn-list" id="spec-btn-list">
 						</div>
 					</div>
@@ -1024,7 +1030,7 @@ body {
 				<div class="saved-schedule-list" id="savedActivityList"></div>
 
 				<div class="saved-schedule-section">
-					<div class="section-title">➕ 직접 활동 추가하기</div>
+					<div class="section-title">🧾 직접 활동 추가하기</div>
 					
 					<div class="manual-input-box">
 						<input type="text" placeholder="저장할 활동 입력" class="manual-input" />
