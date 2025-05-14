@@ -23,15 +23,12 @@ body {
 }
 
 .register-box {
-	background-color: #1e1e1e;
+	background-color: #000;
 	padding: 40px;
 	border-radius: 12px;
 	width: 300px;
 	text-align: center;
-	border-left: 3px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 3px solid #fff;
+	border: 1px solid #333;
 }
 
 .register-box h2 {
@@ -67,9 +64,10 @@ body {
 }
 
 .submit-btn:disabled {
-	background-color: #000;
-	color: #fff;
+	background-color: #999;
+	color: #666;
 	cursor: not-allowed;
+	
 }
 
 .error-message {

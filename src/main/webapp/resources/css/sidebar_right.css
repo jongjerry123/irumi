@@ -50,31 +50,31 @@
 	gap: 6px;
 }
 
+.manual-input-div {
+	background: #333333;
+	border-radius: 5px;
+	display:flex;
+}
+
 .manual-input-box .manual-input {
 	flex: 1;
 	background: transparent;
+	border-width: 0px;
 	color: white;
 	font-size: 12px;
 	padding: 8px 4px;
-	/* outline: none; */
-	
+	outline: none;
 }
 
-.manual-input-div {
-	/* border: solid 1px white; */
-	background: #333333;
-	border-radius: 5px;
-}
+
 
 .manual-input-box .manual-input-explain {
 	flex: 1;
 	background: transparent;
-	border: none;
+	border-width: 0px;
 	color: white;
 	font-size: 12px;
 	padding: 8px 4px;
-	border-radius: 5px;
-	border: 1px solid eeeeee;
 	outline: none;
 }
 

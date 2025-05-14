@@ -14,9 +14,9 @@ import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateActChat;
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
+import com.project.irumi.chatbot.model.dto.CareerItemDTO;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
-import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
 import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Specific;
@@ -40,12 +40,14 @@ public class ActChatManager {
 	@Autowired
 	private DashboardService dashboardService;
 	
+
 //	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}
 
-	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {	    
+
+	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {	    
 
 		ChatMsg botChatMsg = new ChatMsg();
 
@@ -73,7 +75,7 @@ public class ActChatManager {
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		default: // topic 없으면 
-			return new ChatbotResponseDto("현재 세션 토픽 정보가 없습니다.", null);
+			return new ChatbotResponseDTO("현재 세션 토픽 정보가 없습니다.", null);
 			
 		}		
 		
@@ -138,19 +140,19 @@ public class ActChatManager {
                         String answer = "'" + specName + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
                       botChatMsg.setMsgContent(answer);
     					chatbotService.insertChatMsg(botChatMsg);
-                        return new ChatbotResponseDto(
+                        return new ChatbotResponseDTO(
                             answer,
                             List.of("도서 추천", "영상 추천", "기타 활동 추천")
                         );
                     } else {
                     	session.setChatState(StateActChat.INPUT_HAVEBEEN);
-                        return new ChatbotResponseDto(
+                        return new ChatbotResponseDTO(
                             "스펙 관련 입력이 아닌 것 같아요. 자격증, 분야, 기술 등과 관련된 주제로 다시 입력해 주세요."
                         );
                     }
                   } else {
                 	  session.setChatState(StateActChat.INPUT_HAVEBEEN);
-                      return new ChatbotResponseDto("빈 응답이 기록되었습니다. 다시 입력해 주세요.");
+                      return new ChatbotResponseDTO("빈 응답이 기록되었습니다. 다시 입력해 주세요.");
                   }
                 	
                     
@@ -179,7 +181,7 @@ public class ActChatManager {
             case RECOMMEND:
                 // SHOW_MORE_OPTIONS로 자동 이동해서 버튼 선택받기
                 session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
-                return new ChatbotResponseDto(
+                return new ChatbotResponseDTO(
                     "더 추천받거나 다른 유형을 원하시면 아래 옵션을 선택하세요.",
                     List.of("같은 유형으로 더 추천 받기", "다른 유형", "종료")
                 );
@@ -190,17 +192,17 @@ public class ActChatManager {
 					chatbotService.insertChatMsg(botChatMsg);
                     session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                     if(session.getLastActivityType() == "도서") {
-                    	return new ChatbotResponseDto(
+                    	return new ChatbotResponseDTO(
                                 "어떤 유형의 활동을 추천받으시겠어요?",
                                 List.of("영상 추천", "기타 활동 추천")
                             );
                     } else if (session.getLastActivityType() == "영상") {
-                    	return new ChatbotResponseDto(
+                    	return new ChatbotResponseDTO(
                                 "어떤 유형의 활동을 추천받으시겠어요?",
                                 List.of("도서 추천", "기타 활동 추천")
                             );
                     } else {
-                    	return new ChatbotResponseDto(
+                    	return new ChatbotResponseDTO(
                                 "어떤 유형의 활동을 추천받으시겠어요?",
                                 List.of("영상 추천", "기타 활동 추천")
                             );
@@ -219,10 +221,11 @@ public class ActChatManager {
 					chatbotService.insertChatMsg(botChatMsg);
                     convManager.endSession(session.getUserId());   // 종료 누르면 바로 세션 삭제
                     session.resetRecommendedOption();
-                    return new ChatbotResponseDto("이용해주셔서 감사합니다!");
+                    return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
                 } else {
                     session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
                     return new ChatbotResponseDto(
+
                         "원하시는 옵션을 선택해 주세요.",
                         List.of("같은 유형으로 더 추천 받기","다른 유형", "종료")
                     );
@@ -230,11 +233,12 @@ public class ActChatManager {
                 
             default:
                 session.setChatState(StateActChat.INPUT_HAVEBEEN);
-                return new ChatbotResponseDto("오류가 발생했습니다. 처음부터 다시 시도해 주세요.");
+                return new ChatbotResponseDTO("오류가 발생했습니다. 처음부터 다시 시도해 주세요.");
         }
     }
 
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
+
 	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session, Set<String> list) {
 	    String userId = session.getUserId();
 	    String jobId = session.getSubJobTopicId();
@@ -294,7 +298,7 @@ public class ActChatManager {
 	}
 
 	
-	private ChatbotResponseDto cantChooseOptions(String activityType, ConvSession session){
+	private ChatbotResponseDTO cantChooseOptions(String activityType, ConvSession session){
 		ChatMsg botMsg = new ChatMsg();
 	    botMsg.setConvId(session.getConvId());
 	    botMsg.setConvTopic(session.getTopic());
@@ -304,11 +308,12 @@ public class ActChatManager {
 	    botMsg.setMsgContent(activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.");
 	    chatbotService.insertChatMsg(botMsg);
 	    
-	    return new ChatbotResponseDto(
+	    return new ChatbotResponseDTO(
 	    	activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.",
 	        List.of("다른 유형", "종료")
 	    );
 	}
+
 
 
 
@@ -320,6 +325,7 @@ public class ActChatManager {
 	 * CareerItemDto(); dto.setTitle(cleaned); dto.setType("act"); return dto; })
 	 * .collect(Collectors.toList()); }
 	 */
+
     
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isSpecRelatedInput(String input) {

@@ -53,7 +53,6 @@ $(function() {
         }
     });
 	
-	
 		// ➤ 사용자 입력 메시지 서버로 전송 함수
 	  function sendMessage(message) {
 		 //답변 올 때까지 버튼 일시적 비활성화
@@ -101,25 +100,30 @@ $(function() {
 	      const $card = $("<div>").addClass("citem-card");
 	      // ✕ 삭제 버튼
 	      const $removeBtn = $("<button>").addClass("remove-btn").text("✕").on("click", function() {
-	        $card.remove(); // 클릭 시 카드 삭제
-	        // 삭제 클릭시 DB에서도 삭제되게 함
-	        // Dashboard Service 구현 후
-	        $.ajax({
-	            type: "POST",
-	            url: "deleteSavedOption.do",
-	            contentType: "application/json",
-	            data: JSON.stringify(jobCI),  // jobCI는 현재 카드에 해당하는 CareerItemDto 객체
-	            success: function () {
-	              console.log("DB에서 항목 삭제 성공:", jobCI.title);
-	            },
-	            error: function () {
-	              console.error("DB에서 항목 삭제 실패:", jobCI.title);
-	            }
-	          });
+	        
+	    	if (confirm("정말 삭제하시겠습니까?")) { 
+		    	$card.remove(); // 클릭 시 카드 삭제
+		        // 삭제 클릭시 DB에서도 삭제되게 함
+		        // Dashboard Service 구현 후
+		        $.ajax({
+		            type: "POST",
+		            url: "deleteSavedOption.do",
+		            contentType: "application/json",
+		            data: JSON.stringify(jobCI),  // jobCI는 현재 카드에 해당하는 CareerItemDto 객체
+		            success: function () {
+		              console.log("DB에서 항목 삭제 성공:", jobCI.title);
+		            },
+		            error: function () {
+		              console.error("DB에서 항목 삭제 실패:", jobCI.title);
+		            }
+		          });
+	    	}
+	    	else{
+	    		console.log("삭제 취소됨");
+	    	}
 	      });
 
-	      // 직무명 텍스트만 표시
-	      console.log(jobCI.title);
+	     
 	      const $span = $("<span>").text(jobCI.title);
 
 	      $card.append($removeBtn).append($span);

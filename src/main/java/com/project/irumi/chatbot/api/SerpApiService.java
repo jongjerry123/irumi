@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
+import com.project.irumi.chatbot.model.dto.CareerItemDTO;
 
 @Service
 public class SerpApiService {

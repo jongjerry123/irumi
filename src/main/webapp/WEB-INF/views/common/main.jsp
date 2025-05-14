@@ -49,7 +49,7 @@
 }
 
 .intro-subtitle {
-	font-family: 'Dancing Script', cursive;
+	font-family: 'Dancing Script', cursive !important;;
 	font-size: 40px;
 	color: #ccc;
 	margin-top: 0px;

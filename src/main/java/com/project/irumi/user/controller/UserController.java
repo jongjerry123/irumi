@@ -36,10 +36,7 @@ import jakarta.servlet.http.HttpSession;
 public class UserController {
 	// private static final Logger logger =
 	// LoggerFactory.getLogger(UserController.class);
-	private static final String RANDOM_PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"; // 랜덤
-																																	// 비밀번호
-																																	// 생성
-																																	// 필드
+	private static final String RANDOM_PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"; // 랜덤비밀번호
 	private static final int PASSWORD_LENGTH = 16; // 비밀번호 길이 제한 필드
 
 	/*
@@ -164,7 +161,7 @@ public class UserController {
 
 	/* ********************************* 기능 ************************************* */
 	// 아이디 중복 확인
-	@PostMapping("idchk.do")
+	@RequestMapping(value = "idchk.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkId(@RequestParam(name = "userId") String userId) {
 		boolean available = userservice.checkIdAvailability(userId);
@@ -176,7 +173,7 @@ public class UserController {
 	}
 
 	// 이메일 사용가능 확인
-	@PostMapping("checkEmail.do")
+	@RequestMapping(value = "checkEmail.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkEmail(@RequestParam(name = "email") String email) {
 		boolean available = userservice.checkEmailAvailability(email);
@@ -187,13 +184,13 @@ public class UserController {
 	}
 
 	// 인증코드 회원가입 페이지 세션저장
-	@GetMapping("verifyCode.do")
+	@RequestMapping(value = "verifyCode.do", method = RequestMethod.GET)
 	public String handleGetVerifyCode() {
 		return "redirect:/resister.do";
 	}
 
 	// 이메일인증
-	@PostMapping("verifyCode.do")
+	@RequestMapping(value = "verifyCode.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> verifyCode(@RequestParam(name = "code") String code, HttpSession session) {
 		Map<String, Object> response = new HashMap<>();
@@ -228,7 +225,7 @@ public class UserController {
 	}
 
 	// 회원가입
-	@PostMapping("registerUser.do")
+	@RequestMapping(value = "registerUser.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> register(@RequestBody User user, HttpSession session) {
 		Map<String, Object> response = new HashMap<>();
@@ -268,7 +265,7 @@ public class UserController {
 	}
 
 	// 이메일 정보 전송 및 아이디 찾기 처리
-	@PostMapping("findId.do")
+	@RequestMapping(value = "findId.do", method = RequestMethod.POST)
 	public String processFindId(@RequestParam(name = "email") String email, HttpSession session) {
 //        logger.info("processFindId: Processing email for findId");
 		session.setAttribute("findIdEmail", email);
@@ -276,7 +273,7 @@ public class UserController {
 	}
 
 	// 아이디 알려주는 페이지 이동 및 결과 표시
-	@GetMapping("showId.do")
+	@RequestMapping(value = "showId.do", method = RequestMethod.GET)
 	public String showId(HttpSession session, Model model) {
 		// logger.info("showId: Retrieving findIdEmail from session");
 		String email = (String) session.getAttribute("findIdEmail");
@@ -307,7 +304,7 @@ public class UserController {
 	}
 
 	// Naver Mail API를 사용한 인증번호 전송
-	@PostMapping("sendVerification.do")
+	@RequestMapping(value = "sendVerification.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> sendVerification(@RequestParam("email") String email, HttpSession session) {
 		Map<String, Object> response = new HashMap<>();
@@ -525,7 +522,7 @@ public class UserController {
 	}
 
 	// 아이디 찾기에서 아이디주인과 이메일이 일치한지
-	@PostMapping("checkUser.do")
+	@RequestMapping(value = "checkUser.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> checkUser(@RequestParam("userId") String userId, @RequestParam("email") String email) {
 		Map<String, Object> response = new HashMap<>();
@@ -542,7 +539,7 @@ public class UserController {
 	}
 
 	// 임시 비밀번호 생성 및 전송
-	@GetMapping("resetPassword.do")
+	@RequestMapping(value = "resetPassword.do", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> resetPassword(@RequestParam(name = "userId") String userId,
 			@RequestParam(name = "email") String email, HttpSession session) {
@@ -610,7 +607,7 @@ public class UserController {
 	}
 
 	// 구글 로그인 요청
-	@GetMapping("/googleLogin.do")
+	@RequestMapping(value = "/googleLogin.do", method = RequestMethod.GET)
 	public String googleLogin(HttpServletRequest request) {
 		String state = String.valueOf((int) (Math.random() * 900000) + 100000);
 		String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -622,7 +619,7 @@ public class UserController {
 	}
 
 	// 네이버 로그인 요청
-	@GetMapping("/naverLogin.do")
+	@RequestMapping(value = "/naverLogin.do", method = RequestMethod.GET)
 	public String naverLogin(HttpServletRequest request) {
 		String state = String.valueOf((int) (Math.random() * 900000) + 100000);
 		String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -634,7 +631,7 @@ public class UserController {
 	}
 
 	// 카카오 로그인 요청
-	@GetMapping("/kakaoLogin.do")
+	@RequestMapping(value = "/kakaoLogin.do", method = RequestMethod.GET)
 	public String kakaoLogin(HttpServletRequest request) {
 		String redirectUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath() + "/socialCallback.do?provider=kakao";
@@ -645,7 +642,7 @@ public class UserController {
 	}
 
 	// 소셜 로그인 통합 콜백
-	@GetMapping("/socialCallback.do")
+	@RequestMapping(value = "/socialCallback.do", method = RequestMethod.GET)
 	public String socialCallback(@RequestParam("code") String code, @RequestParam(value = "provider") String provider,
 			HttpSession session, Model model, HttpServletRequest request) {
 		try {
@@ -687,7 +684,7 @@ public class UserController {
 	}
 
 	// 소설 로그인 첫 이용자 회원가입용
-	@PostMapping("/registerSocialUser.do")
+	@RequestMapping(value = "/registerSocialUser.do", method = RequestMethod.POST)
 	public String registerSocialUser(@RequestParam(name = "userName") String userName, HttpSession session,
 			Model model) {
 		try {

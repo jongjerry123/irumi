@@ -9,7 +9,7 @@ import java.sql.Date;
 서버에서는 topic에 따라 CareerItemDto로 추상화해서 응답
  * 
  */
-public class CareerItemDto {
+public class CareerItemDTO {
 	private String itemId; // jobId, specId, actId, ssId 등 (선택적으로 사용)
 	private String pId;   // 추가  
 	private String title; // 화면에 표시할 이름
@@ -19,17 +19,17 @@ public class CareerItemDto {
 	private String strschedule;
 	private String state;
 
-	public CareerItemDto() {
+	public CareerItemDTO() {
 	}
 
-	public CareerItemDto(String itemId, String title, String content, String explain) {
+	public CareerItemDTO(String itemId, String title, String content, String explain) {
 		this.itemId = null;
 		this.title = title;
 		this.explain = explain;
 		this.type = null;
 	}
 	
-	public CareerItemDto(String itemId, String pId, String explain, Date ssDate) {
+	public CareerItemDTO(String itemId, String pId, String explain, Date ssDate) {
 		this.itemId = null;
 		this.pId = null;
 		this.explain = explain;
@@ -37,7 +37,7 @@ public class CareerItemDto {
 		this.type = null;
 	}
 	
-	public CareerItemDto(String itemId, String title, String state) {
+	public CareerItemDTO(String itemId, String title, String state) {
 		this.itemId = null;
 		this.title = title;
 		this.state = "N";
