@@ -19,18 +19,44 @@ body {
     min-height: 100vh;
 }
 
+.about-wrapper {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+    
+.about-logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .rotating-logo {
+      width: 120px;
+      height: 120px;
+      animation: spin 20s linear infinite;
+      filter: drop-shadow(0 0 10px #BAAC80);
+      opacity: 0.92;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
 .container {
-    background-color: #1e1e1e;
+    background-color: #000;
     border-radius: 10px;
     padding: 40px;
     width: 400px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    margin: 150px auto 50px;
+    margin: 50px auto 50px;
     text-align: center;
-    border-left: 3px solid #ff4c4c;
-    border-top: 1px solid #ff4c4c;
-    border-bottom: 1px solid #ff4c4c;
-    border-right: 3px solid #ff4c4c;
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    border-right: 1px solid #333;
+    filter: drop-shadow(0 0 5px #9a9a7e);
 }
 
 h2 {
@@ -100,8 +126,8 @@ input[type="text"] {
     cursor: pointer;
     font-size: 14px;
     box-sizing: border-box;
-    background-color: #2ccfcf;
-    color: black;
+    background-color: #000;
+    color: white;
     transition: background-color 0.3s ease;
     width: 100%;
     max-width: 180px;
@@ -109,16 +135,16 @@ input[type="text"] {
 }
 
 .btn:hover {
-    background-color: #3ddfdf;
+    background-color: #000;
 }
 
 .btn:active {
-    background-color: #1aabaa;
+    background-color: #000;
 }
 
 .btn:disabled {
-    background-color: #000;
-    color: #fff;
+    background-color: #999;
+    color: #666;
     cursor: not-allowed;
 }
 </style>
@@ -181,18 +207,15 @@ $(document).ready(function() {
                             $authorityExit.prop('checked', response.currentAuthority === '4');
                             
                             $submitButton.prop('disabled', false).css({
-                                'background-color': '#2ccfcf',
-                                'color': 'black',
-                                'cursor': 'pointer'
+                                'background-color': '#000',
+                                'color': 'white',
+                                'cursor': 'pointer',
+                                'border' : '1px solid #fff'
                             });
                         } else {
                             $userIdMessage.text(response.message || '유저를 찾을 수 없습니다.').addClass('error').removeClass('success');
                             $authorityGroup.hide();
-                            $submitButton.prop('disabled', true).css({
-                                'background-color': '#000',
-                                'color': '#fff',
-                                'cursor': 'not-allowed'
-                            });
+                            $submitButton.prop('disabled', true);
                             selectedUserId = null;
                             console.log('selectedUserId reset to:', selectedUserId);
                         }
@@ -205,6 +228,7 @@ $(document).ready(function() {
                             'background-color': '#000',
                             'color': '#fff',
                             'cursor': 'not-allowed'
+                            
                         });
                         selectedUserId = null;
                         console.log('selectedUserId reset to:', selectedUserId);
@@ -241,9 +265,10 @@ $(document).ready(function() {
                     $authorityMessage.text(response.message || '권한이 변경되었습니다.').toggleClass('success', response.success).toggleClass('error', !response.success);
                     if (response.success) {
                         $submitButton.prop('disabled', false).css({
-                            'background-color': '#2ccfcf',
-                            'color': 'black',
-                            'cursor': 'pointer'
+                            'background-color': '#000',
+                            'color': 'white',
+                            'cursor': 'pointer',
+                            'border' : '1px solid #fff'
                         });
                         // 권한 상태 동기화
                         $authorityUser.prop('checked', authority === '1');
@@ -274,6 +299,11 @@ $(document).ready(function() {
 </head>
 <body>
     <c:import url="/WEB-INF/views/common/header.jsp" />
+<div class="about-wrapper">
+	<!-- 로고 -->
+  <div class="about-logo-container">
+    <img src="/irumi/resources/images/ill2.png" alt="이루미 로고" class="rotating-logo" />
+  </div>
     <div class="container">
         <h2>매니저 관리</h2>
         <div class="input-group">
@@ -290,5 +320,6 @@ $(document).ready(function() {
         </div>
         <button type="button" class="btn" id="submit" disabled>권한 변경</button>
     </div>
+</div>
 </body>
 </html>

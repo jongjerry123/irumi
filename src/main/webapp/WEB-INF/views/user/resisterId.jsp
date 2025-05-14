@@ -18,16 +18,42 @@ body {
 	margin: 0;
 }
 
+.about-wrapper {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+.about-logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .rotating-logo {
+      width: 120px;
+      height: 120px;
+      animation: spin 20s linear infinite;
+      filter: drop-shadow(0 0 10px #BAAC80);
+      opacity: 0.92;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
 .container {
-	background-color: #1e1e1e;
+	background-color: #000;
 	border-radius: 10px;
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	border-left: 3px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 3px solid #fff;
+	border-left: 1px solid #333;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #333;
+	border-right: 1px solid #333;
 }
 
 h2 {
@@ -70,10 +96,10 @@ input[type="text"], input[type="password"], input[type="email"] {
 	background-color: black;
 	color: white;
 	cursor: not-allowed;
-	border-left: 1px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 1px solid #fff;
+	border-left: 1px solid #333;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #333;
+	border-right: 1px solid #333;
 }
 
 .inline-group {
@@ -137,6 +163,11 @@ input[type="text"], input[type="password"], input[type="email"] {
 </head>
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
+<div class="about-wrapper">
+	<!-- 로고 -->
+  <div class="about-logo-container">
+    <img src="/irumi/resources/images/ill.png" alt="이루미 로고" class="rotating-logo" />
+  </div>
 	<div class="container">
 		<h2>회원가입</h2>
 		<form id="register-form">
@@ -197,7 +228,7 @@ input[type="text"], input[type="password"], input[type="email"] {
 				완료</button>
 		</form>
 	</div>
-
+</div>
 	<script>
 	document.addEventListener('DOMContentLoaded', () => {
 	    const usernameInput = document.getElementById('username');
