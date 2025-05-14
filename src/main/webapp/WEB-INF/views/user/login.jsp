@@ -28,10 +28,8 @@ body {
 	border-radius: 12px;
 	width: 300px;
 	text-align: center;
-	border-left: 3px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 3px solid #fff;
+	border: 1px solid #333;
+
 }
 
 .logo-area {
@@ -75,7 +73,7 @@ body {
 }
 
 .login-btn {
-	background-color: #fff;
+	background-color: #eee;
 	color: #000;
 	border: none;
 	width: 100%;
@@ -87,21 +85,19 @@ body {
 	box-sizing: border-box;
 	font-size: 14px;
 	line-height: 20px;
-	border-left: 1px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 1px solid #fff;
+
 }
 
 .login-btn:disabled {
-	background-color: #000;
-	color: #fff;
+	background-color: #CCC;
+	color: #666;
 	cursor: not-allowed;
+	border: 1px solid #eee;
 }
 
 .signup-btn {
-	background-color: #444;
-	color: #fff;
+	background-color: #eee;
+	color: #000;
 	border: none;
 	width: 100%;
 	padding: 10px;
