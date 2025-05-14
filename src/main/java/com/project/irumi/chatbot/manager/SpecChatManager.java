@@ -182,12 +182,14 @@ public class SpecChatManager {
 			userChatMsg.setMsgContent(userMsg);
 			chatbotService.insertChatMsg(userChatMsg);
 			
+			// 더 추천받고 싶은 경우
 			if ("네".equals(userMsg)) {
-				session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC); // 루프 예시
-				botChatMsg.setMsgContent("그렇다면 다시 "+ StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
+				session.setChatState(StateSpecChat.OPT_SPEC_TYPE); // 루프 예시
+				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
 				chatbotService.insertChatMsg(botChatMsg);
 				
-				return new ChatbotResponseDTO("그렇다면 다시 "+ StateSpecChat.TEXT_CURRENT_SPEC.getPrompt(), null);
+				return new ChatbotResponseDTO(StateSpecChat.OPT_SPEC_TYPE.getPrompt(), 
+																					List.of("어학 능력", "자격증", "인턴십 및 현장실습", "대외 활동", "연구 활동", "기타"));
 			}
 			else {
 				session.setChatState(StateSpecChat.COMPLETE);
