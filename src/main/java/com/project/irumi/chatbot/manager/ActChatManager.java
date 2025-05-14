@@ -224,7 +224,7 @@ public class ActChatManager {
                     return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
                 } else {
                     session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
-                    return new ChatbotResponseDto(
+                    return new ChatbotResponseDTO(
 
                         "원하시는 옵션을 선택해 주세요.",
                         List.of("같은 유형으로 더 추천 받기","다른 유형", "종료")
@@ -239,7 +239,7 @@ public class ActChatManager {
 
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
 
-	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session, Set<String> list) {
+	private ChatbotResponseDTO recommendActivity(String spec, String activityType, ConvSession session, Set<String> list) {
 	    String userId = session.getUserId();
 	    String jobId = session.getSubJobTopicId();
 	    String specId = session.getSubSpecTopicId();
@@ -260,14 +260,14 @@ public class ActChatManager {
 	    excludedTitles.addAll(session.getOptions(activityType));  // 직전 추천 목록도 제외
 
 	    // SerpAPI로 추천 검색
-	    List<CareerItemDto> serpResults = serpApiService.searchSerpActivity(spec, activityType, excludedTitles);
+	    List<CareerItemDTO> serpResults = serpApiService.searchSerpActivity(spec, activityType, excludedTitles);
 
 	    if (serpResults.isEmpty()) {
 	        return cantChooseOptions(activityType, session);
 	    }
 
 	    // 세션에 추천 저장
-	    for (CareerItemDto dto : serpResults) {
+	    for (CareerItemDTO dto : serpResults) {
 	        String storedTitle = dto.getTitle().split(" \\(")[0].trim(); // '영상 제목 (링크)'에서 제목만
 	        session.addRecommendedOption(activityType, storedTitle);
 	    }
@@ -275,7 +275,7 @@ public class ActChatManager {
 	    // 대화 로그 저장
 	    StringBuilder msgBuilder = new StringBuilder();
 	    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
-	    for (CareerItemDto dto : serpResults) {
+	    for (CareerItemDTO dto : serpResults) {
 	        msgBuilder.append("- ").append(dto.getTitle()).append("\n");
 	    }
 
@@ -290,7 +290,7 @@ public class ActChatManager {
 
 	    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
 
-	    return new ChatbotResponseDto(
+	    return new ChatbotResponseDTO(
 	        "아래 추천된 항목 중 원하는 요소를 선택해 주세요!",
 	        serpResults,
 	        List.of("같은 유형으로 더 추천 받기", "다른 유형", "종료")

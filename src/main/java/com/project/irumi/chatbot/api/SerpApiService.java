@@ -145,7 +145,7 @@ public class SerpApiService {
     }
     
 	
-    public List<CareerItemDto> searchSerpActivity(String spec, String activityType, Set<String> excludedTitles) {
+    public List<CareerItemDTO> searchSerpActivity(String spec, String activityType, Set<String> excludedTitles) {
     	String query = switch (activityType) {
     		case "도서" -> "%s 공부에 도움이 되는 책 제목과 저자, 출판사만 추천해".formatted(spec);
     		case "영상" -> spec + " 관련 무료 유튜브 강의 추천 site:youtube.com";
@@ -156,8 +156,8 @@ public class SerpApiService {
     	return search(query, activityType, excludedTitles);
     }
 
-	public List<CareerItemDto> search(String query, String activity, Set<String> excludedTitles) {
-		List<CareerItemDto> results = new ArrayList<>();
+	public List<CareerItemDTO> search(String query, String activity, Set<String> excludedTitles) {
+		List<CareerItemDTO> results = new ArrayList<>();
 
 		try {
 			RestTemplate restTemplate = new RestTemplate();
@@ -187,7 +187,7 @@ public class SerpApiService {
 					boolean isDuplicate = excludedTitles.stream().anyMatch(ex -> isSimilar(title, ex));
 					if (isDuplicate) continue;
 
-					CareerItemDto dto = new CareerItemDto();
+					CareerItemDTO dto = new CareerItemDTO();
 					dto.setTitle(activity.equals("영상") && !link.isEmpty() ? title + " (" + link + ")" : title);
 					dto.setType("act");
 

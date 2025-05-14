@@ -40,7 +40,7 @@ public class SsChatManager {
 //		return null;
 //	}
 	
-	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {
 
 
 		ChatMsg botChatMsg = new ChatMsg();
@@ -147,7 +147,7 @@ public class SsChatManager {
 	            } else {
 
 	            	session.setChatState(StateSsChat.SERP_SEARCH);
-	                return new ChatbotResponseDto("일정명을 다시 입력해주세요.");
+	                return new ChatbotResponseDTO("일정명을 다시 입력해주세요.");
 
 	            }
 
@@ -171,7 +171,7 @@ public class SsChatManager {
 	        default:
 
 	            session.setChatState(StateSsChat.SERP_SEARCH);
-	            return new ChatbotResponseDto("처음부터 다시 진행할게요!");
+	            return new ChatbotResponseDTO("처음부터 다시 진행할게요!");
 
 	    }
 	}
