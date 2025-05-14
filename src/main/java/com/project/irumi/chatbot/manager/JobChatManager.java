@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateJobChat;
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
+import com.project.irumi.chatbot.model.dto.CareerItemDTO;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
-import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
 import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.service.DashboardService;
@@ -36,7 +36,7 @@ public class JobChatManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
 
-	public ChatbotResponseDto getGptResponse(ConvSession session, String userMsg) {
+	public ChatbotResponseDTO getGptResponse(ConvSession session, String userMsg) {
 		ChatMsg botChatMsg = new ChatMsg();
 		ChatMsg userChatMsg = new ChatMsg();
 		
@@ -77,13 +77,13 @@ public class JobChatManager {
 				session.setChatState(StateJobChat.ASK_JOB_CHARACTERISTIC);
 				botChatMsg.setMsgContent("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.", null);
+				return new ChatbotResponseDTO("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.", null);
 			} else {
 				session.setChatState(StateJobChat.ASK_PERSONALITY);
 				botChatMsg.setMsgContent("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 직무 찾기 세션입니다.\r\n"
 						+ "희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 직무 찾기 세션입니다.\r\n"
+				return new ChatbotResponseDTO("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 직무 찾기 세션입니다.\r\n"
 						+ "희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
 			}
 
@@ -94,13 +94,13 @@ public class JobChatManager {
 				session.setChatState(StateJobChat.ASK_WORK_CHARACTERISTIC);
 				botChatMsg.setMsgContent("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)");
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)", null);
+				return new ChatbotResponseDTO("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)", null);
 			} 
 			else {
 				session.setChatState(StateJobChat.ASK_JOB_CHARACTERISTIC);
 				botChatMsg.setMsgContent("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
+				return new ChatbotResponseDTO("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
 			}
 
 		case ASK_WORK_CHARACTERISTIC:
@@ -160,11 +160,11 @@ public class JobChatManager {
 		            gptJSON = matcher.group();
 		        } else {
 		            System.out.println("JSON 형식의 배열이 없습니다.");
-		            return new ChatbotResponseDto("스펙 정보 추출하지 못함", null);
+		            return new ChatbotResponseDTO("스펙 정보 추출하지 못함", null);
 		        }
 				
 				// GPT 응답을 CareerItem DTO 리스트로 변환
-				List<CareerItemDto> jobCIList = new ArrayList<>();
+				List<CareerItemDTO> jobCIList = new ArrayList<>();
 				try {
 					// GPT 응답을 JSON 배열로 파싱
 					JSONArray jsonArray = new JSONArray(gptJSON);
@@ -180,7 +180,7 @@ public class JobChatManager {
 //	                        job.setJobExplain(jobExplain);
 //	                        jobList.add(job); // Job 객체 리스트에 추가
 
-						CareerItemDto careerItem = new CareerItemDto();
+						CareerItemDTO careerItem = new CareerItemDTO();
 						careerItem.setTitle(jobName);
 						careerItem.setExplain(jobExplain);
 						careerItem.setType("job");
@@ -189,15 +189,15 @@ public class JobChatManager {
 
 				} catch (JSONException e) {
 					e.printStackTrace(); // JSON 파싱 오류 처리
-					return new ChatbotResponseDto("직무 추천 처리 중 오류가 발생했습니다.", null);
+					return new ChatbotResponseDTO("직무 추천 처리 중 오류가 발생했습니다.", null);
 				}
 
 				// 추천하는 직무를 선택하는 체크박스 리스트 보여주기
 				session.setChatState(StateJobChat.ASK_WANT_MORE_OPT);
-				return new ChatbotResponseDto("더 많은 추천을 받아보고 싶으신가요?", jobCIList, List.of("네", "아니요"));
+				return new ChatbotResponseDTO("더 많은 추천을 받아보고 싶으신가요?", jobCIList, List.of("네", "아니요"));
 			} else {
 				session.setChatState(StateJobChat.ASK_WORK_CHARACTERISTIC);
-				return new ChatbotResponseDto(
+				return new ChatbotResponseDTO(
 						"잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)");
 			}
 
@@ -207,14 +207,14 @@ public class JobChatManager {
 
 				botChatMsg.setMsgContent("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요\",");
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요", null);
+				return new ChatbotResponseDTO("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요", null);
 			} else {
 				session.setChatState(StateJobChat.COMPLETE);
 				// db에 job 저장하기
 
 				botChatMsg.setMsgContent("추천을 마쳤습니다. 도움이 되었기를 바랍니다!");
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto("추천을 마쳤습니다. 도움이 되었기를 바랍니다!", null);
+				return new ChatbotResponseDTO("추천을 마쳤습니다. 도움이 되었기를 바랍니다!", null);
 			}
 
 		case COMPLETE:
@@ -222,21 +222,18 @@ public class JobChatManager {
 
 			botChatMsg.setMsgContent("대화가 완료되었습니다.");
 			chatbotService.insertChatMsg(botChatMsg);
-			return new ChatbotResponseDto("대화가 완료되었습니다.", null);
+			return new ChatbotResponseDTO("대화가 완료되었습니다.", null);
 
 		default:
 			session.setChatState(StateJobChat.ASK_PERSONALITY);
 
 			botChatMsg.setMsgContent("알 수 없는 상태입니다. 처음부터 다시 시도해주세요");
 			chatbotService.insertChatMsg(botChatMsg);
-			return new ChatbotResponseDto("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
+			return new ChatbotResponseDTO("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
 		}
 	}
 
-	public ChatbotResponseDto handleChatbotOption(ConvSession session, String userChoice) {
-		// 아직 옵션 클릭 처리 미구현
-		return new ChatbotResponseDto("선택하신 직무 옵션에 대한 처리를 진행합니다. (아직 미구현)", null);
-	}
+
 
 	// 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
 	private boolean isPersonaliltyRelatedInput(String input) {

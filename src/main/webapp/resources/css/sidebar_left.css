@@ -16,7 +16,6 @@
     cursor: pointer;
     border-radius: 8px;
     transition: background 0.3s;
-    font-weight: bold;
     width: 100%;                  /* 버튼의 너비를 사이드바 너비에 맞게 설정 */
     display: block;               /* 버튼을 block으로 설정하여 한 줄씩 차지 */
 }
@@ -30,5 +29,6 @@
 .sidebar button.active {
     background-color: #BAAC80;
     color: black;
+    font-weight: bold;
 }
 

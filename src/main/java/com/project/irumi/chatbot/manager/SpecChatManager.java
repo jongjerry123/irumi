@@ -17,9 +17,9 @@ import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateSpecChat;
-import com.project.irumi.chatbot.model.dto.CareerItemDto;
+import com.project.irumi.chatbot.model.dto.CareerItemDTO;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
-import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
 import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
@@ -41,7 +41,7 @@ public class SpecChatManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(SpecChatManager.class);
 
-	public ChatbotResponseDto getGptResponse(ConvSession session, String userMsg) {
+	public ChatbotResponseDTO getGptResponse(ConvSession session, String userMsg) {
 		StateSpecChat state = (StateSpecChat) session.getChatState();
 
 		ChatMsg botChatMsg = new ChatMsg(session.getUserId(), session.getConvId(), session.getTopic(),
@@ -68,7 +68,7 @@ public class SpecChatManager {
 			session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
 			botChatMsg.setMsgContent(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
 			chatbotService.insertChatMsg(botChatMsg);
-			return new ChatbotResponseDto(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
+			return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
 
 		case TEXT_CURRENT_SPEC:
 			// 사용자가 current spec을 입력한 이후.
@@ -83,7 +83,7 @@ public class SpecChatManager {
 				session.setChatState(StateSpecChat.OPT_SPEC_TYPE);
 				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto(StateSpecChat.OPT_SPEC_TYPE.getPrompt(),
+				return new ChatbotResponseDTO(StateSpecChat.OPT_SPEC_TYPE.getPrompt(),
 						List.of("어학 능력", "자격증", "인턴십 및 현장실습", "대외 활동", "연구 활동", "기타"));
 			}
 			// 제대로 된 현재스펙 입력하지 않은 경우, 같은 케이스 반복
@@ -92,7 +92,7 @@ public class SpecChatManager {
 
 				botChatMsg.setMsgContent(StateSpecChat.TEXT_CURRENT_SPEC.getFallBackPrompt());
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto(StateSpecChat.TEXT_CURRENT_SPEC.getFallBackPrompt());
+				return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getFallBackPrompt());
 			}
 
 		case OPT_SPEC_TYPE:
@@ -146,17 +146,17 @@ public class SpecChatManager {
 	         
 	        } else {
 	            System.out.println("JSON 형식의 배열이 없습니다.");
-	            return new ChatbotResponseDto("스펙 정보 추출하지 못함", null);
+	            return new ChatbotResponseDTO("스펙 정보 추출하지 못함", null);
 	        }
 
 			// ✅ JSON → CareerItemDto 리스트로 파싱
 			// 사용자가 선택 가능하게 보내는 것.
-			List<CareerItemDto> specCItemList = new ArrayList<>();
+			List<CareerItemDTO> specCItemList = new ArrayList<>();
 			try {
 				JSONArray jsonArray = new JSONArray(gptJSON);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject obj = jsonArray.getJSONObject(i);
-					CareerItemDto dto = new CareerItemDto();
+					CareerItemDTO dto = new CareerItemDTO();
 					dto.setTitle(obj.getString("title"));
 					dto.setExplain(obj.getString("explain"));
 					dto.setType(tempSpecType);
@@ -165,14 +165,14 @@ public class SpecChatManager {
 				logger.info("specCIitemList:" + specCItemList);
 			} catch (JSONException e) {
 				e.printStackTrace();
-				return new ChatbotResponseDto("스펙 추천 중 오류가 발생했습니다.", null);
+				return new ChatbotResponseDTO("스펙 추천 중 오류가 발생했습니다.", null);
 			}
 
 			// 다음 상태로 전환, 봇 메세지 미리 저장
 			session.setChatState(StateSpecChat.ASK_WANT_MORE_OPT);
 			botChatMsg.setMsgContent(StateSpecChat.ASK_WANT_MORE_OPT.getPrompt());
 			chatbotService.insertChatMsg(botChatMsg);
-			return new ChatbotResponseDto(StateSpecChat.ASK_WANT_MORE_OPT.getPrompt(),
+			return new ChatbotResponseDTO(StateSpecChat.ASK_WANT_MORE_OPT.getPrompt(),
 					 specCItemList, List.of("네", "아니요"));
 
 
@@ -187,30 +187,26 @@ public class SpecChatManager {
 				botChatMsg.setMsgContent("그렇다면 다시 "+ StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
 				chatbotService.insertChatMsg(botChatMsg);
 				
-				return new ChatbotResponseDto("그렇다면 다시 "+ StateSpecChat.TEXT_CURRENT_SPEC.getPrompt(), null);
+				return new ChatbotResponseDTO("그렇다면 다시 "+ StateSpecChat.TEXT_CURRENT_SPEC.getPrompt(), null);
 			}
 			else {
 				session.setChatState(StateSpecChat.COMPLETE);
 				
 				botChatMsg.setMsgContent(StateSpecChat.COMPLETE.getPrompt());
 				chatbotService.insertChatMsg(botChatMsg);
-				return new ChatbotResponseDto(StateSpecChat.COMPLETE.getPrompt(), null);
+				return new ChatbotResponseDTO(StateSpecChat.COMPLETE.getPrompt(), null);
 			}
 
 		case COMPLETE:
 			session.setChatState(StateSpecChat.START); // 여기 오류 가능성
-			return new ChatbotResponseDto("대화가 완료되었습니다. 추가로 필요한 것이 있으면 새로 시작해주세요.", null);
+			return new ChatbotResponseDTO("대화가 완료되었습니다. 추가로 필요한 것이 있으면 새로 시작해주세요.", null);
 
 		default:
 			session.setChatState(StateSpecChat.START);
-			return new ChatbotResponseDto("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
+			return new ChatbotResponseDTO("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
 		}
 	}
 
-	public ChatbotResponseDto handleChatbotOption(ConvSession session, String userChoice) {
-		// (옵션 클릭 처리 기능 - 추후 필요시 구현 가능)
-		return new ChatbotResponseDto("선택하신 스펙 옵션에 대해 추가 안내를 준비 중입니다. (아직 미구현)", null);
-	}
 
 	private boolean isSpecRelatedInput(String input) {
 		String prompt = """

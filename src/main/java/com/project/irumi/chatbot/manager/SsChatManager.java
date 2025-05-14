@@ -13,7 +13,7 @@ import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateSsChat;
 import com.project.irumi.chatbot.model.dto.ChatMsg;
-import com.project.irumi.chatbot.model.dto.ChatbotResponseDto;
+import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
 import com.project.irumi.chatbot.model.service.ChatbotService;
 
 @Component
@@ -34,7 +34,7 @@ public class SsChatManager {
 	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
 
 	
-	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
+	public ChatbotResponseDTO setConvSubTopic(ConvSession session, String userChoice) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -43,7 +43,7 @@ public class SsChatManager {
 	
 	
 
-	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {
 
 		ChatMsg botChatMsg = new ChatMsg();
 
@@ -71,7 +71,7 @@ public class SsChatManager {
 			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
 			break;
 		default: // topic 없으면
-			return new ChatbotResponseDto("현재 세션 토픽 정보가 없습니다.", null);
+			return new ChatbotResponseDTO("현재 세션 토픽 정보가 없습니다.", null);
 
 		}
 		userChatMsg.setMsgContent(userMsg);
@@ -137,17 +137,17 @@ public class SsChatManager {
 	                chatbotService.insertChatMsg(serpMsg);
 	                
 	                session.setChatState(StateSsChat.ASK_WANT_MORE);
-	                return new ChatbotResponseDto(
+	                return new ChatbotResponseDTO(
 	                    serpResult,
 	                    List.of("다른 일정 검색", "종료")
 	                );
 	            } else {
 	            	session.setChatState(StateSsChat.SERP_SEARCH);
-	            	return new ChatbotResponseDto("잘못된 응답을 하셨습니다. 알고 싶으신 일정의 명칭을 입력해주세요! (예 :  oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
+	            	return new ChatbotResponseDTO("잘못된 응답을 하셨습니다. 알고 싶으신 일정의 명칭을 입력해주세요! (예 :  oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 	            }
 	            	
 	            } else {
-	                return new ChatbotResponseDto("일정명을 다시 입력해주세요.");
+	                return new ChatbotResponseDTO("일정명을 다시 입력해주세요.");
 	            }
 
 	        case ASK_WANT_MORE:
@@ -157,19 +157,19 @@ public class SsChatManager {
 	                session.setChatState(StateSsChat.SERP_SEARCH);
 	                botChatMsg.setMsgContent("어떤 일정이 궁금하신가요? (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 					chatbotService.insertChatMsg(botChatMsg);
-	                return new ChatbotResponseDto("어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
+	                return new ChatbotResponseDTO("어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 	            } else {
 	            	botChatMsg.setMsgContent("종료");
 					chatbotService.insertChatMsg(botChatMsg);
 	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
 					chatbotService.insertChatMsg(botChatMsg);
 	            	convManager.endSession(session.getUserId());
-	                return new ChatbotResponseDto("이용해주셔서 감사합니다!");
+	                return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
 	            }
 	        
 	        default:
 	            session.setChatState(StateSsChat.START);
-	            return new ChatbotResponseDto("처음부터 다시 진행할게요!");
+	            return new ChatbotResponseDTO("처음부터 다시 진행할게요!");
 	    }
 	}
 
