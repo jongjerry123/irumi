@@ -32,6 +32,7 @@ body {
 
 .category-bar h2 {
 	margin: 0;
+	font-size: 35px;
 
 }
 
@@ -197,7 +198,7 @@ body {
 }
 
 .write-btn {
-  background-color: #552960;
+  background-color: #2d0033;
   color: #fff;
   border: none;
   padding: 10px 24px;
@@ -219,25 +220,28 @@ body {
 table.board-table {
 	width: 100%;
 	border-collapse: separate; 
-	border-spacing: 0;         
-	border: 1px solid #222;
+	border-spacing: 0;  
+	border: 1px solid #2d0033;      
 	border-radius: 12px;
 	overflow: hidden;          
 }
 
-table.board-table th, table.board-table td {
-	border: 1px solid #222;
+table.board-table th{
+
+border: 1px;
+border-color: #2d0033;
+background-color: #2d0033;
 	padding: 12px;
 	text-align: center;
 }
 
-table.board-table th {
-	background-color: #552960;
+table.board-table td {
+	border: 0.5px solid #111;
+	background-color: #000;
+	padding: 12px;
+	text-align: center;
 }
 
-table.board-table td {
-	background-color: #000;
-}
 
 table.board-table td:nth-child(2) {
 	text-align: left;
@@ -357,7 +361,7 @@ table.board-table td:nth-child(2) {
 }
 
 .board-footer button.search-btn {
-  background-color: #552960;
+  background-color: #2d0033;
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -409,7 +413,7 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 <c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="main-content">
 		<div class="category-bar">
-			<h2>커뮤니티</h2>
+			<h2>커뮤니티 - 자유게시판</h2>
 			<div class="tabs">
 				<button class="active" onclick="location.href='freeBoard.do'">자유게시판</button>
 				<button onclick="location.href='qnaList.do'">Q&A</button>
