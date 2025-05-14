@@ -417,6 +417,14 @@ body {
 	height: 100%; /* 부모 높이 차지 */
 }
 
+.chatpage-title {
+	text-align: center;
+	font-size: 25px;
+	font-weight: bold;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
 /* 채팅 부분 ************************************************************************************* */
 .chat-box {
 	background-color: #1e1e1e;
@@ -478,7 +486,7 @@ body {
 
 /* 오른쪽 페널 ******************************************************** */
 .right-panel {
-	width: 250px; /* 고정된 너비 */
+	width: 230px; /* 고정된 너비 */
 	color: #333;
 	padding: 20px;
 	flex-shrink: 0; /* 오른쪽 패널이 축소되지 않게 */
@@ -512,6 +520,7 @@ body {
 	font-size: 14px;
 	margin-left: 4px;
 	font-weight: bold;
+	margin-bottom : 10px;
 }
 
 .right-panel .schedule-value {
@@ -749,6 +758,7 @@ body {
 
 .select-btn-list {
 	padding: 5px;
+	margin-bottom : 5px;	
 }
 
 .select-btn.active {
@@ -860,21 +870,22 @@ body {
 <c:set var="menu" value="chat" scope="request" />
 <div class="container">
 <!-- Sidebar -->
-     <div class="left-containter">
-		     <c:set var="chatTopic" value="ss" scope="request" />
+		<div class="left-containter">
+			<div class="chatpage-title">대화형 도우미</div>
+			<c:set var="chatTopic" value="ss" scope="request" />
 			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
-     </div>
-     <!-- Main content -->
+		</div>
+		<!-- Main content -->
 		<div class="main">
 			<!-- 콘텐츠 영역 -->
 			<div class="chat-box">
 				<div class="select-bar">
 					<div class="select-group">
-						<span class="select-label">🧑‍💼 어떤 일정을 원하시나요? 먼저 직무를 선택해주세요</span>
+						<span class="select-label">🗓️ 어떤 일정을 원하시나요? 먼저 직무를 선택해주세요</span>
 						<div class="select-btn-list" id="job-btn-list"></div>
 					</div>
 					<div class="select-group">
-						<span class="select-label" style="display: none;">📌 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
+						<span class="select-label" style="display: none;"> 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
 						<div class="select-btn-list" id="spec-btn-list"></div>
 					</div>
 					<div class="confirm-select-box">
@@ -901,7 +912,7 @@ body {
 				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
 					id="userInput" />
 				<button class="chat-send-btn" onclick="sendMessage()">
-					<i class="fa fa-paper-plane"></i>
+					➤
 				</button>
 			</div>
 		</div>
@@ -918,7 +929,7 @@ body {
 					<div class="saved-schedule-list" id="savedScheduleList"></div>
 
 					<div class="saved-schedule-section">
-						<div class="section-title">🧾 직접 일정 추가하기</div>
+						<div class="section-title">➕ 직접 일정 추가하기</div>
 
 						<div class="manual-input-box">
 							<input type="date" class="manual-date" id="manualDate" /> <input

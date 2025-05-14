@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -179,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	    const submitBtn = document.createElement("button");
 	    submitBtn.textContent = "선택 완료";
 	    submitBtn.style.marginLeft = "10px";
+	    submitBtn.className = "check-confirm-btn";
 	    submitBtn.onclick = function() {
 	      const checked = Array.from(listWrap.querySelectorAll("input:checked")).map(cb => cb.value);
 	      if (checked.length === 0) {
@@ -265,6 +266,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	    div.textContent = message;
 	    chatArea.appendChild(div);
 	  }
+	  
+	  document.addEventListener("change", function (e) {
+		  if (e.target.matches(".custom-checkbox input[type='checkbox']")) {
+		    const label = e.target.closest(".custom-checkbox");
+		    label.classList.toggle("checked", e.target.checked);
+		  }
+		});
+
 	 
 	  // 실제 메시지 전송 로직
 	  function sendMessage(message) {
@@ -476,6 +485,13 @@ body {
 	height: 100%; /* 부모 높이 차지 */
 }
 
+.chatpage-title {
+	text-align: center;
+	font-size: 25px;
+	font-weight: bold;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
 
 /* 컨텐츠 박스 ***********************************************/
 .chat-box {
@@ -535,7 +551,7 @@ body {
 
 /* 오른쪽 페널********************************************************* */
 .right-panel {
-	width: 250px; /* 고정된 너비 */
+	width: 230px; /* 고정된 너비 */
 	color: #333;
 	padding: 20px;
 	flex-shrink: 0; /* 오른쪽 패널이 축소되지 않게 */
@@ -568,6 +584,7 @@ body {
 	font-size: 14px;
 	margin-left: 4px;
 	font-weight: bold;
+	margin-bottom : 10px;
 }
 
 .right-panel .schedule-value {
@@ -764,6 +781,7 @@ body {
 }
 .select-btn-list {
 	padding: 5px;
+	margin-bottom : 5px;
 }
 .select-btn.active {
 	background: #BAAC80;
@@ -890,8 +908,8 @@ body {
 	color: #B2E86F;
 	font-weight: 600;
 }
-.content-box .custom-checkbox input[type="checkbox"]:checked {
-	background: rgba(186, 172, 128, 0.3); /* 배경색을 체크된 상태에서 적용 */
+.custom-checkbox.checked {
+  background: rgba(186, 172, 128, 0.3);
 }
 .content-box .custom-checkbox:hover {
 	background: rgba(186, 172, 128, 0.3);
@@ -899,24 +917,8 @@ body {
 .content-box .custom-checkbox:hover .checkbox-text {
 	color: #B2E86F;
 }
-.custom-checkbox-list button {
-	width: 50%;
-	align: left;
-	margin-top: 18px;
-	padding: 12px 0;
-	background: #181818;
-	color: #BAAC80;
-	font-size: 18px;
-	font-weight: 700;
-	border: 1.5px solid #BAAC80;
-	border-radius: 10px;
-	cursor: pointer;
-	letter-spacing: 1.3px;
-	transition: background 0.2s, color 0.2s, border 0.2s;
-}
-.custom-checkbox-list button:hover {
-	background: #222;
-}
+
+
 /* 추가 - 선택 버튼 css */
 .chat-input-box {
 	display: flex;
@@ -960,6 +962,35 @@ body {
 	background: #eeeeee;
 	opacity: 1;
 }
+
+/* 대화 내 선택 완료 버튼*/
+.custom-checkbox-list button.check-confirm-btn {
+	border: 1.5px solid #eeeeee;
+	border-radius: 10px;
+	font-size: 12px;
+	padding: 7px 20px;
+	cursor: pointer;
+	transition: background 0.18s, color 0.18s, border 0.18s;
+	margin-top: 3px;
+	font-weight: bold;
+	text-align: center;
+	color: #eeeeee;
+	background: none;
+}
+
+.custom-checkbox-list button.check-confirm-btn:hover {
+	border-radius: 10px;
+	font-size: 12px;
+	padding: 7px 20px;
+	cursor: pointer;
+	transition: background 0.18s, color 0.18s, border 0.18s;
+	margin-top: 3px;
+	font-weight: bold;
+	text-align: center;
+	color: #383838;
+	background: #eeeeee;
+	opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -968,9 +999,10 @@ body {
 	<div class="container">
 		<!-- Sidebar -->
 		<div class="left-container">
-		     <c:set var="chatTopic" value="act" scope="request" />
+			<div class="chatpage-title">대화형 도우미</div>
+			<c:set var="chatTopic" value="act" scope="request" />
 			<c:import url="/WEB-INF/views/common/sidebar_left.jsp" />
-     </div>
+		</div>
 		<!-- Main content -->
 		<div class="main">
 			<!-- 콘텐츠 영역 -->
@@ -982,7 +1014,7 @@ body {
 						</div>
 					</div>
 					<div class="select-group">
-						<span class="select-label" style="display: none;">🗓️ 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
+						<span class="select-label" style="display: none;"> 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
 						<div class="select-btn-list" id="spec-btn-list">
 						</div>
 					</div>
@@ -1012,7 +1044,7 @@ body {
 				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
 					id="userInput" />
 				<button class="chat-send-btn" onclick="sendMessage()">
-					<i class="fa fa-paper-plane"></i>
+					➤
 				</button>
 			</div>
 		</div>
@@ -1030,7 +1062,7 @@ body {
 				<div class="saved-schedule-list" id="savedActivityList"></div>
 
 				<div class="saved-schedule-section">
-					<div class="section-title">🧾 직접 활동 추가하기</div>
+					<div class="section-title">➕ 직접 활동 추가하기</div>
 					
 					<div class="manual-input-box">
 						<input type="text" placeholder="저장할 활동 입력" class="manual-input" />
