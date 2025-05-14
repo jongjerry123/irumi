@@ -34,16 +34,14 @@ public class SsChatManager {
 	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
 
 	
-	public ChatbotResponseDTO setConvSubTopic(ConvSession session, String userChoice) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
-	
-	
 
-	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {
+//	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+	
+	public ChatbotResponseDto handleChatMessage(ConvSession session, String userMsg) {
+
 
 		ChatMsg botChatMsg = new ChatMsg();
 
@@ -147,7 +145,10 @@ public class SsChatManager {
 	            }
 	            	
 	            } else {
-	                return new ChatbotResponseDTO("일정명을 다시 입력해주세요.");
+
+	            	session.setChatState(StateSsChat.SERP_SEARCH);
+	                return new ChatbotResponseDto("일정명을 다시 입력해주세요.");
+
 	            }
 
 	        case ASK_WANT_MORE:
@@ -168,8 +169,10 @@ public class SsChatManager {
 	            }
 	        
 	        default:
-	            session.setChatState(StateSsChat.START);
-	            return new ChatbotResponseDTO("처음부터 다시 진행할게요!");
+
+	            session.setChatState(StateSsChat.SERP_SEARCH);
+	            return new ChatbotResponseDto("처음부터 다시 진행할게요!");
+
 	    }
 	}
 

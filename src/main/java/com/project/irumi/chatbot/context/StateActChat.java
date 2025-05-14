@@ -1,6 +1,5 @@
 package com.project.irumi.chatbot.context;
 public enum StateActChat implements ChatState{
-	/*예시로 작성한 내용임.*/
    INPUT_HAVEBEEN,             // 2. 어떤 '스펙(자격증/분야)'에 대한 활동을 추천받을지 입력받기
    CHOOSE_ACTIVITY_TYPE,   // 3. 추천받고 싶은 활동 유형 선택 (도서/영상/기타 활동)
    RECOMMEND,              // 4. 해당 스펙 + 유형 기반 활동 추천

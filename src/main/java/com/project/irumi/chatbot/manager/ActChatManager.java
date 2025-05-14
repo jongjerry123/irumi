@@ -1,6 +1,7 @@
 package com.project.irumi.chatbot.manager;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,10 +40,12 @@ public class ActChatManager {
 	@Autowired
 	private DashboardService dashboardService;
 	
-	public ChatbotResponseDTO setConvSubTopic(ConvSession session, String userChoice) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
+//	public ChatbotResponseDto setConvSubTopic(ConvSession session, String userChoice) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 
 	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {	    
 
@@ -132,7 +135,6 @@ public class ActChatManager {
     	            	chatbotService.insertChatMsg(Umsg);
     	            	session.setHavebeenact(Umsg);
     	            	
-                    	session.setLastTopic(userMsg.trim());
                         session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                         
                         String answer = "'" + specName + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
@@ -174,7 +176,7 @@ public class ActChatManager {
 
                 session.setLastActivityType(type);
                 session.setChatState(StateActChat.RECOMMEND);
-                return recommendActivity(lastSpec, type, session, session.getOptions(type));
+                return recommendActivity(specName, type, session, session.getOptions(type));
 
             case RECOMMEND:
                 // SHOW_MORE_OPTIONS로 자동 이동해서 버튼 선택받기
@@ -210,7 +212,7 @@ public class ActChatManager {
                 	botChatMsg.setMsgContent("같은 유형으로 더 추천 받기");
 					chatbotService.insertChatMsg(botChatMsg);
                     session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
-                    return recommendActivity(lastSpec, session.getLastActivityType(), session, session.getOptions(session.getLastActivityType()));
+                    return recommendActivity(specName, session.getLastActivityType(), session, session.getOptions(session.getLastActivityType()));
                     
                 } else if ("종료".equals(userMsg)) {
 	            	botChatMsg.setMsgContent("종료");
@@ -221,7 +223,9 @@ public class ActChatManager {
                     session.resetRecommendedOption();
                     return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
                 } else {
-                    return new ChatbotResponseDTO(
+                    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
+                    return new ChatbotResponseDto(
+
                         "원하시는 옵션을 선택해 주세요.",
                         List.of("같은 유형으로 더 추천 받기","다른 유형", "종료")
                     );
@@ -234,136 +238,65 @@ public class ActChatManager {
     }
 
 	/** 활동 유형 및 스펙 기준으로 GPT에게 추천 받는 부분 (도서/영상/기타) */
-	private ChatbotResponseDTO recommendActivity(String spec, String activityType, ConvSession session, Set<String> list) {
-		
-		String userId = session.getUserId(); // 또는 세션에서 직접 꺼내기
-		String jobId = session.getSubJobTopicId();  
-		String specId = session.getSubSpecTopicId();   
-		
-		Specific ss = new Specific();
-		ss.setUserId(userId);
-		ss.setJobId(jobId);
-		ss.setSpecId(specId);
 
-		List<Activity> savedActs = dashboardService.selectUserActs(ss);
-		List<String> savedTitles = savedActs.stream()
-			    .map(Activity::getActContent)  
-			    .collect(Collectors.toList());
-		String excludedActs = savedActs.isEmpty() ? "없음" : String.join(", ", savedTitles);
-		
-	    // 🔹 검색 키워드 생성
-		String havebeen = session.getHavebeenact() != null ? session.getHavebeenact().getMsgContent() : "";
-		if ("없음".equals(havebeen.trim())) {
-		    havebeen = "";
-		}
-		
-		String prompt;
-		
-		if(list == null) {
-			prompt = switch (activityType) {
-		    case "도서" -> """
-		        %s를 공부하는 데 도움이 되는 도서를 3권만 추천해줘.
-		        단, 사용자가 이전에 언급한 활동: "%s" 그리고 이미 저장된 활동들 : [%s] 과 중복되지 않도록 해줘.
-		        도서명, 저자, 출판사만 포함해서 알려줘.
-		        """.formatted(spec, havebeen, excludedActs);
-		        
-		    case "영상" -> """
-		        %s에 대해 공부할 수 있는 유튜브 채널 또는 무료 강의 영상 3개 추천해줘.
-		        단, 사용자가 이전에 언급한 활동: "%s" 그리고 이미 저장된 활동들 : [%s] 과 유사한 내용은 제외하고 새로운 추천만 해줘.
-		        제목과 링크 포함해서 알려줘.
-		        """.formatted(spec, havebeen, excludedActs);
-		        
-		    case "기타 활동" -> """
-		        %s와 관련된 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 중에서
-		        단, 사용자가 이전에 언급한 활동: "%s" 그리고 이미 저장된 활동들 : [%s] 과 겹치지 않는 새로운 활동 3가지를 추천해줘.
-		        활동명 제공해주고 관련 URL이 있다면 URL 함께 제공해줘.
-		        만약 관련 기타 활동이 없으면 반드시 빈칸을 보내줘.
-		        """.formatted(spec, havebeen, excludedActs);
-		        
-		    default -> """
-		        %s에 도움이 될 활동을 추천해줘. 단 "%s"와 비슷한 것은 제외해줘.
-		        """.formatted(spec, havebeen);
-		};
-		} else {
-			prompt = switch (activityType) {
-		    case "도서" -> """
-		        %s를 공부하는 데 도움이 되는 도서를 3권만 추천해줘.
-		        단, 사용자가 이전에 언급한 요소: "%s" 그리고 이미 저장된 요소들 : [%s] 그리고 직전에 추천해줬던 요소들 : [%s] 과 중복되지 않도록 해줘.
-		        도서명, 저자, 출판사만 포함해서 알려줘.
-		        """.formatted(spec, havebeen, excludedActs, list);
-		        
-		    case "영상" -> """
-		        %s에 대해 공부할 수 있는 유튜브 채널 또는 무료 강의 영상 3개 추천해줘.
-		        단, 사용자가 이전에 언급한 활동: "%s" 그리고 이미 저장된 활동들 : [%s] 그리고 직전에 추천해줬던 요소들 : [%s] 과 유사한 내용은 제외하고 새로운 추천만 해줘.
-		        제목과 링크 포함해서 알려줘.
-		        """.formatted(spec, havebeen, excludedActs, list);
-		        
-		    case "기타 활동" -> """
-		        %s와 관련된 실전 경험을 쌓을 수 있는 공모전, 대외활동, 봉사활동 중에서
-		        단, 사용자가 이전에 언급한 활동: "%s" 그리고 이미 저장된 활동들 : [%s] 그리고 직전에 추천해줬던 요소들 : [%s] 과 겹치지 않는 새로운 활동 3가지를 추천해줘.
-		        활동명 제공해주고 관련 URL이 있다면 URL 함께 제공해줘.
-		        만약 관련 기타 활동이 없으면 반드시 빈칸을 보내줘.
-		        """.formatted(spec, havebeen, excludedActs, list);
-		        
-		    default -> """
-		        %s에 도움이 될 활동을 추천해줘. 단 "%s"와 비슷한 것은 제외해줘.
-		        """.formatted(spec, havebeen);
-		};
-		}
-		
+	private ChatbotResponseDto recommendActivity(String spec, String activityType, ConvSession session, Set<String> list) {
+	    String userId = session.getUserId();
+	    String jobId = session.getSubJobTopicId();
+	    String specId = session.getSubSpecTopicId();
 
-		String gptAnswer = gptApiService.callGPT(prompt);
-		System.out.println(gptAnswer);
-		
-		if(gptAnswer == null || gptAnswer.trim().isEmpty()) {
-			ChatbotResponseDTO crd = new ChatbotResponseDTO();
-			
-			crd = cantChooseOptions(activityType, session);
-			
-			return crd;
-		    
-		} else {
-			List<CareerItemDTO> checkboxList = extractCheckboxItems(gptAnswer);
-			
-			if (checkboxList.isEmpty()) {
-				ChatbotResponseDTO crd = new ChatbotResponseDTO();
-				
-				crd = cantChooseOptions(activityType, session);
-				
-				return crd;
-			}
-			
-			for (CareerItemDTO dto : checkboxList) {
-			    session.addRecommendedOption(activityType, dto.getTitle());
-			}
-			
-		    // 🔹 응답 메시지 문자열 생성
-		    StringBuilder msgBuilder = new StringBuilder();
-		    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
-		    for (CareerItemDTO dto : checkboxList) {
-		        msgBuilder.append("- ").append(dto.getTitle()).append(" (").append(dto.getExplain()).append(")\n");
-		    }
+	    // DB에서 이미 저장된 활동들 가져오기
+	    Specific ss = new Specific();
+	    ss.setUserId(userId);
+	    ss.setJobId(jobId);
+	    ss.setSpecId(specId);
 
-		    // 🔹 대화 로그 DB 저장
-		    ChatMsg botMsg = new ChatMsg();
-		    botMsg.setConvId(session.getConvId());
-		    botMsg.setConvTopic(session.getTopic());
-		    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
-		    botMsg.setUserId(session.getUserId());
-		    botMsg.setRole("BOT");
-		    botMsg.setMsgContent(msgBuilder.toString());
-		    chatbotService.insertChatMsg(botMsg);
+	    List<Activity> savedActs = dashboardService.selectUserActs(ss);
+	    List<String> savedTitles = savedActs.stream()
+	        .map(Activity::getActContent)
+	        .collect(Collectors.toList());
 
-		    // 🔹 상태 전이
-		    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
+	    // 제외할 제목들 모으기
+	    Set<String> excludedTitles = new HashSet<>(savedTitles);
+	    excludedTitles.addAll(session.getOptions(activityType));  // 직전 추천 목록도 제외
 
-		    return new ChatbotResponseDTO(
-		        "아래 추천된 항목 중 원하는 요소를 선택해 주세요!",
-		        checkboxList,
-		        List.of("같은 유형으로 더 추천 받기","다른 유형", "종료")
-		    );
-		}
+	    // SerpAPI로 추천 검색
+	    List<CareerItemDto> serpResults = serpApiService.searchSerpActivity(spec, activityType, excludedTitles);
+
+	    if (serpResults.isEmpty()) {
+	        return cantChooseOptions(activityType, session);
+	    }
+
+	    // 세션에 추천 저장
+	    for (CareerItemDto dto : serpResults) {
+	        String storedTitle = dto.getTitle().split(" \\(")[0].trim(); // '영상 제목 (링크)'에서 제목만
+	        session.addRecommendedOption(activityType, storedTitle);
+	    }
+
+	    // 대화 로그 저장
+	    StringBuilder msgBuilder = new StringBuilder();
+	    msgBuilder.append("아래 추천된 ").append(activityType).append(" 항목들을 확인해 보세요:\n");
+	    for (CareerItemDto dto : serpResults) {
+	        msgBuilder.append("- ").append(dto.getTitle()).append("\n");
+	    }
+
+	    ChatMsg botMsg = new ChatMsg();
+	    botMsg.setConvId(session.getConvId());
+	    botMsg.setConvTopic(session.getTopic());
+	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+	    botMsg.setUserId(session.getUserId());
+	    botMsg.setRole("BOT");
+	    botMsg.setMsgContent(msgBuilder.toString());
+	    chatbotService.insertChatMsg(botMsg);
+
+	    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
+
+	    return new ChatbotResponseDto(
+	        "아래 추천된 항목 중 원하는 요소를 선택해 주세요!",
+	        serpResults,
+	        List.of("같은 유형으로 더 추천 받기", "다른 유형", "종료")
+	    );
 	}
+
 	
 	private ChatbotResponseDTO cantChooseOptions(String activityType, ConvSession session){
 		ChatMsg botMsg = new ChatMsg();
@@ -383,19 +316,16 @@ public class ActChatManager {
 
 
 
-	private List<CareerItemDTO> extractCheckboxItems(String gptAnswer) {
-	    return Arrays.stream(gptAnswer.split("\n"))
-	        .filter(line -> line.trim().matches("^\\d+\\..*")) 
-	        .map(line -> {
-	            String content = line.replaceAll("^\\d+\\.\\s*", ""); 
-	            
-	            CareerItemDTO dto = new CareerItemDTO();
-	            dto.setTitle(content);         
-	            dto.setType("act");            
-	            return dto;
-	        })
-	        .collect(Collectors.toList());
-	}
+
+	/*
+	 * private List<CareerItemDto> extractCheckboxItems(String gptAnswer) { return
+	 * Arrays.stream(gptAnswer.split("\n")) .map(String::trim) .filter(line ->
+	 * !line.isBlank()) .map(line -> { String cleaned =
+	 * line.replaceAll("^\\d+[.)\\-\\s]*", "").trim(); CareerItemDto dto = new
+	 * CareerItemDto(); dto.setTitle(cleaned); dto.setType("act"); return dto; })
+	 * .collect(Collectors.toList()); }
+	 */
+
     
     // 추가됨 -- 대화 맥락 파악 후 이상한 대화 거절
     private boolean isSpecRelatedInput(String input) {

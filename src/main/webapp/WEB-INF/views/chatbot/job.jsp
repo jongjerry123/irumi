@@ -399,7 +399,7 @@ document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(cb 
 				<input type="text" placeholder="무엇이든 물어보세요" class="chat-input"
 					id="userInput" />
 				<button class="chat-send-btn" onclick="sendMessage()">
-					<i class="fa fa-paper-plane"></i>
+					➤
 				</button>
 			</div>
 			<!-- Footer -->
