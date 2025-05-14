@@ -743,7 +743,7 @@ body {
 	margin-right: 8px;
 	cursor: pointer;
 	transition: background 0.18s, color 0.18s, border 0.18s;
-	margin-bottom: 4px; /* 버튼들끼리 간격 */
+	margin-bottom: 4px; 
 	opacity: 0.5;
 }
 
@@ -874,7 +874,7 @@ body {
 						<div class="select-btn-list" id="job-btn-list"></div>
 					</div>
 					<div class="select-group">
-						<span class="select-label" style="display: none;">🧾 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
+						<span class="select-label" style="display: none;">📌 준비한 스펙 중 활동을 확인할 대상을 선택해주세요</span>
 						<div class="select-btn-list" id="spec-btn-list"></div>
 					</div>
 					<div class="confirm-select-box">
@@ -918,7 +918,7 @@ body {
 					<div class="saved-schedule-list" id="savedScheduleList"></div>
 
 					<div class="saved-schedule-section">
-						<div class="section-title">➕ 직접 일정 추가하기</div>
+						<div class="section-title">🧾 직접 일정 추가하기</div>
 
 						<div class="manual-input-box">
 							<input type="date" class="manual-date" id="manualDate" /> <input
