@@ -8,13 +8,13 @@
 <title>irumi</title>
 <style>
 body {
-	background-color: #000; 
+	background-color: #000;
 	color: white;
 	margin: 0;
 	padding: 0;
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh; 
+	min-height: 100vh;
 }
 
 .container {
@@ -42,7 +42,7 @@ input[type="email"], input[type="text"] {
 	height: 40px;
 	padding: 0 12px;
 	border: 1px solid #444;
-	border-radius: 6px;
+	border-radius : 6px;
 	background-color: #121212;
 	color: white;
 	box-sizing: border-box;
@@ -111,15 +111,18 @@ input[type="email"], input[type="text"] {
 .message {
 	font-size: 12px;
 	margin-top: 5px;
-	text-align: left;
 }
 
 .message.success {
 	color: #00ffaa;
+	text-align: left;
+	margin-left: 2px;
 }
 
 .message.error {
 	color: #ff5a5a;
+	text-align: left;
+	margin-left: 2px;
 }
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -182,7 +185,7 @@ input[type="email"], input[type="text"] {
             if (!email || !emailRegex.test(email)) {
                 $emailMessage.text('유효한 이메일 주소를 입력해주세요.').addClass('error').removeClass('success');
                 $sendVerificationButton.prop('disabled', true);
-                $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                 isEmailValid = false;
                 return;
             }
@@ -198,7 +201,7 @@ input[type="email"], input[type="text"] {
                     if (response.available) {
                         $emailMessage.text('등록되지 않은 이메일입니다. 회원가입을 진행해주세요.').addClass('error').removeClass('success');
                         $sendVerificationButton.prop('disabled', true);
-                        $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                        $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                         isEmailRegistered = false;
                     } else {
                         $emailMessage.text('등록된 이메일입니다. 인증을 진행해주세요.').addClass('success').removeClass('error');
@@ -210,7 +213,7 @@ input[type="email"], input[type="text"] {
                 error: function() {
                     $emailMessage.text('이메일 확인 중 오류가 발생했습니다.').addClass('error').removeClass('success');
                     $sendVerificationButton.prop('disabled', true);
-                    $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                    $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                 }
             });
         });
@@ -222,8 +225,10 @@ input[type="email"], input[type="text"] {
                 $emailMessage.text('등록된 이메일이 아닙니다.').addClass('error');
                 return;
             }
+            // 버튼 클릭 즉시 "처리 중..." 표시
+            $emailMessage.text('처리 중...').removeClass('success error');
             $sendVerificationButton.prop('disabled', true);
-            $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+            $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
             try {
                 const formData = new FormData();
                 formData.append('email', email);
@@ -234,6 +239,7 @@ input[type="email"], input[type="text"] {
                 });
                 const result = await response.json();
                 if (result.success) {
+                    $emailMessage.text('인증번호가 전송되었습니다.').addClass('success').removeClass('error');
                     $verificationGroup.show();
                     $verificationMessage.text('인증번호를 입력해주세요.').addClass('success');
                     $verificationCode.prop('disabled', false);
@@ -243,7 +249,8 @@ input[type="email"], input[type="text"] {
                     $sendVerificationButton.text('재발송');
                     startTimer();
                 } else {
-                    $verificationMessage.text(result.message || '인증번호 전송에 실패했습니다.').addClass('error');
+                    $emailMessage.text(result.message || '인증번호 전송에 실패했습니다.').addClass('error').removeClass('success');
+                    $verificationMessage.text('');
                 }
                 setTimeout(() => {
                     if (isEmailRegistered) {
@@ -252,7 +259,8 @@ input[type="email"], input[type="text"] {
                     }
                 }, 5000);
             } catch (error) {
-                $verificationMessage.text('인증번호 전송 중 오류가 발생했습니다.').addClass('error');
+                $emailMessage.text('인증번호 전송 중 오류가 발생했습니다.').addClass('error').removeClass('success');
+                $verificationMessage.text('');
                 setTimeout(() => {
                     if (isEmailRegistered) {
                         $sendVerificationButton.prop('disabled', false);
@@ -308,7 +316,7 @@ input[type="email"], input[type="text"] {
                     $timerDisplay.hide();
                     $verificationCode.prop('disabled', true);
                     $verifyCodeButton.prop('disabled', true);
-                    $verifyCodeButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                    $verifyCodeButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                     $verificationMessage.text('인증 시간이 만료되었습니다. 재발송해주세요.').addClass('error');
                 }
             }, 1000);

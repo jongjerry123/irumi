@@ -1,4 +1,4 @@
-package com.project.irumi.social.dto;
+package com.project.irumi.user.social.dto;
 
 public class SocialUserInfo implements java.io.Serializable{
 

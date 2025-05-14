@@ -1,6 +1,6 @@
-package com.project.irumi.social.service;
+package com.project.irumi.user.social.service;
 
-import com.project.irumi.social.dto.SocialUserInfo;
+import com.project.irumi.user.social.dto.SocialUserInfo;
 
 import jakarta.servlet.http.HttpServletRequest;
 
