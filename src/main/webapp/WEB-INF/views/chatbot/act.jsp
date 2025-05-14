@@ -71,6 +71,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	  function loadSpecOptions(jobId) {
 	    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
 	    
+	    document.querySelector(".spec-value").textContent = "";
+	    window.selectedSpecId = null;
+	    window.selectedSpecName = "";
+	    window.selectedSpecType = "";
+	    window.selectedSpecExplain = "";
+
+	    const specButtons = document.querySelectorAll("#spec-btn-list .select-btn");
+	    specButtons.forEach(btn => btn.classList.remove("active"));
+	    
 	    $(".select-group:nth-of-type(2) .select-label").show();
 
 
@@ -125,6 +134,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	      removeBtn.className = "remove-btn";
 	      removeBtn.textContent = "✕";
 	      removeBtn.onclick = function() {
+		    if (confirm("정말 삭제하시겠습니까?")) { 
+
 	        card.remove();
 	        console.log(activity.actId);
 	        
@@ -143,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		    	  }
 		    	});
 	      };
+	     }
 	      // 텍스트
 	      const span = document.createElement("span");
 	      span.textContent = activity.text;
