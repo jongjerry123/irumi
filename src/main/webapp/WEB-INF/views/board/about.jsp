@@ -92,7 +92,7 @@
 
   <!-- 로고 -->
   <div class="about-logo-container">
-    <img src="/irumi/resources/images/ill.png" alt="이루미 로고" class="rotating-logo" />
+    <img src="/irumi/resources/images/ill2.png" alt="이루미 로고" class="rotating-logo" />
   </div>
 
   <!-- 타자 애니메이션 -->

@@ -17,16 +17,41 @@ body {
 	margin: 0;
 }
 
+.about-wrapper {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+    
+.about-logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .rotating-logo {
+      width: 120px;
+      height: 120px;
+      animation: spin 20s linear infinite;
+      filter: drop-shadow(0 0 10px #BAAC80);
+      opacity: 0.92;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
 .container {
 	background-color: #000;
 	border-radius: 10px;
 	padding: 40px;
 	width: 400px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	border-left: 3px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 3px solid #fff;
+	border-left: 1px solid #333;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #333;
+	border-right: 1px solid #333;
 }
 
 h2 {
@@ -130,13 +155,13 @@ input[type="checkbox"] {
 }
 
 #nextBtn:disabled {
-	background-color: #000;
-	color:#fff;
+	background-color: #999;
+	color:#666;
 	cursor: not-allowed;
-	border-left: 1px solid #fff;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-	border-right: 1px solid #fff;
+	border-left: 1px solid #333;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #333;
+	border-right: 1px solid #333;
 }
 </style>
 <script>
@@ -177,8 +202,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </head>
+
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
+<div class="about-wrapper">
+	<!-- 로고 -->
+  <div class="about-logo-container">
+    <img src="/irumi/resources/images/ill.png" alt="이루미 로고" class="rotating-logo" />
+  </div>
 	<div class="container">
 		<h2>다음 내용에 동의해주세요</h2>
 
@@ -243,5 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		<button id="nextBtn" onclick="goToNext()" disabled>다음</button>
 	</div>
+	<br><br><br><br><br><br><br><br><br>
+</div>
 </body>
 </html>
