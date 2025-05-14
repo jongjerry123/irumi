@@ -32,6 +32,7 @@ body {
 
 .category-bar h2 {
 	margin: 0;
+	font-size: 35px;
 }
 
 .tabs {
@@ -96,25 +97,26 @@ table {
 	width: 100%;
 	border-collapse: separate; 
 	border-spacing: 0;         
-	border: 1px solid #222;
+	border: 1px solid #111;
 	border-radius: 12px;
 	overflow: hidden;  
 	margin-top: 40px;         
 }
 
-th, td {
-	border: 1px solid #222;
+th {
+	border: 1px solid #2d0033;
 	padding: 14px;
 	text-align: center;
-}
-
-th {
-	background-color: #552960;
-}
+	background-color: #2d0033;
+} 
 
 td {
+	border: 1px solid #111;
+	padding: 14px;
+	text-align: center;
 	background-color: #000;
 }
+
 
 td a {
 	color: #A983A3;
@@ -243,7 +245,7 @@ input[type="checkbox"] {
 		</div>
 
 		<!-- 하위 탭 -->
-		<div class="tabs" style="margin-top: 30px;">
+		<div class="tabs" style="margin-top: 40px;">
 			<button onclick="location.href='reportedPosts.do'">신고된 게시글</button>
 			<button onclick="location.href='reportedComments.do'">신고된 댓글</button>
 			<button class="active">불량 이용자 목록</button>

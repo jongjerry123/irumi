@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 
 <!DOCTYPE html>
@@ -32,7 +32,7 @@ body {
 
 .category-bar h2 {
 	margin: 0;
-
+	font-size: 35px;
 }
 
 .tabs {
@@ -41,61 +41,61 @@ body {
 }
 
 .tabs button {
-  background-color: #000;
-  color: #fff;
-  padding: 10px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
+	background-color: #000;
+	color: #fff;
+	padding: 10px 24px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	backdrop-filter: blur(4px);
+	transition: all 0.3s ease;
 }
 
 .tabs button:hover {
-  background-color: #111;
-  border-color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+	background-color: #111;
+	border-color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .tabs .active {
-  color: #A983A3;
-  border: 1px solid #A983A3;
-  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
+	color: #A983A3;
+	border: 1px solid #A983A3;
+	box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 .admin-btn {
-  background-color: #000;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
+	background-color: #000;
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 10px;
+	padding: 8px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	backdrop-filter: blur(4px);
+	transition: all 0.3s ease;
 }
 
 .admin-btn:hover {
-  background-color: #111;
-  border-color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+	background-color: #111;
+	border-color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .filters {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
-  padding: 5px 30px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  background-color: #000;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 40px;
+	padding: 5px 30px;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 16px;
+	background-color: #000;
+	box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
 }
 
 .filters-left {
@@ -108,135 +108,142 @@ body {
 }
 
 .dropdown-button {
-  background-color: #000;
-  color: #fff;
-  padding: 8px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
+	background-color: #000;
+	color: #fff;
+	padding: 8px 18px;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(5px);
 }
 
 .dropdown-button:hover {
-  background-color: #111;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+	background-color: #111;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .dropdown-button.selected {
-  border: 1px solid #A983A3;
-  color: #A983A3;
-  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
+	border: 1px solid #A983A3;
+	color: #A983A3;
+	box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 /* 드롭다운 메뉴 영역 */
 .dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #000;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  top: 42px;
-  left: 0;
-  z-index: 1;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s ease;
+	display: none;
+	position: absolute;
+	background-color: #000;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	top: 42px;
+	left: 0;
+	z-index: 1;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+	animation: fadeIn 0.3s ease;
 }
 
 .dropdown-content button {
-  display: block;
-  width: 100%;
-  padding: 10px 16px;
-  border: none;
-  background-color: transparent;
-  color: #fff;
-  text-align: left;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+	display: block;
+	width: 100%;
+	padding: 10px 16px;
+	border: none;
+	background-color: transparent;
+	color: #fff;
+	text-align: left;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
 }
 
 .dropdown-content button:hover {
-  background-color: #111;
+	background-color: #111;
 }
 
 /* 부드러운 등장 효과 */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+@
+keyframes fadeIn {from { opacity:0;
+	transform: translateY(-5px);
 }
 
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
 .sort-btn {
-  background-color: #000;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
+	background-color: #000;
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	padding: 8px 16px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(4px);
 }
 
 .sort-btn:hover {
-  background-color: #111;
-  border-color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+	background-color: #111;
+	border-color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .sort-btn.selected {
-  border: 1px solid #A983A3;
-  color: #A983A3;
-  box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
+	border: 1px solid #A983A3;
+	color: #A983A3;
+	box-shadow: 0 0 8px rgba(169, 131, 163, 0.3);
 }
 
 .write-btn {
-  background-color: #552960;
-  color: #fff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(169, 131, 163, 0.2);
+	background-color: #2d0033;
+	color: #fff;
+	border: none;
+	padding: 10px 24px;
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 12px rgba(169, 131, 163, 0.2);
 }
 
 .write-btn:hover {
-  background-color: #8c6c8c;
-  border-color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(169, 131, 163, 0.4);
+	background-color: #8c6c8c;
+	border-color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 6px 18px rgba(169, 131, 163, 0.4);
 }
 
 table.board-table {
 	width: 100%;
-	border-collapse: separate; 
-	border-spacing: 0;         
-	border: 1px solid #222;
+	border-collapse: separate;
+	border-spacing: 0;
+	border: 1px solid #2d0033;
 	border-radius: 12px;
-	overflow: hidden;          
+	overflow: hidden;
 }
 
-table.board-table th, table.board-table td {
-	border: 1px solid #222;
+table.board-table th {
+	border: 1px;
+	border-color: #2d0033;
+	background-color: #2d0033;
 	padding: 12px;
 	text-align: center;
 }
 
-table.board-table th {
-	background-color: #552960;
-}
-
 table.board-table td {
+	border: 0.5px solid #111;
 	background-color: #000;
+	padding: 12px;
+	text-align: center;
 }
 
 table.board-table td:nth-child(2) {
@@ -246,17 +253,17 @@ table.board-table td:nth-child(2) {
 }
 
 .board-table td a {
-  text-decoration: none; /* 밑줄 제거 */
-  color: #A983A3;         /* 강조색 유지 */
+	text-decoration: none; /* 밑줄 제거 */
+	color: #A983A3; /* 강조색 유지 */
 }
 
 .board-table td a:hover {
-  color: #C69BC6;         /* 선택사항: 호버 시 색 변경 */
+	color: #C69BC6; /* 선택사항: 호버 시 색 변경 */
 }
 
 .board-table td {
-  overflow: visible; /* 기본값은 hidden일 수 있음 */
-  position: relative; /* z-index가 동작하려면 필요 */
+	overflow: visible; /* 기본값은 hidden일 수 있음 */
+	position: relative; /* z-index가 동작하려면 필요 */
 }
 
 .empty-message {
@@ -266,28 +273,27 @@ table.board-table td:nth-child(2) {
 	color: #aaa;
 }
 
-
 .thumbnail-hover {
-  width: 20px;
-  height: 20px;
-  object-fit: cover;
-  border: 1px solid #3a1f41;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  cursor: pointer;
+	width: 20px;
+	height: 20px;
+	object-fit: cover;
+	border: 1px solid #3a1f41;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+	cursor: pointer;
 }
 
 .big-preview {
-  position: fixed;
-  width: 200px;
-  height: auto;
-  top: 100px;
-  left: 100px;
-  z-index: 99999;
-  background-color: #000;
-  padding: 4px;
-  border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.6);
+	position: fixed;
+	width: 200px;
+	height: auto;
+	top: 100px;
+	left: 100px;
+	z-index: 99999;
+	background-color: #000;
+	padding: 4px;
+	border-radius: 8px;
+	box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
 }
 
 .board-footer {
@@ -306,110 +312,136 @@ table.board-table td:nth-child(2) {
 }
 
 .board-footer .pagination button {
-  background-color: #000;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+	background-color: #000;
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	padding: 8px 14px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .board-footer .pagination button:hover {
-  background-color: #111;
-  border-color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+	background-color: #111;
+	border-color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
 }
 
 .board-footer .pagination button.selected {
-  border: 1px solid #A983A3;
-  color: #A983A3;
-  box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
+	border: 1px solid #A983A3;
+	color: #A983A3;
+	box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
 }
 
 .board-footer .search-box {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 16px;
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	margin-top: 16px;
 }
 
 .board-footer input[type="text"] {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  outline: none;
-  background-color: #1a1a1a;
-  color: #fff;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  width: 160px;
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: 1px solid #444;
+	outline: none;
+	background-color: #1a1a1a;
+	color: #fff;
+	font-size: 14px;
+	transition: all 0.3s ease;
+	width: 160px;
 }
 
 .board-footer input[type="text"]:focus {
-  border: 1px solid #A983A3;
-  background-color: #222;
-  box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
+	border: 1px solid #A983A3;
+	background-color: #222;
+	box-shadow: 0 0 6px rgba(169, 131, 163, 0.3);
 }
 
 .board-footer button.search-btn {
-  background-color: #552960;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+	background-color: #2d0033;
+	color: #fff;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .board-footer button.search-btn:hover {
-  background-color: #8c6c8c;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(169, 131, 163, 0.4);
+	background-color: #8c6c8c;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 10px rgba(169, 131, 163, 0.4);
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@
+keyframes fadeUp {from { opacity:0;
+	transform: translateY(10px);
 }
 
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
 tbody tr {
-  opacity: 0;
-  animation: fadeUp 0.5s ease forwards;
+	opacity: 0;
+	animation: fadeUp 0.5s ease forwards;
 }
 
 /* 순차적으로 하나씩 뜨게 만들기 위한 딜레이 */
-tbody tr:nth-child(1) { animation-delay: 0.1s; }
-tbody tr:nth-child(2) { animation-delay: 0.12s; }
-tbody tr:nth-child(3) { animation-delay: 0.14s; }
-tbody tr:nth-child(4) { animation-delay: 0.16s; }
-tbody tr:nth-child(5) { animation-delay: 0.18s; }
-tbody tr:nth-child(6) { animation-delay: 0.2s; }
-tbody tr:nth-child(7) { animation-delay: 0.22s; }
-tbody tr:nth-child(8) { animation-delay: 0.24s; }
-tbody tr:nth-child(9) { animation-delay: 0.26s; }
-tbody tr:nth-child(10) { animation-delay: 0.28s; }
+tbody tr:nth-child(1) {
+	animation-delay: 0.1s;
+}
 
+tbody tr:nth-child(2) {
+	animation-delay: 0.12s;
+}
 
+tbody tr:nth-child(3) {
+	animation-delay: 0.14s;
+}
 
+tbody tr:nth-child(4) {
+	animation-delay: 0.16s;
+}
+
+tbody tr:nth-child(5) {
+	animation-delay: 0.18s;
+}
+
+tbody tr:nth-child(6) {
+	animation-delay: 0.2s;
+}
+
+tbody tr:nth-child(7) {
+	animation-delay: 0.22s;
+}
+
+tbody tr:nth-child(8) {
+	animation-delay: 0.24s;
+}
+
+tbody tr:nth-child(9) {
+	animation-delay: 0.26s;
+}
+
+tbody tr:nth-child(10) {
+	animation-delay: 0.28s;
+}
 </style>
 </head>
 <body>
-<c:import url="/WEB-INF/views/common/header.jsp" />
+	<c:import url="/WEB-INF/views/common/header.jsp" />
 	<div class="main-content">
 		<div class="category-bar">
-			<h2>커뮤니티</h2>
+			<h2>커뮤니티 - 자유게시판</h2>
 			<div class="tabs">
 				<button class="active" onclick="location.href='freeBoard.do'">자유게시판</button>
 				<button onclick="location.href='qnaList.do'">Q&A</button>
@@ -453,8 +485,8 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 						onclick="location.href='writePost.do?type=일반'">✏ 글쓰기</button>
 				</c:when>
 				<c:otherwise>
-					<button class="write-btn" onclick="location.href='loginPage.do'">✏ 글쓰기
-			</button>
+					<button class="write-btn" onclick="location.href='loginPage.do'">✏
+						글쓰기</button>
 				</c:otherwise>
 			</c:choose>
 		</div>
@@ -476,38 +508,37 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
 							<tr>
 								<td>${post.postWriter}</td>
 								<td style="overflow: visible; position: relative;">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
-<c:if test="${post.commentCount > 0}">
-  <span style="color: gray;">(${post.commentCount})</span>
-</c:if>
-</a>
-      <c:if test="${not empty post.postSavedName}">
-        <span title="첨부파일 있음">📎</span>
-      </c:if>
-    </div>
+									<div
+										style="display: flex; justify-content: space-between; align-items: center;">
+										<div style="display: flex; align-items: center; gap: 6px;">
+											<a href="postDetail.do?postId=${post.postId}">${post.postTitle}</a>
+											<c:if test="${post.commentCount > 0}">
+												<span style="color: gray;">(${post.commentCount})</span>
+											</c:if>
+											</a>
+											<c:if test="${not empty post.postSavedName}">
+												<span title="첨부파일 있음">📎</span>
+											</c:if>
+										</div>
 
-    <c:choose>
-      <c:when test="${not empty post.postSavedName && (fn:endsWith(post.postSavedName, '.jpg') || fn:endsWith(post.postSavedName, '.png') || fn:endsWith(post.postSavedName, '.jpeg') || fn:endsWith(post.postSavedName, '.gif'))}">
-        <img src="resources/uploads/${post.postSavedName}" 
-     alt="썸네일" 
-     class="thumbnail-hover" 
-     onmouseover="showPreview(this)" 
-     onmouseout="hidePreview()" />
-      </c:when>
+										<c:choose>
+											<c:when
+												test="${not empty post.postSavedName && (fn:endsWith(post.postSavedName, '.jpg') || fn:endsWith(post.postSavedName, '.png') || fn:endsWith(post.postSavedName, '.jpeg') || fn:endsWith(post.postSavedName, '.gif'))}">
+												<img src="resources/uploads/${post.postSavedName}" alt="썸네일"
+													class="thumbnail-hover" onmouseover="showPreview(this)"
+													onmouseout="hidePreview()" />
+											</c:when>
 
-      <c:when test="${not empty post.firstImageUrl}">
-  <img src="${post.firstImageUrl}" 
-     alt="본문 썸네일" 
-     class="thumbnail-hover" 
-     onmouseover="showPreview(this)" 
-     onmouseout="hidePreview()" />
-</c:when>
-    </c:choose>
-  </div>
-</td>
-								<td><fmt:formatDate value="${post.postTime}" pattern="yyyy-MM-dd HH:mm" /></td>
+											<c:when test="${not empty post.firstImageUrl}">
+												<img src="${post.firstImageUrl}" alt="본문 썸네일"
+													class="thumbnail-hover" onmouseover="showPreview(this)"
+													onmouseout="hidePreview()" />
+											</c:when>
+										</c:choose>
+									</div>
+								</td>
+								<td><fmt:formatDate value="${post.postTime}"
+										pattern="yyyy-MM-dd HH:mm" /></td>
 								<td>${post.postViewCount}</td>
 								<td>${post.postRecommend}</td>
 							</tr>
@@ -569,7 +600,7 @@ tbody tr:nth-child(10) { animation-delay: 0.28s; }
   }
 </script>
 
-<script>//썸내일 크기조정
+	<script>//썸내일 크기조정
 function showPreview(img) {
   const clone = img.cloneNode(true);
   clone.classList.remove("thumbnail-hover");

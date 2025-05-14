@@ -49,7 +49,7 @@ public class HomeController {
         return "redirect:/board/freeBoard.do";  
     }
 	
-	@GetMapping("/about.do")
+	@RequestMapping("/about.do")
 	public String showAboutPage() {
 	    return "board/about";  
 	}
