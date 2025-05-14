@@ -15,19 +15,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.project.irumi.social.dto.SocialUserInfo;
-import com.project.irumi.social.service.SocialOAuthService;
 import com.project.irumi.user.model.dto.User;
 import com.project.irumi.user.service.NaverMailService;
 import com.project.irumi.user.service.UserService;
+import com.project.irumi.user.social.dto.SocialUserInfo;
+import com.project.irumi.user.social.service.SocialOAuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -493,7 +491,7 @@ public class UserController {
 		return response;
 	}
 
-	// 6개월 주기로 비밀번호 교체 요청
+	// 비밀번호 교체 권유 연기 요청
 	@RequestMapping(value = "deferPasswordChange.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deferPasswordChange(@RequestParam(name = "userId") String userId, HttpSession session) {

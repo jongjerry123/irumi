@@ -8,161 +8,169 @@
 <title>irumi</title>
 <style>
 body {
-	background-color: #000;
-	color: white;
-	margin: 0;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
+    background-color: #000;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .container {
-	background-color: #000;
-	border-radius: 10px;
-	padding: 40px;
-	width: 400px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	margin: 150px auto 50px;
-	text-align: center;
-	border: 1px solid #333;
+    background-color: #000;
+    border-radius: 10px;
+    padding: 40px;
+    width: 400px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin: 150px auto 50px;
+    text-align: center;
+    border: 1px solid #333;
 }
 
 h2 {
-	text-align: center;
-	margin-bottom: 30px;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .input-group {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 input[type="text"], input[type="email"] {
-	width: 100%;
-	height: 40px;
-	padding: 0 12px;
-	border: 1px solid #444;
-	border-radius: 6px;
-	background-color: #121212;
-	color: white;
-	box-sizing: border-box;
-	font-size: 14px;
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background-color: #121212;
+    color: white;
+    box-sizing: border-box;
+    font-size: 14px;
 }
 
 .btn, #send-verification, #verify-code {
-	width: 100%;
-	height: 40px;
-	padding: 0 12px;
-	border: none;
-	border-radius: 6px;
-	background-color: #000;
-	color: #fff;
-	font-weight: bold;
-	cursor: pointer;
-	font-size: 14px;
-	box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    box-sizing: border-box;
 }
 
 .btn:disabled, #send-verification:disabled, #verify-code:disabled {
-	background-color: #999;
-	color: #666;
-	cursor: not-allowed;
+    background-color: #999;
+    color: #666;
+    cursor: not-allowed;
 }
 
 .inline-group {
-	display: flex;
-	gap: 10px;
-	align-items: center;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .inline-group input[type="email"], .inline-group input[type="text"] {
-	flex: 1;
-	height: 40px;
+    flex: 1;
+    height: 40px;
 }
 
 .inline-group #send-verification, .inline-group #verify-code {
-	width: auto;
-	min-width: 100px;
-	height: 40px;
+    width: auto;
+    min-width: 100px;
+    height: 40px;
 }
 
 .verification-group {
-	position: relative;
+    position: relative;
 }
 
 #verification-code {
-	width: 100%;
-	height: 40px;
-	padding-right: 60px;
+    width: 100%;
+    height: 40px;
+    padding-right: 60px;
 }
 
 #timer {
-	display: none;
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	color: #fff;
-	font-size: 12px;
-	pointer-events: none;
-	z-index: 10;
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .message {
-	font-size: 12px;
-	margin-top: 5px;
-	text-align: left;
+    font-size: 12px;
+    margin-top: 5px;
 }
 
 .message.success {
-	color: #00ffaa;
+    color: #00ffaa;
+    text-align: left;
+    margin-left: 2px;
 }
 
 .message.error {
-	color: #ff5a5a;
+    color: #ff5a5a;
+    text-align: left;
+    margin-left: 2px;
+}
+.message.processing {
+    color: #fff;
+    text-align: center;
+    margin-left: 2px;
 }
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-	integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-	crossorigin="anonymous"></script>
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
 </head>
 <body>
-	<c:import url="/WEB-INF/views/common/header.jsp" />
-	<div class="container">
-		<h2>비밀번호 찾기</h2>
-		<form id="findPasswordForm">
-			<input type="hidden" name="_csrf" value="${_csrf.token}" />
-			<!-- 아이디 입력 -->
-			<div class="input-group">
-				<input type="text" id="userId" name="userId" placeholder="아이디"
-					maxlength="20">
-				<div id="userId-message" class="message"></div>
-			</div>
-			<!-- 이메일 입력 -->
-			<div class="input-group">
-				<div class="inline-group">
-					<input type="email" id="email" name="email" placeholder="이메일 주소"
-						maxlength="30">
-					<button type="button" id="send-verification" disabled>인증전송</button>
-				</div>
-				<div id="email-message" class="message"></div>
-			</div>
-			<!-- 인증번호 -->
-			<div class="input-group verification-group" style="display: none;">
-				<div class="inline-group">
-					<input type="text" id="verification-code" name="verification-code"
-						placeholder="인증번호" maxlength="6" disabled>
-					<button type="button" id="verify-code" disabled>인증확인</button>
-				</div>
-				<div id="timer">00:00</div>
-				<div id="verification-message" class="message"></div>
-			</div>
-			<button type="button" class="btn" id="reset-password" disabled>임시
-				비밀번호 전송</button>
-		</form>
-	</div>
+    <c:import url="/WEB-INF/views/common/header.jsp" />
+    <div class="container">
+        <h2>비밀번호 찾기</h2>
+        <form id="findPasswordForm">
+            <input type="hidden" name="_csrf" value="${_csrf.token}" />
+            <!-- 아이디 입력 -->
+            <div class="input-group">
+                <input type="text" id="userId" name="userId" placeholder="아이디"
+                    maxlength="20">
+                <div id="userId-message" class="message"></div>
+            </div>
+            <!-- 이메일 입력 -->
+            <div class="input-group">
+                <div class="inline-group">
+                    <input type="email" id="email" name="email" placeholder="이메일 주소"
+                        maxlength="30">
+                    <button type="button" id="send-verification" disabled>인증전송</button>
+                </div>
+                <div id="email-message" class="message"></div>
+            </div>
+            <!-- 인증번호 -->
+            <div class="input-group verification-group" style="display: none;">
+                <div class="inline-group">
+                    <input type="text" id="verification-code" name="verification-code"
+                        placeholder="인증번호" maxlength="6" disabled>
+                    <button type="button" id="verify-code" disabled>인증확인</button>
+                </div>
+                <div id="timer">00:00</div>
+                <div id="verification-message" class="message"></div>
+            </div>
+            <button type="button" class="btn" id="reset-password" disabled>임시
+                비밀번호 전송</button>
+        </form>
+    </div>
 
-	<script>
+    <script>
         (function($) {
             if (typeof $ === 'undefined') {
                 console.error('jQuery is not loaded');
@@ -234,19 +242,19 @@ input[type="text"], input[type="email"] {
                                 } else {
                                     $emailMessage.text('아이디와 이메일이 일치하지 않습니다.').addClass('error').removeClass('success');
                                     $sendVerificationButton.prop('disabled', true);
-                                    $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                                    $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                                     isUserMatched = false;
                                 }
                             },
                             error: function() {
                                 $emailMessage.text('사용자 확인 중 오류가 발생했습니다.').addClass('error');
                                 $sendVerificationButton.prop('disabled', true);
-                                $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                                $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                             }
                         });
                     } else {
                         $sendVerificationButton.prop('disabled', true);
-                        $sendVerificationButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                        $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                     }
                 }
 
@@ -258,8 +266,10 @@ input[type="text"], input[type="email"] {
                     }
                     const email = $emailInput.val().trim();
                     const userId = $userIdInput.val().trim();
+                    // 버튼 클릭 즉시 "처리 중..." 표시
+                    $emailMessage.text('처리 중...').removeClass('success error');
                     $sendVerificationButton.prop('disabled', true);
-                    $sendVerificationButton.css({ 'backgroundColor': 'white', 'color': 'black', 'cursor': 'not-allowed' });
+                    $sendVerificationButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                     try {
                         const formData = new FormData();
                         formData.append('email', email);
@@ -271,6 +281,7 @@ input[type="text"], input[type="email"] {
                         });
                         const result = await response.json();
                         if (result.success) {
+                            $emailMessage.text('인증번호가 전송되었습니다.').addClass('success').removeClass('error');
                             $verificationGroup.show();
                             $verificationMessage.text('인증번호를 입력해주세요.').addClass('success');
                             $verificationCode.prop('disabled', false);
@@ -280,7 +291,8 @@ input[type="text"], input[type="email"] {
                             $sendVerificationButton.text('재발송');
                             startTimer();
                         } else {
-                            $verificationMessage.text(result.message || '인증번호 전송에 실패했습니다.').addClass('error');
+                            $emailMessage.text(result.message || '인증번호 전송에 실패했습니다.').addClass('error').removeClass('success');
+                            $verificationMessage.text('');
                         }
                         setTimeout(() => {
                             if (isUserMatched) {
@@ -289,7 +301,8 @@ input[type="text"], input[type="email"] {
                             }
                         }, 5000);
                     } catch (error) {
-                        $verificationMessage.text('인증번호 전송 중 오류가 발생했습니다.').addClass('error');
+                        $emailMessage.text('인증번호 전송 중 오류가 발생했습니다.').addClass('error').removeClass('success');
+                        $verificationMessage.text('');
                         setTimeout(() => {
                             if (isUserMatched) {
                                 $sendVerificationButton.prop('disabled', false);
@@ -344,7 +357,7 @@ input[type="text"], input[type="email"] {
                             $timerDisplay.hide();
                             $verificationCode.prop('disabled', true);
                             $verifyCodeButton.prop('disabled', true);
-                            $verifyCodeButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
+                            $verifyCodeButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
                             $verificationMessage.text('인증 시간이 만료되었습니다. 재발송해주세요.').addClass('error');
                         }
                     }, 1000);
@@ -373,8 +386,8 @@ input[type="text"], input[type="email"] {
 
                     // 버튼 비활성화 및 처리 중 메시지 표시
                     $resetPasswordButton.prop('disabled', true);
-                    $resetPasswordButton.css({ 'backgroundColor': 'black', 'color': 'white', 'cursor': 'not-allowed' });
-                    $verificationMessage.text('처리 중...').addClass('success').removeClass('error');
+                    $resetPasswordButton.css({ 'backgroundColor': '#999', 'color': '#666', 'cursor': 'not-allowed' });
+                    $verificationMessage.text('처리 중...').addClass('processing').removeClass('success error');
 
                     console.log('Sending reset password request for userId:', userId, 'email:', email);
 
