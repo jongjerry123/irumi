@@ -53,7 +53,6 @@ $(function() {
         }
     });
 	
-	
 		// ➤ 사용자 입력 메시지 서버로 전송 함수
 	  function sendMessage(message) {
 		 //답변 올 때까지 버튼 일시적 비활성화
