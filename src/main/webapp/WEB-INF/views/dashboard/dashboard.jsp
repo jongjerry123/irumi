@@ -45,8 +45,7 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   padding: var(--gap);
 }
-.education-info,
-.spec-info {
+.education-info, .spec-info {
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
@@ -164,6 +163,9 @@ input[type="checkbox"]:checked {
 .certCard table td {
   padding: 5px 0;
   border-bottom: 1px solid #555;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
 }
 a {
   color: var(--primary);
