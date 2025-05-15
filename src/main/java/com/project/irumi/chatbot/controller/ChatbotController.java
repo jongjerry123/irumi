@@ -246,7 +246,10 @@ public class ChatbotController {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
-		ConvSession session = convManager.getSession(userId);
+//		ConvSession session = convManager.getSession(userId);
+		String topic = convManager.getSession(userId).getTopic();
+		String ptopicId = convManager.getSession(userId).getSubJobTopicId();
+		ConvSession session = convManager.createNewSession(userId, topic);
 
 		// 세션 sub 주제 설정
 		switch (session.getTopic()) {
@@ -255,9 +258,29 @@ public class ChatbotController {
 		case "spec":
 			break;
 		case "ss":
+			//1. selecteditem 의 부모를 찾아 subconvJob으로 등록
+			Job pjob=dashboardService.selectJob(ptopicId);
+			CareerItemDTO dto = new CareerItemDTO();
+			dto.setItemId(pjob.getJobId());
+			dto.setTitle(pjob.getJobName());
+			dto.setExplain(pjob.getJobExplain());
+			dto.setType("job");		
+			convManager.setConvSubJobTopic(session, dto);
+			
+			//2. selectedItem을 subconvSpecTopic으로 지정
 			convManager.setConvSubSpecTopic(session, selectedItem);
 			break;
 		case "act":
+			//1. selecteditem 의 부모를 찾아 subconvJob으로 등록
+			Job pjob2=dashboardService.selectJob(ptopicId);
+			CareerItemDTO dto2 = new CareerItemDTO();
+			dto2.setItemId(pjob2.getJobId());
+			dto2.setTitle(pjob2.getJobName());
+			dto2.setExplain(pjob2.getJobExplain());
+			dto2.setType("job");		
+			convManager.setConvSubJobTopic(session, dto2);
+			
+			//2. selectedItem을 subconvSpecTopic으로 지정
 			convManager.setConvSubSpecTopic(session, selectedItem);
 			break;
 		}
