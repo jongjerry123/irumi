@@ -28,8 +28,8 @@ public class SsChatManager {
 	@Autowired
 	private ConvSessionManager convManager;
 	
-	@Autowired
-	private ChatbotService chatbotService;
+//	@Autowired
+//	private ChatbotService chatbotService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
 

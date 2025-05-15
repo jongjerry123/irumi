@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.api.SerpApiService;
 import com.project.irumi.chatbot.context.ConvSession;
-import com.project.irumi.chatbot.context.ConvSessionManager;
+//import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.context.StateActChat;
 import com.project.irumi.chatbot.model.dto.CareerItemDTO;
-import com.project.irumi.chatbot.model.dto.ChatMsg;
+//import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
-import com.project.irumi.chatbot.model.service.ChatbotService;
+//import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
@@ -31,11 +31,11 @@ public class ActChatManager {
 	@Autowired
 	private SerpApiService serpApiService;
 
-	@Autowired
-	private ConvSessionManager convManager;
-	
-	@Autowired
-	private ChatbotService chatbotService;
+//	@Autowired
+//	private ConvSessionManager convManager;
+//	
+//	@Autowired
+//	private ChatbotService chatbotService;
 	
 	@Autowired
 	private DashboardService dashboardService;

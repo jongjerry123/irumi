@@ -37,7 +37,7 @@ public class SpecChatManager {
 	private DashboardService dashboardService;
 
 	@Autowired
-	private ChatbotService chatbotService;
+//	private ChatbotService chatbotService;
 
 	private static final Logger logger = LoggerFactory.getLogger(SpecChatManager.class);
 
