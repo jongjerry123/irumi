@@ -57,25 +57,13 @@ public class SpecChatManager {
 		
 				
 		switch (state) {
-		case START:
-			// 유저가 현재 자신의 성격/ 가치관 입력하게 하는 첫 prompt 저장
-//			botChatMsg.setMsgContent(StateSpecChat.START.getPrompt());
-//			chatbotService.insertChatMsg(botChatMsg);
-//			userChatMsg.setMsgContent(userMsg);
-//			chatbotService.insertChatMsg(userChatMsg);
-
-			// 다음 상태로 이동해 봇 메세지 출력 및 저장
-			session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
-//			botChatMsg.setMsgContent(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
-//			chatbotService.insertChatMsg(botChatMsg);
-			return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
+//		case START:
+//			// 다음 상태로 이동해 봇 메세지 출력 및 저장
+//			session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
+//			return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
 
 		case TEXT_CURRENT_SPEC:
 			// 사용자가 current spec을 입력한 이후.
-			// 유저 메세지 저장
-//			userChatMsg.setMsgContent(userMsg);
-//			chatbotService.insertChatMsg(userChatMsg);
-
 			// 제대로 된 현재 스펙을 입력한 경우
 			if (isSpecRelatedInput(userMsg)) {
 				session.addToContextHistory("유저가 현재 보유한 스펙: " + userMsg);

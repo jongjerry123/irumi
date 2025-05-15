@@ -68,6 +68,16 @@ $(function() {
         url: "startChatSession.do",
         data: { topic: "spec" }, // 필요 시 동적으로 변경
         success: function (sessionTopicOpts) {
+        	/* // ✅ 기존 버튼들 다 처리된 후 이 부분 추가
+            $("#chatArea").empty();              // 이전 대화 삭제
+            removeCheckboxList();               // 이전 체크박스 제거
+            removeOptionButtons();              // 이전 버튼 제거
+            $("#first-bot-prompt").show();      // 첫 봇 메시지 표시
+            $(".chat-send-btn").prop("disabled", false); // 입력창 활성화
+             */
+         	 // 이전 대화, 옵션 제거
+
+             
         	// 유저가 저장한 직무들 전체 프론트에 가지고 있기 위함
         	cacheSessionJobOpts = sessionTopicOpts.jobList; 
             const $jobBtnList = $(".select-job-btn-list");
@@ -104,6 +114,7 @@ $(function() {
                     $specBtnList.append(btn);
                 });
             }
+
         },
         error: function () {
             alert("사용자 정보를 불러오지 못했습니다.");
@@ -153,17 +164,41 @@ $(function() {
 	                    }
 	                });
 	                
+	                // --------------------추가된 부분 -------------------------------
+	                $("#chatArea").empty();
+	    	        removeCheckboxList();
+	    	        removeOptionButtons();
+	    	        $(".saved-spec-list").empty();
+
+	    	        // subtopic 선택 후 manual 입력박스 및 전송 버튼 활성화
+	    	        $(".manual-input-box").show();
+	    	        $(".value").show();
+	    	        $(".chat-send-btn").prop("disabled", false);
+
+	    	        
+	    	        // 프롬프트 문장 생성 및 삽입
+	    	        if (subTopicJobCI && subTopicJobCI.title) {
+	    	        	console.log("출력할 직무명: "+ subTopicJobCI.title);
+	    	        	const $firstPrompt = $("<div>")
+	    	        	  .attr("id", "first-bot-prompt")
+	    	        	  .addClass("answer bot-msg")
+	    	        	  .html(`
+	    	        	    내게 맞는 스펙 추천 세션입니다. <br>
+	    	        	    먼저, <span class="selected-job-text"></span>가 되기 위해 <br>
+	    	        	    이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
+	    	        	  `);
+
+	    	        	$firstPrompt.find(".selected-job-text").text(subTopicJobCI.title); // 안전하게 삽입
+	    	        	$("#chatArea").append($firstPrompt);
+
+	    	        }
+	    	     // ------------------------------------------------------------------------------
+	                
 	            },
 	            error: function () {
 	                alert("서브 토픽 설정에 실패했습니다.");
 	            }
 	        });
-	        //서브토픽 지정 후 봇의 첫 메세지 + 스펙 추가 버튼이 나타나게 함
-	        $("#first-bot-prompt").show();
-	        $(".manual-input-box").show();
-	        $(".selected-job-text").text(subTopicJobCI.title); // 봇 메세지에 나타날 직무 이름
-	        $(".value").show();
-	        $(".chat-send-btn").prop("disabled", false);
 	    } 
 
 	    else {
@@ -455,7 +490,6 @@ $(function() {
            alert("직무를 선택해주세요.");
        }
    });
-
 });
 </script>
 
@@ -504,11 +538,11 @@ $(function() {
 				<div class="content-box">
 					<div class="chat-container" id="chat-container">
 						<div class="chat-area" id="chatArea">
-							<div class="answer bot-msg" id="first-bot-prompt"
+<!-- 							<div class="answer bot-msg" id="first-bot-prompt"
 								style="display: none;">
 								내게 맞는 스펙 추천 세션입니다. <br> 먼저, <span class="selected-job-text"></span>가
 								되기 위해 <br> 이미 달성한 스펙이나 경험이 있으시면 말씀해 주세요.
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>

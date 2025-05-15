@@ -359,8 +359,23 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	      console.error("일정 조회 실패:", err);
 	    	    });
 	    	  }
+	      // 추가된 부분 ----------------------------
+	      $("#chatArea").empty();               // 이전 메시지 제거
+	      $("#userInput").val("");             // 입력창 초기화
+		  $(".chat-send-btn").prop("disabled", false); // 전송버튼 활성화
+			
+			// SS(일정) 찾기 첫 프롬프트 삽입
+			const $firstPrompt = $(`
+			  <div class="message bot-msg" id="first-bot-prompt">
+			    이곳은 일정 찾기 세션입니다. <br>
+			    선택하신 목표 스펙에 맞춰 어떤 시험 일정이 필요한지 알고 싶으세요? <br>
+			    관련된 일정이나 시험명이 있다면 입력해 주세요! <br>
+			    (예시: 정보처리기사 필기 시험 일정, 토익 시험일 등)
+			  </div>
+			`);
+			$("#chatArea").append($firstPrompt);
 	      
-	        $("#first-bot-prompt").show();
+	        $("#first-bot-prompt").show(); // <-- 사실상 없어도 되는듯
 	  });
 	 
 	});

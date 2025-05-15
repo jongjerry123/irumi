@@ -213,7 +213,12 @@ public class ChatbotController {
 		User loginUser = (User) loginSession.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
-		ConvSession session = convManager.getSession(userId);
+		//1. 기존코드
+		//ConvSession session = convManager.getSession(userId);
+		// 2. 고친코드(subtopic 받을 때 세션 다시 만들도록 함)
+		String topic = convManager.getSession(userId).getTopic();
+		ConvSession session = convManager.createNewSession(userId, topic);
+		
 
 		// 세션 sub 주제 설정
 		switch (session.getTopic()) {

@@ -427,7 +427,25 @@ document.addEventListener("DOMContentLoaded", function() {
 	    	      console.error("일정 조회 실패:", err);
 	    	    });
 	    	  }
-	        $("#first-bot-prompt").show();
+	      // 추가된 부분 --------------------------------------
+	      $("#chatArea").empty();
+		  $("#userInput").val("");
+		  $(".chat-send-btn").prop("disabled", false);
+		
+		    // 5. 활동 찾기 첫 메시지 프롬프트 삽입
+		  const $firstPrompt = $(`
+		        <div class="message bot-msg" id="first-bot-prompt">
+		            이곳은 활동 찾기 세션입니다. <br>
+		            위에서 선택하신 목표 스펙을 이루기 위해 관련 활동을 하신 적이 있으신가요? <br>
+		            활동 경험이 있으시다면 적어주시고, 없으시다면 "없음"을 입력해주세요! <br>
+		            (예시 : 기사 자격증을 따기 위해 ooo 문제집 풀어본 경험이 있다, xx 인턴십에 도움이 되도록 사전 프로젝트를 해본 경험이 있다 등등)
+		        </div>
+		  `);
+		  $("#chatArea").append($firstPrompt);
+	      
+	      //---------------------------------------------------
+	      
+	        $("#first-bot-prompt").show(); // <-- 사실상 없어도 되는듯
 	  });
 	
 });
@@ -1028,13 +1046,13 @@ body {
 				<div class="content-box">
 					<div class="chat-container" id="chat-container">
 						<div class="chat-area" id="chatArea">
-							<div class="message bot-msg" id="first-bot-prompt"
+							<!-- <div class="message bot-msg" id="first-bot-prompt"
 							style="display: none;">
 								이곳은 활동 찾기 세션입니다. <br> 위에서 선택하신 목표 스펙을 이루기 위해 관련 활동을 하신 적이
 								있으신가요? <br> 활동 경험이 있으시다면 적어주시고, 없으시다면 "없음"을 입력해주세요! <br>
 								(예시 : 기사 자격증을 따기 위해 ooo 문제집 풀어본 경험이 있다, xx 인턴십에 도움이 되도록 사전 프로젝트를
 								해본 경험이 있다 등등)
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>
