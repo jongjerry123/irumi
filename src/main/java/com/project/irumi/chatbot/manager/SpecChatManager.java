@@ -37,17 +37,17 @@ public class SpecChatManager {
 	private DashboardService dashboardService;
 
 	@Autowired
-	private ChatbotService chatbotService;
+//	private ChatbotService chatbotService;
 
 	private static final Logger logger = LoggerFactory.getLogger(SpecChatManager.class);
 
 	public ChatbotResponseDTO getGptResponse(ConvSession session, String userMsg) {
 		StateSpecChat state = (StateSpecChat) session.getChatState();
 
-		ChatMsg botChatMsg = new ChatMsg(session.getUserId(), session.getConvId(), session.getTopic(),
-				session.getSubJobTopicId(), "BOT");
-		ChatMsg userChatMsg = new ChatMsg(session.getUserId(), session.getConvId(), session.getTopic(),
-				session.getSubJobTopicId(), "USER");
+//		ChatMsg botChatMsg = new ChatMsg(session.getUserId(), session.getConvId(), session.getTopic(),
+//				session.getSubJobTopicId(), "BOT");
+//		ChatMsg userChatMsg = new ChatMsg(session.getUserId(), session.getConvId(), session.getTopic(),
+//				session.getSubJobTopicId(), "USER");
 
 		if (state == null) {
 			state = StateSpecChat.TEXT_CURRENT_SPEC;
@@ -57,32 +57,20 @@ public class SpecChatManager {
 		
 				
 		switch (state) {
-		case START:
-			// 유저가 현재 자신의 성격/ 가치관 입력하게 하는 첫 prompt 저장
-			botChatMsg.setMsgContent(StateSpecChat.START.getPrompt());
-			chatbotService.insertChatMsg(botChatMsg);
-			userChatMsg.setMsgContent(userMsg);
-			chatbotService.insertChatMsg(userChatMsg);
-
-			// 다음 상태로 이동해 봇 메세지 출력 및 저장
-			session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
-			botChatMsg.setMsgContent(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
-			chatbotService.insertChatMsg(botChatMsg);
-			return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
+//		case START:
+//			// 다음 상태로 이동해 봇 메세지 출력 및 저장
+//			session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
+//			return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getPrompt());
 
 		case TEXT_CURRENT_SPEC:
 			// 사용자가 current spec을 입력한 이후.
-			// 유저 메세지 저장
-			userChatMsg.setMsgContent(userMsg);
-			chatbotService.insertChatMsg(userChatMsg);
-
 			// 제대로 된 현재 스펙을 입력한 경우
 			if (isSpecRelatedInput(userMsg)) {
 				session.addToContextHistory("유저가 현재 보유한 스펙: " + userMsg);
 				// 상태를 다음으로 이동해 메세지 출력 및 저장
 				session.setChatState(StateSpecChat.OPT_SPEC_TYPE);
-				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO(StateSpecChat.OPT_SPEC_TYPE.getPrompt(),
 						List.of("어학 능력", "자격증", "인턴십 및 현장실습", "대외 활동", "연구 활동", "기타"));
 			}
@@ -90,18 +78,18 @@ public class SpecChatManager {
 			else {
 				session.setChatState(StateSpecChat.TEXT_CURRENT_SPEC);
 
-				botChatMsg.setMsgContent(StateSpecChat.TEXT_CURRENT_SPEC.getFallBackPrompt());
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent(StateSpecChat.TEXT_CURRENT_SPEC.getFallBackPrompt());
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO(StateSpecChat.TEXT_CURRENT_SPEC.getFallBackPrompt());
 			}
 
 		case OPT_SPEC_TYPE:
 			// 유저가 원하는 스펙 타입 선택한 경우
 			// 유저 응답 DB 저장
-			userChatMsg.setMsgContent(userMsg);
+//			userChatMsg.setMsgContent(userMsg);
 			tempSpecType = userMsg;
 			session.addToContextHistory("유저가 관심 있는 스펙 타입: " + userMsg);
-			chatbotService.insertChatMsg(userChatMsg);
+//			chatbotService.insertChatMsg(userChatMsg);
 
 			// 유저가 원하는 스펙 타입에 따라 추천 리스트 전달.
 			String targetJobName = dashboardService.selectJob(session.getSubJobTopicId()).getJobName();
@@ -119,13 +107,8 @@ public class SpecChatManager {
 					(중요)다른 문장이나 설명은 절대 포함하지 말고, [로 시작해서 ]로 끝나는 완벽한 json 형태로 대답해.
 					각 스펙은 다음 속성을 포함해야 해:
 					- title (스펙 이름)
-					- explain (간단한 설명과 필요한 능력 또는 지식 소개)
+					- explain (간단한 설명과 필요한 능력 또는 지식 소개, 왜 해당 직무에 도움이 되는 스펙인지 간단히 설명)
 
-					예시:
-					[
-					  { "title": "정보처리기사", "explain": "정보 시스템과 소프트웨어 기초 역량을 평가하는 자격증" },
-					  { "title": "포트폴리오 제작", "explain": "자기 주도적 프로젝트를 통해 실무 능력을 보여주는 활동" }
-					]
 					다음과 같은 특성을 가진 유저에게 적합한 스펙으로 3개 추천해야 해.
 					유저의 특성: %s
 					
@@ -170,8 +153,8 @@ public class SpecChatManager {
 
 			// 다음 상태로 전환, 봇 메세지 미리 저장
 			session.setChatState(StateSpecChat.ASK_WANT_MORE_OPT);
-			botChatMsg.setMsgContent(StateSpecChat.ASK_WANT_MORE_OPT.getPrompt());
-			chatbotService.insertChatMsg(botChatMsg);
+//			botChatMsg.setMsgContent(StateSpecChat.ASK_WANT_MORE_OPT.getPrompt());
+//			chatbotService.insertChatMsg(botChatMsg);
 			return new ChatbotResponseDTO(StateSpecChat.ASK_WANT_MORE_OPT.getPrompt(),
 					 specCItemList, List.of("네", "아니요"));
 
@@ -179,14 +162,14 @@ public class SpecChatManager {
 		case ASK_WANT_MORE_OPT:
 			//더 추천받을지 여부 입력한 경우
 			// 사용자 입력 tb 저장
-			userChatMsg.setMsgContent(userMsg);
-			chatbotService.insertChatMsg(userChatMsg);
-			
+//			userChatMsg.setMsgContent(userMsg);
+//			chatbotService.insertChatMsg(userChatMsg);
+//			
 			// 더 추천받고 싶은 경우
 			if ("네".equals(userMsg)) {
 				session.setChatState(StateSpecChat.OPT_SPEC_TYPE); // 루프 예시
-				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent(StateSpecChat.OPT_SPEC_TYPE.getPrompt());
+//				chatbotService.insertChatMsg(botChatMsg);
 				
 				return new ChatbotResponseDTO(StateSpecChat.OPT_SPEC_TYPE.getPrompt(), 
 																					List.of("어학 능력", "자격증", "인턴십 및 현장실습", "대외 활동", "연구 활동", "기타"));
@@ -194,8 +177,8 @@ public class SpecChatManager {
 			else {
 				session.setChatState(StateSpecChat.COMPLETE);
 				
-				botChatMsg.setMsgContent(StateSpecChat.COMPLETE.getPrompt());
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent(StateSpecChat.COMPLETE.getPrompt());
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO(StateSpecChat.COMPLETE.getPrompt(), null);
 			}
 

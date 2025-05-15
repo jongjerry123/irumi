@@ -28,8 +28,8 @@ public class SsChatManager {
 	@Autowired
 	private ConvSessionManager convManager;
 	
-	@Autowired
-	private ChatbotService chatbotService;
+//	@Autowired
+//	private ChatbotService chatbotService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
 
@@ -43,42 +43,42 @@ public class SsChatManager {
 	public ChatbotResponseDTO getGptResponse(ConvSession session, String userMsg) {
 
 
-		ChatMsg botChatMsg = new ChatMsg();
-
-		// 보내온 유저의 메세지 tb에 저장
-		ChatMsg userChatMsg = new ChatMsg();
-		userChatMsg.setConvId(session.getConvId());
-		botChatMsg.setConvId(session.getConvId());
-		userChatMsg.setConvTopic(session.getTopic());
-		botChatMsg.setConvTopic(session.getTopic());
-		switch (session.getTopic()) {
-		case "job":
-			userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "spec":
-			userChatMsg.setConvSubTopicJobId(session.getSubSpecTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "ss":
-			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "act":
-			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		default: // topic 없으면
-			return new ChatbotResponseDTO("현재 세션 토픽 정보가 없습니다.", null);
-
-		}
-		userChatMsg.setMsgContent(userMsg);
-
-		userChatMsg.setRole("USER");
-		botChatMsg.setRole("BOT");
-
-		userChatMsg.setUserId(session.getUserId());
-		botChatMsg.setUserId(session.getUserId());
+//		ChatMsg botChatMsg = new ChatMsg();
+//
+//		// 보내온 유저의 메세지 tb에 저장
+//		ChatMsg userChatMsg = new ChatMsg();
+//		userChatMsg.setConvId(session.getConvId());
+//		botChatMsg.setConvId(session.getConvId());
+//		userChatMsg.setConvTopic(session.getTopic());
+//		botChatMsg.setConvTopic(session.getTopic());
+//		switch (session.getTopic()) {
+//		case "job":
+//			userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		case "spec":
+//			userChatMsg.setConvSubTopicJobId(session.getSubSpecTopicId());
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		case "ss":
+//			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		case "act":
+//			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		default: // topic 없으면
+//			return new ChatbotResponseDTO("현재 세션 토픽 정보가 없습니다.", null);
+//
+//		}
+//		userChatMsg.setMsgContent(userMsg);
+//
+//		userChatMsg.setRole("USER");
+//		botChatMsg.setRole("BOT");
+//
+//		userChatMsg.setUserId(session.getUserId());
+//		botChatMsg.setUserId(session.getUserId());
 
 		
 	    StateSsChat state = (StateSsChat) session.getChatState();
@@ -99,40 +99,40 @@ public class SsChatManager {
 	    	            (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)
 	    	            """;
 
-	    	        ChatMsg botMsg = new ChatMsg();
-	    	        botMsg.setConvId(session.getConvId());
-	    	        botMsg.setConvTopic(session.getTopic());
-	    	        botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-	    	        botMsg.setUserId(session.getUserId());
-	    	        botMsg.setRole("BOT");
-	    	        botMsg.setMsgContent(initMsg);
-
-	    	        chatbotService.insertChatMsg(botMsg); 
+//	    	        ChatMsg botMsg = new ChatMsg();
+//	    	        botMsg.setConvId(session.getConvId());
+//	    	        botMsg.setConvTopic(session.getTopic());
+//	    	        botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//	    	        botMsg.setUserId(session.getUserId());
+//	    	        botMsg.setRole("BOT");
+//	    	        botMsg.setMsgContent(initMsg);
+//
+//	    	        chatbotService.insertChatMsg(botMsg); 
 	            
 	            if(isMeaningful) {
 	            	// SerpAPI 호출
-	            	ChatMsg Umsg = new ChatMsg();
-	            	Umsg.setConvId(session.getConvId());
-	            	Umsg.setConvTopic(session.getTopic());
-	            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); // 필요 시 맞춰 수정
-	            	Umsg.setUserId(session.getUserId());
-	            	Umsg.setRole("USER");
-	            	Umsg.setMsgContent(userMsg);
-
-	            	chatbotService.insertChatMsg(Umsg);
+//	            	ChatMsg Umsg = new ChatMsg();
+//	            	Umsg.setConvId(session.getConvId());
+//	            	Umsg.setConvTopic(session.getTopic());
+//	            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); // 필요 시 맞춰 수정
+//	            	Umsg.setUserId(session.getUserId());
+//	            	Umsg.setRole("USER");
+//	            	Umsg.setMsgContent(userMsg);
+//
+//	            	chatbotService.insertChatMsg(Umsg);
 
 	           	            	
 	                String serpResult = serpApiService.searchExamSchedule(userMsg);
-	                ChatMsg serpMsg = new ChatMsg();
-	                
-	                serpMsg.setConvId(session.getConvId());
-	                serpMsg.setConvTopic(session.getTopic());
-	                serpMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-	                serpMsg.setUserId(session.getUserId());
-	                serpMsg.setRole("BOT");
-	                serpMsg.setMsgContent(serpResult);
-
-	                chatbotService.insertChatMsg(serpMsg);
+//	                ChatMsg serpMsg = new ChatMsg();
+//	                
+//	                serpMsg.setConvId(session.getConvId());
+//	                serpMsg.setConvTopic(session.getTopic());
+//	                serpMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//	                serpMsg.setUserId(session.getUserId());
+//	                serpMsg.setRole("BOT");
+//	                serpMsg.setMsgContent(serpResult);
+//
+//	                chatbotService.insertChatMsg(serpMsg);
 	                
 	                session.setChatState(StateSsChat.ASK_WANT_MORE);
 	                return new ChatbotResponseDTO(
@@ -153,17 +153,17 @@ public class SsChatManager {
 
 	        case ASK_WANT_MORE:
 	            if ("다른 일정 검색".equals(userMsg)) {
-	            	botChatMsg.setMsgContent("다른 일정 검색");
-					chatbotService.insertChatMsg(botChatMsg);
+//	            	botChatMsg.setMsgContent("다른 일정 검색");
+//					chatbotService.insertChatMsg(botChatMsg);
 	                session.setChatState(StateSsChat.SERP_SEARCH);
-	                botChatMsg.setMsgContent("어떤 일정이 궁금하신가요? (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
-					chatbotService.insertChatMsg(botChatMsg);
+//	                botChatMsg.setMsgContent("어떤 일정이 궁금하신가요? (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
+//					chatbotService.insertChatMsg(botChatMsg);
 	                return new ChatbotResponseDTO("어떤 일정이 궁금하신가요? 알고 싶으신 일정의 명칭을 입력해주세요! (예: oooo기사 시험 일정, xxx 공모전 일정, &&& 인턴십 일정)");
 	            } else {
-	            	botChatMsg.setMsgContent("종료");
-					chatbotService.insertChatMsg(botChatMsg);
-	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
-					chatbotService.insertChatMsg(botChatMsg);
+//	            	botChatMsg.setMsgContent("종료");
+//					chatbotService.insertChatMsg(botChatMsg);
+//	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
+//					chatbotService.insertChatMsg(botChatMsg);
 	            	convManager.endSession(session.getUserId());
 	                return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
 	            }
@@ -188,8 +188,6 @@ public class SsChatManager {
         String reply = gptApiService.callGPT(prompt);
         return reply != null && reply.trim().startsWith("예");
     }
-    
-
 }
 
 
