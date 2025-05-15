@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -648,11 +649,12 @@ public class UserController {
 			if (oAuthService == null) {
 				throw new IllegalArgumentException("Unsupported provider: " + provider);
 			}
-
+			int suffix = 100000 + new Random().nextInt(900000);
 			SocialUserInfo userInfo = oAuthService.getUserInfo(code, request);
+			String tempPassword = generateRandomPassword();
 
 			if (userInfo.getEmail() == null) {
-				userInfo.setEmail(userInfo.getSocialId() + "@" + provider.toLowerCase() + ".com");
+				userInfo.setEmail(tempPassword + "@" + provider.toLowerCase() + ".com"+suffix);
 			}
 
 			User existingUser = userservice.findUserBySocialId(userInfo.getSocialId(), userInfo.getLoginType());
