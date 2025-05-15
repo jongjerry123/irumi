@@ -37,24 +37,24 @@ public class JobChatManager {
 	private static final Logger logger = LoggerFactory.getLogger(JobChatManager.class);
 
 	public ChatbotResponseDTO getGptResponse(ConvSession session, String userMsg) {
-		ChatMsg botChatMsg = new ChatMsg();
-		ChatMsg userChatMsg = new ChatMsg();
-		
-		//MSG 저장시에 필요한 대화 세션 정보 세팅
-		userChatMsg.setConvId(session.getConvId());
-		botChatMsg.setConvId(session.getConvId());
-		userChatMsg.setConvTopic(session.getTopic());
-		botChatMsg.setConvTopic(session.getTopic());
-		userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-		botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-	
-		userChatMsg.setMsgContent(userMsg);
-		userChatMsg.setRole("USER");
-		userChatMsg.setUserId(session.getUserId());
-		chatbotService.insertChatMsg(userChatMsg);
-		
-		botChatMsg.setRole("BOT");
-		botChatMsg.setUserId(session.getUserId());
+//		ChatMsg botChatMsg = new ChatMsg();
+//		ChatMsg userChatMsg = new ChatMsg();
+//		
+//		//MSG 저장시에 필요한 대화 세션 정보 세팅
+//		userChatMsg.setConvId(session.getConvId());
+//		botChatMsg.setConvId(session.getConvId());
+//		userChatMsg.setConvTopic(session.getTopic());
+//		botChatMsg.setConvTopic(session.getTopic());
+//		userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//		botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//	
+//		userChatMsg.setMsgContent(userMsg);
+//		userChatMsg.setRole("USER");
+//		userChatMsg.setUserId(session.getUserId());
+//		chatbotService.insertChatMsg(userChatMsg);
+//		
+//		botChatMsg.setRole("BOT");
+//		botChatMsg.setUserId(session.getUserId());
 
 		StateJobChat state = (StateJobChat) session.getChatState();
 		if (state == null)
@@ -65,22 +65,22 @@ public class JobChatManager {
 		// 성격 정보를 저장.
 		case START:
 			// chatbotService로 챗봇의 첫 chatMsg 저장
-			botChatMsg.setMsgContent("내게 맞는 직무 찾기 세션입니다.\r\n" + "먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
-			chatbotService.insertChatMsg(botChatMsg);
+//			botChatMsg.setMsgContent("내게 맞는 직무 찾기 세션입니다.\r\n" + "먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
+//			chatbotService.insertChatMsg(botChatMsg);
 		case ASK_PERSONALITY:
 
 			boolean isMeaningful = isPersonaliltyRelatedInput(userMsg);
 			if (isMeaningful) {
 				session.addToContextHistory("유저는 자신에 대해 다음과 같이 설명함: " + userMsg);
 				session.setChatState(StateJobChat.ASK_JOB_CHARACTERISTIC);
-				botChatMsg.setMsgContent("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO("희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.", null);
 			} else {
 				session.setChatState(StateJobChat.ASK_PERSONALITY);
-				botChatMsg.setMsgContent("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 직무 찾기 세션입니다.\r\n"
-						+ "희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 직무 찾기 세션입니다.\r\n"
+//						+ "희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO("잘못된 응답을 하셨습니다. 다시 입력해주세요. 내게 맞는 직무 찾기 세션입니다.\r\n"
 						+ "희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
 			}
@@ -90,14 +90,14 @@ public class JobChatManager {
 			if (isMeaningful) {
 				session.addToContextHistory("유저가 원하는 희망 직무의 특성은 다음과 같음: " + userMsg);
 				session.setChatState(StateJobChat.ASK_WORK_CHARACTERISTIC);
-				botChatMsg.setMsgContent("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)");
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)");
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO("희망하는 업계가 있다면 알려 주세요.(예: IT, 부동산, 연예계 등)", null);
 			} 
 			else {
 				session.setChatState(StateJobChat.ASK_JOB_CHARACTERISTIC);
-				botChatMsg.setMsgContent("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO("잘못된 응답을 하셨습니다. 다시 입력해주세요.\r\n" + "희망 직무의 특성(예: 연봉, 문화, 업무 방식)을 말씀해주세요.");
 			}
 
@@ -207,15 +207,15 @@ public class JobChatManager {
 //				return new ChatbotResponseDTO("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요", null);
 				
 				session.setChatState(StateJobChat.REC_TYPE);
-				botChatMsg.setMsgContent(StateJobChat.REC_TYPE.getPrompt());
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent(StateJobChat.REC_TYPE.getPrompt());
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO(StateJobChat.REC_TYPE.getPrompt() , List.of("이어서 추천받기", "내 정보 더 입력하기"));
 			} else {
 				session.setChatState(StateJobChat.COMPLETE);
 				// db에 job 저장하기
 
-				botChatMsg.setMsgContent("추천을 마쳤습니다. 도움이 되었기를 바랍니다!");
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent("추천을 마쳤습니다. 도움이 되었기를 바랍니다!");
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO("추천을 마쳤습니다. 도움이 되었기를 바랍니다!", null);
 			}
 		case REC_TYPE:
@@ -317,8 +317,8 @@ public class JobChatManager {
 				// 성격부터 다시 물어봄
 				session.setChatState(StateJobChat.ASK_PERSONALITY);
 
-				botChatMsg.setMsgContent("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요\",");
-				chatbotService.insertChatMsg(botChatMsg);
+//				botChatMsg.setMsgContent("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요\",");
+//				chatbotService.insertChatMsg(botChatMsg);
 				return new ChatbotResponseDTO("그럼 다시  희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요", null);
 			}
 			
@@ -326,15 +326,15 @@ public class JobChatManager {
 		case COMPLETE:
 			session.setChatState(StateJobChat.ASK_PERSONALITY);
 
-			botChatMsg.setMsgContent("대화가 완료되었습니다.");
-			chatbotService.insertChatMsg(botChatMsg);
+//			botChatMsg.setMsgContent("대화가 완료되었습니다.");
+//			chatbotService.insertChatMsg(botChatMsg);
 			return new ChatbotResponseDTO("대화가 완료되었습니다.", null);
 
 		default:
 			session.setChatState(StateJobChat.ASK_PERSONALITY);
 
-			botChatMsg.setMsgContent("알 수 없는 상태입니다. 처음부터 다시 시도해주세요");
-			chatbotService.insertChatMsg(botChatMsg);
+//			botChatMsg.setMsgContent("알 수 없는 상태입니다. 처음부터 다시 시도해주세요");
+//			chatbotService.insertChatMsg(botChatMsg);
 			return new ChatbotResponseDTO("알 수 없는 상태입니다. 처음부터 다시 시도해주세요.", null);
 		}
 	}

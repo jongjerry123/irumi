@@ -2,7 +2,6 @@ package com.project.irumi.chatbot.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.ConvSessionManager;
 import com.project.irumi.chatbot.manager.ActChatManager;
@@ -27,8 +25,10 @@ import com.project.irumi.chatbot.manager.JobChatManager;
 import com.project.irumi.chatbot.manager.SpecChatManager;
 import com.project.irumi.chatbot.manager.SsChatManager;
 import com.project.irumi.chatbot.model.dto.CareerItemDTO;
+import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
 import com.project.irumi.chatbot.model.dto.TopicOptsDTO;
+import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.dto.Activity;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.dto.Spec;
@@ -37,7 +37,6 @@ import com.project.irumi.dashboard.model.dto.Specific;
 import com.project.irumi.dashboard.model.service.DashboardService;
 import com.project.irumi.user.model.dto.User;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -46,7 +45,6 @@ public class ChatbotController {
 
 	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-	
 	@Autowired
 	private ConvSessionManager convManager;
 	private static final Logger logger = LoggerFactory.getLogger(ChatbotController.class);
@@ -61,6 +59,9 @@ public class ChatbotController {
 
 	@Autowired
 	private DashboardService dashboardService;
+
+	@Autowired
+	private ChatbotService chatbotService;
 
 	@Autowired
 	private JobChatManager jobManager;
@@ -109,10 +110,8 @@ public class ChatbotController {
 		// 직무/ 스펙 원본 리스트
 		ArrayList<Job> userJobs;
 
-
 		// CareerItemDto 리스트로 변환하여 저장
 		List<CareerItemDTO> jobCItemList = new ArrayList<>();
-
 
 		switch (topic) {
 		case "job":
@@ -143,7 +142,7 @@ public class ChatbotController {
 		case "ss":
 			// job setting
 			userJobs = dashboardService.selectUserJobs(userId);
-			
+
 			for (Job job : userJobs) {
 				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(job.getJobId());
@@ -152,16 +151,15 @@ public class ChatbotController {
 				dto.setType("job");
 				jobCItemList.add(dto);
 			}
-			
-			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 
+			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 
 			break;
 
 		case "act":
 			// job setting
 			userJobs = dashboardService.selectUserJobs(userId);
-			
+
 			for (Job job : userJobs) {
 				CareerItemDTO dto = new CareerItemDTO();
 				dto.setItemId(job.getJobId());
@@ -170,7 +168,7 @@ public class ChatbotController {
 				dto.setType("job");
 				jobCItemList.add(dto);
 			}
-			
+
 			sessionTopicOpts.setJobList(jobCItemList); // 변환된 리스트 사용
 			// 유저 직무 선택에 따라 sub 주제 세팅
 			break;
@@ -180,33 +178,32 @@ public class ChatbotController {
 		//
 		return sessionTopicOpts;
 	}
-	
+
 	@RequestMapping(value = "selectSpecByJobId.do", method = RequestMethod.POST)
 	@ResponseBody
 	public List<CareerItemDTO> selectSpecByJobId(@RequestBody Map<String, String> data, HttpSession session) {
-	    String jobId = data.get("jobId");
+		String jobId = data.get("jobId");
 
-	    User loginUser = (User) session.getAttribute("loginUser");
-	    String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+		User loginUser = (User) session.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
-	    Specific specific = new Specific();
-	    specific.setUserId(userId);
-	    specific.setJobId(jobId);
+		Specific specific = new Specific();
+		specific.setUserId(userId);
+		specific.setJobId(jobId);
 
-	    List<Spec> specList = dashboardService.selectUserSpecs(specific);
-	    List<CareerItemDTO> result = new ArrayList<>();
+		List<Spec> specList = dashboardService.selectUserSpecs(specific);
+		List<CareerItemDTO> result = new ArrayList<>();
 
-	    for (Spec spec : specList) {
-	        CareerItemDTO dto = new CareerItemDTO();
-	        dto.setItemId(spec.getSpecId());
-	        dto.setTitle(spec.getSpecName());
-	        dto.setExplain(spec.getSpecExplain());
-	        dto.setType("spec");
-	        result.add(dto);
-	    }
-	    return result;
+		for (Spec spec : specList) {
+			CareerItemDTO dto = new CareerItemDTO();
+			dto.setItemId(spec.getSpecId());
+			dto.setTitle(spec.getSpecName());
+			dto.setExplain(spec.getSpecExplain());
+			dto.setType("spec");
+			result.add(dto);
+		}
+		return result;
 	}
-
 
 	// 대화 시작하고 서브 토픽 [직무] 설정 클릭 ===========================
 	// 클릭된 버튼에서 Career Item 객체정보를 받아 convManager에게 보내 subtopic으로 지정
@@ -336,8 +333,8 @@ public class ChatbotController {
 			Specific specific = new Specific();
 			specific.setUserId(userId);
 			specific.setJobId(convSession.getSubJobTopicId());
-			logger.info("target 직무 아이디"+ specific.getJobId());
-			
+			logger.info("target 직무 아이디" + specific.getJobId());
+
 			List<Spec> specList = dashboardService.selectUserSpecs(specific);
 			boolean isSpecDuplicate = false;
 			for (Spec spec : specList) {
@@ -346,7 +343,7 @@ public class ChatbotController {
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("직무에 같은 스펙이 이미 존재합니다.");
 				}
 			}
-			if (isSpecDuplicate == false && specList.size()<7) {
+			if (isSpecDuplicate == false && specList.size() < 7) {
 				// 스펙 추천 챗봇에서 선택한 스펙을 저장하기.
 				// 프론트에서 받아온 스펙 정보로 스펙 객체 만들기
 				Spec spec = new Spec();
@@ -369,8 +366,7 @@ public class ChatbotController {
 				specific1.setSpecId(specId);
 
 				dashboardService.insertSpecLink(specific1);
-			}
-			else {
+			} else {
 				// 7개 초과해 추가하려고 할 경우
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("스펙은 직무당 최대 7개까지만 추가할 수 있습니다.");
 			}
@@ -417,24 +413,35 @@ public class ChatbotController {
 	@RequestMapping(value = "/sendMessageToChatbot.do", method = RequestMethod.POST)
 	@ResponseBody
 	public ChatbotResponseDTO sendMessageToChatbot(@RequestBody Map<String, Object> body, HttpSession session) {
-		// 보낸 유저 정보
+		// 로그인 유저 확인
 		User loginUser = (User) session.getAttribute("loginUser");
 		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
-
 		logger.info("login User: " + userId);
 
 		// 프론트에서 받은 유저 메세지와 토픽 가져오기
 		String userMsg = (String) body.get("userMsg");
 		String topic = (String) body.get("topic");
 
+		// 세션 확인 및 생성
 		ConvSession convSession = convManager.getSession(userId);
 		if (convSession == null || !topic.equals(convSession.getTopic())) {
 			convSession = convManager.createNewSession(userId, topic);
 			System.out.println("[DEBUG] New ConvSession created for " + userId + " / topic: " + topic);
 		}
 
-		ChatbotResponseDTO responseDto;
+		// 1. 유저 메세지 저장
+		ChatMsg userMsgObj = new ChatMsg();
+		userMsgObj.setConvId(convSession.getConvId());
+		userMsgObj.setConvTopic(topic);
+		userMsgObj.setConvSubTopicSpecId(convSession.getSubSpecTopicId()); // null일 수도 있음 <-- 오류나면 switch case 안에 넣기
+		userMsgObj.setMsgContent(userMsg);
+		userMsgObj.setRole("USER");
+		userMsgObj.setUserId(userId);
+		chatbotService.insertChatMsg(userMsgObj);
+		
 
+		// 2. Manager에게 응답 요청
+		ChatbotResponseDTO responseDto;
 		switch (topic) {
 		case "job":
 			responseDto = jobManager.getGptResponse(convSession, userMsg);
@@ -452,6 +459,16 @@ public class ChatbotController {
 			responseDto = new ChatbotResponseDTO("유효하지 않은 주제입니다.", null);
 		}
 
+		
+		// 3. 챗봇 응답 메시지 저장
+	    ChatMsg botMsgObj = new ChatMsg();
+	    botMsgObj.setConvId(convSession.getConvId());
+	    botMsgObj.setConvTopic(topic);
+	    botMsgObj.setConvSubTopicSpecId(convSession.getSubSpecTopicId()); // 필요 시 subTopic 설정
+	    botMsgObj.setMsgContent(responseDto.getGptAnswer()); // 또는 responseDto.getGptAnswer()
+	    botMsgObj.setRole("BOT");
+	    botMsgObj.setUserId(userId);
+	    chatbotService.insertChatMsg(botMsgObj);
 		return responseDto;
 	}
 
@@ -534,65 +551,61 @@ public class ChatbotController {
 		}
 		return specCIList;
 	}
-	
-		@RequestMapping(value = "getActByCI.do", method = RequestMethod.POST)
-		@ResponseBody
-		public List<CareerItemDTO> getActByCI(@RequestBody CareerItemDTO targetCI, HttpSession loginSession) {
 
-			// 로그인 세션에서 현 유저 받아옴.
-			User loginUser = (User) loginSession.getAttribute("loginUser");
-			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+	@RequestMapping(value = "getActByCI.do", method = RequestMethod.POST)
+	@ResponseBody
+	public List<CareerItemDTO> getActByCI(@RequestBody CareerItemDTO targetCI, HttpSession loginSession) {
 
-			Specific specific = new Specific();
-			specific.setUserId(userId);
-			specific.setJobId(targetCI.getpId());
-			specific.setSpecId(targetCI.getItemId());
+		// 로그인 세션에서 현 유저 받아옴.
+		User loginUser = (User) loginSession.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
 
-			List<Activity> activityList = dashboardService.selectUserActs(specific);
-			List<CareerItemDTO> actCIList = new ArrayList<>();
-			for (Activity act : activityList) {
-				CareerItemDTO dto = new CareerItemDTO();
-				dto.setItemId(act.getActId()); 
-				dto.setTitle(act.getActContent());
-				dto.setState(act.getActState());
-				dto.setType("act"); 
+		Specific specific = new Specific();
+		specific.setUserId(userId);
+		specific.setJobId(targetCI.getpId());
+		specific.setSpecId(targetCI.getItemId());
 
-				actCIList.add(dto);
-			}
-			return actCIList;
+		List<Activity> activityList = dashboardService.selectUserActs(specific);
+		List<CareerItemDTO> actCIList = new ArrayList<>();
+		for (Activity act : activityList) {
+			CareerItemDTO dto = new CareerItemDTO();
+			dto.setItemId(act.getActId());
+			dto.setTitle(act.getActContent());
+			dto.setState(act.getActState());
+			dto.setType("act");
+
+			actCIList.add(dto);
 		}
-		
-		@RequestMapping(value = "getSs.do", method = RequestMethod.POST)
-		@ResponseBody
-		public List<CareerItemDTO> getSs(@RequestBody Map<String, String> data, HttpSession loginSession) {
-			String specId = data.get("specId");
-			
-			// 로그인 세션에서 현 유저 받아옴.
-			User loginUser = (User) loginSession.getAttribute("loginUser");
-			String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+		return actCIList;
+	}
 
-			List<SpecSchedule> scheduleList = dashboardService.selectUserSpecSchedule(specId);
-			List<CareerItemDTO> ssList = new ArrayList<>();
-			for (SpecSchedule ss : scheduleList) {
-				CareerItemDTO dto = new CareerItemDTO();
-				dto.setItemId(ss.getSsId()); 
-				dto.setpId(ss.getSpecId());
-				dto.setExplain(ss.getSsType());
-				
-				LocalDate localDate = ss.getSsDate().toLocalDate();
-				String formatted = localDate.format(formatter);
-				
-			    dto.setStrschedule(localDate.format(formatter));
-			    
-			    
-				dto.setType("ss"); 
+	@RequestMapping(value = "getSs.do", method = RequestMethod.POST)
+	@ResponseBody
+	public List<CareerItemDTO> getSs(@RequestBody Map<String, String> data, HttpSession loginSession) {
+		String specId = data.get("specId");
 
-				ssList.add(dto);
-			}
-			return ssList;
+		// 로그인 세션에서 현 유저 받아옴.
+		User loginUser = (User) loginSession.getAttribute("loginUser");
+		String userId = (loginUser != null) ? loginUser.getUserId() : "ExUser";
+
+		List<SpecSchedule> scheduleList = dashboardService.selectUserSpecSchedule(specId);
+		List<CareerItemDTO> ssList = new ArrayList<>();
+		for (SpecSchedule ss : scheduleList) {
+			CareerItemDTO dto = new CareerItemDTO();
+			dto.setItemId(ss.getSsId());
+			dto.setpId(ss.getSpecId());
+			dto.setExplain(ss.getSsType());
+
+			LocalDate localDate = ss.getSsDate().toLocalDate();
+			String formatted = localDate.format(formatter);
+
+			dto.setStrschedule(localDate.format(formatter));
+
+			dto.setType("ss");
+
+			ssList.add(dto);
 		}
-		
-		
-		
-		
+		return ssList;
+	}
+
 }
