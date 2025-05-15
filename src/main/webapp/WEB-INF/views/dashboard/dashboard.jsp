@@ -120,7 +120,7 @@ input[type="checkbox"]:checked {
   transform: scale(1.2);
 }
 .progress-bar {
-  background: darkgray;
+  background: #505050;
   width: 100%;
   height: 20px;
   border-radius: var(--radius);
@@ -241,7 +241,13 @@ a {
 	                            success: function(data) {
 	                            	$('#specProgress').html('목표 스펙 달성도');
 	                            	$('#progressBarSection').html('<div class="progress-bar"><div class="progress" style="width:' + data.progress + '%">' + (Math.round((data.progress + Number.EPSILON) * 100) / 100) + '%</div></div><br>');
-									if (data.progress === 0) {
+	                            	// 색상 계산
+
+	                        		const color = 'rgba(' + (235 + Math.round(-185 * (data.progress) / 100)) + ' , ' + (202 + Math.round(-31 * (data.progress) / 100)) + ' , ' + (68 + Math.round(91 * (data.progress) / 100)) + ', 1.0)';
+
+	                        		// 그라데이션 적용
+	                        		$('.progress').css({'background': 'linear-gradient(to right, rgba(235, 202, 68, 1.0) 30%, ' + color + ' 70%)'});
+	                            	if (data.progress === 0) {
 										$('.progress').prepend('&nbsp;&nbsp;&nbsp;');
 	                            	}
 	                            }

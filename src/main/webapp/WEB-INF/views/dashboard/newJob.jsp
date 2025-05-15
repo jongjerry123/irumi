@@ -35,11 +35,13 @@ form.sform {
 }
 
 fieldset {
-	border: 2px solid #009688;
-	border-radius: 10px;
-	display: inline-block;
-	padding: 20px 30px;
-	background-color: #222;
+    /* border: 2px solid #009688; */
+    border: 0px;
+    border-radius: 10px;
+    display: inline-block;
+    padding: 20px 30px;
+    /* background-color: #222; */
+    width: 1000px;
 }
 
 legend {
@@ -49,12 +51,12 @@ legend {
 }
 
 input[type="search"] {
-	padding: 8px;
-	border: 1px solid #555;
-	border-radius: 5px;
-	width: 1000px;
-	background: #333;
-	color: white;
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    width: 30%;
+    background: #333;
+    color: white;
 }
 
 input[type="submit"], #re {
@@ -91,7 +93,8 @@ th {
 }
 
 td {
-	color: #ccc;
+    color: #ccc;
+    padding: 20px;
 }
 
 td a {
@@ -135,12 +138,12 @@ td a:hover {
     background-color: #444;
 }
 </style>
-
-</style>
+<script type="text/javascript" src="${ pageContext.servletContext.contextPath }/resources/js/jquery-3.7.1.min.js"></script>
 <script>
 	function toggleCheckboxes() {
 		const container = document.getElementById('checkboxContainer');
 		container.style.display = (container.style.display === 'none') ? 'block' : 'none';
+		$('#typeSearchButton').html((container.style.display === 'none') ? '분류 선택 ↓' : '분류 선택 ↑');
 	}
 	
 	function resetPage() {
@@ -157,8 +160,8 @@ td a:hover {
 		<legend>검색할 직업을 입력하세요.</legend>
 			<input type="search" name="keyword" size="50"> &nbsp;
 			<input type="submit" value="검색">&nbsp;&nbsp;&nbsp;<button id="re" type="button" onclick="resetPage()">목록</button><br>
-		<button type="button" onclick="toggleCheckboxes()" style="margin-top: 20px; padding: 10px 20px; background-color: #00bfa5; color: white; border: none; border-radius: 5px; cursor: pointer;">
-			상세검색
+		<button id="typeSearchButton" type="button" onclick="toggleCheckboxes()" style="margin-top: 20px; padding: 10px 20px; background-color: #00bfa5; color: white; border: none; border-radius: 5px; cursor: pointer;">
+			분류 선택 ↓
 		</button>
 		<div id="checkboxContainer" style="display: none; margin-top: 20px;">
 		<div class="checkbox-grid">
