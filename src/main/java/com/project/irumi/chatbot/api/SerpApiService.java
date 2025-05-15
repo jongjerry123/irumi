@@ -131,7 +131,7 @@ public class SerpApiService {
 
             if (!link.isBlank()) {
             	sb.append("📚 입력하신 시험 일정은 관련 링크를 참조해 주세요!<br>")
-            	.append("🔗 <a href='").append(link).append("' target='_blank'>공식 사이트 바로가기</a>");
+            	.append("🔗 <a href='").append(link).append("' target='_blank' class='custom-link'>공식 사이트 바로가기</a>");
             } else {
                 sb.append("🔗 공식 링크를 찾을 수 없습니다. 공식 기관 웹사이트를 참고해 보세요.");
             }
@@ -148,8 +148,8 @@ public class SerpApiService {
     public List<CareerItemDTO> searchSerpActivity(String spec, String activityType, Set<String> excludedTitles) {
     	String query = switch (activityType) {
     		case "도서" -> "%s 공부에 도움이 되는 책 제목과 저자, 출판사만 추천해".formatted(spec);
-    		case "영상" -> spec + " 관련 무료 유튜브 강의 추천 site:youtube.com";
-    		case "기타 활동" -> spec + " 관련 공모전, 대외활동, 봉사활동 소개 site:allcon.or.kr";
+    		case "영상" -> "%s 관련 무료 유튜브 영상 추천 site:youtube.com".formatted(spec);
+//    		case "기타 활동" -> spec + " 관련 공모전, 대외활동, 봉사활동 소개 site:allcon.or.kr";
     		default -> spec + " 관련 유용한 자료 추천";
     	};
 

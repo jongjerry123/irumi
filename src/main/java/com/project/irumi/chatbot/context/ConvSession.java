@@ -18,7 +18,7 @@ public class ConvSession {
 	private String subJobTopicId = null; 
 	private String subSpecTopicId = null;
 	private String userId;
-	private ChatMsg havebeenact;	 	// 해왔던 활동 
+	private String subSpecTopicType = null;	 	 
 	
 
 	
@@ -156,13 +156,23 @@ public class ConvSession {
         this.lastActivityType = lastActivityType;
     }
 
-	public ChatMsg getHavebeenact() {
-		return havebeenact;
+	public String getSubSpecTopicType() {
+		return subSpecTopicType;
 	}
 
-	public void setHavebeenact(ChatMsg umsg) {
-		this.havebeenact = umsg;
+	public void setSubSpecTopicType(String subSpecTopicType) {
+		this.subSpecTopicType = subSpecTopicType;
 	}
+
+	public Map<String, Set<String>> getRecommendedoptions() {
+		return recommendedoptions;
+	}
+
+	public void setRecommendedoptions(Map<String, Set<String>> recommendedoptions) {
+		this.recommendedoptions = recommendedoptions;
+	}
+
+	
 
     
    

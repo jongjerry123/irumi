@@ -769,7 +769,7 @@ body {
 
 .select-btn-list {
 	padding: 5px;
-	margin-bottom : 5px;	
+	margin-bottom : 20px;	
 }
 
 .select-btn.active {
@@ -829,6 +829,15 @@ body {
 	align-self: flex-start;
 	text-align: left;
 }
+
+.custom-link {
+  color: #BAAC80;
+  text-decoration: underline;
+}
+.custom-link:hover {
+  color: #B2E86F;
+}
+
 /* 추가 - 입력창과 버튼 정렬 */
 .chat-input-box {
 	display: flex;
