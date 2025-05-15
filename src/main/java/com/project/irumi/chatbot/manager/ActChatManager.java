@@ -298,14 +298,14 @@ public class ActChatManager {
 
 	
 	private ChatbotResponseDTO cantChooseOptions(String activityType, ConvSession session){
-		ChatMsg botMsg = new ChatMsg();
-	    botMsg.setConvId(session.getConvId());
-	    botMsg.setConvTopic(session.getTopic());
-	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
-	    botMsg.setUserId(session.getUserId());
-	    botMsg.setRole("BOT");
-	    botMsg.setMsgContent(activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.");
-	    chatbotService.insertChatMsg(botMsg);
+//		ChatMsg botMsg = new ChatMsg();
+//	    botMsg.setConvId(session.getConvId());
+//	    botMsg.setConvTopic(session.getTopic());
+//	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
+//	    botMsg.setUserId(session.getUserId());
+//	    botMsg.setRole("BOT");
+//	    botMsg.setMsgContent(activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.");
+//	    chatbotService.insertChatMsg(botMsg);
 	    
 	    return new ChatbotResponseDTO(
 	    	activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.",
