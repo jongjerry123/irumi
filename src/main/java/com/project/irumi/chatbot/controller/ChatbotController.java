@@ -433,6 +433,7 @@ public class ChatbotController {
 		ChatMsg userMsgObj = new ChatMsg();
 		userMsgObj.setConvId(convSession.getConvId());
 		userMsgObj.setConvTopic(topic);
+		userMsgObj.setConvSubTopicJobId(convSession.getSubJobTopicId()); // null일 수도 있음 <-- 오류나면 switch case 안에 넣기
 		userMsgObj.setConvSubTopicSpecId(convSession.getSubSpecTopicId()); // null일 수도 있음 <-- 오류나면 switch case 안에 넣기
 		userMsgObj.setMsgContent(userMsg);
 		userMsgObj.setRole("USER");
@@ -465,6 +466,7 @@ public class ChatbotController {
 	    botMsgObj.setConvId(convSession.getConvId());
 	    botMsgObj.setConvTopic(topic);
 	    botMsgObj.setConvSubTopicSpecId(convSession.getSubSpecTopicId()); // 필요 시 subTopic 설정
+	    botMsgObj.setConvSubTopicJobId(convSession.getSubJobTopicId()); // 필요 시 subTopic 설정
 	    botMsgObj.setMsgContent(responseDto.getGptAnswer()); // 또는 responseDto.getGptAnswer()
 	    botMsgObj.setRole("BOT");
 	    botMsgObj.setUserId(userId);
