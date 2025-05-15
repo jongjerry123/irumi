@@ -416,9 +416,11 @@ window.addEventListener("DOMContentLoaded", function () {
       <div class="detail-content ai">
         <h3>대화형 도우미</h3>
         <p>
-          AI와 함께 진로를 설계해보세요.<br>
-          이루미 도우미는 자격증, 활동, 일정까지 <br>개인화된 정보를 제공하며,<br>
-          궁금한 내용을 실시간으로 물어보고 <br>곧바로 기록할 수 있는 유용한 파트너입니다.
+          AI와 함께 진로를 설계하고 기록하세요.<br>
+		대화형 도우미가 <b>내게 맞는 직무</b>를 추천하고,<br>
+		필요한 스펙과 자격증 일정, <br>
+		도움이 되는 영상/도서 링크까지 개인화된 정보를 제공합니다.<br>
+
         </p>
         <button onclick="moveToAi()">바로가기</button>
       </div>
