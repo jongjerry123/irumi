@@ -40,7 +40,7 @@ public class SsChatManager {
 //		return null;
 //	}
 	
-	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {
+	public ChatbotResponseDTO getGptResponse(ConvSession session, String userMsg) {
 
 
 		ChatMsg botChatMsg = new ChatMsg();

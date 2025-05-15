@@ -71,6 +71,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	  function loadSpecOptions(jobId) {
 	    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
 	    
+	    document.querySelector(".spec-value").textContent = "";
+	    window.selectedSpecId = null;
+	    window.selectedSpecName = "";
+	    window.selectedSpecType = "";
+	    window.selectedSpecExplain = "";
+
+	    const specButtons = document.querySelectorAll("#spec-btn-list .select-btn");
+	    specButtons.forEach(btn => btn.classList.remove("active"));
+	    
 	    $(".select-group:nth-of-type(2) .select-label").show(); 
 
 
@@ -123,6 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	      removeBtn.className = "remove-btn";
 	      removeBtn.textContent = "✕";
 	      removeBtn.onclick = function() {
+	    	if (confirm("정말 삭제하시겠습니까?")) { 
 	        card.remove();
 	        
 	        
@@ -142,6 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		    	});
 
 	      };
+	    }
 	      // 텍스트
 	      const span = document.createElement("span");
 	      span.textContent = item.text;
@@ -758,7 +769,7 @@ body {
 
 .select-btn-list {
 	padding: 5px;
-	margin-bottom : 5px;	
+	margin-bottom : 20px;	
 }
 
 .select-btn.active {
@@ -818,6 +829,15 @@ body {
 	align-self: flex-start;
 	text-align: left;
 }
+
+.custom-link {
+  color: #BAAC80;
+  text-decoration: underline;
+}
+.custom-link:hover {
+  color: #B2E86F;
+}
+
 /* 추가 - 입력창과 버튼 정렬 */
 .chat-input-box {
 	display: flex;
