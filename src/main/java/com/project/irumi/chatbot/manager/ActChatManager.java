@@ -49,44 +49,44 @@ public class ActChatManager {
 
 	public ChatbotResponseDTO handleChatMessage(ConvSession session, String userMsg) {	    
 
-		ChatMsg botChatMsg = new ChatMsg();
-
-		// 보내온 유저의 메세지 tb에 저장
-		ChatMsg userChatMsg = new ChatMsg();
-		userChatMsg.setConvId(session.getConvId());
-		botChatMsg.setConvId(session.getConvId());
-		userChatMsg.setConvTopic(session.getTopic());
-		botChatMsg.setConvTopic(session.getTopic());
-		switch(session.getTopic()) {
-		case "job":
-				userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-				botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-				break;
-		case "spec":
-			userChatMsg.setConvSubTopicJobId(session.getSubSpecTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "ss":
-			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		case "act":
-			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
-			break;
-		default: // topic 없으면 
-			return new ChatbotResponseDTO("현재 세션 토픽 정보가 없습니다.", null);
-			
-		}		
-		
-		
-		userChatMsg.setMsgContent(userMsg);
-		
-		userChatMsg.setRole("USER");
-		botChatMsg.setRole("BOT");
-		
-		userChatMsg.setUserId(session.getUserId());
-		botChatMsg.setUserId(session.getUserId());
+//		ChatMsg botChatMsg = new ChatMsg();
+//
+//		// 보내온 유저의 메세지 tb에 저장
+//		ChatMsg userChatMsg = new ChatMsg();
+//		userChatMsg.setConvId(session.getConvId());
+//		botChatMsg.setConvId(session.getConvId());
+//		userChatMsg.setConvTopic(session.getTopic());
+//		botChatMsg.setConvTopic(session.getTopic());
+//		switch(session.getTopic()) {
+//		case "job":
+//				userChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//				botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//				break;
+//		case "spec":
+//			userChatMsg.setConvSubTopicJobId(session.getSubSpecTopicId());
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		case "ss":
+//			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		case "act":
+//			userChatMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//			botChatMsg.setConvSubTopicSpecId(null); // 직무선택은 subtopic 없음.
+//			break;
+//		default: // topic 없으면 
+//			return new ChatbotResponseDTO("현재 세션 토픽 정보가 없습니다.", null);
+//			
+//		}		
+//		
+//		
+//		userChatMsg.setMsgContent(userMsg);
+//		
+//		userChatMsg.setRole("USER");
+//		botChatMsg.setRole("BOT");
+//		
+//		userChatMsg.setUserId(session.getUserId());
+//		botChatMsg.setUserId(session.getUserId());
 		
 
 		
@@ -113,33 +113,32 @@ public class ActChatManager {
 						(예시 : 기사 자격증을 따기 위해 ooo 문제집 풀어본 경험이 있다, xx 인턴십에 도움이 되도록 사전 프로젝트를 해본 경험이 있다 등등)
     	    	            """;
 
-    	    	        ChatMsg botMsg = new ChatMsg();
-    	    	        botMsg.setConvId(session.getConvId());
-    	    	        botMsg.setConvTopic(session.getTopic());
-    	    	        botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-    	    	        botMsg.setUserId(session.getUserId());
-    	    	        botMsg.setRole("BOT");
-    	    	        botMsg.setMsgContent(initMsg);
-
-    	    	        chatbotService.insertChatMsg(botMsg); 
+//    	    	        ChatMsg botMsg = new ChatMsg();
+//    	    	        botMsg.setConvId(session.getConvId());
+//    	    	        botMsg.setConvTopic(session.getTopic());
+//    	    	        botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//    	    	        botMsg.setUserId(session.getUserId());
+//    	    	        botMsg.setRole("BOT");
+//    	    	        botMsg.setMsgContent(initMsg);
+//
+//    	    	        chatbotService.insertChatMsg(botMsg); 
                     
                     if(isMeaningful) {
-                    	ChatMsg Umsg = new ChatMsg();
-    	            	Umsg.setConvId(session.getConvId());
-    	            	Umsg.setConvTopic(session.getTopic());
-    	            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
-    	            	Umsg.setUserId(session.getUserId());
-    	            	Umsg.setRole("USER");
-    	            	Umsg.setMsgContent(userMsg);
-
-    	            	chatbotService.insertChatMsg(Umsg);
-    	            	session.setHavebeenact(Umsg);
+//                    	ChatMsg Umsg = new ChatMsg();
+//    	            	Umsg.setConvId(session.getConvId());
+//    	            	Umsg.setConvTopic(session.getTopic());
+//    	            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
+//    	            	Umsg.setUserId(session.getUserId());
+//    	            	Umsg.setRole("USER");
+//    	            	Umsg.setMsgContent(userMsg);
+// 	            	
+//    	            	session.setHavebeenact(Umsg);
     	            	
                         session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                         
                         String answer = "'" + specName + "'에 대해 어떤 유형의 활동을 추천받으시겠어요?";
-                      botChatMsg.setMsgContent(answer);
-    					chatbotService.insertChatMsg(botChatMsg);
+//                      botChatMsg.setMsgContent(answer);
+//    					chatbotService.insertChatMsg(botChatMsg);
                         return new ChatbotResponseDTO(
                             answer,
                             List.of("도서 추천", "영상 추천", "기타 활동 추천")
@@ -157,16 +156,16 @@ public class ActChatManager {
                 	
                     
             case CHOOSE_ACTIVITY_TYPE:
-                // 버튼 또는 텍스트 입력 모두 허용
-            	ChatMsg Umsg = new ChatMsg();
-            	Umsg.setConvId(session.getConvId());
-            	Umsg.setConvTopic(session.getTopic());
-            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
-            	Umsg.setUserId(session.getUserId());
-            	Umsg.setRole("USER");
-            	Umsg.setMsgContent(userMsg);
-
-            	chatbotService.insertChatMsg(Umsg);
+//                // 버튼 또는 텍스트 입력 모두 허용
+//            	ChatMsg Umsg = new ChatMsg();
+//            	Umsg.setConvId(session.getConvId());
+//            	Umsg.setConvTopic(session.getTopic());
+//            	Umsg.setConvSubTopicSpecId(session.getSubSpecTopicId()); 
+//            	Umsg.setUserId(session.getUserId());
+//            	Umsg.setRole("USER");
+//            	Umsg.setMsgContent(userMsg);
+//
+//            	chatbotService.insertChatMsg(Umsg);
             	
                 String type = null;
                 if ("도서 추천".equals(userMsg)) type = "도서";
@@ -188,8 +187,8 @@ public class ActChatManager {
 
             case SHOW_MORE_OPTIONS:
                 if ("다른 유형".equals(userMsg)) {
-	            	botChatMsg.setMsgContent("다른 유형 검색");
-					chatbotService.insertChatMsg(botChatMsg);
+//	            	botChatMsg.setMsgContent("다른 유형 검색");
+//					chatbotService.insertChatMsg(botChatMsg);
                     session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                     if(session.getLastActivityType() == "도서") {
                     	return new ChatbotResponseDTO(
@@ -209,17 +208,17 @@ public class ActChatManager {
                     }
                     
                 } else if("같은 유형으로 더 추천 받기".equals(userMsg)){
-                	botChatMsg.setMsgContent("같은 유형으로 더 추천 받기");
-					chatbotService.insertChatMsg(botChatMsg);
+//                	botChatMsg.setMsgContent("같은 유형으로 더 추천 받기");
+//					chatbotService.insertChatMsg(botChatMsg);
                     session.setChatState(StateActChat.CHOOSE_ACTIVITY_TYPE);
                     return recommendActivity(specName, session.getLastActivityType(), session, session.getOptions(session.getLastActivityType()));
                     
                 } else if ("종료".equals(userMsg)) {
-	            	botChatMsg.setMsgContent("종료");
-					chatbotService.insertChatMsg(botChatMsg);
-	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
-					chatbotService.insertChatMsg(botChatMsg);
-                    convManager.endSession(session.getUserId());   // 종료 누르면 바로 세션 삭제
+//	            	botChatMsg.setMsgContent("종료");
+//					chatbotService.insertChatMsg(botChatMsg);
+//	            	botChatMsg.setMsgContent("이용해주셔서 감사합니다!");
+//					chatbotService.insertChatMsg(botChatMsg);
+//                    convManager.endSession(session.getUserId());   // 종료 누르면 바로 세션 삭제
                     session.resetRecommendedOption();
                     return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
                 } else {
@@ -279,14 +278,14 @@ public class ActChatManager {
 	        msgBuilder.append("- ").append(dto.getTitle()).append("\n");
 	    }
 
-	    ChatMsg botMsg = new ChatMsg();
-	    botMsg.setConvId(session.getConvId());
-	    botMsg.setConvTopic(session.getTopic());
-	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
-	    botMsg.setUserId(session.getUserId());
-	    botMsg.setRole("BOT");
-	    botMsg.setMsgContent(msgBuilder.toString());
-	    chatbotService.insertChatMsg(botMsg);
+//	    ChatMsg botMsg = new ChatMsg();
+//	    botMsg.setConvId(session.getConvId());
+//	    botMsg.setConvTopic(session.getTopic());
+//	    botMsg.setConvSubTopicSpecId(session.getSubSpecTopicId());
+//	    botMsg.setUserId(session.getUserId());
+//	    botMsg.setRole("BOT");
+//	    botMsg.setMsgContent(msgBuilder.toString());
+//	    chatbotService.insertChatMsg(botMsg);
 
 	    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
 
