@@ -119,8 +119,8 @@ input[type="password"], input[type="email"], input[type="text"], select
 }
 
 .btn:disabled {
-	background-color: black;
-	color: white;
+	background-color: #999;
+	color: #666;
 	cursor: not-allowed;
 }
 
@@ -350,8 +350,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                                 isEmailAvailable = false;
                                 if ($changeEmailButton) {
                                     $changeEmailButton.prop('disabled', true).css({
-                                        'background-color': 'black',
-                                        'color': 'white',
+                                        'background-color': '#999',
+                                        'color': '#666',
                                         'cursor': 'not-allowed'
                                     });
                                 }
@@ -363,8 +363,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                             isEmailAvailable = false;
                             if ($changeEmailButton) {
                                 $changeEmailButton.prop('disabled', true).css({
-                                    'background-color': 'black',
-                                    'color': 'white',
+                                    'background-color': '#999',
+                                    'color': '#666',
                                     'cursor': 'not-allowed'
                                 });
                             }
@@ -382,8 +382,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                         return;
                     }
                     $changeEmailButton.prop('disabled', true).css({
-                        'background-color': 'black',
-                        'color': 'white',
+                        'background-color': '#999',
+                        'color': '#666',
                         'cursor': 'not-allowed'
                     });
                     try {
@@ -413,8 +413,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                             $verificationGroup.hide();
                             $verificationCodeInput.prop('disabled', true);
                             $verifyCodeButton.prop('disabled', true).css({
-                                'background-color': 'black',
-                                'color': 'white',
+                                'background-color': '#999',
+                                'color': '#666',
                                 'cursor': 'not-allowed'
                             });
                         }
@@ -433,8 +433,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                         $verificationGroup.hide();
                         $verificationCodeInput.prop('disabled', true);
                         $verifyCodeButton.prop('disabled', true).css({
-                            'background-color': 'black',
-                            'color': 'white',
+                            'background-color': '#999',
+                            'color': '#666',
                             'cursor': 'not-allowed'
                         });
                         setTimeout(() => {
@@ -474,8 +474,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                             if (data.success) {
                                 $verificationCodeInput.prop('disabled', true);
                                 $verifyCodeButton.prop('disabled', true).css({
-                                    'background-color': 'black',
-                                    'color': 'white',
+                                    'background-color': '#999',
+                                    'color': '#666',
                                     'cursor': 'not-allowed'
                                 });
                                 clearInterval(timerInterval);
@@ -512,8 +512,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                             $timerDisplay.hide().text('00:00');
                             $verificationCodeInput.prop('disabled', true);
                             $verifyCodeButton.prop('disabled', true).css({
-                                'background-color': 'black',
-                                'color': 'white',
+                                'background-color': '#999',
+                                'color': '#666',
                                 'cursor': 'not-allowed'
                             });
                             $verificationMessage.text('인증 시간이 만료되었습니다. 재발송해주세요.').addClass('error').removeClass('success');
@@ -576,8 +576,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                         isEmailVerified = false;
                         $verificationCodeInput.prop('disabled', true).val('');
                         $verifyCodeButton.prop('disabled', true).css({
-                            'background-color': 'black',
-                            'color': 'white',
+                            'background-color': '#999',
+                            'color': '#666',
                             'cursor': 'not-allowed'
                         });
                         $verificationMessage.text('');
@@ -590,8 +590,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                         if (!isEmailValid) {
                             isEmailAvailable = false;
                             $changeEmailButton.text('인증전송').prop('disabled', true).css({
-                                'background-color': 'black',
-                                'color': 'white',
+                                'background-color': '#999',
+                                'color': '#666',
                                 'cursor': 'not-allowed'
                             });
                             return;
@@ -633,8 +633,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                         isEmailValid = false;
                         if ($changeEmailButton) {
                             $changeEmailButton.prop('disabled', true).css({
-                                'background-color': 'black',
-                                'color': 'white',
+                                'background-color': '#999',
+                                'color': '#666',
                                 'cursor': 'not-allowed'
                             });
                         }
@@ -643,8 +643,8 @@ input[type="password"], input[type="email"], input[type="text"], select
                         isEmailValid = false;
                         if ($changeEmailButton) {
                             $changeEmailButton.prop('disabled', true).css({
-                                'background-color': 'black',
-                                'color': 'white',
+                                'background-color': '#999',
+                                'color': '#666',
                                 'cursor': 'not-allowed'
                             });
                         }

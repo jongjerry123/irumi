@@ -479,10 +479,10 @@ public class ChatbotController {
 			responseDto = specManager.getGptResponse(convSession, userMsg);
 			break;
 		case "ss":
-			responseDto = ssManager.handleChatMessage(convSession, userMsg);
+			responseDto = ssManager.getGptResponse(convSession, userMsg);
 			break;
 		case "act":
-			responseDto = actManager.handleChatMessage(convSession, userMsg);
+			responseDto = actManager.getGptResponse(convSession, userMsg);
 			break;
 		default:
 			responseDto = new ChatbotResponseDTO("유효하지 않은 주제입니다.", null);

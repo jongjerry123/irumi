@@ -71,6 +71,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	  function loadSpecOptions(jobId) {
 	    console.log("[DEBUG] loadSpecOptions 호출됨. jobId:", jobId);
 	    
+	    document.querySelector(".spec-value").textContent = "";
+	    window.selectedSpecId = null;
+	    window.selectedSpecName = "";
+	    window.selectedSpecType = "";
+	    window.selectedSpecExplain = "";
+
+	    const specButtons = document.querySelectorAll("#spec-btn-list .select-btn");
+	    specButtons.forEach(btn => btn.classList.remove("active"));
+	    
 	    $(".select-group:nth-of-type(2) .select-label").show();
 
 
@@ -125,6 +134,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	      removeBtn.className = "remove-btn";
 	      removeBtn.textContent = "✕";
 	      removeBtn.onclick = function() {
+		    if (confirm("정말 삭제하시겠습니까?")) { 
+
 	        card.remove();
 	        console.log(activity.actId);
 	        
@@ -143,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		    	  }
 		    	});
 	      };
+	     }
 	      // 텍스트
 	      const span = document.createElement("span");
 	      span.textContent = activity.text;
@@ -459,12 +471,13 @@ body {
 	background-color: #111;
 	color: #eeeeee;
 	margin: 0;
-	padding: 0 0 0 0 ;
+	padding: 0 0 0 0;
 	min-height: 100vh;
 	display: flex;
-	flex-direction:column;
-	overflow-y:hidden;
+	flex-direction: column;
+	overflow-y: hidden;
 }
+
 .container {
 	display: flex;
 	max-width: 1200px; /* 최대 너비 설정 */
@@ -474,12 +487,13 @@ body {
 	overflow: hidden; /* 내용이 넘치지 않도록 숨김 */
 	flex-grow: 1;
 }
+
 .main {
 	flex: 1; /* 남은 공간을 모두 차지 */
 	display: flex; /* 자식 요소들을 세로로 배치 */
 	flex-direction: column; /* 세로 배치 */
 	flex-grow: 1;
-	height: 100%; 
+	height: 100%;
 }
 
 .left-container {
@@ -521,6 +535,7 @@ body {
 	border-radius: 10px;
 	overflow-y: auto;
 }
+
 .content-box {
 	flex-grow: 1; /* 나머지 공간을 모두 차지 */
 	overflow-y: auto; /* 내용이 넘치면 스크롤 */
@@ -538,13 +553,15 @@ body {
 	scrollbar-color: #BAAC80 #222;
 	scrollbar-width: thin;
 }
+
 .content-box::-webkit-scrollbar {
- width: 9px;
- background: #222;
+	width: 9px;
+	background: #222;
 }
+
 .content-box::-webkit-scrollbar-thumb {
- background: #BAAC80;
- border-radius: 6px;
+	background: #BAAC80;
+	border-radius: 6px;
 }
 
 .select-bar {
@@ -602,7 +619,7 @@ body {
 	font-size: 14px;
 	margin-left: 4px;
 	font-weight: bold;
-	margin-bottom : 10px;
+	margin-bottom: 10px;
 }
 
 .right-panel .schedule-value {
@@ -615,6 +632,7 @@ body {
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
+
 .chat-input-box {
 	display: flex;
 	align-items: center;
@@ -624,6 +642,7 @@ body {
 	margin-top: 10px;
 	flex-shrink: 0;
 }
+
 .chat-input-box .chat-input {
 	flex: 1;
 	background: transparent;
@@ -633,6 +652,7 @@ body {
 	padding: 8px;
 	outline: none;
 }
+
 .chat-input-box .chat-send-btn {
 	width: 36px;
 	height: 36px;
@@ -648,20 +668,22 @@ body {
 	cursor: pointer;
 	transition: background 0.2s;
 }
+
 .chat-input-box .chat-send-btn:hover {
 	background: #BAAC80;
 }
 
 /* manual 부분 */
 .manual-input-box {
-   display: flex;
-   align-items: center;
-   background: #232323;
-   border-radius: 8px;
-   padding: 6px 10px;
-   margin-top: 12px;
-   gap: 6px;
+	display: flex;
+	align-items: center;
+	background: #232323;
+	border-radius: 8px;
+	padding: 6px 10px;
+	margin-top: 12px;
+	gap: 6px;
 }
+
 .manual-input-box .manual-input {
 	width: 100%; /* 유지: .manual-date와 동일한 너비 */
 	box-sizing: border-box; /* 유지: 패딩 포함 크기 계산 */
@@ -672,6 +694,7 @@ body {
 	padding: 8px 14px; /* 수정: .manual-date와 패딩 통일 */
 	outline: none;
 }
+
 .manual-input-box .add-btn {
 	background: #232323;
 	border: 1px solid #BAAC80;
@@ -687,6 +710,7 @@ body {
 	margin-left: 4px;
 	line-height: 28px;
 }
+
 .manual-input-box .add-btn:hover {
 	background: #BAAC80;
 	color: #232323;
@@ -696,18 +720,21 @@ body {
 .saved-schedule-section {
 	margin-bottom: 20px;
 }
+
 .section-title {
 	color: #eeeeee;
 	font-weight: bold;
 	font-size: 15px;
 	margin: 25px 0 10px 0;
 }
+
 .saved-schedule-list {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	margin-bottom: 14px;
 }
+
 .schedule-card {
 	background: #232323;
 	border: 1.5px solid #BAAC80;
@@ -719,7 +746,10 @@ body {
 	font-size: 12px;
 	color: #eeeeee;
 	position: relative;
+	word-break: break-all;
+	
 }
+
 .remove-btn {
 	background: none;
 	border: none;
@@ -729,9 +759,11 @@ body {
 	cursor: pointer;
 	transition: color 0.2s;
 }
+
 .remove-btn:hover {
 	color: #f87171;
 }
+
 .add-schedule-btn {
 	margin-top: 10px;
 	width: 100%;
@@ -749,20 +781,24 @@ body {
 	gap: 8px;
 	transition: background 0.2s, color 0.2s;
 }
+
 .add-schedule-btn span {
 	font-size: 18px;
 	font-weight: bold;
 }
+
 .add-schedule-btn:hover {
 	background: #BAAC80;
 	color: #232323;
 }
+
 .select-group {
 	display: flex;
 	flex-direction: column; /* 세로 정렬 */
 	align-items: flex-start; /* 좌측 정렬 */
 	gap: 8px;
 }
+
 .select-label {
 	color: #eeeeee;
 	font-size: 18px;
@@ -770,6 +806,7 @@ body {
 	margin-bottom: 8px; /* 라벨 아래 약간 여백 */
 	padding-left: 10px;
 }
+
 .select-btn {
 	background: none;
 	border: 1.5px solid #BAAC80;
@@ -783,6 +820,7 @@ body {
 	transition: background 0.18s, color 0.18s, border 0.18s;
 	margin-bottom: 6px; /* 버튼들 위아래 간격 */
 }
+
 .select-btn:hover {
 	background: #BAAC80;
 	border: 1.5px solid #BAAC80;
@@ -797,10 +835,12 @@ body {
 	margin-bottom: 4px; /* 버튼들끼리 간격 */
 	opacity: 0.5;
 }
+
 .select-btn-list {
 	padding: 5px;
-	margin-bottom : 5px;
+	margin-bottom: 20px;
 }
+
 .select-btn.active {
 	background: #BAAC80;
 	color: #232323;
@@ -824,6 +864,7 @@ body {
 	flex-direction: column;
 	gap: 8px;
 }
+
 #userInput {
 	flex: 1;
 	background-color: #333;
@@ -835,6 +876,7 @@ body {
 	font-size: 15px;
 	outline: none;
 }
+
 .message {
 	max-width: 70%;
 	padding: 10px 15px;
@@ -843,12 +885,14 @@ body {
 	font-size: 0.95em;
 	word-wrap: break-word;
 }
+
 .user-msg {
 	background-color: #383838;
 	color: white;
 	align-self: flex-end;
 	text-align: right;
 }
+
 .bot-msg {
 	align-self: flex-start;
 	text-align: left;
@@ -872,10 +916,11 @@ body {
 	font-size: 1em;
 	cursor: pointer;
 }
-#option-buttons button.select-btn:hover {
-	background: #222;
-}
 
+#option-buttons button.select-btn:hover {
+	color: #383838;
+	background: #eeeeee;
+}
 
 /* 추가 **********************************************/
 .content-box .custom-checkbox-list {
@@ -883,6 +928,7 @@ body {
 	flex-direction: column;
 	gap: 5px;
 }
+
 .content-box .custom-checkbox {
 	flex-direction: column; /* 세로로 배치 */
 	align-items: flex-start; /* 왼쪽 정렬 */
@@ -900,15 +946,19 @@ body {
 	transition: border 0.2s, background 0.2s;
 	min-width: 210px;
 	max-width: 340px;
+	word-break: break-all;
 }
+
 .content-box .custom-checkbox input[type="checkbox"] {
 	display: none;
 }
+
 .content-box .custom-checkbox .checkbox-text {
 	color: #BAAC80;
 	font-size: 15px;
 	font-weight: bold;
 }
+
 .content-box .custom-checkbox .checkmark {
 	display: none;
 	font-size: 18px;
@@ -926,16 +976,18 @@ body {
 	color: #B2E86F;
 	font-weight: 600;
 }
+
 .custom-checkbox.checked {
-  background: rgba(186, 172, 128, 0.3);
+	background: rgba(186, 172, 128, 0.3);
 }
+
 .content-box .custom-checkbox:hover {
 	background: rgba(186, 172, 128, 0.3);
 }
+
 .content-box .custom-checkbox:hover .checkbox-text {
 	color: #B2E86F;
 }
-
 
 /* 추가 - 선택 버튼 css */
 .chat-input-box {

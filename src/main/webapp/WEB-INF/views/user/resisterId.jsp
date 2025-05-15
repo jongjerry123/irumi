@@ -46,13 +46,39 @@ keyframes spin { 0% {
 }
 
 100
+
+
+
+
 %
 {
 transform
+
+
+
+
 :
-rotate(
+
+
+
+
+rotate
+
+
+(
+
+
+
+
 360deg
-);
+
+
+
+
+)
+
+
+;
 }
 }
 .container {
@@ -160,17 +186,19 @@ input[type="text"], input[type="password"], input[type="email"] {
 
 .message {
 	font-size: 12px;
-	margin-top: 5px;
+	margin-top:5px
 }
 
 .message.success {
 	color: #00ffaa;
 	text-align: left;
+	margin-left: 2px;
 }
 
 .message.error {
 	color: #ff5a5a;
 	text-align: left;
+	margin-left: 2px;
 }
 </style>
 </head>
@@ -196,10 +224,10 @@ input[type="text"], input[type="password"], input[type="email"] {
 					<div id="id-message" class="message"></div>
 				</div>
 
-				<!-- 이름 입력 -->
+				<!-- 닉네임 입력 -->
 				<div class="input-group">
 					<input type="text" id="userName" name="userName"
-						placeholder="닉네임 입력" maxlength="4">
+						placeholder="닉네임 입력(변경 불가능)" maxlength="10">
 					<div id="name-message" class="message"></div>
 				</div>
 
@@ -353,7 +381,7 @@ input[type="text"], input[type="password"], input[type="email"] {
             });
         }
 
-        // 이름 검증
+        // 닉네임 검증
         function validateUserName(name) {
             const isValidLength = name.length >= 2;
             if (!name) {
@@ -365,7 +393,7 @@ input[type="text"], input[type="password"], input[type="email"] {
                 nameMessage.classList.remove('error');
                 return true;
             } else {
-                nameMessage.textContent = '이름은 2자 이상이어야 합니다.';
+                nameMessage.textContent = '닉네임은 2자 이상이어야 합니다.';
                 nameMessage.classList.add('error');
                 return false;
             }
@@ -393,23 +421,25 @@ input[type="text"], input[type="password"], input[type="email"] {
         }
 
         // 비밀번호 확인 일치 여부 검증
-        function checkPasswordMatch() {
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-            if (!confirmPassword) {
-                confirmMessage.textContent = '';
-                confirmMessage.classList.remove('error');
-                return false;
-            } else if (password !== confirmPassword) {
-                confirmMessage.textContent = '비밀번호가 일치하지 않습니다.';
-                confirmMessage.classList.add('error');
-                return false;
-            } else {
-                confirmMessage.textContent = '';
-                confirmMessage.classList.remove('error');
-                return true;
-            }
-        }
+		function checkPasswordMatch() {
+		    const password = passwordInput.value;
+		    const confirmPassword = confirmPasswordInput.value;
+		
+		    confirmMessage.classList.remove('error', 'success'); // 기존 스타일 제거
+		
+		    if (!confirmPassword) {
+		        confirmMessage.textContent = '';
+		        return false;
+		    } else if (password !== confirmPassword) {
+		        confirmMessage.textContent = '비밀번호가 일치하지 않습니다.';
+		        confirmMessage.classList.add('error');
+		        return false;
+		    } else {
+		        confirmMessage.textContent = '비밀번호가 일치합니다';
+		        confirmMessage.classList.add('success');
+		        return true;
+		    }
+		}
 
         // 이메일 중복 확인
         function checkEmailAvailability(email) {
