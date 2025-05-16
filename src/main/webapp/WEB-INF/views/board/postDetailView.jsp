@@ -344,7 +344,7 @@ body {
 					<!-- 질문등록(또는 새 댓글) 버튼 -->
 					<button type="submit" class="submit-btn">
 						<c:choose>
-							<c:when test="${post.postType == '질문'}">질문 등록</c:when>
+							<c:when test="${post.postType == '질문'}">답변 등록</c:when>
 							<c:otherwise>새 댓글 달기</c:otherwise>
 						</c:choose>
 					</button>
