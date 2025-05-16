@@ -213,7 +213,7 @@ public class ActChatManager {
                     } else {
                     	return new ChatbotResponseDTO(
                                 "어떤 유형의 활동을 추천받으시겠어요?",
-                                List.of("영상 추천", "기타 활동 추천")
+                                List.of("도서 추천", "영상 추천")
                             );
                     }
                     
