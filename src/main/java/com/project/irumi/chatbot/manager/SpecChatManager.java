@@ -1,7 +1,9 @@
 package com.project.irumi.chatbot.manager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,14 +98,16 @@ public class SpecChatManager {
 			String serpQuery = targetJobName + "되기 위해 필요한 추천" + userMsg + " 리스트";
 			String serpResult = serpApiService.searchJobSpec(serpQuery);
 			String userSpecInfo = dashboardService.selectUserSpec(session.getUserId()).toString();
+			
+			//기존 추천된 리스트 가져옴
+			Set<String> recHistory= new HashSet<>();
+			recHistory.addAll(session.getOptions("spec"));
+			logger.info("추천된 이력:"+ recHistory.toString());
+			
 			String gptAnswer = gptApiService.callGPT("""
 					다음 정보를 참고하여 유저가 [%s] 직무에 지원할 때 이력으로 적으면 좋을 스펙 3개를 추천해 줘.
 					아래와 같은 JSON 배열 형식으로만 응답해.
-					응답해야 하는 형태 - 
-					[
-					  { "title": "정보처리기사", "explain": "정보 시스템과 소프트웨어 기초 역량을 평가하는 자격증" },
-					  { "title": "포트폴리오 제작", "explain": "자기 주도적 프로젝트를 통해 실무 능력을 보여주는 활동" }
-					]
+				
 					(중요)다른 문장이나 설명은 절대 포함하지 말고, [로 시작해서 ]로 끝나는 완벽한 json 형태로 대답해.
 					각 스펙은 다음 속성을 포함해야 해:
 					- title (스펙 이름)
@@ -113,11 +117,13 @@ public class SpecChatManager {
 					유저의 특성: %s
 					
 					검색 결과를 참고해서 실제로 존재하는 구체적인 것들로만 추천해 줘. (ex.환경 관련 인턴십 <- 구체적이지 않음)
-					
+				
 					이외 유저의 학력 상태는 다음과 같음: %s
 					추천에 다음 결과를 참고할 수 있음: %s
+					
+					(중요) 다음 리스트와 같은 스펙은 제외하고 추천: %s
 					""".formatted(targetJobName, String.join(" ", session.getContextHistory())
-											,userSpecInfo, serpResult));
+											,userSpecInfo, serpResult, String.join(", ", recHistory)));
 			logger.info("받은 응답:" + gptAnswer);
 			
 			//gpt 응답에서 json만 분리하기
@@ -149,6 +155,11 @@ public class SpecChatManager {
 			} catch (JSONException e) {
 				e.printStackTrace();
 				return new ChatbotResponseDTO("스펙 추천 중 오류가 발생했습니다.", null);
+			}
+			
+			//추천되었던 리스트 저장(다시 추천 못하게)
+			for (CareerItemDTO dto : specCItemList) {
+				session.addRecommendedOption("spec", dto.getTitle());
 			}
 
 			// 다음 상태로 전환, 봇 메세지 미리 저장

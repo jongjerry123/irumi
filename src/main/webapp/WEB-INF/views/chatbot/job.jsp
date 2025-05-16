@@ -161,7 +161,7 @@ $(function() {
 		      $listWrap.append($label);
 	    });
 	    // ➤ "선택 완료" 버튼 추가
-	    const $submitBtn = $("<button>").text("직무 추가하기").addClass("check-confirm-btn").on("click", function() {
+	    /* const $submitBtn = $("<button>").text("직무 추가하기").addClass("check-confirm-btn").on("click", async function() {
 	    	const checked = $listWrap.find("input:checked").map(function() {
 	    	const chosenJobTitle = this.value;
 	     	return options.find(jobCI => jobCI.title === chosenJobTitle); // job 자체를 반환
@@ -195,7 +195,47 @@ $(function() {
 	  
 	    });
 	    $listWrap.append($submitBtn);
+	    $chatArea.append($listWrap); */
+	    const $submitBtn = $("<button>").text("직무 추가하기").addClass("check-confirm-btn").on("click", async function() {
+	        const checked = $listWrap.find("input:checked").map(function() {
+	            const chosenJobTitle = this.value;
+	            return options.find(jobCI => jobCI.title === chosenJobTitle); // job 자체를 반환
+	        }).get();
+
+	        if (checked.length === 0) {
+	            alert("하나 이상 선택해 주세요!");
+	            return;
+	        }
+
+	        // for문과 async/await을 사용하여 순차적으로 처리
+	        for (const jobCI of checked) {
+	            try {
+	                const returnedJobCI = await $.ajax({
+	                    type: "POST",
+	                    url: "insertCareerItem.do",
+	                    contentType: "application/json",
+	                    data: JSON.stringify(jobCI)
+	                });
+
+	                console.log("직무 저장 성공:", returnedJobCI.title);
+	                addToJobList([returnedJobCI]); // 체크된 직무 저장
+
+	            } catch (xhr) {
+	                if (xhr.status === 400) {
+	                    alert(xhr.responseText);  // 서버에서 보낸 실패 메시지
+	                } else {
+	                    alert("직무 추가 중 오류가 발생했습니다.");
+	                }
+	            }
+	        }
+
+	        removeCheckboxList();  // 모든 요청을 처리한 후 체크박스 리스트를 제거
+	    });
+
+	    $listWrap.append($submitBtn);
 	    $chatArea.append($listWrap);
+
+	    
 	  }	
 	  
 	  
