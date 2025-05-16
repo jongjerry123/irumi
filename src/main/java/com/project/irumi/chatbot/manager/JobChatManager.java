@@ -1,7 +1,9 @@
 package com.project.irumi.chatbot.manager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,9 +19,7 @@ import com.project.irumi.chatbot.api.GptApiService;
 import com.project.irumi.chatbot.context.ConvSession;
 import com.project.irumi.chatbot.context.StateJobChat;
 import com.project.irumi.chatbot.model.dto.CareerItemDTO;
-import com.project.irumi.chatbot.model.dto.ChatMsg;
 import com.project.irumi.chatbot.model.dto.ChatbotResponseDTO;
-import com.project.irumi.chatbot.model.service.ChatbotService;
 import com.project.irumi.dashboard.model.dto.Job;
 import com.project.irumi.dashboard.model.service.DashboardService;
 
@@ -51,7 +51,6 @@ public class JobChatManager {
 //			botChatMsg.setMsgContent("내게 맞는 직무 찾기 세션입니다.\r\n" + "먼저, 희망 직무 추천에 도움이 될 사용자님의 특성(성격, 강점, 가치관 등)을 말해주세요.");
 //			chatbotService.insertChatMsg(botChatMsg);
 		case ASK_PERSONALITY:
-
 			boolean isMeaningful = isPersonaliltyRelatedInput(userMsg);
 			if (isMeaningful) {
 				session.addToContextHistory("유저는 자신에 대해 다음과 같이 설명함: " + userMsg);
@@ -88,6 +87,11 @@ public class JobChatManager {
 				if (userJobStr.endsWith("/ ")) {
 				    userJobStr = userJobStr.substring(0, userJobStr.length() - 2);  // 마지막 "/ " 제거
 				}
+				
+				//기존에 추천했던 내용 제외
+				Set<String> recHistory= new HashSet<>();
+				recHistory.addAll(session.getOptions("job"));
+				logger.info("추천된 이력:"+ recHistory.toString());
 
 				String gptAnswer = gptApiService.callGPT("""
 					    다음 정보는 사용자가 원하는 직무 특성, 성격, 가치관, 선호하는 업무 환경 등을 담고 있는 매우 중요한 기준입니다.
@@ -98,28 +102,13 @@ public class JobChatManager {
 					    - jobName (직무 이름)
 					    - jobExplain (간단한 설명)
 
-					    예시 형식:
-					    [
-					      {
-					        "jobName": "데이터 분석가",
-					        "jobExplain": "데이터 기반 의사결정을 지원하는 직무"
-					      },
-					      {
-					        "jobName": "프론트엔드 개발자",
-					        "jobExplain": "사용자 인터페이스를 개발하는 직무"
-					      },
-					      {
-					        "jobName": "AI 엔지니어",
-					        "jobExplain": "머신러닝 기반 시스템을 개발하는 직무"
-					      }
-					    ]
-
 					    절대 다른 설명을 덧붙이지 말고, JSON 배열만 반환하세요.
 					    🔽 다음과 같은 특성을 가진 유저에게 적합한 직무를 3가지 찾아 반환하세요. %s
 					    
-					    다음 리스트에서 너무 비슷하거나 동일한 것은 제외하여 3개 추천하세요. %s
+					    (중요) 다음 리스트와 동일한 직무는 제외하여 3개 추천하세요: %s %s
 					    """.formatted(String.join(" ", session.getContextHistory()),
-					    							userJobStr/*이미 저장된 직무 리스트*/));
+					    							userJobStr/*이미 저장된 직무 리스트*/,String.join(" ", recHistory)));
+				
 
 				logger.info("gpt 응답?:" + gptAnswer);
 
@@ -156,6 +145,10 @@ public class JobChatManager {
 				} catch (JSONException e) {
 					e.printStackTrace(); // JSON 파싱 오류 처리
 					return new ChatbotResponseDTO("직무 추천 처리 중 오류가 발생했습니다.", null);
+				}
+				
+				for (CareerItemDTO dto : jobCIList) {
+					session.addRecommendedOption("job", dto.getTitle());
 				}
 
 				// 추천하는 직무를 선택하는 체크박스 리스트 보여주기
@@ -182,11 +175,15 @@ public class JobChatManager {
 				String userJobStr="";
 				for (Job job: userJobs) {
 					userJobStr+=job.getJobName();
-					userJobStr+="/ ";
+					userJobStr+=", ";
 				}
 				if (userJobStr.endsWith("/ ")) {
 				    userJobStr = userJobStr.substring(0, userJobStr.length() - 2);  // 마지막 "/ " 제거
 				}
+				//기존에 추천했던 내용 제외
+				Set<String> recHistory= new HashSet<>();
+				recHistory.addAll(session.getOptions("job"));
+				logger.info("추천된 이력:"+ recHistory.toString());
 
 				String gptAnswer = gptApiService.callGPT("""
 					    다음 정보는 사용자가 원하는 직무 특성, 성격, 가치관, 선호하는 업무 환경 등을 담고 있는 매우 중요한 기준입니다.
@@ -197,29 +194,13 @@ public class JobChatManager {
 					    - jobName (직무 이름)
 					    - jobExplain (간단한 설명)
 
-					    예시 형식:
-					    [
-					      {
-					        "jobName": "데이터 분석가",
-					        "jobExplain": "데이터 기반 의사결정을 지원하는 직무"
-					      },
-					      {
-					        "jobName": "프론트엔드 개발자",
-					        "jobExplain": "사용자 인터페이스를 개발하는 직무"
-					      },
-					      {
-					        "jobName": "AI 엔지니어",
-					        "jobExplain": "머신러닝 기반 시스템을 개발하는 직무"
-					      }
-					    ]
-
 					    절대 다른 설명을 덧붙이지 말고, JSON 배열만 반환하세요.
 					    🔽 다음과 같은 특성을 가진 유저에게 적합한 직무를 3가지 찾아 반환하세요. %s
 					    
-					    다음 리스트에서 너무 비슷하거나 동일한 것은 제외하여 3개 추천하세요. %s
+					    (중요) 다음 리스트와 동일한 직무는 제외하여 3개 추천하세요: %s %s
 					    """.formatted(String.join(" ", session.getContextHistory()),
-					    							userJobStr/*이미 저장된 직무 리스트*/));
-
+					    							userJobStr+"/"/*이미 저장된 직무 리스트*/,String.join(", ", recHistory)));
+				
 				logger.info("gpt 응답?:" + gptAnswer);
 
 				//gpt 응답에서 json만 분리하기
@@ -255,6 +236,10 @@ public class JobChatManager {
 				} catch (JSONException e) {
 					e.printStackTrace(); // JSON 파싱 오류 처리
 					return new ChatbotResponseDTO("직무 추천 처리 중 오류가 발생했습니다.", null);
+				}
+				
+				for (CareerItemDTO dto : jobCIList) {
+					session.addRecommendedOption("job", dto.getTitle());
 				}
 
 				// 추천하는 직무를 선택하는 체크박스 리스트 보여주기

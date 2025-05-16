@@ -307,6 +307,7 @@ public class ChatbotController {
 		 * (UnsupportedEncodingException e) { // TODO Auto-generated catch block
 		 * e.printStackTrace(); }
 		 */
+		
 		response.setContentType("application/json; charset=UTF-8");
 
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -320,6 +321,7 @@ public class ChatbotController {
 			// 최대 5개까지 추가할 수 있도록 제한
 			List<Job> userJobs = dashboardService.selectUserJobs(userId);
 			boolean isDuplicate = false;
+			logger.info("현재 직무 개수: " + userJobs.size());
 
 			for (Job job : userJobs) {
 				logger.info("추가된 jobname:" + insertedItem.getTitle() + ", 비교:" + job.getJobName());
