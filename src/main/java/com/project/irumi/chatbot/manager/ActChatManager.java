@@ -385,6 +385,8 @@ public class ActChatManager {
 //	    botMsg.setMsgContent(activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.");
 //	    chatbotService.insertChatMsg(botMsg);
 	    
+		session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
+		
 	    return new ChatbotResponseDTO(
 	    	activityType + " 유형의 추천할 만한 요소가 없습니다. 다른 유형을 선택해주세요.",
 	        List.of("다른 유형", "종료")
