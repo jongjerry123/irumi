@@ -164,202 +164,189 @@ input[type="password"], input[type="email"], input[type="text"], select
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-        if (typeof jQuery === 'undefined') {
-            document.write('<script src="/resources/js/jquery-3.7.1.min.js"><\/script>');
-        }
-    </script>
+    if (typeof jQuery === 'undefined') {
+        document.write('<script src="/resources/js/jquery-3.7.1.min.js"><\/script>');
+    }
+</script>
 <script>
-        $(document).ready(function() {
-            try {
-                // DOM 요소 캐싱 (존재 여부 확인)
-                const $newPasswordInput = $('#new-password').length ? $('#new-password') : null;
-                const $confirmPasswordInput = $('#confirm-password').length ? $('#confirm-password') : null;
-                const $emailInput = $('#email').length ? $('#email') : null;
-                const $changeEmailButton = $('#change-email').length ? $('#change-email') : null;
-                const $verificationCodeInput = $('#verification-code').length ? $('#verification-code') : null;
-                const $verifyCodeButton = $('#verify-code').length ? $('#verify-code') : null;
-                const $timerDisplay = $('#timer').length ? $('#timer') : null;
-                const $universityInput = $('#university');
-                const $degreeInput = $('#degree');
-                const $graduatedInput = $('#graduated');
-                const $pointInput = $('#point');
-                const $newPasswordMessage = $('#new-password-message');
-                const $confirmPasswordMessage = $('#confirm-password-message');
-                const $emailMessage = $('#email-message');
-                const $verificationMessage = $('#verification-message');
-                const $universityMessage = $('#university-message');
-                const $degreeMessage = $('#degree-message');
-                const $graduatedMessage = $('#graduated-message');
-                const $pointMessage = $('#point-message');
-                const $verificationGroup = $('.verification-group').length ? $('.verification-group') : null;
-                const $cancelButton = $('#cancel');
-                const $submitButton = $('#submit');
+    $(document).ready(function() {
+        try {
+            // DOM 요소 캐싱 (존재 여부 확인)
+            const $newPasswordInput = $('#new-password').length ? $('#new-password') : null;
+            const $confirmPasswordInput = $('#confirm-password').length ? $('#confirm-password') : null;
+            const $emailInput = $('#email').length ? $('#email') : null;
+            const $changeEmailButton = $('#change-email').length ? $('#change-email') : null;
+            const $verificationCodeInput = $('#verification-code').length ? $('#verification-code') : null;
+            const $verifyCodeButton = $('#verify-code').length ? $('#verify-code') : null;
+            const $timerDisplay = $('#timer').length ? $('#timer') : null;
+            const $universityInput = $('#university');
+            const $degreeInput = $('#degree');
+            const $graduatedInput = $('#graduated');
+            const $pointInput = $('#point');
+            const $newPasswordMessage = $('#new-password-message');
+            const $confirmPasswordMessage = $('#confirm-password-message');
+            const $emailMessage = $('#email-message');
+            const $verificationMessage = $('#verification-message');
+            const $universityMessage = $('#university-message');
+            const $degreeMessage = $('#degree-message');
+            const $graduatedMessage = $('#graduated-message');
+            const $pointMessage = $('#point-message');
+            const $verificationGroup = $('.verification-group').length ? $('.verification-group') : null;
+            const $cancelButton = $('#cancel');
+            const $submitButton = $('#submit');
 
-                // 상태 변수
-                let isPasswordValid = false;
-                let isPasswordMatch = false;
-                let isEmailValid = false;
-                let isEmailAvailable = false;
-                let isEmailVerified = false;
-                let isEmailChanged = false;
-                let isPasswordSameAsCurrent = false;
-                let timerInterval = null;
-                let debounceTimer = null;
+            // 상태 변수
+            let isPasswordValid = false;
+            let isPasswordMatch = false;
+            let isEmailValid = false;
+            let isEmailAvailable = false;
+            let isEmailVerified = false;
+            let isEmailChanged = false;
+            let isPasswordSameAsCurrent = false;
+            let timerInterval = null;
+            let debounceTimer = null;
 
-                // 비밀번호 유효성 검사
-                function validatePassword(password) {
-                    const hasLetter = /[A-Za-z]/.test(password);
-                    const hasNumber = /\d/.test(password);
-                    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-                    const isValidLength = password.length >= 8;
-                    if (!password) {
-                        $newPasswordMessage.text('').removeClass('error');
-                        return false;
-                    } else if (hasLetter && hasNumber && hasSpecialChar && isValidLength) {
-                        return true;
-                    } else {
-                        $newPasswordMessage.text('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.').addClass('error');
-                        return false;
-                    }
-                }
-
-                // 현재 비밀번호와 동일한지 확인
-                function checkPasswordSameAsCurrent(password) {
-                    if (!password || !$newPasswordInput) {
-                        isPasswordSameAsCurrent = false;
-                        $newPasswordMessage.text('').removeClass('error');
-                        validatePasswordMatch();
-                        return;
-                    }
-                    $.ajax({
-                        url: 'checkPassword.do',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ password: password }),
-                        headers: {
-                            'X-CSRF-TOKEN': $('[name=_csrf]').val()
-                        },
-                        success: function(response) {
-                            console.log('Check password response:', response);
-                            if (response.success) {
-                                isPasswordSameAsCurrent = response.isSame;
-                                if (isPasswordSameAsCurrent) {
-                                    $newPasswordMessage.text(response.message).addClass('error');
-                                } else if (validatePassword(password)) {
-                                    $newPasswordMessage.text('').removeClass('error');
-                                } else {
-                                    $newPasswordMessage.text('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.').addClass('error');
-                                }
-                            } else {
-                                $newPasswordMessage.text(response.message).addClass('error');
-                                isPasswordSameAsCurrent = false;
-                            }
-                            validatePasswordMatch();
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error('Check password error:', textStatus, errorThrown);
-                            $newPasswordMessage.text('비밀번호 확인 중 오류가 발생했습니다.').addClass('error');
-                            isPasswordSameAsCurrent = false;
-                            validatePasswordMatch();
-                        }
-                    });
-                }
-
-                // 비밀번호 확인 일치 여부
-                function validatePasswordMatch() {
-                    if (!$newPasswordInput || !$confirmPasswordInput) return false;
-                    const newPassword = $newPasswordInput.val().trim();
-                    const confirmPassword = $confirmPasswordInput.val().trim();
-                    if (!confirmPassword) {
-                        $confirmPasswordMessage.text('').removeClass('error success');
-                        return false;
-                    } else if (newPassword === confirmPassword) {
-                        if (isPasswordSameAsCurrent) {
-                            $confirmPasswordMessage.text('새 비밀번호는 현재 비밀번호와 달라야 합니다.').addClass('error').removeClass('success');
-                            return false;
-                        }
-                        $confirmPasswordMessage.text('비밀번호가 일치합니다.').removeClass('error').addClass('success');
-                        return true;
-                    } else {
-                        $confirmPasswordMessage.text('비밀번호가 일치하지 않습니다.').removeClass('success').addClass('error');
-                        return false;
-                    }
-                }
-
-                // 이메일 유효성 검사
-                function validateEmail(email) {
-                    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                    if (!email) {
-                        $emailMessage.text('이메일을 입력해주세요.').addClass('error');
-                        return false;
-                    } else if (emailPattern.test(email)) {
-                        $emailMessage.text('').removeClass('error');
-                        return true;
-                    } else {
-                        $emailMessage.text('유효한 이메일 형식이 아닙니다.').addClass('error');
-                        return false;
-                    }
-                }
-
-                // 학점 유효성 검사
-                function validatePoint(point) {
-                    if (!point) {
-                        $pointMessage.text('').removeClass('error');
-                        return true; // 빈 입력은 유효
-                    }
-                    const pointPattern = /^\d(\.\d{1,2})?$/; // 0.0, 0.00, 4.5, 4.50 형식 허용
-                    if (!pointPattern.test(point)) {
-                        $pointMessage.text('학점은 0.0~4.5 형식으로 입력해주세요 (예: 3.5, 3.45).').addClass('error');
-                        return false;
-                    }
-                    const pointValue = parseFloat(point);
-                    if (isNaN(pointValue) || pointValue < 0 || pointValue > 4.5) {
-                        $pointMessage.text('학점은 0.0~4.5 사이여야 합니다.').addClass('error');
-                        return false;
-                    }
-                    $pointMessage.text('').removeClass('error');
+            // 비밀번호 유효성 검사
+            function validatePassword(password) {
+                const hasLetter = /[A-Za-z]/.test(password);
+                const hasNumber = /\d/.test(password);
+                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+                const isValidLength = password.length >= 8;
+                if (!password) {
+                    $newPasswordMessage.text('').removeClass('error');
+                    return false;
+                } else if (hasLetter && hasNumber && hasSpecialChar && isValidLength) {
                     return true;
+                } else {
+                    $newPasswordMessage.text('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.').addClass('error');
+                    return false;
                 }
+            }
 
-                // 이메일 중복 확인
-                function checkEmailAvailability(email) {
-                    if (!$emailInput) return;
-                    console.log('Checking email availability:', email);
-                    $.ajax({
-                        url: 'checkEmail.do',
-                        type: 'POST',
-                        data: {
-                            email: email,
-                            _csrf: $('[name=_csrf]').val()
-                        },
-                        dataType: 'json',
-                        success: function(data) {
-                            console.log('Email check response:', data);
-                            if (data.available || email === '${sessionScope.loginUser.userEmail}') {
-                                $emailMessage.text('사용 가능한 이메일입니다.').addClass('success').removeClass('error');
-                                isEmailAvailable = true;
-                                if ($changeEmailButton) {
-                                    $changeEmailButton.prop('disabled', false).css({
-                                        'background-color': '#2ccfcf',
-                                        'color': 'black',
-                                        'cursor': 'pointer'
-                                    });
-                                }
+            // 현재 비밀번호와 동일한지 확인
+            function checkPasswordSameAsCurrent(password) {
+                if (!password || !$newPasswordInput) {
+                    isPasswordSameAsCurrent = false;
+                    $newPasswordMessage.text('').removeClass('error');
+                    validatePasswordMatch();
+                    return;
+                }
+                $.ajax({
+                    url: 'checkPassword.do',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ password: password }),
+                    headers: {
+                        'X-CSRF-TOKEN': $('[name=_csrf]').val()
+                    },
+                    success: function(response) {
+                        console.log('Check password response:', response);
+                        if (response.success) {
+                            isPasswordSameAsCurrent = response.isSame;
+                            if (isPasswordSameAsCurrent) {
+                                $newPasswordMessage.text(response.message).addClass('error');
+                            } else if (validatePassword(password)) {
+                                $newPasswordMessage.text('').removeClass('error');
                             } else {
-                                $emailMessage.text('이미 등록된 이메일입니다. 다른 이메일을 입력해주세요.').addClass('error').removeClass('success');
-                                isEmailAvailable = false;
-                                if ($changeEmailButton) {
-                                    $changeEmailButton.prop('disabled', true).css({
-                                        'background-color': '#999',
-                                        'color': '#666',
-                                        'cursor': 'not-allowed'
-                                    });
-                                }
+                                $newPasswordMessage.text('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.').addClass('error');
                             }
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error('Email check error:', textStatus, errorThrown);
-                            $emailMessage.text('이메일 확인 중 오류가 발생했습니다.').addClass('error').removeClass('success');
+                        } else {
+                            $newPasswordMessage.text(response.message).addClass('error');
+                            isPasswordSameAsCurrent = false;
+                        }
+                        validatePasswordMatch();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Check password error:', textStatus, errorThrown);
+                        $newPasswordMessage.text('비밀번호 확인 중 오류가 발생했습니다.').addClass('error');
+                        isPasswordSameAsCurrent = false;
+                        validatePasswordMatch();
+                    }
+                });
+            }
+
+            // 비밀번호 확인 일치 여부
+            function validatePasswordMatch() {
+                if (!$newPasswordInput || !$confirmPasswordInput) return false;
+                const newPassword = $newPasswordInput.val().trim();
+                const confirmPassword = $confirmPasswordInput.val().trim();
+                if (!confirmPassword) {
+                    $confirmPasswordMessage.text('').removeClass('error success');
+                    return false;
+                } else if (newPassword === confirmPassword) {
+                    if (isPasswordSameAsCurrent) {
+                        $confirmPasswordMessage.text('새 비밀번호는 현재 비밀번호와 달라야 합니다.').addClass('error').removeClass('success');
+                        return false;
+                    }
+                    $confirmPasswordMessage.text('비밀번호가 일치합니다.').removeClass('error').addClass('success');
+                    return true;
+                } else {
+                    $confirmPasswordMessage.text('비밀번호가 일치하지 않습니다.').removeClass('success').addClass('error');
+                    return false;
+                }
+            }
+
+            // 이메일 유효성 검사
+            function validateEmail(email) {
+                const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!email) {
+                    $emailMessage.text('이메일을 입력해주세요.').addClass('error');
+                    return false;
+                } else if (emailPattern.test(email)) {
+                    $emailMessage.text('').removeClass('error');
+                    return true;
+                } else {
+                    $emailMessage.text('유효한 이메일 형식이 아닙니다.').addClass('error');
+                    return false;
+                }
+            }
+
+            // 학점 유효성 검사
+            function validatePoint(point) {
+                if (!point) {
+                    $pointMessage.text('').removeClass('error');
+                    return true; // 빈 입력은 유효
+                }
+                const pointPattern = /^\d(\.\d{1,2})?$/; // 0.0, 0.00, 4.5, 4.50 형식 허용
+                if (!pointPattern.test(point)) {
+                    $pointMessage.text('학점은 0.0~4.5 형식으로 입력해주세요 (예: 3.5, 3.45).').addClass('error');
+                    return false;
+                }
+                const pointValue = parseFloat(point);
+                if (isNaN(pointValue) || pointValue < 0 || pointValue > 4.5) {
+                    $pointMessage.text('학점은 0.0~4.5 사이여야 합니다.').addClass('error');
+                    return false;
+                }
+                $pointMessage.text('').removeClass('error');
+                return true;
+            }
+
+            // 이메일 중복 확인
+            function checkEmailAvailability(email) {
+                if (!$emailInput) return;
+                console.log('Checking email availability:', email);
+                $.ajax({
+                    url: 'checkEmail.do',
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        _csrf: $('[name=_csrf]').val()
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log('Email check response:', data);
+                        if (data.available || email === '${sessionScope.loginUser.userEmail}') {
+                            $emailMessage.text('사용 가능한 이메일입니다.').addClass('success').removeClass('error');
+                            isEmailAvailable = true;
+                            if ($changeEmailButton) {
+                                $changeEmailButton.prop('disabled', false).css({
+                                    'background-color': '#2ccfcf',
+                                    'color': 'black',
+                                    'cursor': 'pointer'
+                                });
+                            }
+                        } else {
+                            $emailMessage.text('이미 등록된 이메일입니다. 다른 이메일을 입력해주세요.').addClass('error').removeClass('success');
                             isEmailAvailable = false;
                             if ($changeEmailButton) {
                                 $changeEmailButton.prop('disabled', true).css({
@@ -369,67 +356,60 @@ input[type="password"], input[type="email"], input[type="text"], select
                                 });
                             }
                         }
-                    });
-                }
-
-                // 인증번호 전송
-                async function sendVerification() {
-                    if (!$emailInput || !$verificationGroup) return;
-                    const email = $emailInput.val().trim();
-                    console.log('Sending verification to:', email);
-                    if (!isEmailValid || !isEmailAvailable) {
-                        $emailMessage.text('유효한 이메일을 먼저 확인해주세요.').addClass('error').removeClass('success');
-                        return;
-                    }
-                    $changeEmailButton.prop('disabled', true).css({
-                        'background-color': '#999',
-                        'color': '#666',
-                        'cursor': 'not-allowed'
-                    });
-                    try {
-                        const formData = new FormData();
-                        formData.append('email', email);
-                        formData.append('_csrf', $('[name=_csrf]').val());
-                        const response = await fetch('sendVerification.do', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        const result = await response.json();
-                        console.log('Verification response:', result);
-                        if (result.success) {
-                            $emailMessage.text('인증번호 전송 완료!').addClass('success').removeClass('error');
-                            $verificationMessage.text('인증번호를 입력해주세요.').addClass('success').removeClass('error');
-                            $verificationGroup.show();
-                            $verificationCodeInput.prop('disabled', false).val('');
-                            $verifyCodeButton.prop('disabled', false).css({
-                                'background-color': '#2ccfcf',
-                                'color': 'black',
-                                'cursor': 'pointer'
-                            });
-                            $changeEmailButton.text('재발송');
-                            startTimer();
-                        } else {
-                            $emailMessage.text(result.message || '인증번호 전송에 실패했습니다.').addClass('error').removeClass('success');
-                            $verificationGroup.hide();
-                            $verificationCodeInput.prop('disabled', true);
-                            $verifyCodeButton.prop('disabled', true).css({
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Email check error:', textStatus, errorThrown);
+                        $emailMessage.text('이메일 확인 중 오류가 발생했습니다.').addClass('error').removeClass('success');
+                        isEmailAvailable = false;
+                        if ($changeEmailButton) {
+                            $changeEmailButton.prop('disabled', true).css({
                                 'background-color': '#999',
                                 'color': '#666',
                                 'cursor': 'not-allowed'
                             });
                         }
-                        setTimeout(() => {
-                            if (isEmailValid && isEmailAvailable && $changeEmailButton) {
-                                $changeEmailButton.prop('disabled', false).css({
-                                    'background-color': '#2ccfcf',
-                                    'color': 'black',
-                                    'cursor': 'pointer'
-                                });
-                            }
-                        }, 5000);
-                    } catch (error) {
-                        console.error('Verification error:', error);
-                        $emailMessage.text('인증번호 전송 중 오류가 발생했습니다.').addClass('error').removeClass('success');
+                    }
+                });
+            }
+
+            // 인증번호 전송
+            async function sendVerification() {
+                if (!$emailInput || !$verificationGroup) return;
+                const email = $emailInput.val().trim();
+                console.log('Sending verification to:', email);
+                if (!isEmailValid || !isEmailAvailable) {
+                    $emailMessage.text('유효한 이메일을 먼저 확인해주세요.').addClass('error').removeClass('success');
+                    return;
+                }
+                $changeEmailButton.prop('disabled', true).css({
+                    'background-color': '#999',
+                    'color': '#666',
+                    'cursor': 'not-allowed'
+                });
+                try {
+                    const formData = new FormData();
+                    formData.append('email', email);
+                    formData.append('_csrf', $('[name=_csrf]').val());
+                    const response = await fetch('sendVerification.do', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    console.log('Verification response:', result);
+                    if (result.success) {
+                        $emailMessage.text('인증번호 전송 완료!').addClass('success').removeClass('error');
+                        $verificationMessage.text('인증번호를 입력해주세요.').addClass('success').removeClass('error');
+                        $verificationGroup.show();
+                        $verificationCodeInput.prop('disabled', false).val('');
+                        $verifyCodeButton.prop('disabled', false).css({
+                            'background-color': '#2ccfcf',
+                            'color': 'black',
+                            'cursor': 'pointer'
+                        });
+                        $changeEmailButton.text('재발송');
+                        startTimer();
+                    } else {
+                        $emailMessage.text(result.message || '인증번호 전송에 실패했습니다.').addClass('error').removeClass('success');
                         $verificationGroup.hide();
                         $verificationCodeInput.prop('disabled', true);
                         $verifyCodeButton.prop('disabled', true).css({
@@ -437,426 +417,470 @@ input[type="password"], input[type="email"], input[type="text"], select
                             'color': '#666',
                             'cursor': 'not-allowed'
                         });
-                        setTimeout(() => {
-                            if (isEmailValid && isEmailAvailable && $changeEmailButton) {
-                                $changeEmailButton.prop('disabled', false).css({
-                                    'background-color': '#2ccfcf',
-                                    'color': 'black',
-                                    'cursor': 'pointer'
-                                });
-                            }
-                        }, 5000);
                     }
-                }
-
-                // 인증번호 검증
-                function verifyCode() {
-                    if (!$verificationCodeInput || !$verifyCodeButton) return;
-                    console.log('Verifying code');
-                    const code = $verificationCodeInput.val().trim();
-                    if (code.length !== 6 || !/^\d+$/.test(code)) {
-                        $verificationMessage.text('6자리 숫자를 입력해주세요.').addClass('error').removeClass('success');
-                        isEmailVerified = false;
-                        return;
-                    }
-                    $.ajax({
-                        url: 'verifyCode.do',
-                        type: 'POST',
-                        data: {
-                            code: code,
-                            _csrf: $('[name=_csrf]').val()
-                        },
-                        dataType: 'json',
-                        success: function(data) {
-                            console.log('Verify code response:', data);
-                            $verificationMessage.text(data.message).toggleClass('success', data.success).toggleClass('error', !data.success);
-                            isEmailVerified = data.success;
-                            if (data.success) {
-                                $verificationCodeInput.prop('disabled', true);
-                                $verifyCodeButton.prop('disabled', true).css({
-                                    'background-color': '#999',
-                                    'color': '#666',
-                                    'cursor': 'not-allowed'
-                                });
-                                clearInterval(timerInterval);
-                                timerInterval = null;
-                                $timerDisplay.hide();
-                            } else {
-                                $verificationCodeInput.select();
-                            }
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error('Verify code error:', textStatus, errorThrown);
-                            $verificationMessage.text('인증번호 확인 중 오류가 발생했습니다.').addClass('error').removeClass('success');
-                            isEmailVerified = false;
+                    setTimeout(() => {
+                        if (isEmailValid && isEmailAvailable && $changeEmailButton) {
+                            $changeEmailButton.prop('disabled', false).css({
+                                'background-color': '#2ccfcf',
+                                'color': 'black',
+                                'cursor': 'pointer'
+                            });
                         }
+                    }, 5000);
+                } catch (error) {
+                    console.error('Verification error:', error);
+                    $emailMessage.text('인증번호 전송 중 오류가 발생했습니다.').addClass('error').removeClass('success');
+                    $verificationGroup.hide();
+                    $verificationCodeInput.prop('disabled', true);
+                    $verifyCodeButton.prop('disabled', true).css({
+                        'background-color': '#999',
+                        'color': '#666',
+                        'cursor': 'not-allowed'
                     });
+                    setTimeout(() => {
+                        if (isEmailValid && isEmailAvailable && $changeEmailButton) {
+                            $changeEmailButton.prop('disabled', false).css({
+                                'background-color': '#2ccfcf',
+                                'color': 'black',
+                                'cursor': 'pointer'
+                            });
+                        }
+                    }, 5000);
                 }
+            }
 
-                // 타이머 시작
-                function startTimer() {
-                    if (!$timerDisplay) return;
-                    console.log('Starting timer');
-                    if (timerInterval !== null) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                    }
-                    let timeLeft = 300; // 5분
-                    $timerDisplay.show().text(formatTime(timeLeft));
-                    timerInterval = setInterval(() => {
-                        timeLeft--;
-                        $timerDisplay.text(formatTime(timeLeft));
-                        if (timeLeft <= 0) {
-                            clearInterval(timerInterval);
-                            timerInterval = null;
-                            $timerDisplay.hide().text('00:00');
+            // 인증번호 검증
+            function verifyCode() {
+                if (!$verificationCodeInput || !$verifyCodeButton) return;
+                console.log('Verifying code');
+                const code = $verificationCodeInput.val().trim();
+                if (code.length !== 6 || !/^\d+$/.test(code)) {
+                    $verificationMessage.text('6자리 숫자를 입력해주세요.').addClass('error').removeClass('success');
+                    isEmailVerified = false;
+                    return;
+                }
+                $.ajax({
+                    url: 'verifyCode.do',
+                    type: 'POST',
+                    data: {
+                        code: code,
+                        _csrf: $('[name=_csrf]').val()
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log('Verify code response:', data);
+                        $verificationMessage.text(data.message).toggleClass('success', data.success).toggleClass('error', !data.success);
+                        isEmailVerified = data.success;
+                        if (data.success) {
                             $verificationCodeInput.prop('disabled', true);
                             $verifyCodeButton.prop('disabled', true).css({
                                 'background-color': '#999',
                                 'color': '#666',
                                 'cursor': 'not-allowed'
                             });
-                            $verificationMessage.text('인증 시간이 만료되었습니다. 재발송해주세요.').addClass('error').removeClass('success');
-                            isEmailVerified = false;
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            $timerDisplay.hide();
+                        } else {
+                            $verificationCodeInput.select();
                         }
-                    }, 1000);
-                }
-
-                // 시간 포맷팅 (mm:ss)
-                function formatTime(seconds) {
-                    const minutes = Math.floor(seconds / 60);
-                    const sec = seconds % 60;
-                    return `${minutes.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-                }
-
-                // 비밀번호 입력 실시간 검사 (디바운싱 적용)
-                if ($newPasswordInput) {
-                    $newPasswordInput.on('input', function() {
-                        clearTimeout(debounceTimer);
-                        debounceTimer = setTimeout(() => {
-                            const password = $newPasswordInput.val().trim();
-                            isPasswordValid = validatePassword(password);
-                            checkPasswordSameAsCurrent(password);
-                        }, 300);
-                    });
-                }
-
-                // 비밀번호 확인 입력 실시간 검사
-                if ($confirmPasswordInput) {
-                    $confirmPasswordInput.on('input', function() {
-                        isPasswordMatch = validatePasswordMatch();
-                    });
-                }
-
-                // 이메일 입력 실시간 검사
-                if ($emailInput) {
-                    $emailInput.on('blur', function() {
-                        console.log('Email blur:', $emailInput.val());
-                        const email = $emailInput.val().trim();
-                        if ($emailInput.prop('readonly')) {
-                            isEmailValid = true;
-                            isEmailAvailable = true;
-                            isEmailVerified = true;
-                            isEmailChanged = false;
-                            $emailMessage.text('').removeClass('error success');
-                            $changeEmailButton.text('변경하기').prop('disabled', false).css({
-                                'background-color': '#2ccfcf',
-                                'color': 'black',
-                                'cursor': 'pointer'
-                            });
-                            $verificationGroup.hide();
-                            if (timerInterval) {
-                                clearInterval(timerInterval);
-                                timerInterval = null;
-                                $timerDisplay.hide();
-                            }
-                            return;
-                        }
-                        isEmailValid = validateEmail(email);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Verify code error:', textStatus, errorThrown);
+                        $verificationMessage.text('인증번호 확인 중 오류가 발생했습니다.').addClass('error').removeClass('success');
                         isEmailVerified = false;
-                        $verificationCodeInput.prop('disabled', true).val('');
+                    }
+                });
+            }
+
+            // 타이머 시작
+            function startTimer() {
+                if (!$timerDisplay) return;
+                console.log('Starting timer');
+                if (timerInterval !== null) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                let timeLeft = 300; // 5분
+                $timerDisplay.show().text(formatTime(timeLeft));
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    $timerDisplay.text(formatTime(timeLeft));
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        $timerDisplay.hide().text('00:00');
+                        $verificationCodeInput.prop('disabled', true);
                         $verifyCodeButton.prop('disabled', true).css({
                             'background-color': '#999',
                             'color': '#666',
                             'cursor': 'not-allowed'
                         });
-                        $verificationMessage.text('');
+                        $verificationMessage.text('인증 시간이 만료되었습니다. 재발송해주세요.').addClass('error').removeClass('success');
+                        isEmailVerified = false;
+                    }
+                }, 1000);
+            }
+
+            // 시간 포맷팅 (mm:ss)
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const sec = seconds % 60;
+                return `${minutes.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            }
+
+            // 비밀번호 입력 실시간 검사 (디바운싱 적용)
+            if ($newPasswordInput) {
+                $newPasswordInput.on('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const password = $newPasswordInput.val().trim();
+                        isPasswordValid = validatePassword(password);
+                        checkPasswordSameAsCurrent(password);
+                    }, 300);
+                });
+            }
+
+            // 비밀번호 확인 입력 실시간 검사
+            if ($confirmPasswordInput) {
+                $confirmPasswordInput.on('input', function() {
+                    isPasswordMatch = validatePasswordMatch();
+                });
+            }
+
+            // 이메일 입력 실시간 검사
+            if ($emailInput) {
+                $emailInput.on('blur', function() {
+                    console.log('Email blur:', $emailInput.val());
+                    const email = $emailInput.val().trim();
+                    if ($emailInput.prop('readonly')) {
+                        isEmailValid = true;
+                        isEmailAvailable = true;
+                        isEmailVerified = true;
+                        isEmailChanged = false;
+                        $emailMessage.text('').removeClass('error success');
+                        $changeEmailButton.text('변경하기').prop('disabled', false).css({
+                            'background-color': '#2ccfcf',
+                            'color': 'black',
+                            'cursor': 'pointer'
+                        });
                         $verificationGroup.hide();
                         if (timerInterval) {
                             clearInterval(timerInterval);
                             timerInterval = null;
                             $timerDisplay.hide();
                         }
-                        if (!isEmailValid) {
-                            isEmailAvailable = false;
-                            $changeEmailButton.text('인증전송').prop('disabled', true).css({
-                                'background-color': '#999',
-                                'color': '#666',
-                                'cursor': 'not-allowed'
-                            });
-                            return;
-                        }
-                        if (email !== '${sessionScope.loginUser.userEmail}') {
-                            isEmailChanged = true;
-                            checkEmailAvailability(email);
-                        } else {
-                            isEmailChanged = false;
-                            isEmailAvailable = true;
-                            isEmailVerified = true;
-                            $emailMessage.text('').removeClass('error success');
-                            $changeEmailButton.text('변경하기').prop('disabled', false).css({
-                                'background-color': '#2ccfcf',
-                                'color': 'black',
-                                'cursor': 'pointer'
-                            });
-                        }
-                    });
-                }
-
-                // 페이지 로드 시 초기 이메일 유효성 체크
-                (function initializeEmail() {
-                    if (!$emailInput) {
-                        // 소셜 로그인 유저: 이메일 필드 없음
-                        isEmailValid = true;
-                        isEmailAvailable = true;
-                        isEmailVerified = true;
                         return;
                     }
-                    const initialEmail = $emailInput.val().trim();
-                    if (initialEmail && validateEmail(initialEmail)) {
-                        isEmailValid = true;
+                    isEmailValid = validateEmail(email);
+                    isEmailVerified = false;
+                    $verificationCodeInput.prop('disabled', true).val('');
+                    $verifyCodeButton.prop('disabled', true).css({
+                        'background-color': '#999',
+                        'color': '#666',
+                        'cursor': 'not-allowed'
+                    });
+                    $verificationMessage.text('');
+                    $verificationGroup.hide();
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        $timerDisplay.hide();
+                    }
+                    if (!isEmailValid) {
+                        isEmailAvailable = false;
+                        $changeEmailButton.text('인증전송').prop('disabled', true).css({
+                            'background-color': '#999',
+                            'color': '#666',
+                            'cursor': 'not-allowed'
+                        });
+                        return;
+                    }
+                    if (email !== '${sessionScope.loginUser.userEmail}') {
+                        isEmailChanged = true;
+                        checkEmailAvailability(email);
+                    } else {
+                        isEmailChanged = false;
                         isEmailAvailable = true;
                         isEmailVerified = true;
                         $emailMessage.text('').removeClass('error success');
-                    } else if (!initialEmail) {
-                        $emailMessage.text('세션에 이메일 정보가 없습니다.').addClass('error');
-                        isEmailValid = false;
-                        if ($changeEmailButton) {
-                            $changeEmailButton.prop('disabled', true).css({
-                                'background-color': '#999',
-                                'color': '#666',
-                                'cursor': 'not-allowed'
-                            });
-                        }
+                        $changeEmailButton.text('변경하기').prop('disabled', false).css({
+                            'background-color': '#2ccfcf',
+                            'color': 'black',
+                            'cursor': 'pointer'
+                        });
+                        $emailInput.prop('readonly', true);
+                    }
+                });
+            }
+
+            // 페이지 로드 시 초기 이메일 유효성 체크 및 readonly 설정
+            (function initializeEmail() {
+                if (!$emailInput) {
+                    // 소셜 로그인 유저: 이메일 필드 없음
+                    isEmailValid = true;
+                    isEmailAvailable = true;
+                    isEmailVerified = true;
+                    return;
+                }
+                const initialEmail = $emailInput.val().trim();
+                $emailInput.prop('readonly', true); // 초기 상태를 readonly로 설정
+                if (initialEmail && validateEmail(initialEmail)) {
+                    isEmailValid = true;
+                    isEmailAvailable = true;
+                    isEmailVerified = true;
+                    $emailMessage.text('').removeClass('error success');
+                } else if (!initialEmail) {
+                    $emailMessage.text('세션에 이메일 정보가 없습니다.').addClass('error');
+                    isEmailValid = false;
+                    if ($changeEmailButton) {
+                        $changeEmailButton.prop('disabled', true).css({
+                            'background-color': '#999',
+                            'color': '#666',
+                            'cursor': 'not-allowed'
+                        });
+                    }
+                } else {
+                    $emailMessage.text('세션 이메일 형식이 유효하지 않습니다.').addClass('error');
+                    isEmailValid = false;
+                    if ($changeEmailButton) {
+                        $changeEmailButton.prop('disabled', true).css({
+                            'background-color': '#999',
+                            'color': '#666',
+                            'cursor': 'not-allowed'
+                        });
+                    }
+                }
+            })();
+
+            // 학점 입력 제한 및 유효성 검사
+            $pointInput.on('input', function() {
+                let value = $(this).val().trim();
+                // 입력값을 즉시 포맷팅 (소숫점 2자리까지만 허용)
+                value = value.replace(/[^0-9.]/g, ''); // 숫자와 점만 허용
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts[1];
+                }
+                if (parts[1] && parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].substring(0, 2);
+                }
+                $(this).val(value);
+                validatePoint(value);
+            });
+
+            // 학점 입력 시 키보드 입력 제한
+            $pointInput.on('keypress', function(e) {
+                const char = String.fromCharCode(e.which);
+                const value = $(this).val();
+                const dotIndex = value.indexOf('.');
+                // 숫자, 소숫점만 허용
+                if (!/[0-9.]/.test(char)) {
+                    e.preventDefault();
+                    return;
+                }
+                // 소숫점은 하나만 허용
+                if (char === '.' && dotIndex !== -1) {
+                    e.preventDefault();
+                    return;
+                }
+                // 소숫점 이후 2자리까지만 허용
+                if (dotIndex !== -1 && value.length - dotIndex > 2 && char !== '.') {
+                    e.preventDefault();
+                    return;
+                }
+            });
+
+            // 이메일 변경 버튼 클릭
+            if ($changeEmailButton) {
+                $changeEmailButton.on('click', function(event) {
+                    event.preventDefault();
+                    console.log('Change email button clicked, disabled:', $(this).prop('disabled'));
+                    if ($(this).prop('disabled')) return;
+                    if ($(this).text() === '변경하기') {
+                        $emailInput.prop('readonly', false).focus(); // readonly 해제
+                        $(this).text('인증전송');
                     } else {
-                        $emailMessage.text('세션 이메일 형식이 유효하지 않습니다.').addClass('error');
-                        isEmailValid = false;
-                        if ($changeEmailButton) {
-                            $changeEmailButton.prop('disabled', true).css({
-                                'background-color': '#999',
-                                'color': '#666',
-                                'cursor': 'not-allowed'
-                            });
-                        }
-                    }
-                })();
-
-                // 학점 입력 제한 및 유효성 검사
-                $pointInput.on('input', function() {
-                    let value = $(this).val().trim();
-                    // 입력값을 즉시 포맷팅 (소숫점 2자리까지만 허용)
-                    value = value.replace(/[^0-9.]/g, ''); // 숫자와 점만 허용
-                    const parts = value.split('.');
-                    if (parts.length > 2) {
-                        value = parts[0] + '.' + parts[1];
-                    }
-                    if (parts[1] && parts[1].length > 2) {
-                        value = parts[0] + '.' + parts[1].substring(0, 2);
-                    }
-                    $(this).val(value);
-                    validatePoint(value);
-                });
-
-                // 학점 입력 시 키보드 입력 제한
-                $pointInput.on('keypress', function(e) {
-                    const char = String.fromCharCode(e.which);
-                    const value = $(this).val();
-                    const dotIndex = value.indexOf('.');
-                    // 숫자, 소숫점만 허용
-                    if (!/[0-9.]/.test(char)) {
-                        e.preventDefault();
-                        return;
-                    }
-                    // 소숫점은 하나만 허용
-                    if (char === '.' && dotIndex !== -1) {
-                        e.preventDefault();
-                        return;
-                    }
-                    // 소숫점 이후 2자리까지만 허용
-                    if (dotIndex !== -1 && value.length - dotIndex > 2 && char !== '.') {
-                        e.preventDefault();
-                        return;
+                        sendVerification();
                     }
                 });
+            }
 
-                // 이메일 변경 버튼 클릭
-                if ($changeEmailButton) {
-                    $changeEmailButton.on('click', function(event) {
-                        event.preventDefault();
-                        console.log('Change email button clicked, disabled:', $(this).prop('disabled'));
-                        if ($(this).prop('disabled')) return;
-                        if ($(this).text() === '변경하기') {
-                            $emailInput.prop('readonly', false).focus();
-                            $(this).text('인증전송');
-                        } else {
-                            sendVerification();
-                        }
-                    });
-                }
-
-                // 인증 코드 확인
-                if ($verifyCodeButton) {
-                    $verifyCodeButton.on('click', function(event) {
-                        event.preventDefault();
-                        console.log('Verify code button clicked, disabled:', $(this).prop('disabled'));
-                        if ($(this).prop('disabled')) return;
-                        verifyCode();
-                    });
-                }
-
-                // 취소 버튼 클릭
-                $cancelButton.on('click', function(event) {
+            // 인증 코드 확인
+            if ($verifyCodeButton) {
+                $verifyCodeButton.on('click', function(event) {
                     event.preventDefault();
-                    console.log('Cancel button clicked');
-                    location.href = 'main.do';
+                    console.log('Verify code button clicked, disabled:', $(this).prop('disabled'));
+                    if ($(this).prop('disabled')) return;
+                    verifyCode();
                 });
+            }
 
-                // 변경하기 버튼 클릭
-                $submitButton.on('click', function(event) {
-                    event.preventDefault();
-                    console.log('Submit button clicked');
+            // 취소 버튼 클릭
+            $cancelButton.on('click', function(event) {
+                event.preventDefault();
+                console.log('Cancel button clicked');
+                location.href = 'main.do';
+            });
 
-                    // 입력값 가져오기
-                    const newPassword = $newPasswordInput ? $newPasswordInput.val().trim() : '';
-                    const confirmPassword = $confirmPasswordInput ? $confirmPasswordInput.val().trim() : '';
-                    const email = $emailInput ? $emailInput.val().trim() : '';
-                    const university = $universityInput.val().trim();
-                    const degree = $degreeInput.val() || '';
-                    const graduated = $graduatedInput.val() || '';
-                    const point = $pointInput.val().trim();
+            // 변경하기 버튼 클릭
+			$submitButton.on('click', function(event) {
+				    event.preventDefault();
+				    console.log('Submit button clicked');
+				
+				    // 입력값 가져오기
+				    const newPassword = $newPasswordInput ? $newPasswordInput.val().trim() : '';
+				    const confirmPassword = $confirmPasswordInput ? $confirmPasswordInput.val().trim() : '';
+				    const email = $emailInput ? $emailInput.val().trim() : '';
+				    const university = $universityInput.val().trim();
+				    const degree = $degreeInput.val() || '';
+				    const graduated = $graduatedInput.val() || '';
+				    const point = $pointInput.val().trim();
+				
+				    // 세션의 기존 값
+				    const sessionEmail = '${sessionScope.loginUser.userEmail}' || '';
+				    const sessionUniversity = '${sessionScope.loginUser.userUniversity}' || '';
+				    const sessionDegree = '${sessionScope.loginUser.userDegree}' || '';
+				    const sessionGraduated = '${sessionScope.loginUser.userGraduate}' || '';
+				    const sessionPoint = '${sessionScope.loginUser.userPoint}' || '';
+				
+				    // 변경 여부 확인
+				    const isPasswordChanged = newPassword && confirmPassword && newPassword === confirmPassword;
+				    const isEmailChangedLocal = $emailInput && isEmailChanged && email !== sessionEmail;
+				    const isUniversityChanged = university !== sessionUniversity;
+				    const isDegreeChanged = degree !== sessionDegree;
+				    const isGraduatedChanged = graduated !== sessionGraduated;
+				    const isPointChanged = point !== sessionPoint;
+				
+				    // 변경된 사항이 없으면 main.do로 이동
+				    if (!isPasswordChanged && !isEmailChangedLocal && !isUniversityChanged && 
+				        !isDegreeChanged && !isGraduatedChanged && !isPointChanged) {
+				        console.log('No changes detected, redirecting to main.do');
+				        location.href = 'main.do';
+				        return;
+				    }
+				
+				    // 비밀번호 유효성 체크
+				    if (newPassword && (!isPasswordValid || !isPasswordMatch || isPasswordSameAsCurrent)) {
+				        if (isPasswordSameAsCurrent) {
+				            $newPasswordMessage.text('새 비밀번호는 현재 비밀번호와 달라야 합니다.').addClass('error');
+				        } else if (!isPasswordValid) {
+				            $newPasswordMessage.text('유효한 비밀번호를 입력해주세요.').addClass('error');
+				        }
+				        if (!isPasswordMatch) {
+				            $confirmPasswordMessage.text('비밀번호가 일치하지 않습니다.').addClass('error');
+				        }
+				        return;
+				    }
+				
+				    // 이메일 유효성 체크
+				    if (email && $emailInput && !isEmailValid) {
+				        $emailMessage.text('유효한 이메일을 입력해주세요.').addClass('error').removeClass('success');
+				        return;
+				    }
+				
+				    // 학점 유효성 체크
+				    if (point && !validatePoint(point)) {
+				        $pointMessage.text('학점은 0.0~4.5 사이여야 합니다.').addClass('error');
+				        return;
+				    }
+				
+				    // 이메일 변경 확인
+				    let includeEmailChange = false;
+				    if (isEmailChangedLocal) {
+				        if (confirm('이메일 변경을 하시겠습니까?')) {
+				            if (!isEmailVerified) {
+				                $emailMessage.text('인증을 완료해주세요.').addClass('error').removeClass('success');
+				                return;
+				            }
+				            includeEmailChange = true;
+				        } else {
+				            includeEmailChange = false;
+				            isEmailChangedLocal = false; // 이메일 변경 취소 시 변경 플래그 초기화
+				        }
+				    }
+				
+				    // 데이터 준비
+				    const userData = {
+				        password: isPasswordChanged ? newPassword : undefined,
+				        email: includeEmailChange ? email : undefined,
+				        university: isUniversityChanged ? university : undefined,
+				        degree: isDegreeChanged ? degree : undefined,
+				        graduated: isGraduatedChanged ? graduated : undefined,
+				        point: isPointChanged && point ? parseFloat(point) : undefined,
+				        userId: '${sessionScope.loginUser.userId}'
+				    };
+				
+				    // userData에 유효한 필드가 있는지 확인
+				    const hasValidFields = Object.entries(userData).some(([key, value]) => 
+				        key !== 'userId' && value !== undefined && value !== null && value !== ''
+				    );
+				    if (!hasValidFields) {
+				        console.log('No valid fields to update, redirecting to main.do');
+				        alert('변경할 유효한 데이터가 없습니다.');
+				        location.href = 'main.do';
+				        return;
+				    }
+				
+				    // AJAX 요청
+				    $.ajax({
+				        url: 'updateUserProfile.do',
+				        type: 'POST',
+				        data: JSON.stringify(userData),
+				        contentType: 'application/json',
+				        headers: {
+				            'X-CSRF-TOKEN': $('[name=_csrf]').val()
+				        },
+				        success: function(response) {
+				            console.log('Update response:', response);
+				            if (response.success) {
+				                if (response.isPasswordChanged) {
+				                    alert('비밀번호가 변경되었습니다. 다시 로그인 해주시길 바랍니다.');
+				                    window.location.href = 'loginPage.do';
+				                } else {
+				                    alert('변경이 완료되었습니다.');
+				                    location.reload();
+				                }
+				            } else {
+				                alert(response.message || '정보 업데이트 실패');
+				            }
+				        },
+				        error: function(jqXHR, textStatus, errorThrown) {
+				            console.error('Update error:', textStatus, errorThrown);
+				            if (jqXHR.status === 403) {
+				                alert('보안 토큰이 유효하지 않습니다. 페이지를 새로고침해주세요.');
+				            } else {
+				                alert('변경 중 오류가 발생했습니다: ' + textStatus);
+				            }
+				        }
+				    });
+				});
 
-                    // 세션의 기존 값
-                    const sessionEmail = '${sessionScope.loginUser.userEmail}' || '';
-                    const sessionUniversity = '${sessionScope.loginUser.userUniversity}' || '';
-                    const sessionDegree = '${sessionScope.loginUser.userDegree}' || '';
-                    const sessionGraduated = '${sessionScope.loginUser.userGraduate}' || '';
-                    const sessionPoint = '${sessionScope.loginUser.userPoint}' || '';
-
-                    // 변경 여부 확인
-                    const isPasswordChanged = newPassword && confirmPassword && newPassword === confirmPassword;
-                    const isEmailChangedLocal = $emailInput && isEmailChanged && isEmailVerified && email !== sessionEmail;
-                    const isUniversityChanged = university !== sessionUniversity;
-                    const isDegreeChanged = degree !== sessionDegree;
-                    const isGraduatedChanged = graduated !== sessionGraduated;
-                    const isPointChanged = point !== sessionPoint;
-
-                    // 변경된 사항이 없으면 main.do로 이동
-                    if (!isPasswordChanged && !isEmailChangedLocal && !isUniversityChanged && 
-                        !isDegreeChanged && !isGraduatedChanged && !isPointChanged) {
-                        console.log('No changes detected, redirecting to main.do');
-                        location.href = 'main.do';
-                        return;
-                    }
-
-                    // 비밀번호 유효성 체크
-                    if (newPassword && (!isPasswordValid || !isPasswordMatch || isPasswordSameAsCurrent)) {
-                        if (isPasswordSameAsCurrent) {
-                            $newPasswordMessage.text('새 비밀번호는 현재 비밀번호와 달라야 합니다.').addClass('error');
-                        } else if (!isPasswordValid) {
-                            $newPasswordMessage.text('유효한 비밀번호를 입력해주세요.').addClass('error');
-                        }
-                        if (!isPasswordMatch) {
-                            $confirmPasswordMessage.text('비밀번호가 일치하지 않습니다.').addClass('error');
-                        }
-                        return;
-                    }
-
-                    // 이메일 유효성 체크
-                    if (email && $emailInput && !isEmailValid) {
-                        $emailMessage.text('유효한 이메일을 입력해주세요.').addClass('error').removeClass('success');
-                        return;
-                    }
-                    if (isEmailChangedLocal && !isEmailVerified) {
-                        $emailMessage.text('이메일 인증을 완료해주세요.').addClass('error').removeClass('success');
-                        return;
-                    }
-
-                    // 학점 유효성 체크 (입력값이 있으면 반드시 유효해야 함)
-                    if (point && !validatePoint(point)) {
-                        $pointMessage.text('학점은 0.0~4.5 사이여야 합니다.').addClass('error');
-                        return;
-                    }
-
-                    // 데이터 준비
-                    const userData = {
-                        password: newPassword || undefined,
-                        email: isEmailChangedLocal ? email : undefined,
-                        university: university || undefined,
-                        degree: degree || undefined,
-                        graduated: graduated || undefined,
-                        point: point ? parseFloat(point) : undefined
-                    };
-
-                 // AJAX 요청
-                    $.ajax({
-                        url: 'updateUserProfile.do',
-                        type: 'POST',
-                        data: JSON.stringify(userData),
-                        contentType: 'application/json',
+            function tryExitSite() {
+                if (confirm("정말 탈퇴하시겠습니까?")) {
+                    fetch("exit.do", {
+                        method: "POST",
                         headers: {
-                            'X-CSRF-TOKEN': $('[name=_csrf]').val()
+                            "Content-Type": "application/json"
                         },
-                        success: function(response) {
-                            console.log('Update response:', response);
-                            if (response.success) {
-
-                                // 비밀번호가 변경되었으면 로그인 페이지로 리다이렉트
-                                if (response.isPasswordChanged) {
-                                	alert('비밀번호가 변경되었습니다.다시 로그인 해주시길 바랍니다.');
-                                    	window.location.href = 'loginPage.do'; // 로그인 페이지로 이동
-                                } else {
-                                	alert('변경이 완료되었습니다.');
-                                    	location.reload(); // 다른 정보가 변경되었으면 페이지를 새로고침
-                                }
-                            } else {
-                                alert(response.message || '정보 업데이트 실패');
-                            }
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error('Update error:', textStatus, errorThrown);
-                            if (jqXHR.status === 403) {
-                                alert('보안 토큰이 유효하지 않습니다. 페이지를 새로고침해주세요.');
-                            } else {
-                                alert('변경 중 오류가 발생했습니다: ' + textStatus);
-                            }
-                        }
+                        body: JSON.stringify({ authority: 4 })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("탈퇴 처리 완료되었습니다.");
+                        location.href = "main.do"; // 로그아웃 또는 메인 이동
+                    })
+                    .catch(error => {
+                        alert("오류 발생: " + error);
                     });
-                });
-            } catch (error) {
-                console.error('Initialization error:', error);
-                alert('페이지 로드 중 오류가 발생했습니다.');
+                }
             }
-        });
-        function tryExitSite() {
-            if (confirm("정말 탈퇴하시겠습니까?")) {
-                fetch("exit.do", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ authority: 4 })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert("탈퇴 처리 완료되었습니다.");
-                    location.href = "main.do"; // 로그아웃 또는 메인 이동
-                })
-                .catch(error => {
-                    alert("오류 발생: " + error);
-                });
-            }
+        } catch (error) {
+            console.error('Initialization error:', error);
+            alert('페이지 로드 중 오류가 발생했습니다.');
         }
-    </script>
+    });
+</script>
 </head>
 <body>
 	<c:import url="/WEB-INF/views/common/header.jsp" />
