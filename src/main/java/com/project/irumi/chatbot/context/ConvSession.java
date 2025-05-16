@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.project.irumi.chatbot.model.dto.ChatMsg;
-
 
 
 public class ConvSession {
@@ -30,6 +28,7 @@ public class ConvSession {
 	
 
 	private Map<String, Set<String>> recommendedoptions = new HashMap<>();
+	private Set<String> havebeenoption = new HashSet<>();
 	private final List<String> contextHistory = new ArrayList<>();
 	
 
@@ -91,9 +90,15 @@ public class ConvSession {
 		this.recommendedoptions = null;
 	}
 	
+	
 	public Set<String> getOptions(String type) {
 	    return recommendedoptions.getOrDefault(type, Set.of());
 	}
+	
+    public void resetHaveBeenOption() {
+    	this.havebeenoption = null;
+    }
+    
 
 	
 	
@@ -172,6 +177,14 @@ public class ConvSession {
 		this.recommendedoptions = recommendedoptions;
 	}
 
+	public Set<String> getHavebeenoption() {
+		return havebeenoption;
+	}
+
+	public void setHavebeenoption(Set<String> havebeenoption) {
+		this.havebeenoption = havebeenoption;
+	}
+
 	
 
     
@@ -182,5 +195,6 @@ public class ConvSession {
 
 
 }
+
 
 
