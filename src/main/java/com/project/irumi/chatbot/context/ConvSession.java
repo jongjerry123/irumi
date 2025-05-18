@@ -87,7 +87,7 @@ public class ConvSession {
 	}
 	
 	public void resetRecommendedOption() {
-		this.recommendedoptions = null;
+		this.recommendedoptions = new HashMap<>();
 	}
 	
 	
@@ -96,7 +96,7 @@ public class ConvSession {
 	}
 	
     public void resetHaveBeenOption() {
-    	this.havebeenoption = null;
+    	this.havebeenoption = new HashSet<>();
     }
     
 

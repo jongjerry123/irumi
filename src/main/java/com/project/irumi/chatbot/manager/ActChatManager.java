@@ -218,6 +218,7 @@ public class ActChatManager {
 //					chatbotService.insertChatMsg(botChatMsg);
 //                    convManager.endSession(session.getUserId());   // 종료 누르면 바로 세션 삭제
                    session.resetRecommendedOption();
+                   session.resetHaveBeenOption();
                    return new ChatbotResponseDTO("이용해주셔서 감사합니다!");
                } else {
                    session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
@@ -277,7 +278,6 @@ public class ActChatManager {
 // 			botMsg.setMsgContent(msgBuilder.toString());
 // 			chatbotService.insertChatMsg(botMsg);
 			
-           session.resetRecommendedOption();
 			session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
 			return new ChatbotResponseDTO("아래 추천된 항목 중 원하는 요소를 선택해 주세요!", gptResults,
 					List.of("같은 유형으로 더 추천 받기", "다른 유형", "종료"));
@@ -306,8 +306,7 @@ public class ActChatManager {
 // 			botMsg.setRole("BOT");
 // 			botMsg.setMsgContent(msgBuilder.toString());
 // 			chatbotService.insertChatMsg(botMsg);
-			
-           session.resetRecommendedOption();       
+           
 			session.setChatState(StateActChat.SHOW_MORE_OPTIONS);
 			return new ChatbotResponseDTO("아래 추천된 항목 중 원하는 요소를 선택해 주세요!", serpResults,
 					List.of("같은 유형으로 더 추천 받기", "다른 유형", "종료"));
